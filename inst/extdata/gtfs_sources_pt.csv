@@ -1,0 +1,25 @@
+ID,LastUpdate,ReferenceDate,URL,Type,GTFSDocs
+cp,2025-02-01,2025-02-05,https://publico.cp.pt/gtfs/gtfs.zip,Long distance,https://www.transit.land/operators/o-eyc-cp
+autna,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1gah1x10RyFu7gJPweBcCXPd9vcFJFQ7c,Long distance,https://www.transit.land/operators/o-ez-autnatransportes
+AML,2025-02-01,2025-02-05,https://api.carrismetropolitana.pt/gtfs,Inter-urban,https://github.com/carrismetropolitana/api
+barreiro,2025-02-01,2025-02-05,https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip,Urban,https://www.tcbarreiro.pt/
+cascais,2025-02-01,2025-02-05,https://drive.google.com/u/0/uc?id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX&export=download,Urban,https://dadosabertos.cascais.pt/pt_PT/dataset/gtfs-mobicascais
+lisboa,2025-02-01,2025-02-05,https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS,Urban,https://gateway.carris.pt/apiui/#!/apis/2c05b837-1c8e-4b34-85b8-371c8edb344b/pages/d7f1c190-908d-4615-b1c1-90908d4615f5
+metroLisboa,2025-02-01,2025-02-05,https://www.metrolisboa.pt/google_transit/googleTransit.zip,Urban,https://www.transit.land/operators/o-eyckr-metrodelisboa
+fertagus,2025-02-01,2025-02-05,https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip,Urban,https://www.transit.land/operators/o-eyce-fertagus
+braga,2025-02-01,2025-02-05,https://tub.pt/developer/gtfs/feed/tub.zip,Urban,https://tub.pt/downloads/
+stcp,2025-02-01,2025-02-05,https://opendata.porto.digital/dataset/5275c986-592c-43f5-8f87-aabbd4e4f3a4/resource/1e0f4315-3694-42b0-a8ce-5218ad4742e5/download/horarios_gtfs_stcp_06_01_2025.zip,Urban,https://opendata.porto.digital/de/dataset/horarios-paragens-e-rotas-em-formato-gtfs-stcp/resource/1e0f4315-3694-42b0-a8ce-5218ad4742e5
+metroPorto,2025-02-01,2025-02-05,https://www.metrodoporto.pt/metrodoporto/uploads/document/file/693/google_transit_v2.zip,Urban,https://www.metrodoporto.pt/pages/337
+CIMMT,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1v9eGjezOzbaBQi-Aa5c15tZXcSiiDwqA,Inter-urban,https://www.transit.land/operators/o-e-rmtejo
+AMAL,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1CM8O4ndsfSJhka42SxFUZ9eB-wE10NqX,Inter-urban,https://www.transit.land/operators/o-ey-vizur
+faro,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1xNHjM7yl-SS1jCkGrvIBBlOhUkFfNBjY,Urban,https://www.transit.land/feeds/f-eyd-pxm
+tavira,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1C2KBOVsbm__ymWDgU1bXGbP0Gv3D2yo5,Urban,https://www.transit.land/operators/o-eyd-sobeedesce
+albufeira,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1tkKV40lQlFcLiJhq8SwZQdxNVjFclRCA,Urban,https://www.transit.land/operators/o-eyd-giro
+loule,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1w92h129CWNSoImBRZQOWT6KRPzSFwJ42,Urban,https://www.transit.land/operators/o-eyd-apanhame
+lagos,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1aPfsxHqopxxcjV8HlRzImzxh_a6zRxGp,Urban,https://www.transit.land/operators/o-ey9-aonda
+olhao,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1X5uXAYJ5ItxMhrnDZSz3v9-U3kgL6QbJ,Urban,https://www.transit.land/operators/o-eyd-circuitoolhao
+portimao,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1Ii02y25MCOilAaQixsZNs1rcgdvNoYCs,Urban,https://www.transit.land/operators/o-ey9-vaievem
+funchal,2025-02-01,2025-02-05,http://www.horariosdofunchal.pt/google_transit.zip,Urban,https://www.transit.land/operators/o-etgc-hf~urbano
+CIMRL,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=192Qat2jJKyv5hhO8T3eVT70M5NB0dtXC,Inter-urban,https://www.transit.land/operators/o-ez-rdlis
+leiria,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1NqcOk8IrlV73TBonJAxpzIUTjaAjF27M,Urban,https://www.transit.land/operators/o-ez1-rdlis
+lousada,2025-02-01,2025-02-05,https://dadosabertos.cm-lousada.pt/datasets/GTFS_CIMTS_UT3.zip,Inter-urban,https://nap-portugal.imt-ip.pt/nap/multimodalsupplydetail/195
