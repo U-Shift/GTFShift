@@ -16,13 +16,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' download_gtfs("https://operator.com/gtfs.zip", "operator_gtfs.zip")
+#' download("https://operator.com/gtfs.zip", "operator_gtfs.zip")
 #' }
 #'
 #' @import tidytransit
 #'
 #' @export
-download_gtfs <- function(gtfs_location, zipfile) {
+download <- function(gtfs_location, zipfile) {
 
   message(sprintf("Downloading GTFS file for %s...", gtfs_location))
 
@@ -47,7 +47,7 @@ download_gtfs <- function(gtfs_location, zipfile) {
 
   ## If no shapes.txt, create them automatically with GTFSwizard
   if (!("shapes" %in% names(gtfs))) {
-    gtfs_create_shapes(zipfile, zipfile)
+    create_shapes(zipfile, zipfile)
     warning(sprintf("> CREATED shapes.txt, the file as missing!"))
   }
 

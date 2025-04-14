@@ -3,7 +3,7 @@ Type: Package
 Title: Explore and Analyse General Transit Feed Specification (GTFS) Files With a Focus on Urban Mobility 
 Version: 0.1.0
 Authors@R: c(
-  person("Rosa", "Félix", , "rosamfelix@@tecnico.ulisboa.pt", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5642-6006")),
+  person("Rosa", "Félix", , "rosamfelix@@tecnico.ulisboa.pt", role = c("aut"), comment = c(ORCID = "0000-0002-5642-6006")),
   person("Gabriel", "Valença", , "gabrielvalenca@tecnico.ulisboa.pt", role = "aut", comment = c(ORCID = "0000-0002-3684-3005")),
   person("Gonçalo", "Matos", , "goncaloafmatos@tecnico.ulisboa.pt", role = c("aut", "cre")))
 Description: GTFShift emerged from the necessity to perform systematic analysis for academic research
@@ -12,14 +12,18 @@ Description: GTFShift emerged from the necessity to perform systematic analysis 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: 
-  tidytransit
-  GTFSwizard
-  zip
-  sf
-  tidyverse
-  lubridate
-  gtfsrouter
-  httr
+  tidytransit,
+  GTFSwizard,
+  zip,
+  sf,
+  tidyverse,
+  lubridate,
+  gtfsrouter,
+  httr,
   jsonlite
 URL: https://github.com/U-Shift/GTFShift
 RoxygenNote: 7.3.1
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
