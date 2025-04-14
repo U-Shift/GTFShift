@@ -1,16 +1,25 @@
 Package: GTFShift
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Explore and Analyse General Transit Feed Specification (GTFS) Files With a Focus on Urban Mobility 
 Version: 0.1.0
 Authors@R: c(
-    person(
-      "Jane", "Doe",
-      email = "jane@example.com",
-      role = c("aut", "cre")
-    )
-  )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+  person("Rosa", "Félix", , "rosamfelix@@tecnico.ulisboa.pt", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5642-6006")),
+  person("Gabriel", "Valença", , "gabrielvalenca@tecnico.ulisboa.pt", role = "aut", comment = c(ORCID = "0000-0002-3684-3005")),
+  person("Gonçalo", "Matos", , "goncaloafmatos@tecnico.ulisboa.pt", role = c("aut", "cre")))
+Description: GTFShift emerged from the necessity to perform systematic analysis for academic research
+  over General Transit Feed Specification (GTFS) files that were not supported by any R library. 
+  It compiles the methods developed for this purpose, aiming to contribute to an open source culture.
+License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
+Imports: 
+  tidytransit
+  GTFSwizard
+  zip
+  sf
+  tidyverse
+  lubridate
+  gtfsrouter
+  httr
+  jsonlite
+URL: https://github.com/U-Shift/GTFShift
+RoxygenNote: 7.3.1
