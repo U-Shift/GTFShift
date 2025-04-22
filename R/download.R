@@ -1,4 +1,4 @@
-#' GTFS download and validate integrity
+#' GTFS download and integrity validation
 #'
 #' Download GTFS file fixing any irregularities.
 #'

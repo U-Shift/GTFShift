@@ -41,7 +41,7 @@ This library offers a small database with a compilation of GTFS files for Portug
 ```{r message=TRUE, warning=FALSE}
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 summary(data)
-data[,]
+data[1:4,]
 ```
 
 ## Download and validate integrity

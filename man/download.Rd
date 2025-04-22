@@ -2,7 +2,7 @@
 % Please edit documentation in R/download.R
 \name{download}
 \alias{download}
-\title{GTFS download and validate integrity}
+\title{GTFS download and integrity validation}
 \usage{
 download(gtfs_location, zipfile)
 }

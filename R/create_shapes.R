@@ -3,7 +3,7 @@
 #' Opens GTFS and generates shapes based on stops positions, considering straight lines connecting them.
 #'
 #' @param gtfs_location String. The location of the GTFS zip file. Either local or URL.
-#' @param zipfile String. Path to the zip file the feed should be written to. The file is overwritten is it already exists.
+#' @param zipfile String. Path to the zip file the feed should be written to. The file is overwritten if it already exists.
 #'
 #' @details
 #' Shapes is created using `GTFSwizard::get_shapes` method.
@@ -21,7 +21,7 @@
 #' @import GTFSwizard
 #' @importFrom utils write.csv
 #'
-#' @export
+#' @noRd
 create_shapes <- function(gtfs_location, zipfile) {
   # GTFSwizard::get_shapes is automatically applied when it detected shapes are missing
   gtfs_fixed <- GTFSwizard::read_gtfs(gtfs_location)
