@@ -50,7 +50,7 @@ data[,]
 
 ```{r message=TRUE, warning=TRUE}
 # DOWNLOAD GTFS and store it locally
-gtfs_local <- lapply(data[6:7,]$ID, function(ID) {
+gtfs_local <- lapply(data[c(6,8),]$ID, function(ID) {
   return(GTFShift::download(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
 })
 ```
@@ -68,7 +68,18 @@ gtfs_list <- lapply(gtfs_local, function(location) {
 })
 
 # Perform unification
-GTFShift::unify(gtfs_list, "database/transit/gtfs_unified.zip", generateTransfers=TRUE)
+gtfs_united_path <- GTFShift::unify(gtfs_list, "database/transit/gtfs_unified.zip", generateTransfers=TRUE)
 ```
 
 
+# Distribute
+
+It can be displayed using `mapview`.
+
+```{r}
+library(mapview)
+
+gtfs_united <- GTFSwizard::read_gtfs(gtfs_united_path)
+mapview::mapview(GTFSwizard::get_shapes_sf(gtfs_united$shapes))
+mapview::mapview(GTFSwizard::get_stops_sf(gtfs_united$stops))
+```

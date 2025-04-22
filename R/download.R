@@ -48,7 +48,7 @@ download <- function(gtfs_location, zipfile) {
   ## If no shapes.txt, create them automatically with GTFSwizard
   if (!("shapes" %in% names(gtfs))) {
     create_shapes(zipfile, zipfile)
-    warning(sprintf("> CREATED shapes.txt, the file as missing!"))
+    warning(sprintf("> CREATED shapes.txt, the file was missing!"))
   }
 
   return(zipfile)

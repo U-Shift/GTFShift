@@ -12,6 +12,8 @@
 #' @details
 #' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
 #'
+#' @returns The path of the file written.
+#'
 #' @examples
 #' \dontrun{
 #' gtfs1 <- GTFSwizard::read_gtfs("gtfs1.zip")
@@ -26,7 +28,7 @@
 #' @import gtfsrouter
 #'
 #' @export
-gtfs_unify <- function(gtfss, zipfile, generateTransfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+unify <- function(gtfss, zipfile, generateTransfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
 
   # Open them with GTFSWizard and merge them
   message(sprintf("1. Starting merge process..."))

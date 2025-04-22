@@ -2,7 +2,7 @@
 title: "Get service frequency at stop per hour"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Stop frequency analysis}
+  %\VignetteIndexEntry{Get service frequency at stop per hour}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -82,7 +82,7 @@ summary(frequencies)
 
 # Distribute
 
-IT can be displayed using `mapview`.
+It can be displayed using `mapview`.
 
 ```{r}
 library(mapview)

@@ -28,6 +28,7 @@
 #' @import tidyverse
 #' @import lubridate
 #' @import tidytransit
+#' @import dplyr
 #'
 #' @export
 get_stop_hour_frequency <- function(gtfs, date=NULL, route_types=list(0,3,5,11), prepend_agency=TRUE) {

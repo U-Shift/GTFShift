@@ -19,6 +19,7 @@
 #'
 #' @import zip
 #' @import GTFSwizard
+#' @importFrom utils write.csv
 #'
 #' @export
 create_shapes <- function(gtfs_location, zipfile) {
