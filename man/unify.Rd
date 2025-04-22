@@ -34,6 +34,7 @@ Merge multiple GTFS into a single aggregated file.
 }
 \details{
 When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
+For a detailed example, see the vignette \code{vignette("unify")}.
 }
 \examples{
 \dontrun{

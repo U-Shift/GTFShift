@@ -32,6 +32,7 @@ For each stop, returns the number of departures aggregated per hour.
 }
 \details{
 This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
+For a detailed example, see the vignette \code{vignette("get_stop_hour_frequency")}.
 }
 \examples{
 \dontrun{
