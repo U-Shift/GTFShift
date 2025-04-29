@@ -15,7 +15,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, message=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 library(GTFShift)
+
+library(tidytransit)
+library(mapview)
 ```
 
 
@@ -23,34 +27,15 @@ library(GTFShift)
 
 Analyzing public transit frequency is important to understand its territorial coverage and dynamics, both on its spatial and temporal dimensions. `GTFShift` provides a simple way to perform this analysis, through `GTFShift::get_stop_hour_frequency()` method, explored in this document.
 
-# Download GTFS files 
-
-## Data source
-
-The gathering of the GTFS files can be simplified by using public archives like [transitfeeds.com](https://transitfeeds.com/) or [transit.land](https://www.transit.land/).
-
-This library offers a small database with a compilation of GTFS files for Portuguese operators. It is a CSV file, available at `extdata/gtfs_sources_pt.csv`, and has the following attributes:
-
-- `ID`, a string unique identifier of the region/city the GTFS file applies to;
-- `LastUpdate`, the date at which this database entry was last updated;
-- `ReferenceDate`, a representative Wednesday that falls within the GTFS calendar;
-- `URL`, the URL at which the GTFS file is available;
-- `GTFSDocs`, the URL to the page that documents the operator GTFS.
-
-
-```{r message=TRUE, warning=FALSE}
-data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-summary(data)
-data[1:4,]
-```
-
-## Download and validate integrity
-
-`GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `GTFShift::download()`. It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files.
+> This article uses a GTFS feed from the library GTFS database for Portugal as an example. Refer to the \code{vignette("download")} for more details.
 
 ```{r}
-# DOWNLOAD GTFS and store it locally
+# Get GTFS from library GTFS database for Portugal
+data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_local <- GTFShift::download(data[4,]$URL, sprintf("database/transit/%s_gtfs.zip", data[4,]$ID))
+
+# Load GTFS
+gtfs <- tidytransit::read_gtfs(gtfs_local)
 ```
 
 
@@ -59,10 +44,6 @@ gtfs_local <- GTFShift::download(data[4,]$URL, sprintf("database/transit/%s_gtfs
 The frequency analysis is performed through `GTFShift::get_stop_hour_frequency()`, producing, for each stop, an aggregated counting of bus servicing it per hour.
 
 ```{r}
-# Load GTFS
-library(tidytransit)
-gtfs <- tidytransit::read_gtfs(gtfs_local)
-
 # Perform frequency analysis
 frequencies <- GTFShift::get_stop_hour_frequency(gtfs)
 ```
@@ -79,13 +60,9 @@ It returns a data frame with the following columns:
 summary(frequencies)
 ```
 
-
-# Distribute
-
-It can be displayed using `mapview`.
+It can be displayed using mapview.
 
 ```{r}
-library(mapview)
 mapview::mapview(frequencies)
 ```
 
