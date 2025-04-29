@@ -7,6 +7,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<style>
+.leaflet-container {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+</style>
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -19,6 +27,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 library(GTFShift)
 
 library(GTFSwizard)
+library(dplyr)
 library(mapview)
 ```
 
@@ -61,13 +70,28 @@ gtfs_united <- GTFSwizard::read_gtfs(gtfs_united_path)
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
 ### Aggregated routes
 ```{r}
-mapview::mapview(GTFSwizard::get_shapes_sf(gtfs_united$shapes))
+shape_agency <- gtfs_united$trips %>%
+  left_join(gtfs_united$routes, by = "route_id") %>%
+  left_join(gtfs_united$agency, by = "agency_id") %>%
+  select(shape_id, agency_id, agency_name) %>%
+  distinct()
+shapes_sf = GTFSwizard::get_shapes_sf(gtfs_united$shapes) %>%
+  left_join(shape_agency, by = "shape_id")
+mapview::mapview(shapes_sf, zcol = "agency_name", legend = TRUE)
 ```
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
 ### Aggregated stops
 ```{r}
-mapview::mapview(GTFSwizard::get_stops_sf(gtfs_united$stops))
+stop_agency <- gtfs_united$stop_times  %>%
+  left_join(gtfs_united$trips, by = "trip_id") %>%
+  left_join(gtfs_united$routes, by = "route_id") %>%
+  left_join(gtfs_united$agency, by = "agency_id") %>%
+  select(stop_id, agency_id, agency_name) %>%
+  distinct()
+stops_sf = GTFSwizard::get_stops_sf(gtfs_united$stops) %>%
+  left_join(stop_agency, by = "stop_id")
+mapview::mapview(stops_sf, zcol = "agency_name", legend = TRUE)
 ```
 </div>
 </div>
