@@ -21,7 +21,8 @@ Imports:
   gtfsrouter,
   httr,
   jsonlite,
-  dplyr
+  dplyr,
+  stringr
 URL: https://github.com/U-Shift/GTFShift
 RoxygenNote: 7.3.2
 Suggests: 

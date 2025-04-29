@@ -42,6 +42,11 @@ download <- function(gtfs_location, zipfile) {
     warning(sprintf("> FIXED GTFS, there were %d stop times without arrival time!", stopsNPrev-stopsNAfter))
   }
 
+  ## If trips does not have shape_id column, create empty one
+  if (!("shape_id" %in% names(gtfs$trips))) {
+    gtfs$trips$shape_id = NA
+  }
+
   # STORE GTFS (zip generated here, because next validation uses GTFSWizard and not tidytransit, which are incompatible)
   tidytransit::write_gtfs(gtfs, zipfile)
 

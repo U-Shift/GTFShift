@@ -1,0 +1,228 @@
+---
+title: "Filter GTFS feeds"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Filter GTFS feeds}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(GTFShift)
+
+library(tidytransit)
+library(dplyr)
+library(mapview)
+```
+
+
+# Introduction 
+
+GTFS feeds do not have a defined scope regarding its coverage of the transportation system. Some can be bounded to one agency, whereas others can aggregate several modes in the same city, or even national wise.
+
+From the simpler to the most complex feeds, some analysis require to narrow the perspective. GTFShift provides some to help in this process.
+
+
+
+# Filters
+
+## Filter by agency
+
+> This example uses a national GTFS feed for long distance rail in Germany, retrieved from https://gtfs.de/en/feeds/de_fv/.
+
+```{r}
+# Load GTFS
+gtfs_local <- GTFShift::download("https://download.gtfs.de/germany/fv_free/latest.zip", "database/transit/germany_gtfs.zip")
+
+gtfs <- tidytransit::read_gtfs(gtfs_local)
+summary(gtfs)
+```
+
+Multimodal feeds aggregate several agencies. `GTFShift::filter_by_agency()`, allows to filter by the agency id, name, or both. You can filter by the `id` and/or `name` of the agency.
+
+```{r}
+# Filter by agency id
+gtfs_5 <- GTFShift::filter_by_agency(gtfs, id=5)
+summary(gtfs_5)
+
+# Filter by agency name
+gtfs_sncf <- GTFShift::filter_by_agency(gtfs, name="SNCF")
+summary(gtfs_sncf)
+```
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Original GTFS
+```{r}
+shape_agency <- gtfs$trips %>%
+  left_join(gtfs$routes, by = "route_id") %>%
+  left_join(gtfs$agency, by = "agency_id") %>%
+  select(shape_id, agency_id, agency_name) %>%
+  distinct()
+shape_agency$name = paste(shape_agency$agency_id, shape_agency$agency_name, sep=": ")
+shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) %>%
+  left_join(shape_agency, by = "shape_id")
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### GTFS filtered for agency `id=5`
+```{r}
+shape_agency <- gtfs_5$trips %>%
+  left_join(gtfs_5$routes, by = "route_id") %>%
+  left_join(gtfs_5$agency, by = "agency_id") %>%
+  select(shape_id, agency_id, agency_name) %>%
+  distinct()
+shape_agency$name = paste(shape_agency$agency_id, shape_agency$agency_name, sep=": ")
+shapes_sf = tidytransit::shapes_as_sf(gtfs_5$shapes) %>%
+  left_join(shape_agency, by = "shape_id")
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### GTFS filtered for agency `name=SNCF`
+```{r}
+shape_agency <- gtfs_sncf$trips %>%
+  left_join(gtfs_sncf$routes, by = "route_id") %>%
+  left_join(gtfs_sncf$agency, by = "agency_id") %>%
+  select(shape_id, agency_id, agency_name) %>%
+  distinct()
+shape_agency$name = paste(shape_agency$agency_id, shape_agency$agency_name, sep=": ")
+shapes_sf = tidytransit::shapes_as_sf(gtfs_sncf$shapes) %>%
+  left_join(shape_agency, by = "shape_id")
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+```
+</div>
+</div>
+
+
+## Filter by mode
+
+
+> This example uses a metropolitan wide GTFS feed for Los Angeles rail services, retrieved from https://developer.metro.net/gtfs-schedule-data/.
+
+```{r}
+# Load GTFS
+gtfs_local <- GTFShift::download("https://gitlab.com/LACMTA/gtfs_rail/raw/master/gtfs_rail.zip", "database/transit/la_gtfs.zip")
+
+gtfs <- tidytransit::read_gtfs(gtfs_local)
+summary(gtfs)
+```
+
+Multimodal feeds aggregate several modes. `GTFShift::filter_by_mode()` allows to restrict the feed to some modes only. Refer to routes.txt 'route_type' parameter on [GTFS documentation](https://gtfs.org/documentation/schedule/reference/#routestxt) for more details on the modes id that should be used as parameters.
+
+```{r}
+# Filter by mode tram
+gtfs_tram <- GTFShift::filter_by_modes(gtfs, modes=list(0))
+summary(gtfs_tram)
+```
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Original GTFS
+```{r}
+shape_route <- gtfs$trips %>%
+  left_join(gtfs$routes, by = "route_id") %>%
+  select(shape_id, route_id, route_type) %>%
+  distinct()
+shape_route$route_type = as.character(shape_route$route_type)
+shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) %>%
+  left_join(shape_route, by = "shape_id") %>%
+  filter(!is.na(route_type))
+mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### GTFS filtered for mode tram (0)
+```{r}
+shape_route <- gtfs_tram$trips %>%
+  left_join(gtfs_tram$routes, by = "route_id") %>%
+  select(shape_id, route_id, route_type) %>%
+  distinct()
+shape_route$route_type = as.character(shape_route$route_type)
+shapes_sf = tidytransit::shapes_as_sf(gtfs_tram$shapes) %>%
+  left_join(shape_route, by = "shape_id")
+mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE)
+```
+</div>
+</div>
+
+
+### Filter by route_name
+
+> This article uses a GTFS feed from the library GTFS database for Portugal as an example. Refer to the \code{vignette("download")} for more details.
+
+```{r}
+# Get GTFS from library GTFS database for Portugal
+data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_local <- GTFShift::download(data[data$ID=="faro",]$URL, "database/transit/faro_gtfs.zip")
+
+gtfs <- tidytransit::read_gtfs(gtfs_local)
+summary(gtfs)
+```
+
+GTFS feeds aggregate several routes. `GTFShift::filter_by_route_name()`, allows to filter the feed for specific routes, given a partial or total match with the short or the long name.
+
+```{r}
+# Filter by short_name with exact match
+gtfs_1 <- GTFShift::filter_by_route_name(gtfs, values=list("1"), short_name=TRUE, exact_match=TRUE)
+summary(gtfs_1)
+
+# Filter by long_name with partial match
+gtfs_terminal <- GTFShift::filter_by_route_name(gtfs, values=list("Terminal", "Rodoviário"), short_name=FALSE, exact_match=FALSE)
+summary(gtfs_terminal)
+```
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Original GTFS
+```{r}
+route_name <- gtfs$trips %>%
+  left_join(gtfs$routes, by = "route_id") %>%
+  select(shape_id, route_id, route_short_name, route_long_name) %>%
+  distinct()
+route_name$name = paste(route_name$route_short_name, route_name$route_long_name, sep=": ")
+shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) %>%
+  left_join(route_name, by = "shape_id")
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### GTFS filtered for route short name `1` (exact match)
+```{r}
+route_name <- gtfs_1$trips %>%
+  left_join(gtfs_1$routes, by = "route_id") %>%
+  select(shape_id, route_id, route_short_name, route_long_name) %>%
+  distinct()
+route_name$name = paste(route_name$route_short_name, route_name$route_long_name, sep=": ")
+shapes_sf = tidytransit::shapes_as_sf(gtfs_1$shapes) %>%
+  left_join(route_name, by = "shape_id")
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### GTFS filtered for route long name `Terminal`, `Rodoviário` (partial match)
+```{r}
+route_name <- gtfs_terminal$trips %>%
+  left_join(gtfs_terminal$routes, by = "route_id") %>%
+  select(shape_id, route_id, route_short_name, route_long_name) %>%
+  distinct()
+route_name$name = paste(gtfs_terminal$route_short_name, route_name$route_long_name, sep=": ")
+shapes_sf = tidytransit::shapes_as_sf(gtfs_terminal$shapes) %>%
+  left_join(route_name, by = "shape_id")
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+```
+</div>
+</div>
+
+
+
+
