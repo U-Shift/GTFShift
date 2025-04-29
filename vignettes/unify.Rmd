@@ -15,7 +15,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, message=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 library(GTFShift)
+
+library(GTFSwizard)
+library(mapview)
 ```
 
 
@@ -23,35 +27,18 @@ library(GTFShift)
 
 Public transit analysis takes advantage of the standardized GTFS format. However, its provision by operator makes it difficult for network aggregated analysis, considering connectivity and multimodality. `GTFShift::unify` proposes a simple solution to this problem, generating an aggregated GTFS file given several instances of these.
 
-# Download GTFS files 
+> This article uses GTFS feeds from the library GTFS database for Portugal as an example. Refer to the \code{vignette("download")} for more details.
 
-## Data source
-
-The gathering of the GTFS files can be simplified by using public archives like [transitfeeds.com](https://transitfeeds.com/) or [transit.land](https://www.transit.land/).
-
-This library offers a small database with a compilation of GTFS files for Portuguese operators. It is a CSV file, available at `extdata/gtfs_sources_pt.csv`, and has the following attributes:
-
-- `ID`, a string unique identifier of the region/city the GTFS file applies to;
-- `LastUpdate`, the date at which this database entry was last updated;
-- `ReferenceDate`, a representative Wednesday that falls within the GTFS calendar;
-- `URL`, the URL at which the GTFS file is available;
-- `GTFSDocs`, the URL to the page that documents the operator GTFS.
-
-
-```{r message=TRUE, warning=FALSE}
+```{r}
+# Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-summary(data)
-data[1:4,]
-```
-
-## Download and validate integrity
-
-`GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `GTFShift::download()`. It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files.
-
-```{r message=TRUE, warning=TRUE}
-# DOWNLOAD GTFS and store it locally
-gtfs_local <- lapply(data[c(6,8),]$ID, function(ID) {
+gtfs_local <- lapply(data[c(4,8),]$ID, function(ID) {
   return(GTFShift::download(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
+})
+
+# Load GTFS
+gtfs_list <- lapply(gtfs_local, function(location) {
+  return(GTFSwizard::read_gtfs(location))
 })
 ```
 
@@ -61,25 +48,28 @@ gtfs_local <- lapply(data[c(6,8),]$ID, function(ID) {
 The unification is performed through `GTFShift::unify()`, producing a single GTFS instance, saved as a ZIP file. Option `generateTransfers` enables the generation of `transfers.txt`, aggregating close stops, even if from different GTFS. 
 
 ```{r}
-# Load GTFS
-library(GTFSwizard)
-gtfs_list <- lapply(gtfs_local, function(location) {
-  return(GTFSwizard::read_gtfs(location))
-})
-
 # Perform unification
 gtfs_united_path <- GTFShift::unify(gtfs_list, "database/transit/gtfs_unified.zip", generateTransfers=TRUE)
 ```
-
-
-# Distribute
-
 It can be displayed using `mapview`.
 
 ```{r}
-library(mapview)
-
 gtfs_united <- GTFSwizard::read_gtfs(gtfs_united_path)
+```
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes
+```{r}
 mapview::mapview(GTFSwizard::get_shapes_sf(gtfs_united$shapes))
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated stops
+```{r}
 mapview::mapview(GTFSwizard::get_stops_sf(gtfs_united$stops))
 ```
+</div>
+</div>
+
+
