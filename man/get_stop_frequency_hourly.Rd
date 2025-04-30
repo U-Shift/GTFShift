@@ -12,7 +12,7 @@ get_stop_frequency_hourly(gtfs, date = NULL)
 \item{date}{Date. Reference date to consider when analyzing the GTFS file. Defaults to next business Wednesday in Portugal.}
 }
 \value{
-A `data.frame` object with the following columns:
+An `sf` `data.frame` object with the following columns:
 - `stop_id`, the `stop_id` attribute from `stops.txt` file;
 - `hour`, the hour for which the frequency applies (24 hour format);
 - `frequency`, the number of services provided at the stop for the corresponding 60 minutes period;
