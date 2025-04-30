@@ -9,7 +9,7 @@
 #' This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
 #' For a detailed example, see the vignette \code{vignette("analysis")}.
 #'
-#' @returns A `data.frame` object with the following columns:
+#' @returns An `sf` `data.frame` object with the following columns:
 #' - `stop_id`, the `stop_id` attribute from `stops.txt` file;
 #' - `hour`, the hour for which the frequency applies (24 hour format);
 #' - `frequency`, the number of services provided at the stop for the corresponding 60 minutes period;
