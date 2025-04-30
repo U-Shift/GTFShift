@@ -1,8 +1,8 @@
 ---
-title: "Get service frequency at stop per hour"
+title: "Analyse GTFS feeds"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Get service frequency at stop per hour}
+  %\VignetteIndexEntry{Analyse GTFS feeds}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -40,7 +40,8 @@ Analyzing public transit frequency is important to understand its territorial co
 ```{r}
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_local <- GTFShift::download(data[4,]$URL, sprintf("database/transit/%s_gtfs.zip", data[4,]$ID))
+gtfs_id = "cascais"
+gtfs_local <- GTFShift::download(data[data$ID==gtfs_id,]$URL, sprintf("database/transit/%s_gtfs.zip", data[data$ID==gtfs_id,]$ID))
 
 # Load GTFS
 gtfs <- tidytransit::read_gtfs(gtfs_local)
@@ -53,7 +54,7 @@ The frequency analysis is performed through `GTFShift::get_stop_hour_frequency()
 
 ```{r}
 # Perform frequency analysis
-frequencies <- GTFShift::get_stop_hour_frequency(gtfs)
+frequencies <- GTFShift::get_stop_frequency_hourly(gtfs)
 ```
 
 
@@ -71,7 +72,7 @@ summary(frequencies)
 It can be displayed using mapview.
 
 ```{r}
-mapview::mapview(frequencies)
+mapview::mapview(frequencies, zcol="frequency", legend=TRUE, cex=4)
 ```
 
 
