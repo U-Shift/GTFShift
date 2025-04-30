@@ -3,13 +3,11 @@
 #' For each stop, returns the number of departures aggregated per hour.
 #'
 #' @param gtfs tidygtfs. GTFS loaded using tidytransit::read_gtfs.
-#' @param date Reference date to consider when analysing the GTFS file. Defaults to next business wednesday (in Portugal).
-#' @param route_types Restricts analysis to defined route_types, defaults to those that have conflicts on urban environments: tram and bus.
-#' @param prepend_agency Boolean. When true, stop_id is prepended with agency_id to avoid duplicate stop ids from multiple GTFS merging.
+#' @param date Date. Reference date to consider when analyzing the GTFS file. Defaults to next business Wednesday in Portugal.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
-#' For a detailed example, see the vignette \code{vignette("get_stop_hour_frequency")}.
+#' For a detailed example, see the vignette \code{vignette("analysis")}.
 #'
 #' @returns A `data.frame` object with the following columns:
 #' - `stop_id`, the `stop_id` attribute from `stops.txt` file;
@@ -20,7 +18,7 @@
 #' @examples
 #' \dontrun{
 #' gtfs <- tidytransit::read_gtfs("gtfs.zip")
-#' frequency_analysis <- get_stop_hour_frequency(gtfs)
+#' frequency_analysis <- get_stop_frequency_hourly(gtfs)
 #' }
 #'
 #' @seealso [tidytransit::read_gtfs()]
@@ -32,7 +30,7 @@
 #' @import dplyr
 #'
 #' @export
-get_stop_hour_frequency <- function(gtfs, date=NULL, route_types=list(0,3,5,11), prepend_agency=TRUE) {
+get_stop_frequency_hourly <- function(gtfs, date=NULL) {
   message(sprintf("Analysing GTFS..."))
 
   ## Consider transit data for one day only
@@ -45,30 +43,11 @@ get_stop_hour_frequency <- function(gtfs, date=NULL, route_types=list(0,3,5,11),
     gtfs, extract_date = date
   )
 
-  # Consider trips for defined modes only
-  if (!is.null(route_types)) {
-    message(sprintf("> Filtering by route types %s...", toString(route_types)))
-    routesNBefore <- length(gtfs_date$routes$route_id)
-    tripsNBefore <- length(gtfs_date$trips$trip_id)
-
-    routes_ids <- gtfs_date$routes[gtfs_date$routes$route_type %in% route_types, ]$route_id
-    trips_ids <- gtfs_date$trips[gtfs_date$trips$route_id %in% routes_ids, ]$trip_id
-    gtfs_date <- tidytransit::filter_feed_by_trips(gtfs_date, trips_ids)
-
-    routesNAfter = length(gtfs_date$routes$route_id)
-    tripsNAfter = length(gtfs_date$trips$trip_id)
-    message(sprintf("> Removed %d routes, representing %d trips, proceding analysis...", routesNBefore-routesNAfter, tripsNBefore-tripsNAfter))
-  }
-
   message(sprintf("> Found %d routes operating %d trips on %d stops...",
-                  length(gtfs_date$trips$trip_id),
-                  length(gtfs_date$routes$route_id),
-                  length(gtfs_date$stops$stop_id)
+    length(gtfs_date$trips$trip_id),
+    length(gtfs_date$routes$route_id),
+    length(gtfs_date$stops$stop_id)
   ))
-
-  if (length(gtfs_date$trips$trip_id)==0) {
-    stop("No trips found after filtering! Make sure you have a valid GTFS!")
-  }
 
   # PROCESS GTFS, generating table calculating the frequencies per bus stop
 
@@ -153,11 +132,6 @@ get_stop_hour_frequency <- function(gtfs, date=NULL, route_types=list(0,3,5,11),
     left_join(gtfs_date$stops |>
                 select(stop_id, stop_lon, stop_lat), by = "stop_id") |>
     st_as_sf(crs = 4326, coords = c("stop_lon", "stop_lat"))
-
-  ## Prepend stop_id with GTFS.agency.agency_id to avoid duplicate stop ids from multiple GTFS merging
-  if (prepend_agency) {
-    table$stop_id <- paste0(sprintf("%s_", gtfs$agency$agency_id), table$stop_id)
-  }
 
   message("Finished GTFS analysis!")
 
