@@ -2,8 +2,8 @@ pandoc: '3.2'
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
+  analyse: analyse.html
   download: download.html
   filter: filter.html
-  get_stop_hour_frequency: get_stop_hour_frequency.html
   unify: unify.html
-last_built: 2025-04-29T17:41Z
+last_built: 2025-04-30T15:56Z

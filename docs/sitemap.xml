@@ -2,6 +2,7 @@
 <url><loc>/404.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
 <url><loc>/LICENSE.html</loc></url>
+<url><loc>/articles/analyse.html</loc></url>
 <url><loc>/articles/download.html</loc></url>
 <url><loc>/articles/filter.html</loc></url>
 <url><loc>/articles/get_stop_hour_frequency.html</loc></url>
@@ -14,6 +15,8 @@
 <url><loc>/reference/filter_by_agency.html</loc></url>
 <url><loc>/reference/filter_by_modes.html</loc></url>
 <url><loc>/reference/filter_by_route_name.html</loc></url>
+<url><loc>/reference/get_route_frequency_hourly.html</loc></url>
+<url><loc>/reference/get_stop_frequency_hourly.html</loc></url>
 <url><loc>/reference/get_stop_hour_frequency.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/unify.html</loc></url>
