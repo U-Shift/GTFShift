@@ -1,6 +1,4 @@
-#' GTFS unify
-#'
-#' Merge multiple GTFS into a single aggregated file.
+#' Merge multiple GTFS into a single aggregated file
 #'
 #' @param gtfss tidygtfs[]. List of GTFS loaded using GTFSwizard::read_gtfs.
 #' @param zipfile String. Path to the zip file the feed should be written to. The file is overwritten if it already exists.
@@ -11,7 +9,7 @@
 #'
 #' @details
 #' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
-#' For a detailed example, see the vignette \code{vignette("unify")}.
+#' For a detailed example, see the \code{vignette("unify")}.
 #'
 #' @returns The path of the file written.
 #'
@@ -19,7 +17,7 @@
 #' \dontrun{
 #' gtfs1 <- GTFSwizard::read_gtfs("gtfs1.zip")
 #' gtfs2 <- GTFSwizard::read_gtfs("gtfs2.zip")
-#' gtfs_unify(list(gtfs1, gtfs2), "gtfs_unified.zip", TRUE)
+#' unified <- GTFShift::unify(list(gtfs1, gtfs2), "gtfs_unified.zip", TRUE)
 #' }
 #'
 #' @seealso [GTFSwizard::read_gtfs()]

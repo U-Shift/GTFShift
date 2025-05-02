@@ -48,7 +48,7 @@ From the simpler to the most complex feeds, some analysis require to narrow the 
 
 ```{r}
 # Load GTFS
-gtfs_local <- GTFShift::download("https://download.gtfs.de/germany/fv_free/latest.zip", "database/transit/germany_gtfs.zip")
+gtfs_local <- GTFShift::download_feed("https://download.gtfs.de/germany/fv_free/latest.zip", "database/transit/germany_gtfs.zip")
 
 gtfs <- tidytransit::read_gtfs(gtfs_local)
 summary(gtfs)
@@ -78,7 +78,7 @@ shape_agency <- gtfs$trips %>%
 shape_agency$name = paste(shape_agency$agency_id, shape_agency$agency_name, sep=": ")
 shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) %>%
   left_join(shape_agency, by = "shape_id")
-mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Agency")
 ```
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -92,7 +92,7 @@ shape_agency <- gtfs_5$trips %>%
 shape_agency$name = paste(shape_agency$agency_id, shape_agency$agency_name, sep=": ")
 shapes_sf = tidytransit::shapes_as_sf(gtfs_5$shapes) %>%
   left_join(shape_agency, by = "shape_id")
-mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Agency")
 ```
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -106,7 +106,7 @@ shape_agency <- gtfs_sncf$trips %>%
 shape_agency$name = paste(shape_agency$agency_id, shape_agency$agency_name, sep=": ")
 shapes_sf = tidytransit::shapes_as_sf(gtfs_sncf$shapes) %>%
   left_join(shape_agency, by = "shape_id")
-mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Agency")
 ```
 </div>
 </div>
@@ -119,7 +119,7 @@ mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
 
 ```{r}
 # Load GTFS
-gtfs_local <- GTFShift::download("https://gitlab.com/LACMTA/gtfs_rail/raw/master/gtfs_rail.zip", "database/transit/la_gtfs.zip")
+gtfs_local <- GTFShift::download_feed("https://gitlab.com/LACMTA/gtfs_rail/raw/master/gtfs_rail.zip", "database/transit/la_gtfs.zip")
 
 gtfs <- tidytransit::read_gtfs(gtfs_local)
 summary(gtfs)
@@ -145,7 +145,7 @@ shape_route$route_type = as.character(shape_route$route_type)
 shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) %>%
   left_join(shape_route, by = "shape_id") %>%
   filter(!is.na(route_type))
-mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE)
+mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE, layer.name="Route type")
 ```
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -158,7 +158,7 @@ shape_route <- gtfs_tram$trips %>%
 shape_route$route_type = as.character(shape_route$route_type)
 shapes_sf = tidytransit::shapes_as_sf(gtfs_tram$shapes) %>%
   left_join(shape_route, by = "shape_id")
-mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE)
+mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE, layer.name="Route type")
 ```
 </div>
 </div>
@@ -166,12 +166,12 @@ mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE)
 
 ### Filter by route_name
 
-> This article uses a GTFS feed from the library GTFS database for Portugal as an example. Refer to the \code{vignette("download")} for more details.
+> This article uses a GTFS feed from the library GTFS database for Portugal as an example. Refer to the [vignette("download")](./download) for more details.
 
 ```{r}
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_local <- GTFShift::download(data[data$ID=="faro",]$URL, "database/transit/faro_gtfs.zip")
+gtfs_local <- GTFShift::download_feed(data[data$ID=="faro",]$URL, "database/transit/faro_gtfs.zip")
 
 gtfs <- tidytransit::read_gtfs(gtfs_local)
 summary(gtfs)
@@ -200,7 +200,7 @@ route_name <- gtfs$trips %>%
 route_name$name = paste(route_name$route_short_name, route_name$route_long_name, sep=": ")
 shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) %>%
   left_join(route_name, by = "shape_id")
-mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Route name")
 ```
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -213,7 +213,7 @@ route_name <- gtfs_1$trips %>%
 route_name$name = paste(route_name$route_short_name, route_name$route_long_name, sep=": ")
 shapes_sf = tidytransit::shapes_as_sf(gtfs_1$shapes) %>%
   left_join(route_name, by = "shape_id")
-mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Route name")
 ```
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -226,7 +226,7 @@ route_name <- gtfs_terminal$trips %>%
 route_name$name = paste(gtfs_terminal$route_short_name, route_name$route_long_name, sep=": ")
 shapes_sf = tidytransit::shapes_as_sf(gtfs_terminal$shapes) %>%
   left_join(route_name, by = "shape_id")
-mapview::mapview(shapes_sf, zcol = "name", legend = TRUE)
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Route name")
 ```
 </div>
 </div>
