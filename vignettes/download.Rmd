@@ -1,8 +1,8 @@
 ---
-title: "Download GTFS files"
+title: "Download transit data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Download GTFS files}
+  %\VignetteIndexEntry{Download transit data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,12 +21,15 @@ library(GTFShift)
 library(tidytransit)
 ```
 
+# Introduction
+
+Performing analysis over transit requires data on the operation and infrastructure. GTFShift includes some built in methods that can you assist gathering it.
 
 # Download GTFS files 
 
 ## Data source
 
-The gathering of the GTFS files can be simplified by using public archives like [transitfeeds.com](https://transitfeeds.com/) or [transit.land](https://www.transit.land/).
+The gathering of the GTFS files can be simplified by using public archives like [mobilitydatabase.org](https://mobilitydatabase.org/) or [transit.land](https://www.transit.land/).
 
 This library offers a small database with a compilation of GTFS files for Portuguese operators. It is a CSV file, available at `extdata/gtfs_sources_pt.csv`, and has the following attributes:
 
@@ -49,7 +52,7 @@ data[1:4,]
 
 ```{r}
 # DOWNLOAD GTFS and store it locally
-gtfs_local <- GTFShift::download(data[4,]$URL, sprintf("database/transit/%s_gtfs.zip", data[4,]$ID))
+gtfs_local <- GTFShift::download_feed(data[4,]$URL, sprintf("database/transit/%s_gtfs.zip", data[4,]$ID))
 print(sprintf("GTFS downloaded and stored at %s", gtfs_local))
 ```
 

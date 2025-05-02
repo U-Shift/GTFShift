@@ -22,7 +22,7 @@
 #' @import tidytransit
 #'
 #' @export
-download <- function(gtfs_location, zipfile) {
+download_feed <- function(gtfs_location, zipfile) {
 
   message(sprintf("Downloading GTFS file for %s...", gtfs_location))
 
