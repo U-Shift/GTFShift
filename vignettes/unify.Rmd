@@ -36,13 +36,13 @@ library(mapview)
 
 Public transit analysis takes advantage of the standardized GTFS format. However, its provision by operator makes it difficult for network aggregated analysis, considering connectivity and multimodality. `GTFShift::unify` proposes a simple solution to this problem, generating an aggregated GTFS file given several instances of these.
 
-> This article uses GTFS feeds from the library GTFS database for Portugal as an example. Refer to the \code{vignette("download")} for more details.
+> This article uses GTFS feeds from the library GTFS database for Portugal as an example. Refer to the [vignette("download")](./download) for more details.
 
 ```{r}
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_local <- lapply(data[c(4,8),]$ID, function(ID) {
-  return(GTFShift::download(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
+  return(GTFShift::download_feed(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
 })
 
 # Load GTFS
@@ -75,9 +75,12 @@ shape_agency <- gtfs_united$trips %>%
   left_join(gtfs_united$agency, by = "agency_id") %>%
   select(shape_id, agency_id, agency_name) %>%
   distinct()
+
 shapes_sf = GTFSwizard::get_shapes_sf(gtfs_united$shapes) %>%
-  left_join(shape_agency, by = "shape_id")
-mapview::mapview(shapes_sf, zcol = "agency_name", legend = TRUE)
+  left_join(shape_agency, by = "shape_id") %>%
+  filter(!is.na(agency_id))
+  
+mapview::mapview(shapes_sf, zcol = "agency_name", legend = TRUE, layer.name="Agency")
 ```
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -89,9 +92,12 @@ stop_agency <- gtfs_united$stop_times  %>%
   left_join(gtfs_united$agency, by = "agency_id") %>%
   select(stop_id, agency_id, agency_name) %>%
   distinct()
+
 stops_sf = GTFSwizard::get_stops_sf(gtfs_united$stops) %>%
-  left_join(stop_agency, by = "stop_id")
-mapview::mapview(stops_sf, zcol = "agency_name", legend = TRUE)
+  left_join(stop_agency, by = "stop_id") %>%
+  filter(!is.na(agency_id))
+
+mapview::mapview(stops_sf, zcol = "agency_name", legend = TRUE, layer.name="Agency")
 ```
 </div>
 </div>

@@ -8,7 +8,7 @@
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour.
-#' For a detailed example, see the vignette \code{vignette("analyse")}.
+#' For a detailed example, see the \code{vignette("analyse")}.
 #'
 #' Adapted from https://github.com/Bondify/GTFS_in_R/.
 #'
