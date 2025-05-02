@@ -15,12 +15,14 @@ get_route_frequency_hourly(gtfs, date = NULL, overline = FALSE)
 }
 \value{
 An `sf` `data.frame` object with the following columns (the first three are only present if `overline=FALSE`):
-- `route_id`, the `route_id` attribute from `routes.txt` file;
-- `route_short_name`, the `route_short_name` attribute from `routes.txt` file;
-- `direction_id`, the `direction_id` attribute from `trips.txt` file;
-- `arrival_hour`, the hour for which the frequency applies (24 hour format);
-- `frequency`, the number of services for the route that depart from the first stop for the corresponding 60 minutes period;
-- `geometry`, the route shape.
+\itemize{
+ \item `route_id`, the `route_id` attribute from `routes.txt` file.
+ \item `route_short_name`, the `route_short_name` attribute from `routes.txt` file.
+ \item `direction_id`, the `direction_id` attribute from `trips.txt` file.
+ \item `arrival_hour`, the hour for which the frequency applies (24 hour format).
+ \item `frequency`, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
+ \item `geometry`, the route shape.
+}
 }
 \description{
 For each route, returns the number of departures aggregated per hour.

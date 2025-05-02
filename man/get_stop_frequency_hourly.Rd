@@ -13,10 +13,12 @@ get_stop_frequency_hourly(gtfs, date = NULL)
 }
 \value{
 An `sf` `data.frame` object with the following columns:
-- `stop_id`, the `stop_id` attribute from `stops.txt` file;
-- `hour`, the hour for which the frequency applies (24 hour format);
-- `frequency`, the number of services provided at the stop for the corresponding 60 minutes period;
-- `geometry`, the stop coordinates.
+\itemize{
+ \item `stop_id`, the `stop_id` attribute from `stops.txt` file.
+ \item `hour`, the hour for which the frequency applies (24 hour format).
+ \item `frequency`, the number of services provided at the stop for the corresponding 60 minutes period.
+ \item `geometry`, the stop coordinates.
+}
 }
 \description{
 For each stop, returns the number of departures aggregated per hour.
