@@ -7,6 +7,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<style>
+.leaflet-container {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+</style>
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -19,6 +27,8 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 library(GTFShift)
 
 library(tidytransit)
+library(sf)
+library(mapview)
 ```
 
 # Introduction
@@ -59,5 +69,22 @@ print(sprintf("GTFS downloaded and stored at %s", gtfs_local))
 ```{r}
 gtfs <- tidytransit::read_gtfs(gtfs_local)
 summary(gtfs)
+```
+
+# Download bus lanes 
+
+Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics. `GTFShift::download_bus_lanes` allows to obtain the bus lanes network on Open Street Maps for a given area.
+
+```{r}
+aml <- st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg")
+aml <- st_transform(aml, 4326)
+
+lisboa <- aml[aml$Concelho == "Lisboa", ]
+
+bbox = st_bbox(lisboa)
+
+bus_lanes <- GTFShift::download_bus_lanes(bbox)
+
+mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
 
