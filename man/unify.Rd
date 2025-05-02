@@ -2,7 +2,7 @@
 % Please edit documentation in R/unify.R
 \name{unify}
 \alias{unify}
-\title{GTFS unify}
+\title{Merge multiple GTFS into a single aggregated file}
 \usage{
 unify(
   gtfss,
@@ -30,17 +30,17 @@ unify(
 The path of the file written.
 }
 \description{
-Merge multiple GTFS into a single aggregated file.
+Merge multiple GTFS into a single aggregated file
 }
 \details{
 When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
-For a detailed example, see the vignette \code{vignette("unify")}.
+For a detailed example, see the \code{vignette("unify")}.
 }
 \examples{
 \dontrun{
 gtfs1 <- GTFSwizard::read_gtfs("gtfs1.zip")
 gtfs2 <- GTFSwizard::read_gtfs("gtfs2.zip")
-gtfs_unify(list(gtfs1, gtfs2), "gtfs_unified.zip", TRUE)
+unified <- GTFShift::unify(list(gtfs1, gtfs2), "gtfs_unified.zip", TRUE)
 }
 
 }
