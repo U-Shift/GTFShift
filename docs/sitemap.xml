@@ -12,6 +12,8 @@
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/create_shapes.html</loc></url>
 <url><loc>/reference/download.html</loc></url>
+<url><loc>/reference/download_bus_lanes.html</loc></url>
+<url><loc>/reference/download_feed.html</loc></url>
 <url><loc>/reference/filter_by_agency.html</loc></url>
 <url><loc>/reference/filter_by_modes.html</loc></url>
 <url><loc>/reference/filter_by_route_name.html</loc></url>
@@ -19,6 +21,7 @@
 <url><loc>/reference/get_stop_frequency_hourly.html</loc></url>
 <url><loc>/reference/get_stop_hour_frequency.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/query_mobilitydatabase.html</loc></url>
 <url><loc>/reference/unify.html</loc></url>
 </urlset>
 

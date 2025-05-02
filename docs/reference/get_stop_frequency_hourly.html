@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">GTFShift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/analyse.html">Analyse GTFS feeds</a>
     </li>
     <li>
-      <a href="../articles/download.html">Download GTFS files</a>
+      <a href="../articles/download.html">Download transit data</a>
     </li>
     <li>
       <a href="../articles/filter.html">Filter GTFS feeds</a>
@@ -86,16 +86,15 @@
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An `sf` `data.frame` object with the following columns:
-- `stop_id`, the `stop_id` attribute from `stops.txt` file;
-- `hour`, the hour for which the frequency applies (24 hour format);
-- `frequency`, the number of services provided at the stop for the corresponding 60 minutes period;
-- `geometry`, the stop coordinates.</p>
-    </div>
+    <p>An `sf` `data.frame` object with the following columns:</p><ul><li><p>`stop_id`, the `stop_id` attribute from `stops.txt` file.</p></li>
+<li><p>`hour`, the hour for which the frequency applies (24 hour format).</p></li>
+<li><p>`frequency`, the number of services provided at the stop for the corresponding 60 minutes period.</p></li>
+<li><p>`geometry`, the stop coordinates.</p></li>
+</ul></div>
     <div id="details">
     <h2>Details</h2>
     <p>This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
-For a detailed example, see the vignette <code>vignette("analysis")</code>.</p>
+For a detailed example, see the <code><a href="../articles/analyse.html">vignette("analyse")</a></code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
