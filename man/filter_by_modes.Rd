@@ -19,7 +19,7 @@ Filter GTFS feed by mode
 }
 \details{
 Allows to filter a GTFS feed for the type of transportation used, allowing for a more narrow analysis of multimodal files.
-Refer to routes.txt `route_type` parameter on [GTFS documentation](https://gtfs.org/documentation/schedule/reference/#routestxt) for more details.
+Refer to routes.txt `route_type` parameter on \href{https://gtfs.org/documentation/schedule/reference/#routestxt}{GTFS documentation} for more details.
 }
 \examples{
 \dontrun{

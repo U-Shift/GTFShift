@@ -19,8 +19,10 @@ Download GTFS file fixing any irregularities.
 }
 \details{
 In addition to downloading the GTFS feed zip file, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
-- `stop_times.txt` with empty `arrival_time` or `departure_time`, filtering rows that do not comply;
-- Feeds with missing `shapes.txt` file, generating it with `GTFShift::create_shapes`.
+\itemize{
+ \item `stop_times.txt` with empty `arrival_time` or `departure_time`, filtering rows that do not comply;
+ \item Feeds with missing `shapes.txt` file, generating it with `GTFShift::create_shapes`.
+}
 }
 \examples{
 \dontrun{
