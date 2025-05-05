@@ -2,7 +2,7 @@
 #'
 #' For each route, returns the number of departures aggregated per hour.
 #'
-#' @param gtfs tidygtfs. GTFS loaded using tidytransit::read_gtfs.
+#' @param gtfs tidygtfs. GTFS feed.
 #' @param date Date. Reference date to consider when analysing the GTFS file. Defaults to next business Wednesday in Portugal.
 #' @param overline Boolean. Defaults to FALSE. If TRUE, routes are aggregated using stplanr::overline2, overlapping lines and converting them into a single route network.
 #'
@@ -24,8 +24,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- tidytransit::read_gtfs("gtfs.zip")
-#' frequency_analysis <- get_route_frequency_hourly(gtfs)
+#' gtfs <- GTFShift::download_feed("gtfs.zip")
+#' frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 #' }
 #'
 #' @seealso [tidytransit::read_gtfs()], [stplanr::overline2]

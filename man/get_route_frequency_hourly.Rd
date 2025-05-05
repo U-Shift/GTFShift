@@ -35,8 +35,8 @@ Adapted from https://github.com/Bondify/GTFS_in_R/.
 }
 \examples{
 \dontrun{
-gtfs <- tidytransit::read_gtfs("gtfs.zip")
-frequency_analysis <- get_route_frequency_hourly(gtfs)
+gtfs <- GTFShift::download_feed("gtfs.zip")
+frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 }
 
 }

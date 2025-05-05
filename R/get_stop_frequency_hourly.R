@@ -2,7 +2,7 @@
 #'
 #' For each stop, returns the number of departures aggregated per hour.
 #'
-#' @param gtfs tidygtfs. GTFS loaded using tidytransit::read_gtfs.
+#' @param gtfs tidygtfs. GTFS feed.
 #' @param date Date. Reference date to consider when analyzing the GTFS file. Defaults to next business Wednesday in Portugal.
 #'
 #' @details
@@ -19,11 +19,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- tidytransit::read_gtfs("gtfs.zip")
-#' frequency_analysis <- get_stop_frequency_hourly(gtfs)
+#' gtfs <- GTFShift::download_feed("gtfs.zip")
+#' frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
 #' }
-#'
-#' @seealso [tidytransit::read_gtfs()]
 #'
 #' @import sf
 #' @import tidyverse

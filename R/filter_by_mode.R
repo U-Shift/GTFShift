@@ -1,6 +1,6 @@
 #' Filter GTFS feed by mode
 #'
-#' @param gtfs tidygtfs. GTFS loaded using tidytransit::read_gtfs.
+#' @param gtfs tidygtfs. GTFS feed.
 #' @param modes Integer[]. A list with the ids of modes to consider.
 #'
 #' @details
@@ -11,11 +11,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- tidytransit::read_gtfs("gtfs.zip")
-#' gtfs_filtered <- filter_by_modes(gtfs, list(0,1))
+#' gtfs <- GTFShift::download_feed("gtfs.zip")
+#' gtfs_filtered <- GTFShift::filter_by_modes(gtfs, list(0,1))
 #' }
-#'
-#' @seealso [tidytransit::read_gtfs()]
 #'
 #' @import tidytransit
 #' @import dplyr

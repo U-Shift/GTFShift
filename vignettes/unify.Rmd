@@ -1,8 +1,8 @@
 ---
-title: "GTFS unification"
+title: "Aggregate GTFS feeds"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GTFS unification}
+  %\VignetteIndexEntry{Aggregate GTFS feeds}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 library(GTFShift)
 
-library(GTFSwizard)
+library(tidytransit)
 library(dplyr)
 library(mapview)
 ```
@@ -41,13 +41,9 @@ Public transit analysis takes advantage of the standardized GTFS format. However
 ```{r}
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_local <- lapply(data[c(4,8),]$ID, function(ID) {
-  return(GTFShift::download_feed(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
-})
 
-# Load GTFS
-gtfs_list <- lapply(gtfs_local, function(location) {
-  return(GTFSwizard::read_gtfs(location))
+gtfs_list <- lapply(c("barreiro", "fertagus"), function(ID) {
+  return(GTFShift::download_feed(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
 })
 ```
 
@@ -58,13 +54,10 @@ The unification is performed through `GTFShift::unify()`, producing a single GTF
 
 ```{r}
 # Perform unification
-gtfs_united_path <- GTFShift::unify(gtfs_list, "database/transit/gtfs_unified.zip", generateTransfers=TRUE)
+gtfs_united <- GTFShift::unify(gtfs_list, generateTransfers=TRUE)
+summary(gtfs_united)
 ```
 It can be displayed using `mapview`.
-
-```{r}
-gtfs_united <- GTFSwizard::read_gtfs(gtfs_united_path)
-```
 
 <div style="display: flex; gap: 20px; overflow-x: auto;">
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -76,7 +69,7 @@ shape_agency <- gtfs_united$trips %>%
   select(shape_id, agency_id, agency_name) %>%
   distinct()
 
-shapes_sf = GTFSwizard::get_shapes_sf(gtfs_united$shapes) %>%
+shapes_sf = tidytransit::shapes_as_sf(gtfs_united$shapes) %>%
   left_join(shape_agency, by = "shape_id") %>%
   filter(!is.na(agency_id))
   
@@ -93,7 +86,7 @@ stop_agency <- gtfs_united$stop_times  %>%
   select(stop_id, agency_id, agency_name) %>%
   distinct()
 
-stops_sf = GTFSwizard::get_stops_sf(gtfs_united$stops) %>%
+stops_sf = tidytransit::stops_as_sf(gtfs_united$stops) %>%
   left_join(stop_agency, by = "stop_id") %>%
   filter(!is.na(agency_id))
 

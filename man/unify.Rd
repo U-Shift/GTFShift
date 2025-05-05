@@ -6,7 +6,7 @@
 \usage{
 unify(
   gtfss,
-  zipfile,
+  store_path = NA,
   generateTransfers = TRUE,
   transfer_distance = 300,
   transfer_time = 120,
@@ -14,38 +14,39 @@ unify(
 )
 }
 \arguments{
-\item{gtfss}{tidygtfs[]. List of GTFS loaded using GTFSwizard::read_gtfs.}
+\item{gtfss}{tidygtfs[]. List of GTFS feeds.}
 
-\item{zipfile}{String. Path to the zip file the feed should be written to. The file is overwritten if it already exists.}
+\item{generateTransfers}{Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.}
 
-\item{generateTransfers}{Boolean. When true (default), generates transfers.txt, aggregating close stops, even if from different GTFS.}
+\item{transfer_distance}{Integer. (Default 300) Upper straight-line distance limit in metres for transfers.}
 
-\item{transfer_distance}{Integer. Upper straight-line distance limit in metres for transfers.}
+\item{transfer_time}{Integer. (Default 120) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.}
 
-\item{transfer_time}{Integer. Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.}
+\item{transfer_street_routing}{(Default FALSE) If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).}
 
-\item{transfer_street_routing}{If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).}
+\item{store_path.}{String. (Optional) If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.}
 }
 \value{
-The path of the file written.
+A tidygtfs object.
 }
 \description{
 Merge multiple GTFS into a single aggregated file
 }
 \details{
+Aggregates multiple feeds using `GTFSwizard::merge_gtfs()`.
 When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
 For a detailed example, see the \code{vignette("unify")}.
 }
 \examples{
 \dontrun{
-gtfs1 <- GTFSwizard::read_gtfs("gtfs1.zip")
-gtfs2 <- GTFSwizard::read_gtfs("gtfs2.zip")
-unified <- GTFShift::unify(list(gtfs1, gtfs2), "gtfs_unified.zip", TRUE)
+gtfs1 <- GTFShift::download_feed("gtfs1.zip")
+gtfs2 <- GTFShift::download_feed("gtfs2.zip")
+unified <- GTFShift::unify(list(gtfs1, gtfs2), generateTransfers=TRUE)
 }
 
 }
 \seealso{
-[GTFSwizard::read_gtfs()]
+[GTFSwizard::merge_gtfs()]
 
 [gtfsrouter::gtfs_transfer_table()]
 }

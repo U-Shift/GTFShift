@@ -23,8 +23,8 @@ Refer to routes.txt `route_type` parameter on \href{https://gtfs.org/documentati
 }
 \examples{
 \dontrun{
-gtfs <- tidytransit::read_gtfs("gtfs.zip")
-gtfs_filtered <- filter_by_modes(gtfs, list(0,1))
+gtfs <- GTFShift::download_feed("gtfs.zip")
+gtfs_filtered <- GTFShift::filter_by_modes(gtfs, list(0,1))
 }
 
 }
