@@ -29,8 +29,8 @@ For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
 \dontrun{
-gtfs <- tidytransit::read_gtfs("gtfs.zip")
-frequency_analysis <- get_stop_frequency_hourly(gtfs)
+gtfs <- GTFShift::download_feed("gtfs.zip")
+frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
 }
 
 }

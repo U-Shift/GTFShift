@@ -24,9 +24,9 @@ Allows to filter a GTFS feed for the agency, using the id, name or both. Returns
 }
 \examples{
 \dontrun{
-gtfs <- tidytransit::read_gtfs("gtfs.zip")
-gtfs_filtered_by_id <- filter_by_agency(gtfs, agency_id=2)
-gtfs_filtered_by_name <- filter_by_agency(gtfs, agency_name="City bus company")
+gtfs <- GTFShift::download_feed("gtfs.zip")
+gtfs_filtered_by_id <- GTFShift::filter_by_agency(gtfs, agency_id=2)
+gtfs_filtered_by_name <- GTFShift::filter_by_agency(gtfs, agency_name="City bus company")
 }
 
 }

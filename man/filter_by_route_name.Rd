@@ -27,8 +27,8 @@ This method allows to filter the feed for the route short or long name, with a p
 }
 \examples{
 \dontrun{
-gtfs <- tidytransit::read_gtfs("gtfs.zip")
-gtfs_filtered <- filter_by_route_name(gtfs, list("Blue line", "Red line"))
+gtfs <- GTFShift::download_feed("gtfs.zip")
+gtfs_filtered <- GTFShift::filter_by_route_name(gtfs, list("Blue line", "Red line"))
 }
 
 }

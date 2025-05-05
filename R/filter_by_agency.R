@@ -1,6 +1,6 @@
 #' Filter GTFS feed by agency
 #'
-#' @param gtfs tidygtfs. GTFS loaded using tidytransit::read_gtfs.
+#' @param gtfs tidygtfs. GTFS feed.
 #' @param id Integer. Ids of the agency (conditionally required).
 #' @param name String. Name of the agency (conditionally required).
 #'
@@ -11,12 +11,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- tidytransit::read_gtfs("gtfs.zip")
-#' gtfs_filtered_by_id <- filter_by_agency(gtfs, agency_id=2)
-#' gtfs_filtered_by_name <- filter_by_agency(gtfs, agency_name="City bus company")
+#' gtfs <- GTFShift::download_feed("gtfs.zip")
+#' gtfs_filtered_by_id <- GTFShift::filter_by_agency(gtfs, agency_id=2)
+#' gtfs_filtered_by_name <- GTFShift::filter_by_agency(gtfs, agency_name="City bus company")
 #' }
-#'
-#' @seealso [tidytransit::read_gtfs()]
 #'
 #' @import tidytransit
 #' @import dplyr

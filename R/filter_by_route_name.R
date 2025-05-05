@@ -1,6 +1,6 @@
 #' Filter GTFS feed by route name
 #'
-#' @param gtfs tidygtfs. GTFS loaded using tidytransit::read_gtfs.
+#' @param gtfs tidygtfs. GTFS feed.
 #' @param values String[]. List of the route names to filter the feed.
 #' @param short_name Boolean. If true, query for route_short_name, otherwise, route_long_name is considered.
 #' @param exact_match Boolean. If true, route name is queried for an exact match, otherwise, partial match is considered.
@@ -13,11 +13,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- tidytransit::read_gtfs("gtfs.zip")
-#' gtfs_filtered <- filter_by_route_name(gtfs, list("Blue line", "Red line"))
+#' gtfs <- GTFShift::download_feed("gtfs.zip")
+#' gtfs_filtered <- GTFShift::filter_by_route_name(gtfs, list("Blue line", "Red line"))
 #' }
-#'
-#' @seealso [tidytransit::read_gtfs()]
 #'
 #' @import tidytransit
 #' @import dplyr

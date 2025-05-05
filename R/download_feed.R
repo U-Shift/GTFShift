@@ -1,38 +1,32 @@
-#' GTFS download and integrity validation
+#' Read GTFS feed, fixing integrity errors
 #'
-#' Download GTFS file fixing any irregularities.
-#'
-#' @param gtfs_location String. The location of the GTFS zip file. Either local or URL.
-#' @param zipfile String. Path to the zip file the feed should be written to. The file is overwritten if it already exists.
+#' @param path String. The location of the GTFS zip file. Either local or URL.
+#' @param store_path. String. (Optional) If provided, GTFS feed zip is stored at location. The file is overwritten if it already exists.
 #'
 #' @details
-#' In addition to downloading the GTFS feed zip file, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
+#' In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
 #' \itemize{
-#'  \item `stop_times.txt` with empty `arrival_time` or `departure_time`, filtering rows that do not comply;
-#'  \item Feeds with missing `shapes.txt` file, generating it with `GTFShift::create_shapes`.
+#'  \item `stop_times.txt` with empty `arrival_time` or `departure_time`, filtering rows that do not comply.
+#'  \item Feeds with missing `shapes.txt` file, generating it using `GTFSwizard::get_shapes()`.
 #' }
 #'
-#' @returns The path of the file written.
+#' @returns A tidygtfs object.
 #'
-#' @seealso [GTFShift::create_shapes()]
+#' @seealso [tidytransit::read_gtfs()]
+#' @seealso [GTFSwizard::get_shapes()]
 #'
 #' @examples
 #' \dontrun{
-#' download("https://operator.com/gtfs.zip", "operator_gtfs.zip")
+#' gtfs <- GTFShift::download_feed("https://operator.com/gtfs.zip")
 #' }
 #'
 #' @import tidytransit
 #'
 #' @export
-download_feed <- function(gtfs_location, zipfile) {
-
-  message(sprintf("Downloading GTFS file for %s...", gtfs_location))
+download_feed <- function(path, store_path=NA) {
 
   # DOWNLOAD GTFS
-  if (!dir.exists(dirname(zipfile))) {
-    dir.create(dirname(zipfile), recursive = TRUE)
-  }
-  gtfs <- tidytransit::read_gtfs(gtfs_location)
+  gtfs <- tidytransit::read_gtfs(path)
 
   # VALIDATE integrity
 
@@ -49,14 +43,22 @@ download_feed <- function(gtfs_location, zipfile) {
     gtfs$trips$shape_id = NA
   }
 
-  # STORE GTFS (zip generated here, because next validation uses GTFSWizard and not tidytransit, which are incompatible)
-  tidytransit::write_gtfs(gtfs, zipfile)
-
   ## If no shapes.txt, create them automatically with GTFSwizard
   if (!("shapes" %in% names(gtfs))) {
-    create_shapes(zipfile, zipfile)
+    # GTFSwizard::get_shapes is automatically applied when it detected shapes are missing
+    gtfs_fixed <- GTFSwizard::as_wizardgtfs(gtfs)
+    gtfs$shapes <- gtfs_fixed$shapes
+    gtfs$trips <- gtfs_fixed$trips
     warning(sprintf("> CREATED shapes.txt, the file was missing!"))
   }
 
-  return(zipfile)
+  # STORE GTFS
+  if (!is.na(store_path)) {
+    if (!dir.exists(dirname(store_path))) {
+      dir.create(dirname(store_path), recursive = TRUE)
+    }
+    tidytransit::write_gtfs(gtfs, store_path)
+  }
+
+  return(gtfs)
 }

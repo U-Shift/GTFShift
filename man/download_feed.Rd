@@ -2,34 +2,36 @@
 % Please edit documentation in R/download_feed.R
 \name{download_feed}
 \alias{download_feed}
-\title{GTFS download and integrity validation}
+\title{Read GTFS feed, fixing integrity errors}
 \usage{
-download_feed(gtfs_location, zipfile)
+download_feed(path, store_path = NA)
 }
 \arguments{
-\item{gtfs_location}{String. The location of the GTFS zip file. Either local or URL.}
+\item{path}{String. The location of the GTFS zip file. Either local or URL.}
 
-\item{zipfile}{String. Path to the zip file the feed should be written to. The file is overwritten if it already exists.}
+\item{store_path.}{String. (Optional) If provided, GTFS feed zip is stored at location. The file is overwritten if it already exists.}
 }
 \value{
-The path of the file written.
+A tidygtfs object.
 }
 \description{
-Download GTFS file fixing any irregularities.
+Read GTFS feed, fixing integrity errors
 }
 \details{
-In addition to downloading the GTFS feed zip file, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
+In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
 \itemize{
- \item `stop_times.txt` with empty `arrival_time` or `departure_time`, filtering rows that do not comply;
- \item Feeds with missing `shapes.txt` file, generating it with `GTFShift::create_shapes`.
+ \item `stop_times.txt` with empty `arrival_time` or `departure_time`, filtering rows that do not comply.
+ \item Feeds with missing `shapes.txt` file, generating it using `GTFSwizard::get_shapes()`.
 }
 }
 \examples{
 \dontrun{
-download("https://operator.com/gtfs.zip", "operator_gtfs.zip")
+gtfs <- GTFShift::download_feed("https://operator.com/gtfs.zip")
 }
 
 }
 \seealso{
-[GTFShift::create_shapes()]
+[tidytransit::read_gtfs()]
+
+[GTFSwizard::get_shapes()]
 }
