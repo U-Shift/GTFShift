@@ -7,7 +7,7 @@
 filter_by_route_name(gtfs, values, short_name = TRUE, exact_match = TRUE)
 }
 \arguments{
-\item{gtfs}{tidygtfs. GTFS loaded using tidytransit::read_gtfs.}
+\item{gtfs}{tidygtfs. GTFS feed.}
 
 \item{values}{String[]. List of the route names to filter the feed.}
 
@@ -27,11 +27,8 @@ This method allows to filter the feed for the route short or long name, with a p
 }
 \examples{
 \dontrun{
-gtfs <- GTFShift::download_feed("gtfs.zip")
+gtfs <- GTFShift::load_feed("gtfs.zip")
 gtfs_filtered <- GTFShift::filter_by_route_name(gtfs, list("Blue line", "Red line"))
 }
 
-}
-\seealso{
-[tidytransit::read_gtfs()]
 }

@@ -64,17 +64,17 @@ data[1:4,]
 
 ## Download and validate integrity
 
-`GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `GTFShift::download_feed()`. It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files and returns a tidygtfs object, that can be used in any other method of GTFShift or tidyrtransit packages.
+`GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `GTFShift::load_feed()`. It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files and returns a tidygtfs object, that can be used in any other method of GTFShift or tidyrtransit packages.
 
 ```{r message=TRUE, warning=TRUE}
 # DOWNLOAD GTFS and store it locally
-gtfs <- GTFShift::download_feed(data[data$ID=="cp",]$URL)
+gtfs <- GTFShift::load_feed(data[data$ID=="cp",]$URL)
 summary(gtfs)
 ```
 
 # Download bus lanes 
 
-Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics. `GTFShift::download_bus_lanes` allows to obtain the bus lanes network on Open Street Maps for a given area.
+Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics. `GTFShift::osm_bus_lanes` allows to obtain the bus lanes network on Open Street Maps for a given area.
 
 ```{r}
 aml <- st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg")
@@ -84,7 +84,7 @@ lisboa <- aml[aml$Concelho == "Lisboa", ]
 
 bbox = st_bbox(lisboa)
 
-bus_lanes <- GTFShift::download_bus_lanes(bbox)
+bus_lanes <- GTFShift::osm_bus_lanes(bbox)
 
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```

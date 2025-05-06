@@ -39,8 +39,8 @@ For a detailed example, see the \code{vignette("unify")}.
 }
 \examples{
 \dontrun{
-gtfs1 <- GTFShift::download_feed("gtfs1.zip")
-gtfs2 <- GTFShift::download_feed("gtfs2.zip")
+gtfs1 <- GTFShift::load_feed("gtfs1.zip")
+gtfs2 <- GTFShift::load_feed("gtfs2.zip")
 unified <- GTFShift::unify(list(gtfs1, gtfs2), generateTransfers=TRUE)
 }
 

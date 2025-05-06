@@ -24,7 +24,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- GTFShift::download_feed("gtfs.zip")
+#' gtfs <- GTFShift::load_feed("gtfs.zip")
 #' frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 #' }
 #'

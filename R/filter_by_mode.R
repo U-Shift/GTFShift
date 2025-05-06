@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- GTFShift::download_feed("gtfs.zip")
+#' gtfs <- GTFShift::load_feed("gtfs.zip")
 #' gtfs_filtered <- GTFShift::filter_by_modes(gtfs, list(0,1))
 #' }
 #'
