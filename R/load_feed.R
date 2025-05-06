@@ -17,15 +17,15 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- GTFShift::download_feed("https://operator.com/gtfs.zip")
+#' gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
 #' }
 #'
 #' @import tidytransit
 #'
 #' @export
-download_feed <- function(path, store_path=NA) {
+load_feed <- function(path, store_path=NA) {
 
-  # DOWNLOAD GTFS
+  # LOAD GTFS
   gtfs <- tidytransit::read_gtfs(path)
 
   # VALIDATE integrity

@@ -7,7 +7,7 @@
 get_route_frequency_hourly(gtfs, date = NULL, overline = FALSE)
 }
 \arguments{
-\item{gtfs}{tidygtfs. GTFS loaded using tidytransit::read_gtfs.}
+\item{gtfs}{tidygtfs. GTFS feed.}
 
 \item{date}{Date. Reference date to consider when analysing the GTFS file. Defaults to next business Wednesday in Portugal.}
 
@@ -35,7 +35,7 @@ Adapted from https://github.com/Bondify/GTFS_in_R/.
 }
 \examples{
 \dontrun{
-gtfs <- GTFShift::download_feed("gtfs.zip")
+gtfs <- GTFShift::load_feed("gtfs.zip")
 frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 }
 

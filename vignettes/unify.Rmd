@@ -43,7 +43,7 @@ Public transit analysis takes advantage of the standardized GTFS format. However
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 
 gtfs_list <- lapply(c("barreiro", "fertagus"), function(ID) {
-  return(GTFShift::download_feed(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
+  return(GTFShift::load_feed(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
 })
 ```
 

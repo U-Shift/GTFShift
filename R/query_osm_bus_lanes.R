@@ -1,4 +1,4 @@
-#' Download bus lanes from Open Street Maps
+#' Export bus lanes from Open Street Maps
 #
 #'
 #' @param bbox bbox. Area from which to export bus lanes.
@@ -12,7 +12,7 @@
 #' @examples
 #' \dontrun{
 #' BBOX = sf::st_bbox(city_limit)
-#' bus_lanes <- GTFShift::download_bus_lanes(BBOX)
+#' bus_lanes <- GTFShift::osm_bus_lanes(BBOX)
 #' }
 #'
 #' @import osmdata
@@ -20,7 +20,7 @@
 #' @import dplyr
 #'
 #' @export
-download_bus_lanes <- function(bbox) {
+osm_bus_lanes <- function(bbox) {
 
   road_osm = road_osm = opq(bbox) |> # uses osmdata package, to extract only with BB
     add_osm_feature(key = "highway") |>

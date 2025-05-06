@@ -7,7 +7,7 @@
 filter_by_agency(gtfs, id = NA, name = NA)
 }
 \arguments{
-\item{gtfs}{tidygtfs. GTFS loaded using tidytransit::read_gtfs.}
+\item{gtfs}{tidygtfs. GTFS feed.}
 
 \item{id}{Integer. Ids of the agency (conditionally required).}
 
@@ -24,12 +24,9 @@ Allows to filter a GTFS feed for the agency, using the id, name or both. Returns
 }
 \examples{
 \dontrun{
-gtfs <- GTFShift::download_feed("gtfs.zip")
+gtfs <- GTFShift::load_feed("gtfs.zip")
 gtfs_filtered_by_id <- GTFShift::filter_by_agency(gtfs, agency_id=2)
 gtfs_filtered_by_name <- GTFShift::filter_by_agency(gtfs, agency_name="City bus company")
 }
 
-}
-\seealso{
-[tidytransit::read_gtfs()]
 }

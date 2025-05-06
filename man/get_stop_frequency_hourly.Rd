@@ -7,7 +7,7 @@
 get_stop_frequency_hourly(gtfs, date = NULL)
 }
 \arguments{
-\item{gtfs}{tidygtfs. GTFS loaded using tidytransit::read_gtfs.}
+\item{gtfs}{tidygtfs. GTFS feed.}
 
 \item{date}{Date. Reference date to consider when analyzing the GTFS file. Defaults to next business Wednesday in Portugal.}
 }
@@ -29,11 +29,8 @@ For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
 \dontrun{
-gtfs <- GTFShift::download_feed("gtfs.zip")
+gtfs <- GTFShift::load_feed("gtfs.zip")
 frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
 }
 
-}
-\seealso{
-[tidytransit::read_gtfs()]
 }

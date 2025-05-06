@@ -7,7 +7,7 @@
 filter_by_modes(gtfs, modes = list())
 }
 \arguments{
-\item{gtfs}{tidygtfs. GTFS loaded using tidytransit::read_gtfs.}
+\item{gtfs}{tidygtfs. GTFS feed.}
 
 \item{modes}{Integer[]. A list with the ids of modes to consider.}
 }
@@ -23,11 +23,8 @@ Refer to routes.txt `route_type` parameter on \href{https://gtfs.org/documentati
 }
 \examples{
 \dontrun{
-gtfs <- GTFShift::download_feed("gtfs.zip")
+gtfs <- GTFShift::load_feed("gtfs.zip")
 gtfs_filtered <- GTFShift::filter_by_modes(gtfs, list(0,1))
 }
 
-}
-\seealso{
-[tidytransit::read_gtfs()]
 }

@@ -44,7 +44,7 @@ Analyzing public transit feeds is important to understand its territorial covera
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "cascais"
-gtfs <- GTFShift::download_feed(data[data$ID==gtfs_id,]$URL)
+gtfs <- GTFShift::load_feed(data[data$ID==gtfs_id,]$URL)
 ```
 
 
