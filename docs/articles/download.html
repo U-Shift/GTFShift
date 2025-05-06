@@ -58,7 +58,7 @@
       <a href="../articles/filter.html">Filter GTFS feeds</a>
     </li>
     <li>
-      <a href="../articles/unify.html">GTFS unification</a>
+      <a href="../articles/unify.html">Aggregate GTFS feeds</a>
     </li>
   </ul>
 </li>
@@ -196,27 +196,27 @@ operator GTFS.</li>
 <h3 id="download-and-validate-integrity">Download and validate integrity<a class="anchor" aria-label="anchor" href="#download-and-validate-integrity"></a>
 </h3>
 <p><code>GTFShift</code> library offers a method to download and fix any
-integrity violations at GTFS files: <code>GTFShift::download()</code>.
+integrity violations at GTFS files: <code><a href="../reference/load_feed.html">GTFShift::load_feed()</a></code>.
 It fixes inconsistencies on the <code>stop_times.txt</code> and missing
-<code>shapes.txt</code> files.</p>
+<code>shapes.txt</code> files and returns a tidygtfs object, that can be
+used in any other method of GTFShift or tidyrtransit packages.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># DOWNLOAD GTFS and store it locally</span></span>
-<span><span class="va">gtfs_local</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/download_feed.html">download_feed</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="fl">4</span>,<span class="op">]</span><span class="op">$</span><span class="va">URL</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"database/transit/%s_gtfs.zip"</span>, <span class="va">data</span><span class="op">[</span><span class="fl">4</span>,<span class="op">]</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"GTFS downloaded and stored at %s"</span>, <span class="va">gtfs_local</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "GTFS downloaded and stored at database/transit/barreiro_gtfs.zip"</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu">tidytransit</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytransit/man/read_gtfs.html" class="external-link">read_gtfs</a></span><span class="op">(</span><span class="va">gtfs_local</span><span class="op">)</span></span>
+<span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/load_feed.html">load_feed</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">ID</span><span class="op">==</span><span class="st">"cp"</span>,<span class="op">]</span><span class="op">$</span><span class="va">URL</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">get_shapes()</span> reconstructs the shapes table using euclidean approximation, based on the coordinates and sequence of stops for each trip, and<span style="color: #BB0000;"> may not be accurate</span>.</span></span>
+<span><span class="co">#&gt; Warning in GTFShift::load_feed(data[data$ID == "cp", ]$URL): &gt; CREATED</span></span>
+<span><span class="co">#&gt; shapes.txt, the file was missing!</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidygtfs object</span></span>
-<span><span class="co">#&gt; files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, feed_info, stops</span></span>
-<span><span class="co">#&gt; agency       Transportes Colectivos do Barreiro</span></span>
-<span><span class="co">#&gt; service      from 2024-12-01 to 2025-12-31</span></span>
+<span><span class="co">#&gt; files        agency, routes, stop_times, trips, calendar, calendar_dates, stops</span></span>
+<span><span class="co">#&gt; agency       CP - Comboios de Portugal</span></span>
+<span><span class="co">#&gt; service      from 2024-12-15 to 2025-12-13</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
-<span><span class="co">#&gt; # routes       20</span></span>
-<span><span class="co">#&gt; # trips      3029</span></span>
-<span><span class="co">#&gt; # stop_ids    279</span></span>
-<span><span class="co">#&gt; # stop_names  162</span></span>
-<span><span class="co">#&gt; # shapes       75</span></span></code></pre></div>
+<span><span class="co">#&gt; # routes      179</span></span>
+<span><span class="co">#&gt; # trips      1597</span></span>
+<span><span class="co">#&gt; # stop_ids    457</span></span>
+<span><span class="co">#&gt; # stop_names  457</span></span>
+<span><span class="co">#&gt; # shapes      253</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -224,9 +224,9 @@ It fixes inconsistencies on the <code>stop_times.txt</code> and missing
 </h2>
 <p>Bus lanes can improve bus transit operation. Understanding their
 spatial distribution is important to study operation dynamics.
-<code><a href="../reference/download_bus_lanes.html">GTFShift::download_bus_lanes</a></code> allows to obtain the bus lanes
+<code><a href="../reference/osm_bus_lanes.html">GTFShift::osm_bus_lanes</a></code> allows to obtain the bus lanes
 network on Open Street Maps for a given area.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">aml</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="st">"https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Reading layer `MUNICIPIOSgeo' from data source </span></span>
 <span><span class="co">#&gt;   `https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg' </span></span>
@@ -242,7 +242,7 @@ network on Open Street Maps for a given area.</p>
 <span></span>
 <span><span class="va">bbox</span> <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">lisboa</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">bus_lanes</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/download_bus_lanes.html">download_bus_lanes</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">)</span></span>
+<span><span class="va">bus_lanes</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/osm_bus_lanes.html">osm_bus_lanes</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">mapview</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mapview/man/mapView.html" class="external-link">mapview</a></span><span class="op">(</span><span class="va">bus_lanes</span>, layer.name <span class="op">=</span> <span class="st">"Bus lanes"</span><span class="op">)</span></span></code></pre></div>
 <div class="leaflet html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:700px;height:432.632880098888px;"></div>

@@ -41,7 +41,7 @@
       <a href="../articles/filter.html">Filter GTFS feeds</a>
     </li>
     <li>
-      <a href="../articles/unify.html">GTFS unification</a>
+      <a href="../articles/unify.html">Aggregate GTFS feeds</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -77,7 +77,7 @@
 
 
 <dl><dt id="arg-gtfs">gtfs<a class="anchor" aria-label="anchor" href="#arg-gtfs"></a></dt>
-<dd><p>tidygtfs. GTFS loaded using tidytransit::read_gtfs.</p></dd>
+<dd><p>tidygtfs. GTFS feed.</p></dd>
 
 
 <dt id="arg-date">date<a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
@@ -96,16 +96,12 @@
     <p>This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
 For a detailed example, see the <code><a href="../articles/analyse.html">vignette("analyse")</a></code>.</p>
     </div>
-    <div id="see-also">
-    <h2>See also</h2>
-    <div class="dont-index"><p>[tidytransit::read_gtfs()]</p></div>
-    </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu">tidytransit</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytransit/man/read_gtfs.html" class="external-link">read_gtfs</a></span><span class="op">(</span><span class="st">"gtfs.zip"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">frequency_analysis</span> <span class="op">&lt;-</span> <span class="fu">get_stop_frequency_hourly</span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="load_feed.html">load_feed</a></span><span class="op">(</span><span class="st">"gtfs.zip"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">frequency_analysis</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">get_stop_frequency_hourly</span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

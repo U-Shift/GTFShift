@@ -41,7 +41,7 @@
       <a href="../articles/filter.html">Filter GTFS feeds</a>
     </li>
     <li>
-      <a href="../articles/unify.html">GTFS unification</a>
+      <a href="../articles/unify.html">Aggregate GTFS feeds</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -71,7 +71,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">unify</span><span class="op">(</span></span>
 <span>  <span class="va">gtfss</span>,</span>
-<span>  <span class="va">zipfile</span>,</span>
+<span>  store_path <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  generateTransfers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  transfer_distance <span class="op">=</span> <span class="fl">300</span>,</span>
 <span>  transfer_time <span class="op">=</span> <span class="fl">120</span>,</span>
@@ -84,50 +84,51 @@
 
 
 <dl><dt id="arg-gtfss">gtfss<a class="anchor" aria-label="anchor" href="#arg-gtfss"></a></dt>
-<dd><p>tidygtfs[]. List of GTFS loaded using GTFSwizard::read_gtfs.</p></dd>
-
-
-<dt id="arg-zipfile">zipfile<a class="anchor" aria-label="anchor" href="#arg-zipfile"></a></dt>
-<dd><p>String. Path to the zip file the feed should be written to. The file is overwritten if it already exists.</p></dd>
+<dd><p>tidygtfs[]. List of GTFS feeds.</p></dd>
 
 
 <dt id="arg-generatetransfers">generateTransfers<a class="anchor" aria-label="anchor" href="#arg-generatetransfers"></a></dt>
-<dd><p>Boolean. When true (default), generates transfers.txt, aggregating close stops, even if from different GTFS.</p></dd>
+<dd><p>Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.</p></dd>
 
 
 <dt id="arg-transfer-distance">transfer_distance<a class="anchor" aria-label="anchor" href="#arg-transfer-distance"></a></dt>
-<dd><p>Integer. Upper straight-line distance limit in metres for transfers.</p></dd>
+<dd><p>Integer. (Default 300) Upper straight-line distance limit in metres for transfers.</p></dd>
 
 
 <dt id="arg-transfer-time">transfer_time<a class="anchor" aria-label="anchor" href="#arg-transfer-time"></a></dt>
-<dd><p>Integer. Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.</p></dd>
+<dd><p>Integer. (Default 120) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.</p></dd>
 
 
 <dt id="arg-transfer-street-routing">transfer_street_routing<a class="anchor" aria-label="anchor" href="#arg-transfer-street-routing"></a></dt>
-<dd><p>If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).</p></dd>
+<dd><p>(Default FALSE) If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).</p></dd>
+
+
+<dt id="arg-store-path-">store_path.<a class="anchor" aria-label="anchor" href="#arg-store-path-"></a></dt>
+<dd><p>String. (Optional) If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The path of the file written.</p>
+    <p>A tidygtfs object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
+    <p>Aggregates multiple feeds using `GTFSwizard::merge_gtfs()`.
+When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
 For a detailed example, see the <code><a href="../articles/unify.html">vignette("unify")</a></code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p>[GTFSwizard::read_gtfs()]</p>
+    <div class="dont-index"><p>[GTFSwizard::merge_gtfs()]</p>
 <p>[gtfsrouter::gtfs_transfer_table()]</p></div>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">gtfs1</span> <span class="op">&lt;-</span> <span class="fu">GTFSwizard</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/GTFSwizard/man/read_gtfs.html" class="external-link">read_gtfs</a></span><span class="op">(</span><span class="st">"gtfs1.zip"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs2</span> <span class="op">&lt;-</span> <span class="fu">GTFSwizard</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/GTFSwizard/man/read_gtfs.html" class="external-link">read_gtfs</a></span><span class="op">(</span><span class="st">"gtfs2.zip"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">unified</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">unify</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">gtfs1</span>, <span class="va">gtfs2</span><span class="op">)</span>, <span class="st">"gtfs_unified.zip"</span>, <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gtfs1</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="load_feed.html">load_feed</a></span><span class="op">(</span><span class="st">"gtfs1.zip"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gtfs2</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="load_feed.html">load_feed</a></span><span class="op">(</span><span class="st">"gtfs2.zip"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">unified</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">unify</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">gtfs1</span>, <span class="va">gtfs2</span><span class="op">)</span>, generateTransfers<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

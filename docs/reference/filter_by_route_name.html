@@ -41,7 +41,7 @@
       <a href="../articles/filter.html">Filter GTFS feeds</a>
     </li>
     <li>
-      <a href="../articles/unify.html">GTFS unification</a>
+      <a href="../articles/unify.html">Aggregate GTFS feeds</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -77,7 +77,7 @@
 
 
 <dl><dt id="arg-gtfs">gtfs<a class="anchor" aria-label="anchor" href="#arg-gtfs"></a></dt>
-<dd><p>tidygtfs. GTFS loaded using tidytransit::read_gtfs.</p></dd>
+<dd><p>tidygtfs. GTFS feed.</p></dd>
 
 
 <dt id="arg-values">values<a class="anchor" aria-label="anchor" href="#arg-values"></a></dt>
@@ -101,16 +101,12 @@
     <p>On a GTFS feed, the `route_id` rarely matches the real name of the route, that can range from numbers, letters, words or combinations of both.
 This method allows to filter the feed for the route short or long name, with a partial or exact match.</p>
     </div>
-    <div id="see-also">
-    <h2>See also</h2>
-    <div class="dont-index"><p>[tidytransit::read_gtfs()]</p></div>
-    </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu">tidytransit</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytransit/man/read_gtfs.html" class="external-link">read_gtfs</a></span><span class="op">(</span><span class="st">"gtfs.zip"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs_filtered</span> <span class="op">&lt;-</span> <span class="fu">filter_by_route_name</span><span class="op">(</span><span class="va">gtfs</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Blue line"</span>, <span class="st">"Red line"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="load_feed.html">load_feed</a></span><span class="op">(</span><span class="st">"gtfs.zip"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gtfs_filtered</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">filter_by_route_name</span><span class="op">(</span><span class="va">gtfs</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Blue line"</span>, <span class="st">"Red line"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

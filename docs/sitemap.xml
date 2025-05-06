@@ -21,6 +21,8 @@
 <url><loc>/reference/get_stop_frequency_hourly.html</loc></url>
 <url><loc>/reference/get_stop_hour_frequency.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/load_feed.html</loc></url>
+<url><loc>/reference/osm_bus_lanes.html</loc></url>
 <url><loc>/reference/query_mobilitydatabase.html</loc></url>
 <url><loc>/reference/unify.html</loc></url>
 </urlset>
