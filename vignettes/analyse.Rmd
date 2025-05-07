@@ -43,8 +43,9 @@ Analyzing public transit feeds is important to understand its territorial covera
 ```{r}
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_id = "cascais"
+gtfs_id = "lisboa"
 gtfs <- GTFShift::load_feed(data[data$ID==gtfs_id,]$URL)
+gtfs <- GTFShift::load_feed("database/transit/lisboa_gtfs.zip")
 ```
 
 
@@ -78,28 +79,70 @@ The analysis can be performed for each route individually.
 ```{r}
 frequencies_route <- GTFShift::get_route_frequency_hourly(gtfs)
 summary(frequencies_route)
+mapview(frequencies_route)
+st_write(frequencies_route, "frequencies_route.gpkg")
 ```
+
+```{python}
+from shapely.geometry import Polygon
+from centerline.geometry import Centerline
+import geopandas as gpd
+
+gdf = gpd.read_file("unioned_sf.gpkg")
+polygon = gdf.geometry.iloc[0]
+attributes = {
+    "id": gdf.iloc[0].get("id", 1),  # fallback to 1 if 'id' column doesn't exist
+    "name": gdf.iloc[0].get("name", "polygon"),  # fallback to 'polygon'
+    "valid": True  # or fetch from file if applicable
+}
+centerline = Centerline(polygon, **attributes)
+
+
+# Create a GeoDataFrame for centerline geometries
+centerline_gdf = gpd.GeoDataFrame(
+    {"id": [attributes["id"] for _ in centerline.geoms],
+     "name": [attributes["name"] for _ in centerline.geoms]},
+    geometry=[geom for geom in centerline.geoms],
+    crs=gdf.crs
+)
+
+# Export to GeoPackage
+centerline_gdf.to_file("centerline.gpkg", layer="centerline", driver="GPKG")
+str(centerline_gdf)
+
+centerline.name
+
+```
+
 
 The `overline` parameter allows for an even more aggregated screening of the operation, clustering routes that overlap and converting them into a single route network. This allows for a better visualization of the volumes of frequencies per each segment of the network.
 
 ```{r}
-frequencies_route_overline <- GTFShift::get_route_frequency_hourly(gtfs, overline=TRUE)
+frequencies_route_overline <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+07)
+frequencies_route_overline_5 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+05)
+frequencies_route_overline_4 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+04)
+frequencies_route_overline_3 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+03)
+
+frequencies_route_overline_8 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+08)
+frequencies_route_overline_9 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+09)
+frequencies_route_overline_12 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+12)
+# frequencies_route_overline_osm <- GTFShift::get_route_frequency_hourly(gtfs, overline_osm=TRUE)
 summary(frequencies_route_overline)
+summary(frequencies_route_overline_5)
+summary(frequencies_route_overline_3)
 ```
 
 <div style="display: flex; gap: 20px; overflow-x: auto;">
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
 ### Aggregated routes for 8 a.m.
 ```{r}
-mapview::mapview(
-  frequencies_route %>% filter(arrival_hour==8 & frequency > 2),
-  zcol = "frequency",
-  layer.name = "Frequency (hour)"
-)
+mapview::mapview(frequencies_route |> filter(arrival_hour==8 & frequency > 2), zcol = "frequency", layer.name = "Frequency (hour)")
+st_write(frequencies_route, "frequencies_route.gpkg")
+
 ```
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
-### Aggregated routes with overline for 8 a.m.
+### Aggregated routes with overline for 8 a.m. (regionalise = 1e7)
 ```{r}
 # above 2 per hour
 mapview::mapview(
@@ -107,9 +150,54 @@ mapview::mapview(
   zcol = "frequency",
   layer.name = "Frequency (hour)"
 )
+st_write(frequencies_route_overline, "frequencies_route_overline.gpkg")
 ```
 </div>
 </div>
 
 
 
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes with overline for 8 a.m. (regionalise = 1e5)
+```{r}
+mapview::mapview(
+  frequencies_route_overline_5 %>% filter(arrival_hour==8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes with overline for 8 a.m. (regionalise = 1e4)
+```{r}
+# above 2 per hour
+mapview::mapview(
+  frequencies_route_overline_4 %>% filter(arrival_hour==8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+```
+</div>
+</div>
+
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes with overline for 8 a.m. (regionalise = 1e3)
+```{r}
+mapview::mapview(
+  frequencies_route_overline_3 %>% filter(arrival_hour==8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes with overline for 8 a.m. 
+```{r}
+
+```
+</div>
+</div>
