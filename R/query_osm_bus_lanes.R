@@ -29,6 +29,9 @@ osm_bus_lanes <- function(bbox) {
 
   road_osm = road_osm$osm_lines
 
+  st_write(st_transform(road_osm, crs = 3857), "road_osm_3857.gpkg")
+
+
   osm_lanes = road_osm |> select(contains("psv"))
   osm_lanes = osm_lanes |> filter(psv == "designated" |
                                     `lanes:psv` == 1 |

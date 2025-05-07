@@ -114,6 +114,23 @@ centerline.name
 
 ```
 
+```{python}
+import neatnet
+```
+
+```{r}
+library(reticulate)
+reticulate::py_config()
+
+reticulate::virtualenv_create("r-reticulate")
+reticulate::use_virtualenv("r-reticulate")
+reticulate::py_install("neatnet")
+reticulate::py_module_available("neatnet")
+neatnet <- reticulate::import("neatnet")
+```
+
+
+
 
 The `overline` parameter allows for an even more aggregated screening of the operation, clustering routes that overlap and converting them into a single route network. This allows for a better visualization of the volumes of frequencies per each segment of the network.
 

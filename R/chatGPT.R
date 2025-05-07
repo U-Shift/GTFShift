@@ -21,6 +21,8 @@ st_write(routes_708_overline, "routes_708_overline.gpkg")
 
 
 buffers <- sf::st_buffer(routes, dist = 5)
+st_write(buffers, "buffers.gpkg")
+
 mapview(buffers)
 View(buffers)
 
