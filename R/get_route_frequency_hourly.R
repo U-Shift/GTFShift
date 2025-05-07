@@ -38,7 +38,7 @@
 #' @import stplanr
 #'
 #' @export
-get_route_frequency_hourly <- function(gtfs, date=NULL, overline=FALSE) {
+get_route_frequency_hourly <- function(gtfs, date=NULL, overline=NA, overline_osm=NA) {
   message(sprintf("Analysing GTFS..."))
 
   # DATE FILTER
@@ -88,18 +88,23 @@ get_route_frequency_hourly <- function(gtfs, date=NULL, overline=FALSE) {
     st_as_sf()
 
   # Overline?
-  if (overline) {
+  if (!is.na(overline)) {
     routes_freq_all = data.frame()
     for (h in unique(routes_freq$arrival_hour)) { # hours of the day
       routes_freq_h = routes_freq %>%
         filter(arrival_hour == h) %>%
-        stplanr::overline2(attrib = "frequency") %>%
+        stplanr::overline2(attrib = "frequency", regionalise = overline) %>%
         arrange(frequency) %>%
         mutate(arrival_hour = h)
 
       routes_freq_all = rbind(routes_freq_all, routes_freq_h)
     }
     return (routes_freq_all)
+  }
+
+  if (!is.na(overline_osm)) {
+    # OSM overline
+
   }
 
   return(routes_freq)

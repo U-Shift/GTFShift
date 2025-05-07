@@ -22,7 +22,7 @@
 #' @export
 osm_bus_lanes <- function(bbox) {
 
-  road_osm = road_osm = opq(bbox) |> # uses osmdata package, to extract only with BB
+  road_osm = opq(bbox) |> # uses osmdata package, to extract only with BB
     add_osm_feature(key = "highway") |>
     osmdata_sf() |>
     osm_poly2line() # makes roundabouts into lines

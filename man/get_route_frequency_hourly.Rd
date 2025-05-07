@@ -4,7 +4,7 @@
 \alias{get_route_frequency_hourly}
 \title{Get aggregated frequency per hour for each bus route}
 \usage{
-get_route_frequency_hourly(gtfs, date = NULL, overline = FALSE)
+get_route_frequency_hourly(gtfs, date = NULL, overline = NA, overline_osm = NA)
 }
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
