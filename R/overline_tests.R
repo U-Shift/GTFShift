@@ -59,13 +59,16 @@ library(dplyr)
 library(stplanr)
 library(mapview)
 library(sf)
-routes_706 = routes_706 |>
+routes_706 = frequencies_route |>
   mutate(
     match_id = row_number(),
     id=match_id
   )
 View(routes_706)
 mapview::mapview(routes_706)
+
+road_osm_segments = line_segment(st_transform(road_osm, crs = 3857) |> select(osm_id), segment_length=10)
+road_osm_segments = road_osm_segments %>% mutate(osm_id_2=row_number())
 
 osm_706 = rnet_join(rnet_x = routes_706,
                     rnet_y = road_osm |> select(osm_id),
@@ -75,12 +78,10 @@ osm_706 = rnet_join(rnet_x = routes_706,
                     # dist_subset = 3,
                     # subset_x = TRUE, # muito lento
                     key_column = "match_id",
-                    dist = 10
+                    dist = 5
 ) |> st_drop_geometry()
 View(osm_706)
 st_write(osm_706, "osm_706.gpkg")
-
-mapview::mapview(osm_706)
 
 
 osm_706_line = road_osm |>
@@ -91,6 +92,14 @@ osm_706_line = road_osm |>
   ) |>
   left_join(osm_706 |> select(osm_id, length_y), by="osm_id")
 osm_706_line
+
+st_write(st_transform(osm_706_line, crs = 3857), "osm_706_line_3857_5.gpkg")
+
+aggregated_line <- st_union(osm_706_line)
+mapview::mapview(aggregated_line)
+View(aggregated_line)
+st_write(aggregated_line, "aggregated_line.gpkg")
+
 # |>
 #   left_join(osm_706) |>
 #   left_join(routes_706 |>
@@ -105,14 +114,18 @@ mapview::mapview(routes_706, color="gray", lwd=5) + mapview::mapview(osm_706_lin
 library(anime)
 matches <- anime::anime(
   source=st_transform(osm_706_line, crs = 3857),
-  target=st_transform(routes_706, crs=3857)
+  target=st_transform(routes_706, crs=3857),
+  angle_tolerance=45
 )
 matches_tbl <- get_matches(matches)
 matches_tbl
 
 osm_706_line_join <- left_join(osm_706_line, matches_tbl, by=c("id"="source_id")) %>% mutate(shared_ratio = shared_len/length_y * 100)
 View(osm_706_line_join)
-mapview::mapview(routes_706, color="gray", lwd=5) + mapview::mapview(osm_706_line_join, color="green", lwd=1)
+mapview::mapview(routes_706, color="gray", lwd=5) + mapview::mapview(
+  osm_706_line_join,
+  color="green", lwd=1
+)
 
 
 st_write(routes_moraissoares_overline, paste0("data/", bus_operator, "_routes_moraissoares_freq.gpkg"))
@@ -124,3 +137,9 @@ st_write(routes_742, paste0("data/", bus_operator, "_routes_742.gpkg"))
 # inspect in qgis
 
 
+## APPROACH EDGES
+library(sf)
+osm_706_line_3857 = st_transform(osm_706_line, crs=3857)
+start_points <- st_line_sample(osm_706_line_3857, sample = 0) %>% st_cast("POINT")
+end_points <- st_line_sample(osm_706_line_3857, sample = 1) %>% st_cast("POINT")
+mapview::mapview(start_points, layer.name="Start points", color="yellow") + mapview::mapview(end_points, layer.name="End points", color="black")
