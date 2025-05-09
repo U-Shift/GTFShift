@@ -1,0 +1,18 @@
+reference:
+  - title: Read
+    contents:
+    - load_feed
+  - title: Filter
+    contents:
+    - starts_with("filter_")
+  - title: Analyse
+    contents:
+    - starts_with("get_")
+    - network_overline
+  - title: Manipulate
+    contents:
+    - unify
+  - title: External data
+    contents:
+    - starts_with("query_")
+    - osm_bus_lanes
