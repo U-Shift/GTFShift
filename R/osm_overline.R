@@ -11,6 +11,7 @@ library(mapview)
 osm_overline <- function(sl,attr) {
 
   # Get bounding box for object
+<<<<<<< Updated upstream
   bbox <- sf::st_bbox(routes_moraissoares)
 
   # Download OSM road network for bbox
@@ -20,11 +21,21 @@ osm_overline <- function(sl,attr) {
       "motorway_link", "trunk_link", "primary_link",
       "secondary_link", "tertiary_link","service", "bus_guideway", "busway"
     )) |>
+=======
+  bbox <- sf::st_bbox(sl)
+
+  # Download OSM road network for bbox
+  road_osm = opq(bbox) |> # uses osmdata package, to extract only with BB
+    add_osm_feature(key = "highway") |>
+>>>>>>> Stashed changes
     osmdata_sf() |>
     osm_poly2line() # makes roundabouts into lines
 
   road_osm = road_osm$osm_lines
+<<<<<<< Updated upstream
   View(road_osm)
+=======
+>>>>>>> Stashed changes
   mapview::mapview(road_osm)
 
   # Overlap

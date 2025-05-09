@@ -5,7 +5,7 @@ routes_freq <- frequencies_route
 library(mapview)
 library(stplanr)
 mapview(routes_freq)
-
+View(routes_freq)
 routes_742 = routes_freq %>%
   filter(route_short_name == "742") |>
   filter(arrival_hour == 8)
@@ -33,12 +33,12 @@ routes_moraissoares_overline = routes_moraissoares %>%
   overline2(attrib = "frequency", regionalise = 1e4) %>%
   arrange(frequency) %>%
   mutate(hour = 8)
+st_write(routes_moraissoares_overline, "routes_moraissoares_overline.gpkg")
 
+View(routes_moraissoares_overline)
+mapview::mapview(routes_moraissoares_overline)
 mapview::mapview(routes_moraissoares_overline, zcol = "frequency")
-# , , lwd = 5, layer.name = "Frequência",
-
-
-
+mapview::mapview(routes_moraissoares_overline, zcol = "frequency", lwd = "frequency", lwd.multiplier = 2)
 
 # só 706
 routes_706_overline = routes_706 %>%
@@ -59,10 +59,9 @@ library(dplyr)
 library(stplanr)
 library(mapview)
 library(sf)
-routes_706 = frequencies_route |>
+routes_706 = routes_706 |>
   mutate(
-    match_id = row_number(),
-    id=match_id
+    match_id = row_number()
   )
 View(routes_706)
 mapview::mapview(routes_706)
@@ -70,27 +69,27 @@ mapview::mapview(routes_706)
 road_osm_segments = line_segment(st_transform(road_osm, crs = 3857) |> select(osm_id), segment_length=10)
 road_osm_segments = road_osm_segments %>% mutate(osm_id_2=row_number())
 
+library(dplyr)
 osm_706 = rnet_join(rnet_x = routes_706,
                     rnet_y = road_osm |> select(osm_id),
-                    length_y = TRUE,
+                    length_y = FALSE,
                     # contains = FALSE, # error
                     # max_angle_diff = 25,
                     # dist_subset = 3,
                     # subset_x = TRUE, # muito lento
                     key_column = "match_id",
-                    dist = 5
-) |> st_drop_geometry()
-View(osm_706)
-st_write(osm_706, "osm_706.gpkg")
+                    dist = 10
+        ) |> st_drop_geometry()
 
+View(osm_706)
+
+mapview(osm_706, zcol="match_id")
 
 osm_706_line = road_osm |>
   select(osm_id) |>
-  filter(osm_id %in% osm_706$osm_id) |>
-  mutate(
-    id = row_number()
-  ) |>
-  left_join(osm_706 |> select(osm_id, length_y), by="osm_id")
+  filter(osm_id %in% osm_706$osm_id)
+
+  # left_join(osm_706 |> select(osm_id, length_y), by="osm_id")
 osm_706_line
 
 st_write(st_transform(osm_706_line, crs = 3857), "osm_706_line_3857_5.gpkg")
@@ -127,6 +126,32 @@ mapview::mapview(routes_706, color="gray", lwd=5) + mapview::mapview(
   color="green", lwd=1
 )
 
+# interpolate values
+interpolated_from_source <- st_transform(osm_706_line, crs = 3857) |>
+  reframe(value = interpolate_intensive(osm_id, matches))
+
+# bind them together
+interpolated_target <- bind_cols(target, interpolated_from_source)
+
+
+  left_join(osm_706 |> st_drop_geometry()) |>
+  left_join(routes_706 |>
+              st_drop_geometry() |>
+              select(frequency, match_id)) |>
+  group_by(osm_id) |>
+  summarise(frequency = sum(frequency))
+
+mapview(
+  osm_706_line,
+  zcol = "frequency",
+  lwd.multiplier = 2 # acho que não faz nada
+)
+
+# não resolve. fica com "buracos"  e apanha partes que não devia.
+
+
+>>>>>>> Stashed changes
+
 
 st_write(routes_moraissoares_overline, paste0("data/", bus_operator, "_routes_moraissoares_freq.gpkg"))
 st_write(routes_706, paste0("data/", bus_operator, "_routes_706.gpkg"))
@@ -137,9 +162,12 @@ st_write(routes_742, paste0("data/", bus_operator, "_routes_742.gpkg"))
 # inspect in qgis
 
 
+<<<<<<< Updated upstream
 ## APPROACH EDGES
 library(sf)
 osm_706_line_3857 = st_transform(osm_706_line, crs=3857)
 start_points <- st_line_sample(osm_706_line_3857, sample = 0) %>% st_cast("POINT")
 end_points <- st_line_sample(osm_706_line_3857, sample = 1) %>% st_cast("POINT")
 mapview::mapview(start_points, layer.name="Start points", color="yellow") + mapview::mapview(end_points, layer.name="End points", color="black")
+=======
+>>>>>>> Stashed changes
