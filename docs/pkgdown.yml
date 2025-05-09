@@ -1,9 +1,9 @@
 pandoc: '3.2'
-pkgdown: 2.1.1
+pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
   analyse: analyse.html
   download: download.html
   filter: filter.html
   unify: unify.html
-last_built: 2025-05-06T13:22Z
+last_built: 2025-05-09T16:02Z

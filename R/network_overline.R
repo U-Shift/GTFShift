@@ -27,7 +27,7 @@
 #' @import dplyr
 #'
 #' @export
-network_overline <- function(network, df, attr, network_segment_length=100, fun=dplyr::sum) {
+network_overline <- function(network, df, attr, network_segment_length=100, fun=sum) {
   # 1. Prepare network
   network_line = stplanr::line_cast(st_transform(network, crs=3857))
   if (!is.na(network_segment_length)) {
