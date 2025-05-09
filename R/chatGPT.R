@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 library(dplyr)
 library(mapview)
 library(sf)
@@ -5,6 +6,12 @@ View(frequencies_route)
 summary(frequencies_route)
 
 routes_708 = frequencies_route %>%
+=======
+View(frequencies_route)
+summary(frequencies_route)
+
+routes_708 = routes_freq %>%
+>>>>>>> Stashed changes
   filter(route_short_name == "708")|>
   filter(arrival_hour == 8)
 
@@ -20,9 +27,13 @@ mapview::mapview(routes_708_overline,zcol = "frequency")
 st_write(routes_708_overline, "routes_708_overline.gpkg")
 
 
+<<<<<<< Updated upstream
 buffers <- sf::st_buffer(routes, dist = 5)
 st_write(buffers, "buffers.gpkg")
 
+=======
+buffers <- sf::st_buffer(routes, dist = 10)
+>>>>>>> Stashed changes
 mapview(buffers)
 View(buffers)
 
@@ -32,9 +43,12 @@ View(unioned_sf)
 mapview(unioned_sf)
 class(unioned_sf)
 
+<<<<<<< Updated upstream
 st_write(unioned_sf, "unioned_sf.gpkg")
 
 
+=======
+>>>>>>> Stashed changes
 
 network_lines <- st_boundary(unioned)
 network_lines <- st_cast(network_lines, "LINESTRING")
@@ -59,9 +73,17 @@ library(sf)
 library(units)
 
 m1 = midlines_draw(unioned_sf)
+<<<<<<< Updated upstream
 m1_m = midlines_draw(unioned_sf, dfMaxLength = set_units(5,"m"))
 mapview(m1)
 mapview(m1_m)
 
 m2 = midlines_clean(m1, n_removed = 1)
+=======
+m1_m = midlines_draw(unioned_sf, dfMaxLength = set_units(1,"m"))
+mapview(m1)
+mapview(m1_m)
+
+m2 = midlines_clean(m1, n_removed = 4)
+>>>>>>> Stashed changes
 mapview(m2[m2$removed_flag==0,])

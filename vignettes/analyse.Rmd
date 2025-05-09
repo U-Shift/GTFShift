@@ -44,8 +44,13 @@ Analyzing public transit feeds is important to understand its territorial covera
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "lisboa"
+<<<<<<< Updated upstream
 gtfs <- GTFShift::load_feed(data[data$ID==gtfs_id,]$URL)
 gtfs <- GTFShift::load_feed("database/transit/lisboa_gtfs.zip")
+=======
+gtfs <- GTFShift::download_feed(data[data$ID==gtfs_id,]$URL)
+gtfs <- GTFShift::download_feed("database/transit/lisboa_gtfs.zip")
+>>>>>>> Stashed changes
 ```
 
 
@@ -80,6 +85,7 @@ The analysis can be performed for each route individually.
 frequencies_route <- GTFShift::get_route_frequency_hourly(gtfs)
 summary(frequencies_route)
 mapview(frequencies_route)
+View(frequencies_route)
 st_write(frequencies_route, "frequencies_route.gpkg")
 ```
 
@@ -136,6 +142,8 @@ The `overline` parameter allows for an even more aggregated screening of the ope
 
 ```{r}
 frequencies_route_overline <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+07)
+st_write(frequencies_route_overline %>% filter(arrival_hour==8), "overline_carris.gpkg")
+
 frequencies_route_overline_5 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+05)
 frequencies_route_overline_4 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+04)
 frequencies_route_overline_3 <- GTFShift::get_route_frequency_hourly(gtfs, overline=1e+03)
@@ -153,7 +161,15 @@ summary(frequencies_route_overline_3)
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
 ### Aggregated routes for 8 a.m.
 ```{r}
+<<<<<<< Updated upstream
 mapview::mapview(frequencies_route |> filter(arrival_hour==8 & frequency > 2), zcol = "frequency", layer.name = "Frequency (hour)")
+=======
+mapview::mapview(
+  frequencies_route %>% filter(arrival_hour==8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+>>>>>>> Stashed changes
 st_write(frequencies_route, "frequencies_route.gpkg")
 
 ```
@@ -168,12 +184,57 @@ mapview::mapview(
   layer.name = "Frequency (hour)"
 )
 st_write(frequencies_route_overline, "frequencies_route_overline.gpkg")
+<<<<<<< Updated upstream
+=======
 ```
 </div>
 </div>
 
 
 
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes with overline for 8 a.m. (regionalise = 1e5)
+```{r}
+mapview::mapview(
+  frequencies_route_overline_5 %>% filter(arrival_hour==8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes with overline for 8 a.m. (regionalise = 1e4)
+```{r}
+# above 2 per hour
+mapview::mapview(
+  frequencies_route_overline_4 %>% filter(arrival_hour==8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+>>>>>>> Stashed changes
+```
+</div>
+</div>
+
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes with overline for 8 a.m. (regionalise = 1e3)
+```{r}
+mapview::mapview(
+  frequencies_route_overline_3 %>% filter(arrival_hour==8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+```
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+### Aggregated routes with overline for 8 a.m. 
+```{r}
+
+<<<<<<< Updated upstream
 
 <div style="display: flex; gap: 20px; overflow-x: auto;">
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -215,6 +276,8 @@ mapview::mapview(
 ### Aggregated routes with overline for 8 a.m. 
 ```{r}
 
+=======
+>>>>>>> Stashed changes
 ```
 </div>
 </div>
