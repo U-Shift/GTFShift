@@ -43,7 +43,7 @@ Analyzing public transit feeds is important to understand its territorial covera
 ```{r}
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_id = "cascais"
+gtfs_id = "lisboa"
 gtfs <- GTFShift::load_feed(data[data$ID==gtfs_id,]$URL)
 ```
 
@@ -111,5 +111,33 @@ mapview::mapview(
 </div>
 </div>
 
+## Improve visualization with `GTFShift::network_overline`
 
+Using the `overline` attribute in `GTFShift::get_route_frequency_hourly()` might not be the best option if the GTFS shapes do not share exactly the same geometry. In those cases, the overlapping lines might not be merged correctly, causing inconsistent results, such as a street with different frequencies along it, despite not having any bus stop in between those differences.
+
+![Overline error example](../inst/images/analyse_overline_error.png)
+
+This is a [known issue](https://github.com/ropensci/stplanr/issues/575) of `stplanr::overline2()`, the method used for the network aggregation that has not been solved yet.
+
+As an alternative, `GTFShift` provides the method `GTFShift::network_overline()`, that allows for the route aggregation. Given a simplified network, it identifies the segments corresponding to each route and uses them to aggregate the attribute defined in the parameters. It can be used to aggregate the frequencies. 
+
+> One approach for the network simplification could be through the centerlines determination. During the development of this project, no R packages were found suiting this purpose. [Centerline](https://github.com/atsyplenkov/centerline) package has this feature in its roadmap. Currently, there are available solutions for [Python](https://uscuni.org/neatnet/index.html) or [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
+
+Below is provided an example, that uses the centerlines for the Carris network as a simplification, generated in an external tool.
+
+```{r}
+network <- sf::st_read(system.file("extdata", "centerline_carris.gpkg", package = "GTFShift"))
+
+frequencies_route_overline_improved = GTFShift::network_overline(
+  network, 
+  frequencies_route %>% filter(arrival_hour==8),
+  attr = "frequency"
+)
+
+mapview::mapview(
+  frequencies_route_overline_improved %>% filter(frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+```
 
