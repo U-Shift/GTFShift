@@ -4,13 +4,7 @@
 \alias{network_overline}
 \title{Aggregate lines based on overlap with simplified network}
 \usage{
-network_overline(
-  network,
-  df,
-  attr,
-  network_segment_length = 100,
-  fun = dplyr::sum
-)
+network_overline(network, df, attr, network_segment_length = 100, fun = sum)
 }
 \arguments{
 \item{network}{sf. A spatial object representing the simplified network.}
