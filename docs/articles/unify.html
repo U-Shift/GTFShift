@@ -135,8 +135,32 @@ Portugal as an example. Refer to the <a href="./download">vignette(â€œdownloadâ€
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"gtfs_sources_pt.csv"</span>, package <span class="op">=</span> <span class="st">"GTFShift"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">gtfs_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"barreiro"</span>, <span class="st">"fertagus"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">ID</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/load_feed.html">load_feed</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">URL</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">ID</span> <span class="op">==</span> <span class="va">ID</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"database/transit/%s_gtfs.zip"</span>, <span class="va">ID</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="va">feed</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/load_feed.html">load_feed</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">URL</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">ID</span> <span class="op">==</span> <span class="va">ID</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="co"># If some GTFS does not have calendar.txt, but another yes, so we must create it to enable unification</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span> <span class="op">(</span><span class="st">"calendar"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">feed</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="va">feed</span><span class="op">$</span><span class="va">calendar</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/create_calendar.html">create_calendar</a></span><span class="op">(</span><span class="va">feed</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">feed</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">feed</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; tidygtfs object</span></span>
+<span><span class="co">#&gt; files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, feed_info, stops</span></span>
+<span><span class="co">#&gt; agency       Transportes Colectivos do Barreiro</span></span>
+<span><span class="co">#&gt; service      from 2024-12-01 to 2025-12-31</span></span>
+<span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
+<span><span class="co">#&gt; # routes       20</span></span>
+<span><span class="co">#&gt; # trips      3029</span></span>
+<span><span class="co">#&gt; # stop_ids    279</span></span>
+<span><span class="co">#&gt; # stop_names  162</span></span>
+<span><span class="co">#&gt; # shapes       75</span></span>
+<span><span class="co">#&gt; tidygtfs object</span></span>
+<span><span class="co">#&gt; files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops</span></span>
+<span><span class="co">#&gt; agency       Fertagus</span></span>
+<span><span class="co">#&gt; service      from 2025-01-18 to 2025-07-18</span></span>
+<span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
+<span><span class="co">#&gt; # routes       3</span></span>
+<span><span class="co">#&gt; # trips      260</span></span>
+<span><span class="co">#&gt; # stop_ids    14</span></span>
+<span><span class="co">#&gt; # stop_names  14</span></span>
+<span><span class="co">#&gt; # shapes       6</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="unify-gtfs">Unify GTFS<a class="anchor" aria-label="anchor" href="#unify-gtfs"></a>
