@@ -30,6 +30,13 @@
 #' @export
 unify <- function(gtfss, store_path=NA, generateTransfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
 
+  # Initial validation
+  has_calendar = sapply(gtfss, function(g) "calendar" %in% names(g))
+  has_calendar_dates_only = sapply(gtfss, function(g) "calendar_dates" %in% names(g) && !"calendar" %in% names(g))
+  if (any(has_calendar) && any(has_calendar_dates_only) && !all(has_calendar_dates_only)) {
+    stop("Feeds structure is inconsistent. There is at least one feed with calendar_dates.txt, but without calendar.txt, when others have it. Check GTFShift::create_calendar to fix this.")
+  }
+
   # Convert to GTFSWizard and merge them
   message(sprintf("1. Starting merge process..."))
   merged = NULL

@@ -12,6 +12,7 @@ reference:
   - title: Manipulate
     contents:
     - unify
+    - starts_with("create_")
   - title: External data
     contents:
     - starts_with("query_")
