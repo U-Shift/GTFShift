@@ -43,7 +43,11 @@ Public transit analysis takes advantage of the standardized GTFS format. However
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 
 gtfs_list <- lapply(c("barreiro", "fertagus"), function(ID) {
-  return(GTFShift::load_feed(data$URL[data$ID == ID], sprintf("database/transit/%s_gtfs.zip", ID)))
+  feed = GTFShift::load_feed(data$URL[data$ID == ID])
+  # If some GTFS does not have calendar.txt, but another yes, so we must create it to enable unification
+  if (! ("calendar" %in% names(feed))) feed$calendar = GTFShift::create_calendar(feed)
+  summary(feed)
+  return(feed)
 })
 ```
 
