@@ -24,7 +24,7 @@
 #' @seealso [GTFSwizard::merge_gtfs()]
 #' @seealso [gtfsrouter::gtfs_transfer_table()]
 #'
-#' @import GTFSwizard
+#' @importFrom GTFSwizard as_wizardgtfs merge_gtfs
 #' @import gtfsrouter
 #'
 #' @export
