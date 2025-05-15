@@ -33,7 +33,7 @@ network_overline <- function(network, df, attr, network_segment_length=100, fun=
   if (!is.na(network_segment_length)) {
     network_segmented = stplanr::line_segment(network_line, segment_length=network_segment_length) %>% mutate(segment=row_number())
   } else {
-    network_segmented = network_line
+    network_segmented = network_line %>% mutate(segment=row_number())
   }
 
   df = df %>% st_transform(crs=3857) %>% mutate(df_id=row_number())
