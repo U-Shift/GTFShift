@@ -1,0 +1,25 @@
+---
+title: "Get Started"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = FALSE,
+  comment = "#>"
+)
+```
+
+# Installation
+
+You can install the development version of `GTFShift` from GitHub with:
+```{r}
+# install.packages("remotes")
+remotes::install_github("GTFShift/GTFShift")
+```
+
+# Load the package
+
+```{r setup}
+library(GTFShift)
+```

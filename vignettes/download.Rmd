@@ -27,13 +27,12 @@ knitr::opts_chunk$set(
 ```{r setup, message=FALSE}
 library(GTFShift)
 library(tidytransit)
-library(sf)
-library(mapview)
 ```
 
 # Introduction
 
-Performing analysis over transit requires data on the operation and infrastructure. GTFShift includes some built in methods that can you assist gathering it.
+Performing analysis over transit requires data on the operation and infrastructure.
+GTFShift includes some built in methods that can you assist gathering it.
 
 # Download GTFS files 
 
@@ -41,7 +40,8 @@ Performing analysis over transit requires data on the operation and infrastructu
 
 The gathering of the GTFS files can be simplified by using public archives like [mobilitydatabase.org](https://mobilitydatabase.org/) or [transit.land](https://www.transit.land/).
 
-GTFShift provides a method to query Mobility Database: `GTFShift::query_mobilitydatabase()`. It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds with information about the providers, the area they cover and an URL to download them.
+GTFShift provides a method to query Mobility Database: `query_mobilitydatabase()`.
+It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds with information about the providers, the area they cover and an URL to download them.
 
 To use it, an access token must be provided. It can be obtained for free at Mobility Database website.
 
@@ -64,7 +64,8 @@ data[1:4,]
 
 ## Download and validate integrity
 
-`GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `GTFShift::load_feed()`. It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files and returns a tidygtfs object, that can be used in any other method of GTFShift or tidyrtransit packages.
+`GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `load_feed()`.
+It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files and returns a tidygtfs object, that can be used in any other method of GTFShift or tidyrtransit packages.
 
 ```{r message=TRUE, warning=TRUE}
 # DOWNLOAD GTFS and store it locally
@@ -74,17 +75,14 @@ summary(gtfs)
 
 # Download bus lanes 
 
-Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics. `GTFShift::osm_bus_lanes` allows to obtain the bus lanes network on Open Street Maps for a given area.
+Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics.
+`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMaps for a given area.
 
 ```{r}
-aml = st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg")
-aml = st_transform(aml, 4326)
+aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
+lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
 
-lisboa = aml[aml$Concelho == "Lisboa", ]
-
-bbox = st_bbox(lisboa)
-
-bus_lanes = GTFShift::osm_bus_lanes(bbox)
+bus_lanes = GTFShift::osm_bus_lanes(lisboa)
 
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
