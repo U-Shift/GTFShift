@@ -27,7 +27,7 @@ Imports:
   osmdata,
   stplanr,
   stringr
-URL: https://github.com/U-Shift/GTFShift
+URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
 RoxygenNote: 7.3.2
 Suggests: 
     knitr,

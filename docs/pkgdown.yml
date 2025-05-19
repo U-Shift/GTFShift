@@ -6,4 +6,7 @@ articles:
   download: download.html
   filter: filter.html
   unify: unify.html
-last_built: 2025-05-19T14:54Z
+last_built: 2025-05-19T15:06Z
+urls:
+  reference: https://u-shift.github.io/GTFShift/reference
+  article: https://u-shift.github.io/GTFShift/articles

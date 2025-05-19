@@ -4,83 +4,57 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Aggregate GTFS feeds • GTFShift</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Aggregate GTFS feeds">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/jquery-3.6.1/jquery-3.6.1.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Aggregate GTFS feeds">
 </head>
-<body data-spy="scroll" data-target="#toc">
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <div class="container template-article">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">GTFShift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
-      </span>
-    </div>
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
+    <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/analyse.html">Analyse GTFS feeds</a>
-    </li>
-    <li>
-      <a href="../articles/download.html">Download transit data</a>
-    </li>
-    <li>
-      <a href="../articles/filter.html">Filter GTFS feeds</a>
-    </li>
-    <li>
-      <a href="../articles/unify.html">Aggregate GTFS feeds</a>
-    </li>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/analyse.html">Analyse GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/download.html">Download transit data</a></li>
+    <li><a class="dropdown-item" href="../articles/filter.html">Filter GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/unify.html">Aggregate GTFS feeds</a></li>
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/U-Shift/GTFShift/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
-
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/U-Shift/GTFShift/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
-<!--/.nav-collapse -->
+
+
   </div>
-<!--/.container -->
-</div>
-<!--/.navbar -->
+</nav><div class="container template-article">
 
 
 
-      </header><link href="unify_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<link href="unify_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
 <script src="unify_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><link href="unify_files/leaflet-1.3.1/leaflet.css" rel="stylesheet">
 <script src="unify_files/leaflet-1.3.1/leaflet.js"></script><link href="unify_files/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
 <script src="unify_files/proj4-2.6.2/proj4.min.js"></script><script src="unify_files/Proj4Leaflet-1.0.1/proj4leaflet.js"></script><link href="unify_files/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
@@ -88,14 +62,13 @@
 <script src="unify_files/clipboard-0.0.1/setClipboardText.js"></script><link href="unify_files/mapviewCSS-0.0.1/mapview-popup.css" rel="stylesheet">
 <link href="unify_files/mapviewCSS-0.0.1/mapview.css" rel="stylesheet">
 <div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Aggregate GTFS feeds</h1>
+  <main id="main" class="col-md-9"><div class="page-header">
+
+      <h1>Aggregate GTFS feeds</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/HEAD/vignettes/unify.Rmd" class="external-link"><code>vignettes/unify.Rmd</code></a></small>
-      <div class="hidden name"><code>unify.Rmd</code></div>
-
+      <div class="d-none name"><code>unify.Rmd</code></div>
     </div>
 
     
@@ -108,9 +81,7 @@
 }
 </style>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>warning <span class="op">=</span> <span class="cn">FALSE</span>, message <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/U-Shift/GTFShift" class="external-link">GTFShift</a></span><span class="op">)</span></span>
-<span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/U-Shift/GTFShift" class="external-link">GTFShift</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-transit/tidytransit" class="external-link">tidytransit</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/mapview" class="external-link">mapview</a></span><span class="op">)</span></span></code></pre></div>
@@ -128,9 +99,9 @@ Portugal as an example. Refer to the <a href="./download">vignette(“download�
 </blockquote>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get GTFS from library GTFS database for Portugal</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"gtfs_sources_pt.csv"</span>, package <span class="op">=</span> <span class="st">"GTFShift"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"gtfs_sources_pt.csv"</span>, package <span class="op">=</span> <span class="st">"GTFShift"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">gtfs_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"barreiro"</span>, <span class="st">"fertagus"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">ID</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">gtfs_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"barreiro"</span>, <span class="st">"fertagus"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">ID</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">feed</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/load_feed.html">load_feed</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">URL</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">ID</span> <span class="op">==</span> <span class="va">ID</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="co"># If some GTFS does not have calendar.txt, but another yes, so we must create it to enable unification</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span> <span class="op">(</span><span class="st">"calendar"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">feed</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="va">feed</span><span class="op">$</span><span class="va">calendar</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/create_calendar.html">create_calendar</a></span><span class="op">(</span><span class="va">feed</span><span class="op">)</span></span>
@@ -138,7 +109,7 @@ Portugal as an example. Refer to the <a href="./download">vignette(“download�
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">feed</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidygtfs object</span></span>
-<span><span class="co">#&gt; files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, feed_info, stops</span></span>
+<span><span class="co">#&gt; files        agency, stops, routes, trips, stop_times, calendar, calendar_dates, shapes, feed_info</span></span>
 <span><span class="co">#&gt; agency       Transportes Colectivos do Barreiro</span></span>
 <span><span class="co">#&gt; service      from 2024-12-01 to 2025-12-31</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
@@ -148,7 +119,7 @@ Portugal as an example. Refer to the <a href="./download">vignette(“download�
 <span><span class="co">#&gt; # stop_names  162</span></span>
 <span><span class="co">#&gt; # shapes       75</span></span>
 <span><span class="co">#&gt; tidygtfs object</span></span>
-<span><span class="co">#&gt; files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops</span></span>
+<span><span class="co">#&gt; files        agency, stops, routes, trips, stop_times, calendar, calendar_dates, fare_attributes, fare_rules, shapes, feed_info, vehicles</span></span>
 <span><span class="co">#&gt; agency       Fertagus</span></span>
 <span><span class="co">#&gt; service      from 2025-01-18 to 2025-07-18</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
@@ -168,10 +139,10 @@ producing a single GTFS instance, saved as a ZIP file. Option
 different GTFS.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform unification</span></span>
-<span><span class="va">gtfs_united</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/unify.html">unify</a></span><span class="op">(</span><span class="va">gtfs_list</span>, generateTransfers<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">gtfs_united</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/unify.html">unify</a></span><span class="op">(</span><span class="va">gtfs_list</span>, generateTransfers <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidygtfs object</span></span>
-<span><span class="co">#&gt; files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, transfers, calendar, calendar_dates, feed_info, stops</span></span>
+<span><span class="co">#&gt; files        agency, stops, routes, trips, stop_times, calendar, calendar_dates, fare_attributes, fare_rules, shapes, transfers, feed_info</span></span>
 <span><span class="co">#&gt; agencies     Transportes Colectivos do Barreiro, Fertagus</span></span>
 <span><span class="co">#&gt; service      from 2024-12-01 to 2025-12-31</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
@@ -186,14 +157,14 @@ different GTFS.</p>
 <h4 id="aggregated-routes">Aggregated routes<a class="anchor" aria-label="anchor" href="#aggregated-routes"></a>
 </h4>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">shape_agency</span> <span class="op">&lt;-</span> <span class="va">gtfs_united</span><span class="op">$</span><span class="va">trips</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">routes</span>, by <span class="op">=</span> <span class="st">"route_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">agency</span>, by <span class="op">=</span> <span class="st">"agency_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">shape_id</span>, <span class="va">agency_id</span>, <span class="va">agency_name</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">shape_agency</span> <span class="op">=</span> <span class="va">gtfs_united</span><span class="op">$</span><span class="va">trips</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">routes</span>, by <span class="op">=</span> <span class="st">"route_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">agency</span>, by <span class="op">=</span> <span class="st">"agency_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">shape_id</span>, <span class="va">agency_id</span>, <span class="va">agency_name</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">shapes_sf</span> <span class="op">=</span> <span class="fu">tidytransit</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytransit/man/shapes_as_sf.html" class="external-link">shapes_as_sf</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">shapes</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">shape_agency</span>, by <span class="op">=</span> <span class="st">"shape_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">shapes_sf</span> <span class="op">=</span> <span class="fu">tidytransit</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytransit/man/shapes_as_sf.html" class="external-link">shapes_as_sf</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">shapes</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">shape_agency</span>, by <span class="op">=</span> <span class="st">"shape_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">agency_id</span><span class="op">)</span><span class="op">)</span></span>
 <span>  </span>
 <span><span class="fu">mapview</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mapview/man/mapView.html" class="external-link">mapview</a></span><span class="op">(</span><span class="va">shapes_sf</span>, zcol <span class="op">=</span> <span class="st">"agency_name"</span>, legend <span class="op">=</span> <span class="cn">TRUE</span>, layer.name<span class="op">=</span><span class="st">"Agency"</span><span class="op">)</span></span></code></pre></div>
@@ -204,15 +175,15 @@ different GTFS.</p>
 <h4 id="aggregated-stops">Aggregated stops<a class="anchor" aria-label="anchor" href="#aggregated-stops"></a>
 </h4>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">stop_agency</span> <span class="op">&lt;-</span> <span class="va">gtfs_united</span><span class="op">$</span><span class="va">stop_times</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">trips</span>, by <span class="op">=</span> <span class="st">"trip_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">routes</span>, by <span class="op">=</span> <span class="st">"route_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">agency</span>, by <span class="op">=</span> <span class="st">"agency_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">stop_id</span>, <span class="va">agency_id</span>, <span class="va">agency_name</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">stop_agency</span> <span class="op">=</span> <span class="va">gtfs_united</span><span class="op">$</span><span class="va">stop_times</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">trips</span>, by <span class="op">=</span> <span class="st">"trip_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">routes</span>, by <span class="op">=</span> <span class="st">"route_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">agency</span>, by <span class="op">=</span> <span class="st">"agency_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">stop_id</span>, <span class="va">agency_id</span>, <span class="va">agency_name</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">stops_sf</span> <span class="op">=</span> <span class="fu">tidytransit</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytransit/man/stops_as_sf.html" class="external-link">stops_as_sf</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">stops</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">stop_agency</span>, by <span class="op">=</span> <span class="st">"stop_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">stops_sf</span> <span class="op">=</span> <span class="fu">tidytransit</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytransit/man/stops_as_sf.html" class="external-link">stops_as_sf</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">stops</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">stop_agency</span>, by <span class="op">=</span> <span class="st">"stop_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">agency_id</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">mapview</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mapview/man/mapView.html" class="external-link">mapview</a></span><span class="op">(</span><span class="va">stops_sf</span>, zcol <span class="op">=</span> <span class="st">"agency_name"</span>, legend <span class="op">=</span> <span class="cn">TRUE</span>, layer.name<span class="op">=</span><span class="st">"Agency"</span><span class="op">)</span></span></code></pre></div>
@@ -221,29 +192,22 @@ different GTFS.</p>
 </div>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-
-      </div>
-
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
 
-      <footer><div class="copyright">
-  <p></p>
-<p>Developed by Rosa Félix, Gabriel Valença, Gonçalo Matos.</p>
+    <footer><div class="pkgdown-footer-left">
+  <p>Developed by Gonçalo Matos, Rosa Félix.</p>
 </div>
 
-<div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+<div class="pkgdown-footer-right">
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
-
 
 
 
