@@ -133,7 +133,7 @@ mapview::mapview(
 
 Using the `overline` attribute in `GTFShift::get_route_frequency_hourly()` might not be the best option if the GTFS shapes do not share exactly the same geometry. In those cases, the overlapping lines might not be merged correctly, causing inconsistent results, such as a street with different frequencies along it, despite not having any bus stop in between those differences.
 
-![Overline error example](../inst/images/analyse_overline_error.png)
+![Overline error example](./vignettes/images/analyse_overline_error.png)
 
 This is a [known issue](https://github.com/ropensci/stplanr/issues/575) of `stplanr::overline2()`, the method used for the network aggregation that has not been solved yet.
 
