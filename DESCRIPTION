@@ -34,3 +34,4 @@ Suggests:
     rmarkdown,
     mapview
 VignetteBuilder: knitr
+Config/Needs/website: rmarkdown
