@@ -11,6 +11,8 @@ Description: GTFShift emerged from the necessity to perform systematic analysis 
   Its functionality is built mostly on [tidytransit](https://r-transit.github.io/tidytransit/) package.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Depends:
+  R (>= 4.1.0)
 Imports: 
   tidytransit,
   GTFSwizard,
