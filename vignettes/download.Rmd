@@ -18,14 +18,14 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
   comment = "#>"
 )
 ```
 
 ```{r setup, message=FALSE}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 library(GTFShift)
-
 library(tidytransit)
 library(sf)
 library(mapview)
@@ -57,7 +57,7 @@ This library offers a small database with a compilation of GTFS files for Portug
 
 
 ```{r message=TRUE, warning=FALSE}
-data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 summary(data)
 data[1:4,]
 ```
@@ -68,7 +68,7 @@ data[1:4,]
 
 ```{r message=TRUE, warning=TRUE}
 # DOWNLOAD GTFS and store it locally
-gtfs <- GTFShift::load_feed(data[data$ID=="cp",]$URL)
+gtfs = GTFShift::load_feed(data[data$ID=="cp",]$URL)
 summary(gtfs)
 ```
 
@@ -77,15 +77,14 @@ summary(gtfs)
 Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics. `GTFShift::osm_bus_lanes` allows to obtain the bus lanes network on Open Street Maps for a given area.
 
 ```{r}
-aml <- st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg")
-aml <- st_transform(aml, 4326)
+aml = st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg")
+aml = st_transform(aml, 4326)
 
-lisboa <- aml[aml$Concelho == "Lisboa", ]
+lisboa = aml[aml$Concelho == "Lisboa", ]
 
 bbox = st_bbox(lisboa)
 
-bus_lanes <- GTFShift::osm_bus_lanes(bbox)
+bus_lanes = GTFShift::osm_bus_lanes(bbox)
 
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
-
