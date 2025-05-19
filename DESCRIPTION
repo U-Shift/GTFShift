@@ -23,6 +23,8 @@ Imports:
   httr,
   jsonlite,
   dplyr,
+  osmdata,
+  stplanr,
   stringr
 URL: https://github.com/U-Shift/GTFShift
 RoxygenNote: 7.3.2
