@@ -17,15 +17,15 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup, message=FALSE}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```{r setup}
 library(GTFShift)
-
 library(tidytransit)
 library(mapview)
 library(sf)
