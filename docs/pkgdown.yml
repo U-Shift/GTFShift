@@ -1,4 +1,4 @@
-pandoc: '3.4'
+pandoc: '3.2'
 pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
@@ -7,7 +7,7 @@ articles:
   filter: filter.html
   articles/GTFShift: GTFShift.html
   unify: unify.html
-last_built: 2025-05-19T16:06Z
+last_built: 2025-05-20T10:55Z
 urls:
   reference: https://u-shift.github.io/GTFShift/reference
   article: https://u-shift.github.io/GTFShift/articles
