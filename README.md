@@ -44,6 +44,9 @@ Narrowing the scope is also possible, using filtering methods according to multi
 Finally, network density can be analyzed at the stop level, with `get_stop_frequency_hourly()`, or at the 
 route level, with `get_route_frequency_hourly()`. This analysis is aggregated by stop, route, and hour.
 
+![](assets/map.png)
+> Aggregated route frequency for Carris Lisboa operator, at 8:00
+
 ### External data
 If the GTFS feed location is unknown, it can be queried using `query_mobilitydatabase()`, a method that 
 asks the Mobility Database API for the feeds that match the parameters provided, such as the municipality, 
