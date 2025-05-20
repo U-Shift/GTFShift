@@ -1,10 +1,11 @@
 library(GTFShift)
 library(tidytransit)
+library(sf)
 
 date = "2025-05-14"
 
 # Get bbox for Lisbon
-aml <- st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg")
+aml <- st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
 aml <- st_transform(aml, 4326)
 
 lisboa <- aml[aml$Concelho == "Lisboa", ]
