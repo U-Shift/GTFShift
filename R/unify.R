@@ -25,7 +25,7 @@
 #' @seealso [gtfsrouter::gtfs_transfer_table()]
 #'
 #' @importFrom GTFSwizard as_wizardgtfs merge_gtfs
-#' @import gtfsrouter
+#' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
 unify <- function(gtfss, store_path=NA, generateTransfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {

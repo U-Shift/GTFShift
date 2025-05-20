@@ -4,7 +4,14 @@
 \alias{network_overline}
 \title{Aggregate lines based on overlap with simplified network}
 \usage{
-network_overline(network, df, attr, network_segment_length = 100, fun = sum)
+network_overline(
+  network,
+  df,
+  attr,
+  network_segment_length = 100,
+  fun = sum,
+  join_dist = 10
+)
 }
 \arguments{
 \item{network}{sf. A spatial object representing the simplified network.}
@@ -16,6 +23,8 @@ network_overline(network, df, attr, network_segment_length = 100, fun = sum)
 \item{network_segment_length}{Integer. (Default 100) If not NA, network is split in segments of defined meters.}
 
 \item{fun.}{Method. (Default sim) Function to summarise the attributes by.}
+
+\item{join_dist.}{Integer. (Default 10) Meters to consider when joining routes and network segments.}
 }
 \value{
 A spatial object of the network provided, extended with the aggregated values. A `segment` column will be also added to the network, as a unique identifier used for the aggregation process.
@@ -31,7 +40,11 @@ the segments corresponding to each line and uses them to aggregate the attribute
 \dontrun{
 network = st_read("network_centerlines.gpkg")
 frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
-GTFShift::network_overline(network, frequency_analysis \%>\% filter(arrival_hour==8), attr = "frequency")
+GTFShift::network_overline(
+  network, f
+  requency_analysis \%>\% filter(arrival_hour==8),
+  attr = "frequency"
+)
 }
 
 }
