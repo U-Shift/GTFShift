@@ -1,3 +1,7 @@
+url: https://u-shift.github.io/GTFShift/
+template:
+  bootstrap: 5
+
 reference:
   - title: Read
     contents:

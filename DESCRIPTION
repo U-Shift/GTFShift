@@ -3,15 +3,16 @@ Type: Package
 Title: Explore and Analyse General Transit Feed Specification (GTFS) Files With a Focus on Urban Mobility 
 Version: 0.4.0
 Authors@R: c(
-  person("Rosa", "Félix", , "rosamfelix@@tecnico.ulisboa.pt", role = c("aut"), comment = c(ORCID = "0000-0002-5642-6006")),
-  person("Gabriel", "Valença", , "gabrielvalenca@tecnico.ulisboa.pt", role = "aut", comment = c(ORCID = "0000-0002-3684-3005")),
-  person("Gonçalo", "Matos", , "goncaloafmatos@tecnico.ulisboa.pt", role = c("aut", "cre")))
+  person("Gonçalo", "Matos", , "goncaloafmatos@tecnico.pt", role = c("aut", "cre"), comment = c(ORCID = "0009-0001-3489-1732")),
+  person("Rosa", "Félix", , "rosamfelix@tecnico.pt", role = c("aut"), comment = c(ORCID = "0000-0002-5642-6006")))
 Description: GTFShift emerged from the necessity to perform systematic analysis for academic research
   over General Transit Feed Specification (GTFS) files that were not supported by any R library. It compiles 
   the methods developed for this purpose, aiming to contribute to an open source culture.
   Its functionality is built mostly on [tidytransit](https://r-transit.github.io/tidytransit/) package.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Depends:
+  R (>= 4.1.0)
 Imports: 
   tidytransit,
   GTFSwizard,
@@ -23,11 +24,14 @@ Imports:
   httr,
   jsonlite,
   dplyr,
+  osmdata,
+  stplanr,
   stringr
-URL: https://github.com/U-Shift/GTFShift
+URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
 RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
     mapview
 VignetteBuilder: knitr
+Config/Needs/website: rmarkdown
