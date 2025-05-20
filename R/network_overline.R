@@ -5,6 +5,7 @@
 #' @param attr String. The attribute to aggregate the lines by.
 #' @param network_segment_length Integer. (Default 100) If not NA, network is split in segments of defined meters.
 #' @param fun. Method. (Default sim) Function to summarise the attributes by.
+#' @param join_dist. Integer. (Default 10) Meters to consider when joining routes and network segments.
 #'
 #' @details
 #' This method allows for the lines aggregation. Given a simplified network, it identifies (using `stplanr::rnet_join()`)
@@ -27,7 +28,7 @@
 #' @import dplyr
 #'
 #' @export
-network_overline <- function(network, df, attr, network_segment_length=100, fun=sum) {
+network_overline <- function(network, df, attr, network_segment_length=100, fun=sum, join_dist=10) {
   # 1. Prepare network
   network_line = stplanr::line_cast(st_transform(network, crs=3857))
   if (!is.na(network_segment_length)) {
@@ -43,7 +44,7 @@ network_overline <- function(network, df, attr, network_segment_length=100, fun=
      rnet_y = network_segmented |> select(segment),
      length_y = FALSE,
      key_column = "df_id",
-     dist = 10
+     dist = join_dist
   ) |> st_drop_geometry()
 
   df_network_attr = df_network_match %>%
