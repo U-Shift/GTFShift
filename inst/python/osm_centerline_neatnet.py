@@ -15,7 +15,7 @@ def safe_features(bbox, study_area, tags):
 
 
 def explode_multilines(gdf):
-    gdf = gdf.explode(index_parts = False)
+    gdf = gdf.explode(index_parts=False)
     gdf = gdf[gdf.geometry.type == "LineString"]
     return gdf
 
@@ -156,3 +156,5 @@ def get_centerline(bbox, study_area, use_buildings, output_path):
     # 4 Reprojecting layers to EPSG:4326 and storing to output path provided
     street_lines_4326 = street_lines.to_crs(epsg=4326)
     street_lines_4326.to_file(output_path, layer="street_lines", driver="GPKG")
+    
+    return street_lines_4326

@@ -38,8 +38,8 @@ osm_centerlines <- function(bbox=NULL, place=NULL, use_buildings = TRUE, venv="r
   stopifnot(file.exists(py_script))
 
   # Call Python script via reticulate
-  py_run_file(py_script, local = TRUE)
-  py$get_centerline(bbox, place, use_buildings, temp_file)
+  reticulate::source_python(system.file("python", "osm_centerline_neatnet.py", package = "GTFShift"))
+  get_centerline(bbox, place, use_buildings, temp_file)
 
   # Read the GPKG file as sf
   result <- sf::st_read(temp_file, quiet = TRUE)
