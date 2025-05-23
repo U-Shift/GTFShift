@@ -1,10 +1,16 @@
-#' Export centerlines for OSM road network
+#' Get centerlines for OSM road network
 #'
-#' @param bbox bbox. Area from which to export bus lanes.
+#' @param bbox bbox. (Optional, if place provided) Area from which to export bus lanes.
+#' @param place String. (Optional, if bbox provided) Place from which to export bus lanes.
+#' @param use_buildings Boolean. (Default True) Uses buildings from OSM as exclusion_mask for neatnet.
 #' @param venv String. (Default r-reticulate) Python environment where neatnet will run.
 #'
 #' @details
-#' ...
+#' Exports road network from Open Street Maps for given area and uses
+#' Python \href{https://uscuni.org/neatnet/}{neatnet} package to compute its centerlines.
+#' One of `bbox` or `place` must be provided. If both, `bbox` is considered.
+#' Parameter `use_buildings` exports building footprints from OSM for better results on
+#' the network simplification process.
 #'
 #' @returns osm_lines in sf format
 #'
@@ -14,18 +20,11 @@
 #' network <- GTFShift::osm_centerlines(BBOX)
 #' }
 #'
-#' @import osmdata
+#' @import reticulate
 #' @import sf
-#' @import dplyr
 #'
 #' @export
-library(reticulate)
-library(sf)
-venv="r-reticulate"
-osm_centerlines <- function(bbox, venv="r-reticulate") {
-
-  # TODOOO! Change Município de Lisboa, Portugal to bbox!!
-
+osm_centerlines <- function(bbox=NULL, place=NULL, use_buildings = TRUE, venv="r-reticulate") {
   # Set up Python environment
   reticulate::use_virtualenv(venv, required = TRUE)
 
@@ -33,17 +32,14 @@ osm_centerlines <- function(bbox, venv="r-reticulate") {
   py_install(packages = c("osmnx", "pandas", "geopandas", "shapely", "neatnet"), pip = TRUE, pip_ignore_installed=TRUE)
 
   # Define path to script and temp output
-  py_script <- system.file("python/osm_centerline_neatnet.py", package = "GTFShift")
-  #TODO! Delete line below before compiling
-  py_script <- "inst/python/osm_centerline_neatnet.py"
-
+  py_script <- system.file("python", "osm_centerline_neatnet.py", package = "GTFShift")
   temp_file <- tempfile(fileext = ".gpkg")
+
+  stopifnot(file.exists(py_script))
 
   # Call Python script via reticulate
   py_run_file(py_script, local = TRUE)
-
-  # Optional: pass arguments to the script
-  py$get_centerline("Município de Lisboa, Portugal", temp_file)
+  py$get_centerline(bbox, place, use_buildings, temp_file)
 
   # Read the GPKG file as sf
   result <- sf::st_read(temp_file, quiet = TRUE)
