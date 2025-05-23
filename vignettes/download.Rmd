@@ -100,7 +100,7 @@ Performing an aggregated analysis for the spatial distribution of the route freq
 
 ### Original network
 
-```{r}
+```{r original_network}
 library(osmdata)
 
 road_osm = opq("Arroios, Lisboa, Portugal") |>
@@ -113,15 +113,17 @@ road_osm = road_osm$osm_lines
 
 mapview::mapview(road_osm)
 ```
+
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
 
 ### Simplified network
 
-```{r}
-# centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
+```{r simplified_network}
+centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
 
-# mapview::mapview(centerlines)
+mapview::mapview(centerlines)
 ```
+
 </div>
 </div>
