@@ -52,7 +52,7 @@ load_feed <- function(path, store_path=NA, create_transfers=FALSE, transfer_dist
   ## If no shapes.txt, create them automatically with GTFSwizard
   if (!("shapes" %in% names(gtfs))) {
     # GTFSwizard::get_shapes is automatically applied when it detected shapes are missing
-    gtfs_fixed <- GTFSwizard::as_wizardgtfs(gtfs)
+    suppressMessages(suppressWarnings({gtfs_fixed <- GTFSwizard::as_wizardgtfs(gtfs)}))
     gtfs$shapes <- gtfs_fixed$shapes
     gtfs$trips <- gtfs_fixed$trips
     warning(sprintf("> CREATED shapes.txt, the file was missing!"))
