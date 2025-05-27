@@ -19,3 +19,7 @@ StripTrailingWhitespace: Yes
 BuildType: Package
 PackageUseDevtools: Yes
 PackageInstallArgs: --no-multiarch --with-keep.source
+
+PythonType: virtualenv
+PythonVersion: 3.12.3
+PythonPath: ~/.virtualenvs/r-reticulate/bin/python
