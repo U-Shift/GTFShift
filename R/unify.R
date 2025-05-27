@@ -2,7 +2,7 @@
 #'
 #' @param gtfss tidygtfs[]. List of GTFS feeds.
 #' @param store_path. String. (Optional) If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.
-#' @param generateTransfers Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.
+#' @param create_transfers Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.
 #' @param transfer_distance Integer. (Default 300) Upper straight-line distance limit in metres for transfers.
 #' @param transfer_time Integer. (Default 120) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
 #' @param transfer_street_routing (Default FALSE) If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
@@ -18,7 +18,7 @@
 #' \dontrun{
 #' gtfs1 <- GTFShift::load_feed("gtfs1.zip")
 #' gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-#' unified <- GTFShift::unify(list(gtfs1, gtfs2), generateTransfers=TRUE)
+#' unified <- GTFShift::unify(list(gtfs1, gtfs2), create_transfers=TRUE)
 #' }
 #'
 #' @seealso [GTFSwizard::merge_gtfs()]
@@ -28,7 +28,7 @@
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-unify <- function(gtfss, store_path=NA, generateTransfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
 
   # Initial validation
   has_calendar = sapply(gtfss, function(g) "calendar" %in% names(g))
@@ -60,7 +60,7 @@ unify <- function(gtfss, store_path=NA, generateTransfers=TRUE, transfer_distanc
   gtfs <- tidytransit::read_gtfs(gtfs_temp)
 
   # Generate transfers.txt
-  if (generateTransfers) {
+  if (create_transfers) {
     message(sprintf("2. Generating transfers..."))
     merged_router <- gtfsrouter::extract_gtfs(gtfs_temp)
     # Use default parameters:
