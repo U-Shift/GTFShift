@@ -63,8 +63,6 @@ unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance
   if (create_transfers) {
     message(sprintf("2. Generating transfers..."))
     merged_router <- gtfsrouter::extract_gtfs(gtfs_temp)
-    # Use default parameters:
-    # 200 meters distance, 120 sec time, routing through the road network (?)
     merged_router <- gtfsrouter::gtfs_transfer_table(merged_router, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
 
     # gtfsrouter::extract_gtfs converts stop times to seconds, lets get it back to the format HH:mm before storing it...

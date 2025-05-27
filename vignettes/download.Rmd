@@ -65,12 +65,13 @@ data[1:4,]
 ## Download and validate integrity
 
 `GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `load_feed()`.
-It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files and returns a tidygtfs object, that can be used in any other method of GTFShift or tidyrtransit packages.
+It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files and returns a tidygtfs object, that can be used in any other method of GTFShift or tidyrtransit packages. 
+
+Option `create_transfers` enables the generation of `transfers.txt`, aggregating close stops.
 
 ```{r message=TRUE, warning=TRUE}
 # DOWNLOAD GTFS and store it locally
-gtfs = GTFShift::load_feed(data[data$ID=="cp",]$URL)
-summary(gtfs)
+gtfs = load_feed(data[data$ID=="cp",]$URL, create_transfers=TRUE)
 ```
 
 # Download bus lanes 
