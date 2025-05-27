@@ -43,7 +43,16 @@ The gathering of the GTFS files can be simplified by using public archives like 
 GTFShift provides a method to query Mobility Database: `query_mobilitydatabase()`.
 It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds with information about the providers, the area they cover and an URL to download them.
 
-To use it, an access token must be provided. It can be obtained for free at Mobility Database website.
+To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
+
+```{r}
+# use usethis::edit_r_environ() to set MOBILITYDB_API_KEY variable for this code chunk to work
+feeds <- GTFShift::query_mobilitydatabase(Sys.getenv("MOBILITYDB_API_KEY"), country_code="PT", is_official=TRUE)
+feeds[1:4, c("provider", "status", "producer_url")]
+```
+
+
+
 
 ## Use GTFShift incorporated database for Portugal
 
@@ -86,3 +95,4 @@ bus_lanes = GTFShift::osm_bus_lanes(lisboa)
 
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
+
