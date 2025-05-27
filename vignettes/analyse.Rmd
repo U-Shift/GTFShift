@@ -147,7 +147,7 @@ network = sf::st_read(system.file("extdata", "centerline_carris.gpkg",
 
 frequencies_route_overline_improved = GTFShift::network_overline(
   network, 
-  frequencies_route |> filter(arrival_hour==8),
+  frequencies_route |> filter(arrival_hour == 8),
   attr = "frequency"
 )
 
