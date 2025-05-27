@@ -33,6 +33,7 @@
 #'
 #' @import httr
 #' @import dplyr
+#' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
 query_mobilitydatabase <- function(
