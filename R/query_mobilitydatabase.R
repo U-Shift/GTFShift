@@ -27,7 +27,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official_=TRUE)
+#' feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official=TRUE)
 #' }
 #'
 #' @import httr
@@ -72,6 +72,10 @@ query_mobilitydatabase <- function(
 
   # Convert response to data.frame
   content <- content(response, as = "parsed")
+
+  if(http_error(response)) {
+    stop(sprintf("Mobility database bad response: %s", http_status(response)))
+  }
 
 
   safe_extract <- function(x) if (is.null(x)) NA else x
