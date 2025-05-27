@@ -45,14 +45,23 @@ It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds wit
 
 To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
 
-```{r}
+``` r
 # use usethis::edit_r_environ() to set MOBILITYDB_API_KEY variable for this code chunk to work
+
 feeds <- GTFShift::query_mobilitydatabase(Sys.getenv("MOBILITYDB_API_KEY"), country_code="PT", is_official=TRUE)
+
 feeds[1:4, c("provider", "status", "producer_url")]
+#>                           provider status
+#> 1       A Onda - Mobilidade Urbana active
+#> 2 Apanha-me! - Transportes Urbanos active
+#> 3             Carris Metropolitana active
+#> 4      Cascais Próxima, E.M., S.A. active
+#>                                                                       producer_url
+#> 1 https://drive.google.com/uc?export=download&id=1aPfsxHqopxxcjV8HlRzImzxh_a6zRxGp
+#> 2 https://drive.google.com/uc?export=download&id=1w92h129CWNSoImBRZQOWT6KRPzSFwJ42
+#> 3                                          https://api.carrismetropolitana.pt/gtfs
+#> 4 https://drive.google.com/uc?export=download&id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX
 ```
-
-
-
 
 ## Use GTFShift incorporated database for Portugal
 
