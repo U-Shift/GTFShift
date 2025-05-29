@@ -45,10 +45,15 @@ It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds wit
 
 To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
 
-``` r
-# use usethis::edit_r_environ() to set MOBILITYDB_API_KEY variable for this code chunk to work
 
-feeds <- GTFShift::query_mobilitydatabase(Sys.getenv("MOBILITYDB_API_KEY"), country_code="PT", is_official=TRUE)
+```{r evalate=FALSE, message=FALSE, warning=FALSE}}
+# usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work
+
+feeds = GTFShift::query_mobilitydatabase(Sys.getenv("MOBILITY_DATABASE"),
+                                          country_code="PT")
+```
+
+```r
 
 feeds[1:4, c("provider", "status", "producer_url")]
 #>                           provider status
