@@ -8,16 +8,17 @@
 #' @param country_code. String. (Optional) Filter feeds by their exact country code.
 #' @param subdivision_name. String. (Optional) List only feeds with the specified value. Can be a partial match.
 #' @param municipality String. (Optional) List only feeds with the specified value. Can be a partial match. Case insensitive.
+#' @param bbox bbox (Optional) Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.
 #' @param dataset_latitudes Double[]. (Optional) Minimum and maximum latitudes of the bounding box to use for filtering.
 #' @param dataset_longitudes Double[]. (Optional) Minimum and maximum longitudes of the bounding box to use for filtering.
-#' @param is_official. Boolean. (Optional) If true, only return official feeds.
+#' @param is_official. Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.
 #'
 #' @details
 #' This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform. To use it, an access token must be provided. It can be obtained for free at Mobility Database website.\cr\cr
 #' For more details on the parameters, refer to \url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
 #' Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:
 #' \itemize{
-#'  \item `Provider`. The name of the GTFS provider.
+#'  \item `provider`. The name of the GTFS provider.
 #'  \item `status`. Tells if the feed is active, inactive or deprecated.
 #'  \item `producer_url`. The GTFS feed URL. Can be used to download.
 #' }
@@ -27,24 +28,24 @@
 #'
 #' @examples
 #' \dontrun{
-#' feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official_=TRUE)
+#' feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official=TRUE)
 #' }
 #'
 #' @import httr
 #' @import dplyr
+#' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-query_mobilitydatabase <- function(
-    token,
-    bounding_filter_method = "partially_enclosed",
-    limit=10,
-    offset=0,
-    country_code=NA,
-    subdivision_name=NA,
-    municipality=NA,
-    dataset_latitudes=NA,
-    dataset_longitudes=NA,
-    is_official=NA
+query_mobilitydatabase <- function(token,
+                                   bounding_filter_method = "partially_enclosed",
+                                   limit = 10,
+                                   offset = 0,
+                                   country_code = NA,
+                                   subdivision_name = NA,
+                                   municipality = NA,
+                                   bbox = NA,
+                                   is_official = NA
+
 ) {
 
   url <- "https://api.mobilitydatabase.org/v1/gtfs_feeds"
@@ -57,8 +58,10 @@ query_mobilitydatabase <- function(
   if (!is.na(country_code)) params["country_code"] = country_code
   if (!is.na(subdivision_name)) params["subdivision_name"] = subdivision_name
   if (!is.na(municipality)) params["municipality"] = municipality
-  if (!is.na(dataset_latitudes)) params["dataset_latitudes"] = dataset_latitudes
-  if (!is.na(dataset_longitudes)) params["dataset_longitudes"] = dataset_longitudes
+  if (!is.na(bbox)) {
+    params["dataset_latitudes"] = sprintf("%f,%f", bbox$ymin[[1]], bbox$ymax[[1]])
+    params["dataset_longitudes"] = sprintf("%f,%f", bbox$xmin[[1]], bbox$xmax[[1]])
+  }
   if (!is.na(is_official)) params["is_official"] = is_official
 
   response <- GET(
@@ -72,6 +75,10 @@ query_mobilitydatabase <- function(
 
   # Convert response to data.frame
   content <- content(response, as = "parsed")
+
+  if(http_error(response)) {
+    stop(sprintf("Mobility database bad response: %s", http_status(response)))
+  }
 
 
   safe_extract <- function(x) if (is.null(x)) NA else x
