@@ -20,4 +20,4 @@ reference:
   - title: External data
     contents:
     - starts_with("query_")
-    - osm_bus_lanes
+    - starts_with("osm_")
