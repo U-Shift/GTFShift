@@ -9,8 +9,6 @@
 #' @param subdivision_name. String. (Optional) List only feeds with the specified value. Can be a partial match.
 #' @param municipality String. (Optional) List only feeds with the specified value. Can be a partial match. Case insensitive.
 #' @param bbox bbox (Optional) Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.
-#' @param dataset_latitudes Double[]. (Optional) Minimum and maximum latitudes of the bounding box to use for filtering.
-#' @param dataset_longitudes Double[]. (Optional) Minimum and maximum longitudes of the bounding box to use for filtering.
 #' @param is_official. Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.
 #'
 #' @details
