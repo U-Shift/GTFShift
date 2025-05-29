@@ -11,7 +11,7 @@
 #' @param bbox bbox (Optional) Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.
 #' @param dataset_latitudes Double[]. (Optional) Minimum and maximum latitudes of the bounding box to use for filtering.
 #' @param dataset_longitudes Double[]. (Optional) Minimum and maximum longitudes of the bounding box to use for filtering.
-#' @param is_official. Boolean. (Optional) If true, only return official feeds.
+#' @param is_official. Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.
 #'
 #' @details
 #' This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform. To use it, an access token must be provided. It can be obtained for free at Mobility Database website.\cr\cr
@@ -36,16 +36,16 @@
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-query_mobilitydatabase <- function(
-    token,
-    bounding_filter_method = "partially_enclosed",
-    limit=10,
-    offset=0,
-    country_code=NA,
-    subdivision_name=NA,
-    municipality=NA,
-    bbox=NA,
-    is_official=NA
+query_mobilitydatabase <- function(token,
+                                   bounding_filter_method = "partially_enclosed",
+                                   limit = 10,
+                                   offset = 0,
+                                   country_code = NA,
+                                   subdivision_name = NA,
+                                   municipality = NA,
+                                   bbox = NA,
+                                   is_official = NA
+
 ) {
 
   url <- "https://api.mobilitydatabase.org/v1/gtfs_feeds"
