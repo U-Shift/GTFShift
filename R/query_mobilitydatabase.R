@@ -1,7 +1,8 @@
 #' Query Mobility Database API for GTFS feeds
 #
 #'
-#' @param token String. Access token.
+#' @param access_token String. (Optional when refresh_token) Access token.
+#' @param refresh_token String. (Optional when access_token) Refresh token.
 #' @param bounding_filter_method. String. (Default `partially_enclosed`) Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.
 #' @param limit. Integer. (Default 10) The number of items to be returned.
 #' @param offset. Integer. (Default 0) Offset of the first item to return.
@@ -12,7 +13,9 @@
 #' @param is_official. Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.
 #'
 #' @details
-#' This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform. To use it, an access token must be provided. It can be obtained for free at Mobility Database website.\cr\cr
+#' This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform.
+#' To use it, an access or a refresh token must be provided.
+#' It can be obtained for free at Mobility Database website.\cr\cr
 #' For more details on the parameters, refer to \url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
 #' Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:
 #' \itemize{
@@ -26,15 +29,15 @@
 #'
 #' @examples
 #' \dontrun{
-#' feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official=TRUE)
+#' feeds <- GTFShift::query_mobilitydatabase(refresh_token="myToken", country_code="PT", is_official=TRUE)
 #' }
 #'
 #' @import httr
 #' @import dplyr
-#' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-query_mobilitydatabase <- function(token,
+query_mobilitydatabase <- function(access_token = NA,
+                                   refresh_token = NA,
                                    bounding_filter_method = "partially_enclosed",
                                    limit = 10,
                                    offset = 0,
@@ -43,16 +46,34 @@ query_mobilitydatabase <- function(token,
                                    municipality = NA,
                                    bbox = NA,
                                    is_official = NA
-
 ) {
 
+  # Validate parameters
+  if (is.na(access_token) && is.na(refresh_token)) {
+    stop("No token provided! At least one of the access or refresh tokens must be provided as an argument.")
+  }
+
+  # If refresh token, get access token from API
+  if (is.na(access_token) && !is.na(refresh_token)) {
+    body <- sprintf('{"refresh_token": "%s"}', refresh_token)
+    response <- POST(
+      "https://api.mobilitydatabase.org/v1/tokens",
+      add_headers(`Content-Type` = "application/json"),
+      body = body
+    )
+    content <- content(response, as = "parsed")
+    if(http_error(response)) {
+      stop(sprintf("Mobility database bad response: %s", http_status(response)))
+    }
+    access_token <- content$access_token
+  }
+
+  # Query mobility database
   url <- "https://api.mobilitydatabase.org/v1/gtfs_feeds"
 
-  params <- list(
-    bounding_filter_method=bounding_filter_method,
-    limit = limit,
-    offset = offset
-  )
+  params <- list(bounding_filter_method = bounding_filter_method,
+                 limit = limit,
+                 offset = offset)
   if (!is.na(country_code)) params["country_code"] = country_code
   if (!is.na(subdivision_name)) params["subdivision_name"] = subdivision_name
   if (!is.na(municipality)) params["municipality"] = municipality
@@ -67,7 +88,7 @@ query_mobilitydatabase <- function(token,
     query = params,
     add_headers(
       `accept` = "application/json",
-      `Authorization` = sprintf("Bearer %s", token)
+      `Authorization` = sprintf("Bearer %s", access_token)
     )
   )
 

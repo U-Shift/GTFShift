@@ -62,39 +62,17 @@ It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds wit
 
 To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
 
-``` r
-feeds <- GTFShift::query_mobilitydatabase(Sys.getenv("MOBILITY_DATABASE"), country_code="PT")
-#> Registered S3 method overwritten by 'gtfsrouter':
-#>   method       from  
-#>   summary.gtfs gtfsio
+```{r}
+# usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work
+
+feeds <- GTFShift::query_mobilitydatabase(refresh_token = Sys.getenv("MOBILITY_DATABASE"), country_code="PT")
 
 feeds[1:4, c("provider", "status", "producer_url")]
-#>                           provider   status
-#> 1       A Onda - Mobilidade Urbana   active
-#> 2 Apanha-me! - Transportes Urbanos   active
-#> 3                         AUTNA SL   active
-#> 4       Câmara Municipal de Águeda inactive
-#>                                                                       producer_url
-#> 1 https://drive.google.com/uc?export=download&id=1aPfsxHqopxxcjV8HlRzImzxh_a6zRxGp
-#> 2 https://drive.google.com/uc?export=download&id=1w92h129CWNSoImBRZQOWT6KRPzSFwJ42
-#> 3 https://drive.google.com/uc?export=download&id=1gah1x10RyFu7gJPweBcCXPd9vcFJFQ7c
-#> 4          https://dados.gov.pt/en/datasets/r/1ef6b3b7-0726-4c5a-978c-bf6b780c7472
 
 gtfs <- GTFShift::load_feed(feeds[c(1), ]$producer_url)
-#> Warning in GTFShift::load_feed(feeds[c(1), ]$producer_url): > FIXED GTFS, there
-#> were 2 stop times without arrival time!
 summary(gtfs)
-#> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
-#> agency       A Onda - Mobilidade Urbana
-#> service      from 2023-01-01 to 2025-12-31
-#> uses         stop_times (no frequencies)
-#> # routes      10
-#> # trips      614
-#> # stop_ids   304
-#> # stop_names 186
-#> # shapes      89
 ```
+
 
 ## Using GTFShift incorporated database for Portugal
 
