@@ -7,7 +7,7 @@
 unify(
   gtfss,
   store_path = NA,
-  generateTransfers = TRUE,
+  create_transfers = TRUE,
   transfer_distance = 300,
   transfer_time = 120,
   transfer_street_routing = FALSE
@@ -16,7 +16,7 @@ unify(
 \arguments{
 \item{gtfss}{tidygtfs[]. List of GTFS feeds.}
 
-\item{generateTransfers}{Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.}
+\item{create_transfers}{Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.}
 
 \item{transfer_distance}{Integer. (Default 300) Upper straight-line distance limit in metres for transfers.}
 
@@ -41,7 +41,7 @@ For a detailed example, see the \code{vignette("unify")}.
 \dontrun{
 gtfs1 <- GTFShift::load_feed("gtfs1.zip")
 gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-unified <- GTFShift::unify(list(gtfs1, gtfs2), generateTransfers=TRUE)
+unified <- GTFShift::unify(list(gtfs1, gtfs2), create_transfers=TRUE)
 }
 
 }
