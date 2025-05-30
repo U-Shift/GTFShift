@@ -20,11 +20,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE, 
   message = FALSE,
+  cache = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup}
+```{r setup, cache=FALSE}
 library(GTFShift)
 library(tidytransit)
 library(dplyr)
@@ -78,9 +79,11 @@ shape_agency = gtfs_united$trips |>
 shapes_sf = tidytransit::shapes_as_sf(gtfs_united$shapes) |>
   left_join(shape_agency, by = "shape_id") |>
   filter(!is.na(agency_id))
-  
+```
+```{r, cache=FALSE}
 mapview::mapview(shapes_sf, zcol = "agency_name", legend = TRUE, layer.name="Agency")
 ```
+
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
 
@@ -97,9 +100,11 @@ stop_agency = gtfs_united$stop_times  |>
 stops_sf = tidytransit::stops_as_sf(gtfs_united$stops) |>
   left_join(stop_agency, by = "stop_id") |>
   filter(!is.na(agency_id))
-
+```
+```{r, cache=FALSE}
 mapview::mapview(stops_sf, zcol = "agency_name", legend = TRUE, layer.name="Agency")
 ```
+
 </div>
 </div>
 
