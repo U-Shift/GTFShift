@@ -29,7 +29,7 @@
 #' @import tidytransit
 #'
 #' @export
-load_feed <- function(path, store_path=NA, create_transfers=FALSE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+load_feed <- function(path, store_path=NA, create_transfers=FALSE, transfer_distance=200, transfer_time=120, transfer_street_routing=FALSE) {
 
   # LOAD GTFS
   gtfs <- tidytransit::read_gtfs(path)
