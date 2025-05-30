@@ -21,3 +21,12 @@ reference:
     contents:
     - starts_with("query_")
     - starts_with("osm_")
+articles:
+  - title: Articles
+    navbar: ~
+    contents:
+    - download
+    - filter
+    - unify
+    - analyse
+    - osm
