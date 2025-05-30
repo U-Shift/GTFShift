@@ -54,8 +54,7 @@
 <span>  country_code <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  subdivision_name <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  municipality <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  dataset_latitudes <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  dataset_longitudes <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  bbox <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  is_official <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -72,12 +71,8 @@
 <dd><p>String. (Optional) List only feeds with the specified value. Can be a partial match. Case insensitive.</p></dd>
 
 
-<dt id="arg-dataset-latitudes">dataset_latitudes<a class="anchor" aria-label="anchor" href="#arg-dataset-latitudes"></a></dt>
-<dd><p>Double[]. (Optional) Minimum and maximum latitudes of the bounding box to use for filtering.</p></dd>
-
-
-<dt id="arg-dataset-longitudes">dataset_longitudes<a class="anchor" aria-label="anchor" href="#arg-dataset-longitudes"></a></dt>
-<dd><p>Double[]. (Optional) Minimum and maximum longitudes of the bounding box to use for filtering.</p></dd>
+<dt id="arg-bbox">bbox<a class="anchor" aria-label="anchor" href="#arg-bbox"></a></dt>
+<dd><p>bbox (Optional) Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.</p></dd>
 
 
 <dt id="arg-bounding-filter-method-">bounding_filter_method.<a class="anchor" aria-label="anchor" href="#arg-bounding-filter-method-"></a></dt>
@@ -101,7 +96,7 @@
 
 
 <dt id="arg-is-official-">is_official.<a class="anchor" aria-label="anchor" href="#arg-is-official-"></a></dt>
-<dd><p>Boolean. (Optional) If true, only return official feeds.</p></dd>
+<dd><p>Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -112,7 +107,7 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This method queries <a href="https://mobilitydatabase.org/" class="external-link">Mobility Database</a> API, allowing to get a list of GTFS feeds documented at this platform. To use it, an access token must be provided. It can be obtained for free at Mobility Database website.<br><br>
 For more details on the parameters, refer to <a href="https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds" class="external-link">https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds</a>.<br><br>
-Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:</p><ul><li><p>`Provider`. The name of the GTFS provider.</p></li>
+Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:</p><ul><li><p>`provider`. The name of the GTFS provider.</p></li>
 <li><p>`status`. Tells if the feed is active, inactive or deprecated.</p></li>
 <li><p>`producer_url`. The GTFS feed URL. Can be used to download.</p></li>
 </ul></div>
@@ -120,7 +115,7 @@ Some useful columns of the returned data.frame (refer to the API documentation f
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">feeds</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">query_mobilitydatabase</span><span class="op">(</span><span class="va">myToken</span>, country_code<span class="op">=</span><span class="st">"PT"</span>, is_official_<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">feeds</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">query_mobilitydatabase</span><span class="op">(</span><span class="va">myToken</span>, country_code<span class="op">=</span><span class="st">"PT"</span>, is_official<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -134,7 +129,7 @@ Some useful columns of the returned data.frame (refer to the API documentation f
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

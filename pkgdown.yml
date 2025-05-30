@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   analyse: analyse.html
@@ -7,7 +7,7 @@ articles:
   filter: filter.html
   articles/GTFShift: GTFShift.html
   unify: unify.html
-last_built: 2025-05-23T13:02Z
+last_built: 2025-05-30T08:33Z
 urls:
   reference: https://u-shift.github.io/GTFShift/reference
   article: https://u-shift.github.io/GTFShift/articles
