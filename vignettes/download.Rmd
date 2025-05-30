@@ -1,8 +1,8 @@
 ---
-title: "Download transit data"
+title: "1. Getting transit data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Download transit data}
+  %\VignetteIndexEntry{1. Getting transit data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,12 +32,28 @@ library(tidytransit)
 
 # Introduction
 
-Performing analysis over transit requires data on the operation and infrastructure.
-GTFShift includes some built in methods that can you assist gathering it.
+Performing analysis over transit requires data on the operation and infrastructure. [GTFS](https://gtfs.org/) is an open standard that offers this information in a simple and complete way. 
 
-# Download GTFS files 
+GTFShift includes some built in methods that can assist gathering it, explored in this article.
 
-## Use open catalogues 
+# Read a GTFS file
+
+GTFShift makes use of several R packages to implement its features, but most of it is built upon [tidytransit](https://r-transit.github.io/tidytransit/), so all the methods that accept a GTFS object should be a `tidygtfs` object.
+
+To create it, you can either use `GTFShift::load_feed` or the tidytransit method, `tidytransit::read_gtfs`. Actually, `GTFShift::load_feed` is an extension of the last, with the additional features of scanning the feed for any integrity errors and fixing them automatically, as well as the option to store it locally.
+
+```{r eval = FALSE}
+# Using tidytransit
+gtfs <- tidytransit::load_feed("https://operator.com/gtfs.zip")
+
+# Using GTFShift
+gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
+```
+
+
+# Find GTFS feeds
+
+## Using open catalogues 
 
 The gathering of the GTFS files can be simplified by using public archives like [mobilitydatabase.org](https://mobilitydatabase.org/) or [transit.land](https://www.transit.land/).
 
@@ -46,30 +62,41 @@ It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds wit
 
 To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
 
-
-```{r eval=FALSE, message=FALSE, warning=FALSE}
-# usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work
-
-feeds = GTFShift::query_mobilitydatabase(Sys.getenv("MOBILITY_DATABASE"),
-                                          country_code="PT")
-```
-
-```r
+``` r
+feeds <- GTFShift::query_mobilitydatabase(Sys.getenv("MOBILITY_DATABASE"), country_code="PT")
+#> Registered S3 method overwritten by 'gtfsrouter':
+#>   method       from  
+#>   summary.gtfs gtfsio
 
 feeds[1:4, c("provider", "status", "producer_url")]
-#>                           provider status
-#> 1       A Onda - Mobilidade Urbana active
-#> 2 Apanha-me! - Transportes Urbanos active
-#> 3             Carris Metropolitana active
-#> 4      Cascais Próxima, E.M., S.A. active
+#>                           provider   status
+#> 1       A Onda - Mobilidade Urbana   active
+#> 2 Apanha-me! - Transportes Urbanos   active
+#> 3                         AUTNA SL   active
+#> 4       Câmara Municipal de Águeda inactive
 #>                                                                       producer_url
 #> 1 https://drive.google.com/uc?export=download&id=1aPfsxHqopxxcjV8HlRzImzxh_a6zRxGp
 #> 2 https://drive.google.com/uc?export=download&id=1w92h129CWNSoImBRZQOWT6KRPzSFwJ42
-#> 3                                          https://api.carrismetropolitana.pt/gtfs
-#> 4 https://drive.google.com/uc?export=download&id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX
+#> 3 https://drive.google.com/uc?export=download&id=1gah1x10RyFu7gJPweBcCXPd9vcFJFQ7c
+#> 4          https://dados.gov.pt/en/datasets/r/1ef6b3b7-0726-4c5a-978c-bf6b780c7472
+
+gtfs <- GTFShift::load_feed(feeds[c(1), ]$producer_url)
+#> Warning in GTFShift::load_feed(feeds[c(1), ]$producer_url): > FIXED GTFS, there
+#> were 2 stop times without arrival time!
+summary(gtfs)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> agency       A Onda - Mobilidade Urbana
+#> service      from 2023-01-01 to 2025-12-31
+#> uses         stop_times (no frequencies)
+#> # routes      10
+#> # trips      614
+#> # stop_ids   304
+#> # stop_names 186
+#> # shapes      89
 ```
 
-## Use GTFShift incorporated database for Portugal
+## Using GTFShift incorporated database for Portugal
 
 This library offers a small database with a compilation of GTFS files for Portuguese operators. It is a CSV file, available at `extdata/gtfs_sources_pt.csv`, and has the following attributes:
 
@@ -84,72 +111,9 @@ This library offers a small database with a compilation of GTFS files for Portug
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 summary(data)
 data[1:4,]
-```
 
-## Download and validate integrity
-
-`GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `load_feed()`.
-It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files and returns a tidygtfs object, that can be used in any other method of GTFShift or tidyrtransit packages. 
-
-Option `create_transfers` enables the generation of `transfers.txt`, aggregating close stops.
-
-```{r message=TRUE, warning=TRUE}
-# DOWNLOAD GTFS and store it locally
-gtfs = GTFShift::load_feed(data[data$ID=="barreiro",]$URL, create_transfers=TRUE)
+gtfs <- GTFShift::load_feed(data[c(1), ]$URL)
 summary(gtfs)
 ```
 
-# Download bus lanes 
 
-Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics.
-`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMaps for a given area.
-
-```{r}
-aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
-lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
-
-bus_lanes = GTFShift::osm_bus_lanes(lisboa)
-
-mapview::mapview(bus_lanes, layer.name = "Bus lanes")
-```
-
-
-
-# Get centerlines for OSM road network
-
-Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
-
-`osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from Open Street Maps, using Python [neatnet](https://uscuni.org/neatnet/) package.
-
-<div style="display: flex; gap: 20px; overflow-x: auto;">
-<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
-
-### Original network
-
-```{r original_network}
-library(osmdata)
-
-road_osm = opq("Arroios, Lisboa, Portugal") |>
-    add_osm_feature(key = "highway", value = c("motorway", "trunk", "primary", "secondary", "tertiary", "residential", "unclassified", "living_street")) |>
-    add_osm_feature(key = "area", value = "!yes") |>
-    osmdata_sf() |>
-    osm_poly2line()
-
-road_osm = road_osm$osm_lines
-
-mapview::mapview(road_osm)
-```
-
-</div>
-<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
-
-### Simplified network
-
-```{r simplified_network}
-centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
-
-mapview::mapview(centerlines)
-```
-
-</div>
-</div>

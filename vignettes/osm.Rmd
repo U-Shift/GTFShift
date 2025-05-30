@@ -1,0 +1,93 @@
+---
+title: "5. Get OSM data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{5. Get OSM data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+.leaflet-container {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+</style>
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  engine.path = list(python = '~/.virtualenvs/r-reticulate/bin/python3.12')
+)
+```
+
+```{r setup, message=FALSE}
+library(GTFShift)
+library(tidytransit)
+```
+
+# Introduction
+
+Open Street Maps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
+GTFShift includes some methods that allow to access its information directly.
+
+
+# Download bus lanes 
+
+Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics.
+`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMaps for a given area.
+
+```{r}
+aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
+lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
+
+bus_lanes = GTFShift::osm_bus_lanes(lisboa)
+
+mapview::mapview(bus_lanes, layer.name = "Bus lanes")
+```
+
+
+
+# Get centerlines for OSM road network
+
+Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
+
+`osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from Open Street Maps, using Python [neatnet](https://uscuni.org/neatnet/) package.
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Original network
+
+```{r original_network}
+library(osmdata)
+
+road_osm = opq("Arroios, Lisboa, Portugal") |>
+    add_osm_feature(key = "highway", value = c("motorway", "trunk", "primary", "secondary", "tertiary", "residential", "unclassified", "living_street")) |>
+    add_osm_feature(key = "area", value = "!yes") |>
+    osmdata_sf() |>
+    osm_poly2line()
+
+road_osm = road_osm$osm_lines
+
+mapview::mapview(road_osm)
+```
+
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Simplified network
+
+```{r simplified_network}
+centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
+
+mapview::mapview(centerlines)
+```
+
+</div>
+</div>
+
