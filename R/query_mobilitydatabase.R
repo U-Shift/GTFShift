@@ -36,17 +36,16 @@
 #' @import dplyr
 #'
 #' @export
-query_mobilitydatabase <- function(
-    access_token=NA,
-    refresh_token=NA,
-    bounding_filter_method = "partially_enclosed",
-    limit = 10,
-    offset = 0,
-    country_code = NA,
-    subdivision_name = NA,
-    municipality = NA,
-    bbox = NA,
-    is_official = NA
+query_mobilitydatabase <- function(access_token = NA,
+                                   refresh_token = NA,
+                                   bounding_filter_method = "partially_enclosed",
+                                   limit = 10,
+                                   offset = 0,
+                                   country_code = NA,
+                                   subdivision_name = NA,
+                                   municipality = NA,
+                                   bbox = NA,
+                                   is_official = NA
 ) {
 
   # Validate parameters
@@ -72,11 +71,9 @@ query_mobilitydatabase <- function(
   # Query mobility database
   url <- "https://api.mobilitydatabase.org/v1/gtfs_feeds"
 
-  params <- list(
-    bounding_filter_method=bounding_filter_method,
-    limit = limit,
-    offset = offset
-  )
+  params <- list(bounding_filter_method = bounding_filter_method,
+                 limit = limit,
+                 offset = offset)
   if (!is.na(country_code)) params["country_code"] = country_code
   if (!is.na(subdivision_name)) params["subdivision_name"] = subdivision_name
   if (!is.na(municipality)) params["municipality"] = municipality
