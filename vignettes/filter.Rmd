@@ -1,8 +1,8 @@
 ---
-title: "Filter GTFS feeds"
+title: "2. Filter GTFS feeds"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Filter GTFS feeds}
+  %\VignetteIndexEntry{2. Filter GTFS feeds}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
