@@ -68,12 +68,9 @@ load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_dista
 
     suppressMessages(suppressWarnings({gtfs_transfers <- gtfsrouter::extract_gtfs(gtfs_temp)})) # Suppress warning that has no transfers, as they will be generated next
     gtfs_transfers <- gtfsrouter::gtfs_transfer_table(gtfs_transfers, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
+    gtfs$transfers <- gtfs_transfers$transfers
 
-    # gtfsrouter::extract_gtfs converts stop times to seconds, lets get it back to the format HH:mm before storing it...
-    gtfs_transfers$stop_times$arrival_time <- sapply(gtfs_transfers$stop_times$arrival_time, time_convert_seconds_to_hms)
-    gtfs_transfers$stop_times$departure_time <- sapply(gtfs_transfers$stop_times$departure_time, time_convert_seconds_to_hms)
-
-    gtfs <- tidytransit::as_tidygtfs(gtfs_transfers)
+    gtfs <- tidytransit::as_tidygtfs(gtfs)
   }
 
   # STORE GTFS

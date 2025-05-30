@@ -63,14 +63,11 @@ unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance
   if (create_transfers) {
     message(sprintf("2. Generating transfers..."))
 
-    suppressMessages(suppressWarnings({ merged_router <- gtfsrouter::extract_gtfs(gtfs_temp) })) # Suppress warning that has no transfers, as they will be generated next
-    merged_router <- gtfsrouter::gtfs_transfer_table(merged_router, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
+    suppressMessages(suppressWarnings({gtfs_transfers <- gtfsrouter::extract_gtfs(gtfs_temp)})) # Suppress warning that has no transfers, as they will be generated next
+    gtfs_transfers <- gtfsrouter::gtfs_transfer_table(gtfs_transfers, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
+    gtfs$transfers <- gtfs_transfers$transfers
 
-    # gtfsrouter::extract_gtfs converts stop times to seconds, lets get it back to the format HH:mm before storing it...
-    merged_router$stop_times$arrival_time <- sapply(merged_router$stop_times$arrival_time, time_convert_seconds_to_hms)
-    merged_router$stop_times$departure_time <- sapply(merged_router$stop_times$departure_time, time_convert_seconds_to_hms)
-
-    gtfs <- tidytransit::as_tidygtfs(merged_router)
+    gtfs <- tidytransit::as_tidygtfs(gtfs)
   }
 
   # STORE GTFS
