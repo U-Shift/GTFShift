@@ -12,8 +12,7 @@ query_mobilitydatabase(
   country_code = NA,
   subdivision_name = NA,
   municipality = NA,
-  dataset_latitudes = NA,
-  dataset_longitudes = NA,
+  bbox = NA,
   is_official = NA
 )
 }
@@ -22,9 +21,7 @@ query_mobilitydatabase(
 
 \item{municipality}{String. (Optional) List only feeds with the specified value. Can be a partial match. Case insensitive.}
 
-\item{dataset_latitudes}{Double[]. (Optional) Minimum and maximum latitudes of the bounding box to use for filtering.}
-
-\item{dataset_longitudes}{Double[]. (Optional) Minimum and maximum longitudes of the bounding box to use for filtering.}
+\item{bbox}{bbox (Optional) Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.}
 
 \item{bounding_filter_method.}{String. (Default `partially_enclosed`) Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.}
 
@@ -36,7 +33,7 @@ query_mobilitydatabase(
 
 \item{subdivision_name.}{String. (Optional) List only feeds with the specified value. Can be a partial match.}
 
-\item{is_official.}{Boolean. (Optional) If true, only return official feeds.}
+\item{is_official.}{Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.}
 }
 \value{
 data.frame with query results
@@ -49,14 +46,14 @@ This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API,
 For more details on the parameters, refer to \url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
 Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:
 \itemize{
- \item `Provider`. The name of the GTFS provider.
+ \item `provider`. The name of the GTFS provider.
  \item `status`. Tells if the feed is active, inactive or deprecated.
  \item `producer_url`. The GTFS feed URL. Can be used to download.
 }
 }
 \examples{
 \dontrun{
-feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official_=TRUE)
+feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official=TRUE)
 }
 
 }
