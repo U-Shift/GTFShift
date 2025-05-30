@@ -28,7 +28,7 @@
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance=200, transfer_time=120, transfer_street_routing=FALSE) {
 
   # Initial validation
   has_calendar = sapply(gtfss, function(g) "calendar" %in% names(g))
