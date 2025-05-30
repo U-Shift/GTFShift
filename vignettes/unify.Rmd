@@ -1,8 +1,8 @@
 ---
-title: "Aggregate GTFS feeds"
+title: "3. Aggregate GTFS feeds"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Aggregate GTFS feeds}
+  %\VignetteIndexEntry{3. Aggregate GTFS feeds}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
