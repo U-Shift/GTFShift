@@ -1,13 +1,29 @@
 #' Get next business Wednesday
 #'
-#' Find the next Wednesday that is not a holiday.
-#' @param start_date String. Reference date.
+#'
+#' @param start_date String. (Default Sys.Date()) Reference date.
+#' @param country_code String. (Optional) Country code in the format `ISO 3166-1 alpha-2`. When provided, public holidays are considered.
+#'
+#' @details
+#' Find the next Wednesday that is not a holiday. When country is given, public holidays are considered, using \href{https://date.nager.at/Api}{Nager.Date} API.
+#'
+#' @returns Date
+#'
+#' @examples
+#' \dontrun{
+#' next_wednesday <- GTFShift::calendar_nextBusinessWednesday(country_code="PT")
+#' }
+#'
 #' @import lubridate
-#' @keywords internal
-#' @noRd
-calendar_nextBusinessWednesday <- function(start_date = Sys.Date()) {
+#'
+#' @export
+calendar_nextBusinessWednesday <- function(start_date = Sys.Date(), country_code=NA) {
   year <- lubridate::year(start_date)
-  holidays <- calendar_get_pt_holidays(year)
+  if (!is.na(country_code)) {
+    holidays <- calendar_get_pt_holidays(year, country_code)
+  } else {
+    holidays <- list()
+  }
 
   # Find the next Wednesday
   next_wed <- start_date + (4 - lubridate::wday(start_date) + 7) %% 7
@@ -19,7 +35,7 @@ calendar_nextBusinessWednesday <- function(start_date = Sys.Date()) {
     # If we cross into a new year, update holidays
     if (year(next_wed) != year) {
       year <- lubridate::year(next_wed)
-      holidays <- calendar_get_pt_holidays(year)
+      holidays <- calendar_get_pt_holidays(year, country_code)
     }
   }
 
@@ -33,8 +49,8 @@ calendar_nextBusinessWednesday <- function(start_date = Sys.Date()) {
 #' @import httr
 #' @import jsonlite
 #' @noRd
-calendar_get_pt_holidays <- function(year) {
-  url <- paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/PT")
+calendar_get_pt_holidays <- function(year, country_code) {
+  url <- paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/", country_code)
   response <- httr::GET(url)
 
   if (status_code(response) == 200) {
