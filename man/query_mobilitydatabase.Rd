@@ -5,7 +5,8 @@
 \title{Query Mobility Database API for GTFS feeds}
 \usage{
 query_mobilitydatabase(
-  token,
+  access_token = NA,
+  refresh_token = NA,
   bounding_filter_method = "partially_enclosed",
   limit = 10,
   offset = 0,
@@ -17,7 +18,9 @@ query_mobilitydatabase(
 )
 }
 \arguments{
-\item{token}{String. Access token.}
+\item{access_token}{String. (Optional when refresh_token) Access token.}
+
+\item{refresh_token}{String. (Optional when access_token) Refresh token.}
 
 \item{municipality}{String. (Optional) List only feeds with the specified value. Can be a partial match. Case insensitive.}
 
@@ -42,7 +45,9 @@ data.frame with query results
 Query Mobility Database API for GTFS feeds
 }
 \details{
-This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform. To use it, an access token must be provided. It can be obtained for free at Mobility Database website.\cr\cr
+This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform.
+To use it, an access or a refresh token must be provided.
+It can be obtained for free at Mobility Database website.\cr\cr
 For more details on the parameters, refer to \url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
 Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:
 \itemize{
@@ -53,7 +58,7 @@ Some useful columns of the returned data.frame (refer to the API documentation f
 }
 \examples{
 \dontrun{
-feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official=TRUE)
+feeds <- GTFShift::query_mobilitydatabase(refresh_token="myToken", country_code="PT", is_official=TRUE)
 }
 
 }
