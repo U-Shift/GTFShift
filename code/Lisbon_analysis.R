@@ -24,7 +24,7 @@ gtfs_list <- lapply(c("lisboa", "AML"), function(ID) {
   return(feed)
 })
 
-gtfs_united <- GTFShift::unify(gtfs_list, generateTransfers=FALSE)
+gtfs_united <- GTFShift::unify(gtfs_list, create_transfers=FALSE)
 summary(gtfs_united)
 
 frequencies_stop <- GTFShift::get_stop_frequency_hourly(gtfs_united, date=date)
