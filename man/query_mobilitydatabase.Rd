@@ -33,11 +33,7 @@ query_mobilitydatabase(
 
 \item{subdivision_name.}{String. (Optional) List only feeds with the specified value. Can be a partial match.}
 
-\item{dataset_latitudes}{Double[]. (Optional) Minimum and maximum latitudes of the bounding box to use for filtering.}
-
-\item{dataset_longitudes}{Double[]. (Optional) Minimum and maximum longitudes of the bounding box to use for filtering.}
-
-\item{is_official.}{Boolean. (Optional) If true, only return official feeds.}
+\item{is_official.}{Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.}
 }
 \value{
 data.frame with query results

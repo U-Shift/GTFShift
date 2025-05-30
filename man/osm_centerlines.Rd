@@ -4,12 +4,7 @@
 \alias{osm_centerlines}
 \title{Get centerlines for OSM road network}
 \usage{
-osm_centerlines(
-  bbox = NULL,
-  place = NULL,
-  use_buildings = TRUE,
-  venv = "r-reticulate"
-)
+osm_centerlines(bbox = NULL, place = NULL, use_buildings = TRUE, venv = NA)
 }
 \arguments{
 \item{bbox}{bbox. (Optional, if place provided) Area from which to export bus lanes.}
@@ -18,7 +13,7 @@ osm_centerlines(
 
 \item{use_buildings}{Boolean. (Default True) Uses buildings from OSM as exclusion_mask for neatnet.}
 
-\item{venv}{String. (Default r-reticulate) Python environment where neatnet will run.}
+\item{venv}{String. (Default creates a new one) Python environment where neatnet will run.}
 }
 \value{
 osm_lines in sf format

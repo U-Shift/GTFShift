@@ -3,7 +3,7 @@
 #' @param bbox bbox. (Optional, if place provided) Area from which to export bus lanes.
 #' @param place String. (Optional, if bbox provided) Place from which to export bus lanes.
 #' @param use_buildings Boolean. (Default True) Uses buildings from OSM as exclusion_mask for neatnet.
-#' @param venv String. (Default r-reticulate) Python environment where neatnet will run.
+#' @param venv String. (Default creates a new one) Python environment where neatnet will run.
 #'
 #' @details
 #' Exports road network from Open Street Maps for given area and uses
@@ -24,8 +24,12 @@
 #' @import sf
 #'
 #' @export
-osm_centerlines <- function(bbox=NULL, place=NULL, use_buildings = TRUE, venv="r-reticulate") {
+osm_centerlines <- function(bbox=NULL, place=NULL, use_buildings = TRUE, venv=NA) {
+
   # Set up Python environment
+  if (is.na(venv)) {
+    venv <- reticulate::virtualenv_create()
+  }
   reticulate::use_virtualenv(venv, required = TRUE)
 
   # Ensure dependencies are installed
