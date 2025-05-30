@@ -20,11 +20,12 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE,
   collapse = TRUE,
+  cache = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup}
+```{r setup, cache=FALSE}
 library(GTFShift)
 library(tidytransit)
 library(mapview)
@@ -44,7 +45,7 @@ Analyzing public transit feeds is important to understand its territorial covera
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "lisboa"
-gtfs = GTFShift::load_feed(data[data$ID==gtfs_id,]$URL)
+gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id])
 ```
 
 
@@ -60,7 +61,7 @@ summary(frequencies_stop)
 
 Its returns an `sf` `data.frame` that can be displayed using mapview, or stored in GeoPackage format.
 
-```{r}
+```{r, cache=FALSE}
 # Display map
 mapview::mapview(
   frequencies_stop |>
@@ -101,7 +102,7 @@ quantile(frequencies_route_overline$frequency)
 
 ## Aggregated frequencies for 8 a.m.
 
-```{r}
+```{r, cache=FALSE}
 mapview::mapview(
   frequencies_route |> filter(arrival_hour == 8 & frequency > 2),
   zcol = "frequency",
@@ -111,7 +112,7 @@ mapview::mapview(
 
 ## Aggregated frequencies for routes overline for 8 a.m.
 
-```{r}
+```{r, cache=FALSE}
 # above 2 per hour
 mapview::mapview(
   frequencies_route_overline |> filter(
@@ -152,7 +153,8 @@ frequencies_route_overline_improved = GTFShift::network_overline(
 )
 
 quantile(frequencies_route_overline_improved$frequency)
-
+```
+```{r, cache=FALSE}
 mapview::mapview(
   frequencies_route_overline_improved |>
     select(frequency, segment) |>
