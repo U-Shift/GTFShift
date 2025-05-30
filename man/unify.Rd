@@ -9,7 +9,7 @@ unify(
   store_path = NA,
   create_transfers = TRUE,
   transfer_distance = 300,
-  transfer_time = 120,
+  transfer_time = 500,
   transfer_street_routing = FALSE
 )
 }
@@ -20,7 +20,7 @@ unify(
 
 \item{transfer_distance}{Integer. (Default 300) Upper straight-line distance limit in metres for transfers.}
 
-\item{transfer_time}{Integer. (Default 120) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.}
+\item{transfer_time}{Integer. (Default 500) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.}
 
 \item{transfer_street_routing}{(Default FALSE) If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).}
 
