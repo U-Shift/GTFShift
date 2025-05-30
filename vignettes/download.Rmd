@@ -20,7 +20,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE,
   message = FALSE,
-  comment = "#>"
+  comment = "#>",
+  engine.path = list(python = '~/.virtualenvs/r-reticulate/bin/python3.12')
 )
 ```
 
@@ -43,7 +44,30 @@ The gathering of the GTFS files can be simplified by using public archives like 
 GTFShift provides a method to query Mobility Database: `query_mobilitydatabase()`.
 It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds with information about the providers, the area they cover and an URL to download them.
 
-To use it, an access token must be provided. It can be obtained for free at Mobility Database website.
+To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
+
+
+```{r eval=FALSE, message=FALSE, warning=FALSE}
+# usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work
+
+feeds = GTFShift::query_mobilitydatabase(Sys.getenv("MOBILITY_DATABASE"),
+                                          country_code="PT")
+```
+
+```r
+
+feeds[1:4, c("provider", "status", "producer_url")]
+#>                           provider status
+#> 1       A Onda - Mobilidade Urbana active
+#> 2 Apanha-me! - Transportes Urbanos active
+#> 3             Carris Metropolitana active
+#> 4      Cascais Próxima, E.M., S.A. active
+#>                                                                       producer_url
+#> 1 https://drive.google.com/uc?export=download&id=1aPfsxHqopxxcjV8HlRzImzxh_a6zRxGp
+#> 2 https://drive.google.com/uc?export=download&id=1w92h129CWNSoImBRZQOWT6KRPzSFwJ42
+#> 3                                          https://api.carrismetropolitana.pt/gtfs
+#> 4 https://drive.google.com/uc?export=download&id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX
+```
 
 ## Use GTFShift incorporated database for Portugal
 
@@ -88,3 +112,44 @@ bus_lanes = GTFShift::osm_bus_lanes(lisboa)
 
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
+
+
+
+# Get centerlines for OSM road network
+
+Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
+
+`osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from Open Street Maps, using Python [neatnet](https://uscuni.org/neatnet/) package.
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Original network
+
+```{r original_network}
+library(osmdata)
+
+road_osm = opq("Arroios, Lisboa, Portugal") |>
+    add_osm_feature(key = "highway", value = c("motorway", "trunk", "primary", "secondary", "tertiary", "residential", "unclassified", "living_street")) |>
+    add_osm_feature(key = "area", value = "!yes") |>
+    osmdata_sf() |>
+    osm_poly2line()
+
+road_osm = road_osm$osm_lines
+
+mapview::mapview(road_osm)
+```
+
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Simplified network
+
+```{r simplified_network}
+centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
+
+mapview::mapview(centerlines)
+```
+
+</div>
+</div>
