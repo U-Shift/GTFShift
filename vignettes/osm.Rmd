@@ -20,12 +20,13 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE,
   message = FALSE,
+  cache = TRUE,
   comment = "#>",
   engine.path = list(python = '~/.virtualenvs/r-reticulate/bin/python3.12')
 )
 ```
 
-```{r setup, message=FALSE}
+```{r setup, message=FALSE, cache=FALSE}
 library(GTFShift)
 library(tidytransit)
 ```
@@ -46,7 +47,8 @@ aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNIC
 lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
 
 bus_lanes = GTFShift::osm_bus_lanes(lisboa)
-
+```
+```{r, cache=FALSE}
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
 
@@ -73,9 +75,11 @@ road_osm = opq("Arroios, Lisboa, Portugal") |>
     osm_poly2line()
 
 road_osm = road_osm$osm_lines
-
+```
+```{r, cache=FALSE}
 mapview::mapview(road_osm)
 ```
+
 
 </div>
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -84,7 +88,8 @@ mapview::mapview(road_osm)
 
 ```{r simplified_network}
 centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
-
+```
+```{r, cache=FALSE}
 mapview::mapview(centerlines)
 ```
 
