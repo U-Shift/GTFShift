@@ -18,7 +18,7 @@ unify(
 
 \item{create_transfers}{Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.}
 
-\item{transfer_distance}{Integer. (Default 300) Upper straight-line distance limit in metres for transfers.}
+\item{transfer_distance}{Integer. (Default 300) Upper straight-line distance limit in meters for transfers.}
 
 \item{transfer_time}{Integer. (Default 120) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.}
 

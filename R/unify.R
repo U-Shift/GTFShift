@@ -3,8 +3,8 @@
 #' @param gtfss tidygtfs[]. List of GTFS feeds.
 #' @param store_path. String. (Optional) If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.
 #' @param create_transfers Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.
-#' @param transfer_distance Integer. (Default 300) Upper straight-line distance limit in metres for transfers.
-#' @param transfer_time Integer. (Default 500) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
+#' @param transfer_distance Integer. (Default 300) Upper straight-line distance limit in meters for transfers.
+#' @param transfer_time Integer. (Default 120) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
 #' @param transfer_street_routing (Default FALSE) If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
 #'
 #' @details
@@ -28,7 +28,7 @@
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=500, transfer_street_routing=FALSE) {
+unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
 
   # Initial validation
   has_calendar = sapply(gtfss, function(g) "calendar" %in% names(g))
@@ -63,14 +63,11 @@ unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance
   if (create_transfers) {
     message(sprintf("2. Generating transfers..."))
 
-    suppressMessages(suppressWarnings({ merged_router <- gtfsrouter::extract_gtfs(gtfs_temp) })) # Suppress warning that has no transfers, as they will be generated next
-    merged_router <- gtfsrouter::gtfs_transfer_table(merged_router, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
+    suppressMessages(suppressWarnings({gtfs_transfers <- gtfsrouter::extract_gtfs(gtfs_temp)})) # Suppress warning that has no transfers, as they will be generated next
+    gtfs_transfers <- gtfsrouter::gtfs_transfer_table(gtfs_transfers, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
+    gtfs$transfers <- gtfs_transfers$transfers
 
-    # gtfsrouter::extract_gtfs converts stop times to seconds, lets get it back to the format HH:mm before storing it...
-    merged_router$stop_times$arrival_time <- sapply(merged_router$stop_times$arrival_time, time_convert_seconds_to_hms)
-    merged_router$stop_times$departure_time <- sapply(merged_router$stop_times$departure_time, time_convert_seconds_to_hms)
-
-    gtfs <- tidytransit::as_tidygtfs(merged_router)
+    gtfs <- tidytransit::as_tidygtfs(gtfs)
   }
 
   # STORE GTFS
