@@ -22,7 +22,7 @@ Find the next Wednesday that is not a holiday. When country is given, public hol
 }
 \examples{
 \dontrun{
-next_wednesday <- GTFShift::calendar_nextBusinessWednesday(country_code="PT")
+next_wednesday = GTFShift::calendar_nextBusinessWednesday(country_code="PT")
 }
 
 }
