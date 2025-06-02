@@ -45,7 +45,7 @@ Analyzing public transit feeds is important to understand its territorial covera
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "lisboa"
-gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id])
+gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
 ```
 
 

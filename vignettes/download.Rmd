@@ -74,7 +74,7 @@ feeds |>
   dplyr::select(provider, status, producer_url) |>
   head()
 
-gtfs = GTFShift::load_feed(feeds$producer_url[1])
+gtfs = GTFShift::load_feed(feeds$producer_url[1], create_transfers=FALSE)
 summary(gtfs)
 ```
 
@@ -94,8 +94,7 @@ This library offers a small database with a compilation of GTFS files for Portug
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 head(data)
 
-gtfs = GTFShift::load_feed(data$URL[1], # example with CP - trains
-                           create_transfers = FALSE)
+gtfs = GTFShift::load_feed(data$URL[1], create_transfers = FALSE) # example with CP - trains
 summary(gtfs)
 ```
 
