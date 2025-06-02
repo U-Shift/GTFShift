@@ -3,7 +3,7 @@
 #' For each stop, returns the number of departures aggregated per hour.
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param date Date. Reference date to consider when analyzing the GTFS file. Defaults to next business Wednesday in Portugal.
+#' @param date Date. (Default GTFShift::calendar_nextBusinessWednesday) Reference date to consider when analyzing the GTFS file.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
@@ -23,6 +23,8 @@
 #' frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
 #' }
 #'
+#' @seealso [GTFShift::calendar_nextBusinessWednesday]
+#'
 #' @import sf
 #' @import tidyverse
 #' @import lubridate
@@ -30,14 +32,10 @@
 #' @import dplyr
 #'
 #' @export
-get_stop_frequency_hourly <- function(gtfs, date=NULL) {
-  message(sprintf("Analysing GTFS..."))
+get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusinessWednesday()) {
+  message(sprintf("Analysing GTFS for %s...", date))
 
   ## Consider transit data for one day only
-  if (is.null(date)) {
-    date = calendar_nextBusinessWednesday()
-    message(sprintf("> Reference date not provided, considering next business wednesday: %s...", date))
-  }
   message(sprintf("> Filtering by reference date %s...", date))
   gtfs_date <- tidytransit::filter_feed_by_date(
     gtfs, extract_date = date
