@@ -61,9 +61,3 @@ calendar_get_pt_holidays <- function(year, country_code) {
   }
 }
 
-time_convert_seconds_to_hms <- function(seconds) {
-  h <- seconds %/% 3600
-  m <- (seconds %% 3600) %/% 60
-  s <- seconds %% 60
-  sprintf("%02d:%02d:%02d", h, m, s)
-}
