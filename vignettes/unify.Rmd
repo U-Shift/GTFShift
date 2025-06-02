@@ -59,7 +59,10 @@ The unification is performed through `GTFShift::unify()`, producing a single GTF
 ```{r}
 # Perform unification
 gtfs_united = GTFShift::unify(gtfs_list, create_transfers = TRUE)
+
 summary(gtfs_united)
+
+summary(gtfs_united$transfers)
 ```
 
 It can be displayed using `mapview`.
