@@ -110,8 +110,14 @@ Portugal as an example. Refer to the <a href="./download">vignette(â€œdownloadâ€
 <h2 id="analyse-hourly-frequency-per-stop">Analyse hourly frequency per stop<a class="anchor" aria-label="anchor" href="#analyse-hourly-frequency-per-stop"></a>
 </h2>
 <p>To analyse frequencies at stops, use
-<code>get_stop_hour_frequency()</code>, producing, for each, an
-aggregated counting of bus servicing it per hour.</p>
+<code><a href="../reference/get_stop_frequency_hourly.html">GTFShift::get_stop_frequency_hourly</a></code>, producing, for each,
+an aggregated counting of bus servicing it per hour.</p>
+<blockquote>
+<p>By default, the analysis is performed for next business Wednesday, in
+Portugal. Refer to
+<code><a href="../reference/calendar_nextBusinessWednesday.html">GTFShift::calendar_nextBusinessWednesday</a></code>, for more details.
+You can override this, using <code>date</code> parameter.</p>
+</blockquote>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform frequency analysis</span></span>
 <span><span class="va">frequencies_stop</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/get_stop_frequency_hourly.html">get_stop_frequency_hourly</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
@@ -146,9 +152,15 @@ displayed using mapview, or stored in GeoPackage format.</p>
 <h2 id="analyse-hourly-frequency-per-route">Analyse hourly frequency per route<a class="anchor" aria-label="anchor" href="#analyse-hourly-frequency-per-route"></a>
 </h2>
 <p>The frequency analysis can also be performed route wise. For this
-purpose, use <code>get_route_hour_frequency()</code>, returning
-aggregated results per hour.</p>
+purpose, use <code><a href="../reference/get_route_frequency_hourly.html">GTFShift::get_route_frequency_hourly</a></code>,
+returning aggregated results per hour.</p>
 <p>The analysis can be performed for each route individually.</p>
+<blockquote>
+<p>By default, the analysis is performed for next business Wednesday, in
+Portugal. Refer to
+<code><a href="../reference/calendar_nextBusinessWednesday.html">GTFShift::calendar_nextBusinessWednesday</a></code>, for more details.
+You can override this, using <code>date</code> parameter.</p>
+</blockquote>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">frequencies_route</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/get_route_frequency_hourly.html">get_route_frequency_hourly</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">frequencies_route</span><span class="op">)</span></span>
@@ -220,11 +232,12 @@ the network and can help prioritizing interventions in the network.</p>
 <h3 id="improve-visualization-with-network_overline">Improve visualization with <code>network_overline</code><a class="anchor" aria-label="anchor" href="#improve-visualization-with-network_overline"></a>
 </h3>
 <p>Using the <code>overline</code> attribute in
-<code><a href="../reference/get_route_frequency_hourly.html">get_route_frequency_hourly()</a></code> might not be the best option
-if the GTFS shapes do not share exactly the same geometry. In those
-cases, the overlapping lines might not be merged correctly, causing
-inconsistent results, such as a street with different frequencies along
-it, despite not having any bus stop in between those differences.</p>
+<code><a href="../reference/get_route_frequency_hourly.html">GTFShift::get_route_frequency_hourly</a></code> might not be the best
+option if the GTFS shapes do not share exactly the same geometry. In
+those cases, the overlapping lines might not be merged correctly,
+causing inconsistent results, such as a street with different
+frequencies along it, despite not having any bus stop in between those
+differences.</p>
 <div class="float">
 <img src="figures/analyse_overline_error.png" alt="Overline error example"><div class="figcaption">Overline error example</div>
 </div>
@@ -232,10 +245,11 @@ it, despite not having any bus stop in between those differences.</p>
 <code><a href="https://docs.ropensci.org/stplanr/reference/overline.html" class="external-link">stplanr::overline2()</a></code>, the method used for the network
 aggregation that has not been solved yet.</p>
 <p>As an alternative, <code>GTFShift</code> provides the method
-<code><a href="../reference/network_overline.html">network_overline()</a></code>, that allows for the route aggregation.
-Given a simplified network, it identifies the segments corresponding to
-each route and uses them to aggregate the attribute defined in the
-parameters. It can be used to aggregate the frequencies.</p>
+<code><a href="../reference/network_overline.html">GTFShift::network_overline</a></code>, that allows for the route
+aggregation. Given a simplified network, it identifies the segments
+corresponding to each route and uses them to aggregate the attribute
+defined in the parameters. It can be used to aggregate the
+frequencies.</p>
 <blockquote>
 <p>One approach for the network simplification could be through the
 centerlines determination. During the development of this project, no R
