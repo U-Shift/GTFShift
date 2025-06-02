@@ -24,8 +24,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
+#' gtfs = GTFShift::load_feed("gtfs.zip")
+#' frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
 #' }
 #'
 #' @seealso [tidytransit::read_gtfs()], [stplanr::overline2], [GTFShift::calendar_nextBusinessWednesday]
@@ -38,14 +38,14 @@
 #' @import stplanr
 #'
 #' @export
-get_route_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusinessWednesday(), overline = FALSE) {
+get_route_frequency_hourly = function(gtfs,
+                                      date = GTFShift::calendar_nextBusinessWednesday(),
+                                      overline = FALSE) {
   message(sprintf("Analysing GTFS for %s...", date))
 
   ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
-  gtfs_date <- tidytransit::filter_feed_by_date(
-    gtfs, extract_date = date
-  )
+  gtfs_date = tidytransit::filter_feed_by_date(gtfs, extract_date = date)
 
   # PROCESS GTFS, generating table calculating the frequencies per route
   trips = gtfs_date$trip
@@ -54,41 +54,52 @@ get_route_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusin
   routes = gtfs_date$routes
   stop_times = gtfs_date$stop_times
 
-  stop_times <- stop_times %>%
-    left_join(trips) %>%
-    left_join(routes) %>%
-    select(route_id, route_short_name, trip_id, stop_id, service_id, arrival_time, departure_time, direction_id, shape_id, stop_sequence)
+  stop_times = stop_times |>
+    left_join(trips) |>
+    left_join(routes) |>
+    select(
+      route_id,
+      route_short_name,
+      trip_id,
+      stop_id,
+      service_id,
+      arrival_time,
+      departure_time,
+      direction_id,
+      shape_id,
+      stop_sequence
+    )
 
-  stop_times <- stop_times %>% # Only departures from origin (first stop)
+  stop_times = stop_times |> # Only departures from origin (first stop)
     filter(stop_sequence == 1)
 
-  stop_times <- stop_times %>%
+  stop_times = stop_times |>
     mutate(
       arrival_hour = lubridate::hour(arrival_time)
     )
 
-  freq_data <- stop_times %>%
-    group_by(route_id, route_short_name, direction_id, arrival_hour) %>%
-    summarize(frequency = n()) %>%
+  freq_data = stop_times |>
+    group_by(route_id, route_short_name, direction_id, arrival_hour) |>
+    summarize(frequency = n()) |>
     ungroup()
 
   routes_freq =
-    freq_data %>%
-    left_join(trips %>%
-                select(route_id, direction_id, shape_id) %>%
-                distinct()) %>%
-    as.data.frame() %>%
-    left_join(shapes) %>%
+    freq_data |>
+    left_join(trips |>
+                select(route_id, direction_id, shape_id) |>
+                distinct()) |>
+    as.data.frame() |>
+    left_join(shapes) |>
     st_as_sf()
 
   # Overline?
   if (overline) {
     routes_freq_all = data.frame()
     for (h in unique(routes_freq$arrival_hour)) { # hours of the day
-      routes_freq_h = routes_freq %>%
-        filter(arrival_hour == h) %>%
-        stplanr::overline2(attrib = "frequency") %>%
-        arrange(frequency) %>%
+      routes_freq_h = routes_freq |>
+        filter(arrival_hour == h) |>
+        stplanr::overline2(attrib = "frequency") |>
+        arrange(frequency) |>
         mutate(arrival_hour = h)
 
       routes_freq_all = rbind(routes_freq_all, routes_freq_h)

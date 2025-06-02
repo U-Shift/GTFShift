@@ -11,31 +11,32 @@
 #'
 #' @examples
 #' \dontrun{
-#' next_wednesday <- GTFShift::calendar_nextBusinessWednesday(country_code="PT")
+#' next_wednesday = GTFShift::calendar_nextBusinessWednesday(country_code="PT")
 #' }
 #'
 #' @import lubridate
 #'
 #' @export
-calendar_nextBusinessWednesday <- function(start_date = Sys.Date(), country_code="PT") {
-  year <- lubridate::year(start_date)
+calendar_nextBusinessWednesday = function(start_date = Sys.Date(),
+                                           country_code = "PT") {
+  year = lubridate::year(start_date)
   if (!is.na(country_code)) {
-    holidays <- calendar_get_pt_holidays(year, country_code)
+    holidays = calendar_get_pt_holidays(year, country_code)
   } else {
-    holidays <- list()
+    holidays = list()
   }
 
   # Find the next Wednesday
-  next_wed <- start_date + (4 - lubridate::wday(start_date) + 7) %% 7
+  next_wed = start_date + (4 - lubridate::wday(start_date) + 7) %% 7
 
   # If next Wednesday is a holiday, keep searching
   while (next_wed %in% holidays) {
-    next_wed <- next_wed + 7  # Move to the next Wednesday
+    next_wed = next_wed + 7  # Move to the next Wednesday
 
     # If we cross into a new year, update holidays
     if (year(next_wed) != year) {
-      year <- lubridate::year(next_wed)
-      holidays <- calendar_get_pt_holidays(year, country_code)
+      year = lubridate::year(next_wed)
+      holidays = calendar_get_pt_holidays(year, country_code)
     }
   }
 
@@ -49,12 +50,12 @@ calendar_nextBusinessWednesday <- function(start_date = Sys.Date(), country_code
 #' @import httr
 #' @import jsonlite
 #' @noRd
-calendar_get_pt_holidays <- function(year, country_code) {
-  url <- paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/", country_code)
-  response <- httr::GET(url)
+calendar_get_pt_holidays = function(year, country_code) {
+  url = paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/", country_code)
+  response = httr::GET(url)
 
   if (status_code(response) == 200) {
-    holidays <- jsonlite::fromJSON(content(response, "text", encoding = "UTF-8"))
+    holidays = jsonlite::fromJSON(content(response, "text", encoding = "UTF-8"))
     return(as.Date(holidays$date))
   } else {
     stop("Failed to retrieve holidays. Please check your internet connection or API availability.")
