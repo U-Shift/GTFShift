@@ -2,7 +2,7 @@
 #'
 #'
 #' @param start_date String. (Default Sys.Date()) Reference date.
-#' @param country_code String. (Optional) Country code in the format `ISO 3166-1 alpha-2`. When provided, public holidays are considered.
+#' @param country_code String. (Default PT) Country code in the format `ISO 3166-1 alpha-2`. When provided, public holidays are considered.
 #'
 #' @details
 #' Find the next Wednesday that is not a holiday. When country is given, public holidays are considered, using \href{https://date.nager.at/Api}{Nager.Date} API.
@@ -17,7 +17,7 @@
 #' @import lubridate
 #'
 #' @export
-calendar_nextBusinessWednesday <- function(start_date = Sys.Date(), country_code=NA) {
+calendar_nextBusinessWednesday <- function(start_date = Sys.Date(), country_code="PT") {
   year <- lubridate::year(start_date)
   if (!is.na(country_code)) {
     holidays <- calendar_get_pt_holidays(year, country_code)

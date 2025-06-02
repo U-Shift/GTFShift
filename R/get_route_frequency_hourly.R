@@ -3,7 +3,7 @@
 #' For each route, returns the number of departures aggregated per hour.
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param date Date. Reference date to consider when analysing the GTFS file. Defaults to next business Wednesday in Portugal.
+#' @param date Date. (Default GTFShift::calendar_nextBusinessWednesday) Reference date to consider when analysing the GTFS file.
 #' @param overline Boolean. Defaults to FALSE. If TRUE, routes are aggregated using stplanr::overline2, overlapping lines and converting them into a single route network.
 #'
 #' @details
@@ -28,7 +28,7 @@
 #' frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 #' }
 #'
-#' @seealso [tidytransit::read_gtfs()], [stplanr::overline2]
+#' @seealso [tidytransit::read_gtfs()], [stplanr::overline2], [GTFShift::calendar_nextBusinessWednesday]
 #'
 #' @import tidytransit
 #' @import dplyr
@@ -38,16 +38,10 @@
 #' @import stplanr
 #'
 #' @export
-get_route_frequency_hourly <- function(gtfs, date=NULL, overline=FALSE) {
-  message(sprintf("Analysing GTFS..."))
+get_route_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusinessWednesday(), overline = FALSE) {
+  message(sprintf("Analysing GTFS for %s...", date))
 
-  # DATE FILTER
-  # Consider transit data for one day only
-  if (is.null(date)) {
-    date = calendar_nextBusinessWednesday()
-    message(sprintf("> Reference date not provided, considering next business wednesday: %s...", date))
-  }
-
+  ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
   gtfs_date <- tidytransit::filter_feed_by_date(
     gtfs, extract_date = date

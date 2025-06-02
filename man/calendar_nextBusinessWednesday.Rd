@@ -4,12 +4,12 @@
 \alias{calendar_nextBusinessWednesday}
 \title{Get next business Wednesday}
 \usage{
-calendar_nextBusinessWednesday(start_date = Sys.Date(), country_code = NA)
+calendar_nextBusinessWednesday(start_date = Sys.Date(), country_code = "PT")
 }
 \arguments{
 \item{start_date}{String. (Default Sys.Date()) Reference date.}
 
-\item{country_code}{String. (Optional) Country code in the format `ISO 3166-1 alpha-2`. When provided, public holidays are considered.}
+\item{country_code}{String. (Default PT) Country code in the format `ISO 3166-1 alpha-2`. When provided, public holidays are considered.}
 }
 \value{
 Date

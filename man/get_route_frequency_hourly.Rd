@@ -4,12 +4,16 @@
 \alias{get_route_frequency_hourly}
 \title{Get aggregated frequency per hour for each bus route}
 \usage{
-get_route_frequency_hourly(gtfs, date = NULL, overline = FALSE)
+get_route_frequency_hourly(
+  gtfs,
+  date = GTFShift::calendar_nextBusinessWednesday(),
+  overline = FALSE
+)
 }
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{date}{Date. Reference date to consider when analysing the GTFS file. Defaults to next business Wednesday in Portugal.}
+\item{date}{Date. (Default GTFShift::calendar_nextBusinessWednesday) Reference date to consider when analysing the GTFS file.}
 
 \item{overline}{Boolean. Defaults to FALSE. If TRUE, routes are aggregated using stplanr::overline2, overlapping lines and converting them into a single route network.}
 }
@@ -41,5 +45,5 @@ frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 
 }
 \seealso{
-[tidytransit::read_gtfs()], [stplanr::overline2]
+[tidytransit::read_gtfs()], [stplanr::overline2], [GTFShift::calendar_nextBusinessWednesday]
 }
