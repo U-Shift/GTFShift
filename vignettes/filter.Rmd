@@ -47,7 +47,7 @@ From the simpler to the most complex feeds, some analysis require to narrow the 
 
 ```{r}
 # Load GTFS
-gtfs = GTFShift::load_feed("https://download.gtfs.de/germany/fv_free/latest.zip")
+gtfs = load_feed("https://download.gtfs.de/germany/fv_free/latest.zip")
 summary(gtfs)
 ```
 
@@ -133,7 +133,7 @@ mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Agency")
 
 ```{r}
 # Load GTFS
-gtfs = GTFShift::load_feed("https://gitlab.com/LACMTA/gtfs_rail/raw/master/gtfs_rail.zip")
+gtfs = GTFShift::load_feed("https://gitlab.com/LACMTA/gtfs_rail/raw/master/gtfs_rail.zip", create_transfers=FALSE)
 summary(gtfs)
 ```
 
@@ -195,7 +195,7 @@ mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE, layer.name="Rout
 ```{r}
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs = GTFShift::load_feed(data[data$ID=="faro",]$URL)
+gtfs = GTFShift::load_feed(data[data$ID=="faro",]$URL, create_transfers=FALSE)
 summary(gtfs)
 ```
 
