@@ -20,12 +20,13 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE,
   message = FALSE,
+  cache = TRUE,
   comment = "#>",
   engine.path = list(python = '~/.virtualenvs/r-reticulate/bin/python3.12')
 )
 ```
 
-```{r setup, message=FALSE}
+```{r setup, message=FALSE, cache=FALSE}
 library(GTFShift)
 library(tidytransit)
 ```
@@ -44,10 +45,10 @@ To create it, you can either use `GTFShift::load_feed` or the tidytransit method
 
 ```{r eval = FALSE}
 # Using tidytransit
-gtfs <- tidytransit::load_feed("https://operator.com/gtfs.zip")
+gtfs = tidytransit::load_feed("https://operator.com/gtfs.zip")
 
 # Using GTFShift
-gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
+gtfs = GTFShift::load_feed("https://operator.com/gtfs.zip")
 ```
 
 
@@ -65,11 +66,15 @@ To use it, an access token must be provided. It can be obtained for free at Mobi
 ```{r}
 # usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work
 
-feeds <- GTFShift::query_mobilitydatabase(refresh_token = Sys.getenv("MOBILITY_DATABASE"), country_code="PT")
+feeds = GTFShift::query_mobilitydatabase(refresh_token = Sys.getenv("MOBILITY_DATABASE"),
+                                         subdivision_name = "Lisbon")
 
-feeds[1:4, c("provider", "status", "producer_url")]
+feeds |>
+  dplyr::filter(status == "active") |>
+  dplyr::select(provider, status, producer_url) |>
+  head()
 
-gtfs <- GTFShift::load_feed(feeds[c(1), ]$producer_url)
+gtfs = GTFShift::load_feed(feeds$producer_url[1], create_transfers=FALSE)
 summary(gtfs)
 ```
 
@@ -87,10 +92,9 @@ This library offers a small database with a compilation of GTFS files for Portug
 
 ```{r message=TRUE, warning=FALSE}
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-summary(data)
-data[1:4,]
+head(data)
 
-gtfs <- GTFShift::load_feed(data[c(1), ]$URL)
+gtfs = GTFShift::load_feed(data$URL[1], create_transfers = FALSE) # example with CP - trains
 summary(gtfs)
 ```
 
