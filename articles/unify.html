@@ -142,6 +142,7 @@ different GTFS.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform unification</span></span>
 <span><span class="va">gtfs_united</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/unify.html">unify</a></span><span class="op">(</span><span class="va">gtfs_list</span>, create_transfers <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidygtfs object</span></span>
 <span><span class="co">#&gt; files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, transfers, ., calendar, calendar_dates, feed_info, stops</span></span>
@@ -152,7 +153,16 @@ different GTFS.</p>
 <span><span class="co">#&gt; # trips      3289</span></span>
 <span><span class="co">#&gt; # stop_ids    293</span></span>
 <span><span class="co">#&gt; # stop_names  176</span></span>
-<span><span class="co">#&gt; # shapes       81</span></span></code></pre></div>
+<span><span class="co">#&gt; # shapes       81</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gtfs_united</span><span class="op">$</span><span class="va">transfers</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  from_stop_id        to_stop_id        transfer_type min_transfer_time</span></span>
+<span><span class="co">#&gt;  Length:1150        Length:1150        Min.   :2     Min.   :120      </span></span>
+<span><span class="co">#&gt;  Class :character   Class :character   1st Qu.:2     1st Qu.:120      </span></span>
+<span><span class="co">#&gt;  Mode  :character   Mode  :character   Median :2     Median :248      </span></span>
+<span><span class="co">#&gt;                                        Mean   :2     Mean   :245      </span></span>
+<span><span class="co">#&gt;                                        3rd Qu.:2     3rd Qu.:350      </span></span>
+<span><span class="co">#&gt;                                        Max.   :2     Max.   :416</span></span></code></pre></div>
 <p>It can be displayed using <code>mapview</code>.</p>
 <div style="display: flex; gap: 20px; overflow-x: auto;">
 <div class="section level4" style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
