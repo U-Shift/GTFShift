@@ -18,7 +18,7 @@ reference:
     contents:
     - unify
     - starts_with("create_")
-  - title: Open Street Maps
+  - title: OpenStreetMaps
     contents:
     - starts_with("osm_")
   - title: Utils

@@ -33,7 +33,7 @@ library(tidytransit)
 
 # Introduction
 
-Open Street Maps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
+OpenStreetMaps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
 GTFShift includes some methods that allow to access its information directly.
 
 
@@ -58,7 +58,7 @@ mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 
 Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
 
-`osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from Open Street Maps, using Python [neatnet](https://uscuni.org/neatnet/) package.
+`osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from OpenStreetMaps, using Python [neatnet](https://uscuni.org/neatnet/) package.
 
 <div style="display: flex; gap: 20px; overflow-x: auto;">
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
