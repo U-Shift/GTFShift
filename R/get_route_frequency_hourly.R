@@ -17,7 +17,7 @@
 #'  \item `route_id`, the `route_id` attribute from `routes.txt` file.
 #'  \item `route_short_name`, the `route_short_name` attribute from `routes.txt` file.
 #'  \item `direction_id`, the `direction_id` attribute from `trips.txt` file.
-#'  \item `arrival_hour`, the hour for which the frequency applies (24 hour format).
+#'  \item `hour`, the hour for which the frequency applies (24 hour format).
 #'  \item `frequency`, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
 #'  \item `geometry`, the route shape.
 #' }
@@ -75,11 +75,11 @@ get_route_frequency_hourly = function(gtfs,
 
   stop_times = stop_times |>
     mutate(
-      arrival_hour = lubridate::hour(arrival_time)
+      hour = lubridate::hour(departure_time)
     )
 
   freq_data = stop_times |>
-    group_by(route_id, route_short_name, direction_id, arrival_hour) |>
+    group_by(route_id, route_short_name, direction_id, hour) |>
     summarize(frequency = n()) |>
     ungroup()
 
@@ -95,12 +95,12 @@ get_route_frequency_hourly = function(gtfs,
   # Overline?
   if (overline) {
     routes_freq_all = data.frame()
-    for (h in unique(routes_freq$arrival_hour)) { # hours of the day
+    for (h in unique(routes_freq$hour)) { # hours of the day
       routes_freq_h = routes_freq |>
-        filter(arrival_hour == h) |>
+        filter(hour == h) |>
         stplanr::overline2(attrib = "frequency") |>
         arrange(frequency) |>
-        mutate(arrival_hour = h)
+        mutate(hour = h)
 
       routes_freq_all = rbind(routes_freq_all, routes_freq_h)
     }
