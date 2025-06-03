@@ -3,18 +3,18 @@
 #' For each stop, returns the number of departures aggregated per hour.
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param date Date. (Default GTFShift::calendar_nextBusinessWednesday) Reference date to consider when analyzing the GTFS file.
+#' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
-#' @returns An `sf` `data.frame` object with the following columns:
+#' @returns An \code{sf} \code{data.frame} object with the following columns:
 #' \itemize{
-#'  \item `stop_id`, the `stop_id` attribute from `stops.txt` file.
-#'  \item `hour`, the hour for which the frequency applies (24 hour format).
-#'  \item `frequency`, the number of services provided at the stop for the corresponding 60 minutes period.
-#'  \item `geometry`, the stop coordinates.
+#'  \item \code{stop_id}, the \code{stop_id} attribute from \code{stops.txt} file.
+#'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
+#'  \item \code{frequency}, the number of services provided at the stop for the corresponding 60 minutes period.
+#'  \item \code{geometry}, the stop coordinates.
 #' }
 #'
 #' @examples

@@ -20,20 +20,21 @@ network_overline(
 
 \item{attr}{String. The attribute to aggregate the lines by.}
 
-\item{network_segment_length}{Integer. (Default 100) If not NA, network is split in segments of defined meters.}
+\item{network_segment_length}{Integer (Default 100). If not NA, network is split in segments of defined meters.}
 
-\item{fun.}{Method. (Default sim) Function to summarise the attributes by.}
+\item{fun}{Method (Default \code{base::sum}). Function to summarise the attributes by.}
 
-\item{join_dist.}{Integer. (Default 10) Meters to consider when joining routes and network segments.}
+\item{join_dist}{Integer (Default 10). Meters to consider when joining routes and network segments.}
 }
 \value{
-A spatial object of the network provided, extended with the aggregated values. A `segment` column will be also added to the network, as a unique identifier used for the aggregation process.
+A spatial object of the network provided, extended with the aggregated values.
+A \code{segment} column will be also added to the network, as a unique identifier used for the aggregation process.
 }
 \description{
 Aggregate lines based on overlap with simplified network
 }
 \details{
-This method allows for the lines aggregation. Given a simplified network, it identifies (using `stplanr::rnet_join()`)
+This method allows for the lines aggregation. Given a simplified network, it identifies (using \code{stplanr::rnet_join()})
 the segments corresponding to each line and uses them to aggregate the attribute defined in the parameters.
 }
 \examples{

@@ -1,16 +1,16 @@
 #' Query Mobility Database API for GTFS feeds
 #
 #'
-#' @param access_token String. (Optional when refresh_token) Access token.
-#' @param refresh_token String. (Optional when access_token) Refresh token.
-#' @param bounding_filter_method. String. (Default `partially_enclosed`) Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.
-#' @param limit. Integer. (Default 10) The number of items to be returned.
-#' @param offset. Integer. (Default 0) Offset of the first item to return.
-#' @param country_code. String. (Optional) Filter feeds by their exact country code.
-#' @param subdivision_name. String. (Optional) List only feeds with the specified value. Can be a partial match.
-#' @param municipality String. (Optional) List only feeds with the specified value. Can be a partial match. Case insensitive.
-#' @param bbox bbox (Optional) Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.
-#' @param is_official. Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.
+#' @param access_token String (Optional when refresh_token). Access token.
+#' @param refresh_token String (Optional when access_token). Refresh token.
+#' @param bounding_filter_method String (Default partially_enclosed). Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.
+#' @param limit Integer (Default 10). The number of items to be returned.
+#' @param offset Integer (Default 0). Offset of the first item to return.
+#' @param country_code String (Optional). Filter feeds by their exact country code.
+#' @param subdivision_name String (Optional). List only feeds with the specified value. Can be a partial match.
+#' @param municipality String (Optional). List only feeds with the specified value. Can be a partial match. Case insensitive.
+#' @param bbox bbox (Optional). Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.
+#' @param is_official. Boolean (Optional). If TRUE, only return official feeds.
 #'
 #' @details
 #' This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform.
@@ -19,9 +19,9 @@
 #' For more details on the parameters, refer to \url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
 #' Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:
 #' \itemize{
-#'  \item `provider`. The name of the GTFS provider.
-#'  \item `status`. Tells if the feed is active, inactive or deprecated.
-#'  \item `producer_url`. The GTFS feed URL. Can be used to download.
+#'  \item \code{provider} The name of the GTFS provider.
+#'  \item \code{status} Tells if the feed is active, inactive or deprecated.
+#'  \item \code{producer_url} The GTFS feed URL. Can be used to download.
 #' }
 #'
 #' @returns data.frame with query results

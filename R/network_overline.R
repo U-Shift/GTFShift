@@ -3,16 +3,17 @@
 #' @param network sf. A spatial object representing the simplified network.
 #' @param df sf. A spatial object representing the lines to aggregate.
 #' @param attr String. The attribute to aggregate the lines by.
-#' @param network_segment_length Integer. (Default 100) If not NA, network is split in segments of defined meters.
-#' @param fun. Method. (Default sim) Function to summarise the attributes by.
-#' @param join_dist. Integer. (Default 10) Meters to consider when joining routes and network segments.
+#' @param network_segment_length Integer (Default 100). If not NA, network is split in segments of defined meters.
+#' @param fun Method (Default \code{base::sum}). Function to summarise the attributes by.
+#' @param join_dist Integer (Default 10). Meters to consider when joining routes and network segments.
 #'
 #' @details
-#' This method allows for the lines aggregation. Given a simplified network, it identifies (using `stplanr::rnet_join()`)
+#' This method allows for the lines aggregation. Given a simplified network, it identifies (using \code{stplanr::rnet_join()})
 #' the segments corresponding to each line and uses them to aggregate the attribute defined in the parameters.
 #'
 #'
-#' @returns A spatial object of the network provided, extended with the aggregated values. A `segment` column will be also added to the network, as a unique identifier used for the aggregation process.
+#' @returns A spatial object of the network provided, extended with the aggregated values.
+#' A \code{segment} column will be also added to the network, as a unique identifier used for the aggregation process.
 #'
 #' @examples
 #' \dontrun{

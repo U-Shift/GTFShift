@@ -1,19 +1,22 @@
 #' Read GTFS feed, fixing integrity errors
 #'
 #' @param path String. The location of the GTFS zip file. Either local or URL.
-#' @param store_path. String. (Optional) If provided, GTFS feed zip is stored at location. The file is overwritten if it already exists.
-#' @param create_transfers Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops.
-#' @param transfer_distance Integer. (Default 300) Upper straight-line distance limit in metres for transfers.
-#' @param transfer_time Integer. (Default 120) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
-#' @param transfer_street_routing (Default FALSE) If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
+#' @param store_path String (Optional). If provided, GTFS feed zip is stored at location. The file is overwritten if it already exists.
+#' @param create_transfers Boolean (Default TRUE). When true, generates \code{transfers.txt}, aggregating close stops.
+#' @param transfer_distance Integer (Default 300). Upper straight-line distance limit in meters for transfers.
+#' @param transfer_time Integer (Default 120). Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
+#' @param transfer_street_routing Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
 #'
 #' @details
 #' In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
 #' \itemize{
-#'  \item `stop_times.txt` with empty `arrival_time` or `departure_time`, filtering rows that do not comply.
-#'  \item Feeds with missing `shapes.txt` file, generating it using `GTFSwizard::get_shapes()`.
+#'  \item \code{stop_times.txt} with empty \code{arrival_time} or \code{departure_time}, filtering rows that do not comply.
+#'  \item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFSwizard::get_shapes()}.
 #' }
-#' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
+#' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops
+#' network of the final aggregated version. This computation is executed with \code{gtfsrouter::gtfs_transfer_table()}, with
+#' the parameters \code{d_limit=transfer_distance}, \code{min_transfer_time=transfer_time} and \code{network_times=transfer_street_routing}.
+#' The other parameters are applied the library default values.
 #'
 #' @returns A tidygtfs object.
 #'

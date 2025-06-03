@@ -1,11 +1,12 @@
 #' Get next business Wednesday
 #'
 #'
-#' @param start_date String. (Default Sys.Date()) Reference date.
-#' @param country_code String. (Default PT) Country code in the format `ISO 3166-1 alpha-2`. When provided, public holidays are considered.
+#' @param start_date String (Default \code{Sys.Date()}). Reference date.
+#' @param country_code String (Default PT). Country code in the format \code{ISO 3166-1 alpha-2}. When provided, public holidays are considered.
 #'
 #' @details
-#' Find the next Wednesday that is not a holiday. When country is given, public holidays are considered, using \href{https://date.nager.at/Api}{Nager.Date} API.
+#' Find the next Wednesday that is not a holiday. When country is given, public holidays are considered,
+#' using \href{https://date.nager.at/Api}{Nager.Date} API.
 #'
 #' @returns Date
 #'
