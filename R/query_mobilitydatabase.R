@@ -29,7 +29,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' feeds <- GTFShift::query_mobilitydatabase(refresh_token="myToken", country_code="PT", is_official=TRUE)
+#' feeds <- GTFShift::query_mobilitydatabase(
+#'   refresh_token = "myToken",
+#'   country_code = "PT",
+#'   is_official = TRUE
+#' )
 #' }
 #'
 #' @import httr
