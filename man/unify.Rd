@@ -5,7 +5,7 @@
 \title{Merge multiple GTFS into a single aggregated file}
 \usage{
 unify(
-  gtfss,
+  ...,
   store_path = NA,
   create_transfers = TRUE,
   transfer_distance = 300,
@@ -14,7 +14,7 @@ unify(
 )
 }
 \arguments{
-\item{gtfss}{tidygtfs[]. List of GTFS feeds.}
+\item{...}{tidygtfs[]. List of GTFS feeds.}
 
 \item{create_transfers}{Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.}
 
@@ -41,7 +41,7 @@ For a detailed example, see the \code{vignette("unify")}.
 \dontrun{
 gtfs1 <- GTFShift::load_feed("gtfs1.zip")
 gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-unified <- GTFShift::unify(list(gtfs1, gtfs2), create_transfers=TRUE)
+unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers=TRUE)
 }
 
 }

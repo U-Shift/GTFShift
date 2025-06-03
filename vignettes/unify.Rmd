@@ -58,7 +58,7 @@ The unification is performed through `GTFShift::unify()`, producing a single GTF
 
 ```{r}
 # Perform unification
-gtfs_united = GTFShift::unify(gtfs_list, create_transfers = TRUE)
+gtfs_united = GTFShift::unify(gtfs_list[[1]], gtfs_list[[2]], create_transfers = TRUE)
 
 summary(gtfs_united)
 
