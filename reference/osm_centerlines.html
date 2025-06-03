@@ -55,19 +55,19 @@
 
 
 <dl><dt id="arg-bbox">bbox<a class="anchor" aria-label="anchor" href="#arg-bbox"></a></dt>
-<dd><p>bbox. (Optional, if place provided) Area from which to export bus lanes.</p></dd>
+<dd><p>bbox (Optional, if place provided). Area from which to export bus lanes.</p></dd>
 
 
 <dt id="arg-place">place<a class="anchor" aria-label="anchor" href="#arg-place"></a></dt>
-<dd><p>String. (Optional, if bbox provided) Place from which to export bus lanes.</p></dd>
+<dd><p>String (Optional, if bbox provided). Place from which to export bus lanes.</p></dd>
 
 
 <dt id="arg-use-buildings">use_buildings<a class="anchor" aria-label="anchor" href="#arg-use-buildings"></a></dt>
-<dd><p>Boolean. (Default True) Uses buildings from OSM as exclusion_mask for neatnet.</p></dd>
+<dd><p>Boolean (Default TRUE). Uses buildings from OSM as exclusion_mask for neatnet.</p></dd>
 
 
 <dt id="arg-venv">venv<a class="anchor" aria-label="anchor" href="#arg-venv"></a></dt>
-<dd><p>String. (Default creates a new one) Python environment where neatnet will run.</p></dd>
+<dd><p>String (Default creates a new one). Python environment where neatnet will run.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -77,9 +77,9 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Exports road network from OpenStreetMaps for given area and uses
-Python <a href="https://uscuni.org/neatnet/" class="external-link">neatnet</a> package to compute its centerlines.
-One of `bbox` or `place` must be provided. If both, `bbox` is considered.
-Parameter `use_buildings` exports building footprints from OSM for better results on
+Python <a href="https://uscuni.org/neatnet/" class="external-link">neatnet</a> package to compute its centerlines.</p>
+<p>One of <code>bbox</code> or <code>place</code> must be provided. If both, <code>bbox</code> is considered.</p>
+<p>Parameter <code>use_buildings</code> exports building footprints from OSM for better results on
 the network simplification process.</p>
     </div>
 

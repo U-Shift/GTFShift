@@ -74,24 +74,25 @@
 
 
 <dt id="arg-network-segment-length">network_segment_length<a class="anchor" aria-label="anchor" href="#arg-network-segment-length"></a></dt>
-<dd><p>Integer. (Default 100) If not NA, network is split in segments of defined meters.</p></dd>
+<dd><p>Integer (Default 100). If not NA, network is split in segments of defined meters.</p></dd>
 
 
-<dt id="arg-fun-">fun.<a class="anchor" aria-label="anchor" href="#arg-fun-"></a></dt>
-<dd><p>Method. (Default sim) Function to summarise the attributes by.</p></dd>
+<dt id="arg-fun">fun<a class="anchor" aria-label="anchor" href="#arg-fun"></a></dt>
+<dd><p>Method (Default <code><a href="https://rdrr.io/r/base/sum.html" class="external-link">base::sum</a></code>). Function to summarise the attributes by.</p></dd>
 
 
-<dt id="arg-join-dist-">join_dist.<a class="anchor" aria-label="anchor" href="#arg-join-dist-"></a></dt>
-<dd><p>Integer. (Default 10) Meters to consider when joining routes and network segments.</p></dd>
+<dt id="arg-join-dist">join_dist<a class="anchor" aria-label="anchor" href="#arg-join-dist"></a></dt>
+<dd><p>Integer (Default 10). Meters to consider when joining routes and network segments.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A spatial object of the network provided, extended with the aggregated values. A `segment` column will be also added to the network, as a unique identifier used for the aggregation process.</p>
+    <p>A spatial object of the network provided, extended with the aggregated values.
+A <code>segment</code> column will be also added to the network, as a unique identifier used for the aggregation process.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This method allows for the lines aggregation. Given a simplified network, it identifies (using `stplanr::rnet_join()`)
+    <p>This method allows for the lines aggregation. Given a simplified network, it identifies (using <code><a href="https://docs.ropensci.org/stplanr/reference/rnet_join.html" class="external-link">stplanr::rnet_join()</a></code>)
 the segments corresponding to each line and uses them to aggregate the attribute defined in the parameters.</p>
     </div>
     <div class="section level2">

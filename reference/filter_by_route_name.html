@@ -63,20 +63,21 @@
 
 
 <dt id="arg-short-name">short_name<a class="anchor" aria-label="anchor" href="#arg-short-name"></a></dt>
-<dd><p>Boolean. If true, query for route_short_name, otherwise, route_long_name is considered.</p></dd>
+<dd><p>Boolean. If TRUE, query for route_short_name, otherwise, route_long_name is considered.</p></dd>
 
 
 <dt id="arg-exact-match">exact_match<a class="anchor" aria-label="anchor" href="#arg-exact-match"></a></dt>
-<dd><p>Boolean. If true, route name is queried for an exact match, otherwise, partial match is considered.</p></dd>
+<dd><p>Boolean. If TRUE, route name is queried for an exact match, otherwise, partial match is considered.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A `tidygtfs` object with the filtered feed.</p>
+    <p>A tidygtfs object with the filtered feed.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>On a GTFS feed, the `route_id` rarely matches the real name of the route, that can range from numbers, letters, words or combinations of both.
+    <p>On a GTFS feed, the <code>route_id</code> rarely matches the real name of the route, that can range from numbers,
+letters, words or combinations of both.
 This method allows to filter the feed for the route short or long name, with a partial or exact match.</p>
     </div>
 

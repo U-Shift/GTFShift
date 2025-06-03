@@ -63,27 +63,27 @@
 
 
 <dt id="arg-date">date<a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
-<dd><p>Date. (Default GTFShift::calendar_nextBusinessWednesday) Reference date to consider when analysing the GTFS file.</p></dd>
+<dd><p>Date (Default <code><a href="calendar_nextBusinessWednesday.html">GTFShift::calendar_nextBusinessWednesday()</a></code>). Reference date to consider when analyzing the GTFS file.</p></dd>
 
 
 <dt id="arg-overline">overline<a class="anchor" aria-label="anchor" href="#arg-overline"></a></dt>
-<dd><p>Boolean. Defaults to FALSE. If TRUE, routes are aggregated using stplanr::overline2, overlapping lines and converting them into a single route network.</p></dd>
+<dd><p>Boolean (Default FALSE). If TRUE, routes are aggregated using <code><a href="https://docs.ropensci.org/stplanr/reference/overline.html" class="external-link">stplanr::overline2()</a></code>, overlapping lines and converting them into a single route network.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An `sf` `data.frame` object with the following columns (the first three are only present if `overline=FALSE`):</p><ul><li><p>`route_id`, the `route_id` attribute from `routes.txt` file.</p></li>
-<li><p>`route_short_name`, the `route_short_name` attribute from `routes.txt` file.</p></li>
-<li><p>`direction_id`, the `direction_id` attribute from `trips.txt` file.</p></li>
-<li><p>`hour`, the hour for which the frequency applies (24 hour format).</p></li>
-<li><p>`frequency`, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.</p></li>
-<li><p>`geometry`, the route shape.</p></li>
+    <p>An <code>sf</code> <code>data.frame</code> object with the following columns (the first three are only present if <code>overline=FALSE</code>):</p><ul><li><p><code>route_id</code>, the <code>route_id</code> attribute from <code>routes.txt</code> file.</p></li>
+<li><p><code>route_short_name</code>, the <code>route_short_name</code> attribute from <code>routes.txt</code> file.</p></li>
+<li><p><code>direction_id</code>, the <code>direction_id</code> attribute from <code>trips.txt</code> file.</p></li>
+<li><p><code>hour</code>, the hour for which the frequency applies (24 hour format).</p></li>
+<li><p><code>frequency</code>, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.</p></li>
+<li><p><code>geometry</code>, the route shape.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour.
 For a detailed example, see the <code><a href="../articles/analyse.html">vignette("analyse")</a></code>.</p>
-<p>Adapted from https://github.com/Bondify/GTFS_in_R/.</p>
+<p>Adapted from <a href="https://github.com/Bondify/GTFS_in_R/" class="external-link">https://github.com/Bondify/GTFS_in_R/</a>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

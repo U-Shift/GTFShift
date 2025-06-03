@@ -66,43 +66,43 @@
 
 
 <dl><dt id="arg-access-token">access_token<a class="anchor" aria-label="anchor" href="#arg-access-token"></a></dt>
-<dd><p>String. (Optional when refresh_token) Access token.</p></dd>
+<dd><p>String (Optional when refresh_token). Access token.</p></dd>
 
 
 <dt id="arg-refresh-token">refresh_token<a class="anchor" aria-label="anchor" href="#arg-refresh-token"></a></dt>
-<dd><p>String. (Optional when access_token) Refresh token.</p></dd>
+<dd><p>String (Optional when access_token). Refresh token.</p></dd>
+
+
+<dt id="arg-bounding-filter-method">bounding_filter_method<a class="anchor" aria-label="anchor" href="#arg-bounding-filter-method"></a></dt>
+<dd><p>String (Default partially_enclosed). Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.</p></dd>
+
+
+<dt id="arg-limit">limit<a class="anchor" aria-label="anchor" href="#arg-limit"></a></dt>
+<dd><p>Integer (Default 10). The number of items to be returned.</p></dd>
+
+
+<dt id="arg-offset">offset<a class="anchor" aria-label="anchor" href="#arg-offset"></a></dt>
+<dd><p>Integer (Default 0). Offset of the first item to return.</p></dd>
+
+
+<dt id="arg-country-code">country_code<a class="anchor" aria-label="anchor" href="#arg-country-code"></a></dt>
+<dd><p>String (Optional). Filter feeds by their exact country code.</p></dd>
+
+
+<dt id="arg-subdivision-name">subdivision_name<a class="anchor" aria-label="anchor" href="#arg-subdivision-name"></a></dt>
+<dd><p>String (Optional). List only feeds with the specified value. Can be a partial match.</p></dd>
 
 
 <dt id="arg-municipality">municipality<a class="anchor" aria-label="anchor" href="#arg-municipality"></a></dt>
-<dd><p>String. (Optional) List only feeds with the specified value. Can be a partial match. Case insensitive.</p></dd>
+<dd><p>String (Optional). List only feeds with the specified value. Can be a partial match. Case insensitive.</p></dd>
 
 
 <dt id="arg-bbox">bbox<a class="anchor" aria-label="anchor" href="#arg-bbox"></a></dt>
-<dd><p>bbox (Optional) Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.</p></dd>
-
-
-<dt id="arg-bounding-filter-method-">bounding_filter_method.<a class="anchor" aria-label="anchor" href="#arg-bounding-filter-method-"></a></dt>
-<dd><p>String. (Default `partially_enclosed`) Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.</p></dd>
-
-
-<dt id="arg-limit-">limit.<a class="anchor" aria-label="anchor" href="#arg-limit-"></a></dt>
-<dd><p>Integer. (Default 10) The number of items to be returned.</p></dd>
-
-
-<dt id="arg-offset-">offset.<a class="anchor" aria-label="anchor" href="#arg-offset-"></a></dt>
-<dd><p>Integer. (Default 0) Offset of the first item to return.</p></dd>
-
-
-<dt id="arg-country-code-">country_code.<a class="anchor" aria-label="anchor" href="#arg-country-code-"></a></dt>
-<dd><p>String. (Optional) Filter feeds by their exact country code.</p></dd>
-
-
-<dt id="arg-subdivision-name-">subdivision_name.<a class="anchor" aria-label="anchor" href="#arg-subdivision-name-"></a></dt>
-<dd><p>String. (Optional) List only feeds with the specified value. Can be a partial match.</p></dd>
+<dd><p>bbox (Optional). Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.</p></dd>
 
 
 <dt id="arg-is-official-">is_official.<a class="anchor" aria-label="anchor" href="#arg-is-official-"></a></dt>
-<dd><p>Boolean. (Optional) Default `FALSE`. If TRUE, only return official feeds.</p></dd>
+<dd><p>Boolean (Optional). If TRUE, only return official feeds.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -115,9 +115,9 @@
 To use it, an access or a refresh token must be provided.
 It can be obtained for free at Mobility Database website.<br><br>
 For more details on the parameters, refer to <a href="https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds" class="external-link">https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds</a>.<br><br>
-Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:</p><ul><li><p>`provider`. The name of the GTFS provider.</p></li>
-<li><p>`status`. Tells if the feed is active, inactive or deprecated.</p></li>
-<li><p>`producer_url`. The GTFS feed URL. Can be used to download.</p></li>
+Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:</p><ul><li><p><code>provider</code> The name of the GTFS provider.</p></li>
+<li><p><code>status</code> Tells if the feed is active, inactive or deprecated.</p></li>
+<li><p><code>producer_url</code> The GTFS feed URL. Can be used to download.</p></li>
 </ul></div>
 
     <div class="section level2">
