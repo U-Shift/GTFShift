@@ -1,6 +1,6 @@
 #' Merge multiple GTFS into a single aggregated file
 #'
-#' @param gtfss tidygtfs[]. List of GTFS feeds.
+#' @param ... tidygtfs[]. List of GTFS feeds.
 #' @param store_path. String. (Optional) If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.
 #' @param create_transfers Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.
 #' @param transfer_distance Integer. (Default 300) Upper straight-line distance limit in meters for transfers.
@@ -18,7 +18,7 @@
 #' \dontrun{
 #' gtfs1 <- GTFShift::load_feed("gtfs1.zip")
 #' gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-#' unified <- GTFShift::unify(list(gtfs1, gtfs2), create_transfers=TRUE)
+#' unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers=TRUE)
 #' }
 #'
 #' @seealso [GTFSwizard::merge_gtfs()]
@@ -28,7 +28,9 @@
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-unify <- function(gtfss, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+unify <- function(..., store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+
+  gtfss = list(...)
 
   # Initial validation
   has_calendar = sapply(gtfss, function(g) "calendar" %in% names(g))
