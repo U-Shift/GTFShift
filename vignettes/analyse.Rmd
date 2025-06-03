@@ -108,7 +108,7 @@ quantile(frequencies_route_overline$frequency)
 
 ```{r, cache=FALSE}
 mapview::mapview(
-  frequencies_route |> filter(arrival_hour == 8 & frequency > 2),
+  frequencies_route |> filter(hour == 8 & frequency > 2),
   zcol = "frequency",
   layer.name = "Frequency (hour)"
 )
@@ -120,7 +120,7 @@ mapview::mapview(
 # above 2 per hour
 mapview::mapview(
   frequencies_route_overline |> filter(
-    arrival_hour == 8 &
+    hour == 8 &
       frequency > 2 # optional
   ),
   zcol = "frequency",
@@ -152,7 +152,7 @@ network = sf::st_read(system.file("extdata", "centerline_carris.gpkg",
 
 frequencies_route_overline_improved = GTFShift::network_overline(
   network, 
-  frequencies_route |> filter(arrival_hour == 8),
+  frequencies_route |> filter(hour == 8),
   attr = "frequency"
 )
 
