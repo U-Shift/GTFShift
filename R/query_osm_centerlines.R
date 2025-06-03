@@ -1,15 +1,17 @@
 #' Get centerlines for OSM road network
 #'
-#' @param bbox bbox. (Optional, if place provided) Area from which to export bus lanes.
-#' @param place String. (Optional, if bbox provided) Place from which to export bus lanes.
-#' @param use_buildings Boolean. (Default True) Uses buildings from OSM as exclusion_mask for neatnet.
-#' @param venv String. (Default creates a new one) Python environment where neatnet will run.
+#' @param bbox bbox (Optional, if place provided). Area from which to export bus lanes.
+#' @param place String (Optional, if bbox provided). Place from which to export bus lanes.
+#' @param use_buildings Boolean (Default TRUE). Uses buildings from OSM as exclusion_mask for neatnet.
+#' @param venv String (Default creates a new one). Python environment where neatnet will run.
 #'
 #' @details
 #' Exports road network from OpenStreetMaps for given area and uses
 #' Python \href{https://uscuni.org/neatnet/}{neatnet} package to compute its centerlines.
-#' One of `bbox` or `place` must be provided. If both, `bbox` is considered.
-#' Parameter `use_buildings` exports building footprints from OSM for better results on
+#'
+#' One of \code{bbox} or \code{place} must be provided. If both, \code{bbox} is considered.
+#'
+#' Parameter \code{use_buildings} exports building footprints from OSM for better results on
 #' the network simplification process.
 #'
 #' @returns osm_lines in sf format
