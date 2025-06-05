@@ -47,7 +47,7 @@ target_network = st_read("network_centerlines.gpkg")
 frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs, overline=FALSE)
 GTFShift::network_overline(
   target_network,
-  frequency_analysis \%>\% filter(arrival_hour==8),
+  frequency_analysis |> filter(arrival_hour==8),
   attr = "frequency"
 )
 }
