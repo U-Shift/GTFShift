@@ -162,7 +162,7 @@ quantile(frequencies_route_overline_improved$frequency)
 mapview::mapview(
   frequencies_route_overline_improved |>
     select(frequency, segment) |>
-    filter(frequency > 6),
+    filter(frequency > 12),
   zcol = "frequency",
   # lwd = "frequency",
   layer.name = "Frequency (hour)"
