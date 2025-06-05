@@ -25,7 +25,7 @@
 #' frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs, overline=FALSE)
 #' GTFShift::network_overline(
 #'   target_network,
-#'   frequency_analysis %>% filter(arrival_hour==8),
+#'   frequency_analysis |> filter(arrival_hour==8),
 #'   attr = "frequency"
 #' )
 #' }
@@ -51,14 +51,14 @@ network_overline <- function(
     network_segmented = stplanr::line_segment(
       network_line,
       segment_length=target_network_split
-    ) %>% mutate(segment=row_number())
+    ) |> mutate(segment=row_number())
   } else {
     network_segmented = network_line |>
       mutate(segment = row_number())
   }
 
-  df = lines %>%
-    st_transform(crs=3857) %>%
+  df = lines |>
+    st_transform(crs=3857) |>
     mutate(df_id=row_number())
 
   # 2. Overlap df and network segments
@@ -84,9 +84,9 @@ network_overline <- function(
     summarise(!!attr := fun(frequency))
 
   # 4. Get geometry back
-  result = network_segmented %>%
-    filter(segment %in% df_network_segment$segment) %>%
-    left_join(df_network_segment, by="segment") %>%
+  result = network_segmented |>
+    filter(segment %in% df_network_segment$segment) |>
+    left_join(df_network_segment, by="segment") |>
     select(-segment)
 
   return(result)
