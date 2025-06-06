@@ -137,13 +137,13 @@ Using the `overline` attribute in `GTFShift::get_route_frequency_hourly` might n
 
 This is a [known issue](https://github.com/ropensci/stplanr/issues/575) of `stplanr::overline2()`, the method used for the network aggregation that has not been solved yet.
 
-As an alternative, `GTFShift` provides the method `GTFShift::network_overline`, that allows for the route aggregation. Given a simplified network, it identifies the segments corresponding to each route and uses them to aggregate the attribute defined in the parameters. It can be used to aggregate the frequencies. 
+As an alternative, `GTFShift` provides the method `GTFShift::network_overline`, that allows for the route aggregation. Given a target network, it identifies the segments corresponding to each route and uses them to aggregate the attribute defined in the parameters. It can be used to aggregate the frequencies. 
 
-> One approach for the network simplification could be through the centerlines determination. During the development of this project, no R packages were found suiting this purpose. [Centerline](https://github.com/atsyplenkov/centerline) package has this feature in its roadmap. Currently, there are available solutions for [Python](https://uscuni.org/neatnet/index.html) or [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
+> One approach to build a simplified road target network could be through the centerlines determination. During the development of this project, no R packages were found suiting this purpose. [Centerline](https://github.com/atsyplenkov/centerline) package has this feature in its roadmap. Currently, there are available solutions for [Python](https://uscuni.org/neatnet/index.html) or [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 
-> GTFShift provides a method that encapsulates Python [neatnet](https://uscuni.org/neatnet/index.html) package. Refer to [vignette("donwload")](download.html#get-centerlines-for-osm-road-network) for more details.
+> GTFShift provides a method that encapsulates Python [neatnet](https://uscuni.org/neatnet/index.html) package. Refer to [vignette("osm")](osm.html#get-centerlines-for-osm-road-network) for more details.
 
-Below is provided an example, that uses the centerlines for the Carris network as a simplification, generated using [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
+Below is provided an example, that uses the centerlines for the Carris network as a target network, generated using [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 
 ```{r}
 network = sf::st_read(system.file("extdata", "centerline_carris.gpkg", 
