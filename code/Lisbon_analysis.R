@@ -53,7 +53,7 @@ frequencies_route_overline_improved = GTFShift::network_overline(
 quantile(frequencies_route_overline_improved$frequency)
 
 mapview::mapview(
-  frequencies_route_overline_improved %>% select(frequency, segment) %>% filter(frequency > quantile(frequencies_route_overline_improved$frequency, probs=0.75)),
+  frequencies_route_overline_improved %>% filter(frequency > quantile(frequencies_route_overline_improved$frequency, probs=0.75)),
   zcol = "frequency",
   layer.name = "Frequency (hour)"
 )
