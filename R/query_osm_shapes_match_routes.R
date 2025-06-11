@@ -16,6 +16,10 @@
 #' \itemize{
 #'  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
 #'  \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
+#'  \item \code{distance_diff}, the difference, in meters, between GTFS shape and OSM route lengths.
+#'  \item \code{points_diff}, the sum of the difference, in meters, between GTFS shape and OSM route start and end points.
+#'  \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
+#'  \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
 #' }
 #'
