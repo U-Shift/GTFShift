@@ -120,7 +120,7 @@ data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShif
 gtfs_id = "lisboa"
 gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
 # Subset feed for some routes only, for demonstration purposes
-gtfs = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E"))
+gtfs = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "61B"))
 
 # Build OSM query
 library(osmdata)
@@ -130,13 +130,13 @@ q = opq("Lisbon")  |>
 
 # Match shapes geometry
 shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs, q)
+
+summary(shapes_match_routes)
 ```
 
 
 ```{r, cache=FALSE}
 # Visualize results
-max(shapes_match_routes$distance_diff)
-
 shapes_match_routes$map_name = paste(
   shapes_match_routes$route_short_name,
   " // ",
