@@ -51,7 +51,7 @@ gtfs = load_feed("https://download.gtfs.de/germany/fv_free/latest.zip")
 summary(gtfs)
 ```
 
-Multimodal feeds aggregate several agencies. `GTFShift::filter_by_agency()`, allows to filter by the agency id, name, or both. You can filter by the `id` and/or `name` of the agency.
+Multimodal feeds aggregate several agencies. `GTFShift::filter_by_agency`, allows to filter by the agency id, name, or both. You can filter by the `id` and/or `name` of the agency.
 
 ```{r}
 # Filter by agency id
@@ -137,7 +137,7 @@ gtfs = GTFShift::load_feed("https://gitlab.com/LACMTA/gtfs_rail/raw/master/gtfs_
 summary(gtfs)
 ```
 
-Multimodal feeds aggregate several modes. `GTFShift::filter_by_mode()` allows to restrict the feed to some modes only. Refer to routes.txt 'route_type' parameter on [GTFS documentation](https://gtfs.org/documentation/schedule/reference/#routestxt) for more details on the modes id that should be used as parameters.
+Multimodal feeds aggregate several modes. `GTFShift::filter_by_mode` allows to restrict the feed to some modes only. Refer to routes.txt 'route_type' parameter on [GTFS documentation](https://gtfs.org/documentation/schedule/reference/#routestxt) for more details on the modes id that should be used as parameters.
 
 ```{r}
 # Filter by mode tram
@@ -199,7 +199,7 @@ gtfs = GTFShift::load_feed(data[data$ID=="faro",]$URL, create_transfers=FALSE)
 summary(gtfs)
 ```
 
-GTFS feeds aggregate several routes. `GTFShift::filter_by_route_name()`, allows to filter the feed for specific routes, given a partial or total match with the short or the long name.
+GTFS feeds aggregate several routes. `GTFShift::filter_by_route_name`, allows to filter the feed for specific routes, given a partial or total match with the short or the long name.
 
 ```{r}
 # Filter by short_name with exact match
