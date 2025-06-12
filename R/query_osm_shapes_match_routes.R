@@ -9,7 +9,7 @@
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
 #'
-#' The match is performed considering, for each shape, the closest OSM route considering
+#' The match is performed considering, for each shape, the closest OSM route, based on
 #' the start and end points and total length.
 #'
 #' @returns A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
