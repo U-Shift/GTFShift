@@ -83,7 +83,7 @@ mapview::mapview(
 
 # Analyse hourly frequency per route
 
-The frequency analysis can also be performed route wise. For this purpose, use `GTFShift::get_route_frequency_hourly`, returning aggregated results per hour.
+The frequency analysis can also be performed route wise. For this purpose, use `GTFShift::get_route_frequency_hourly`, returning aggregated results per hour and route.
 
 The analysis can be performed for each route individually.
 
@@ -104,7 +104,10 @@ quantile(frequencies_route_overline$frequency)
 ```
 
 
-## Aggregated frequencies for 8 a.m.
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Aggregated frequencies for 8 a.m.
 
 ```{r, cache=FALSE}
 mapview::mapview(
@@ -114,7 +117,10 @@ mapview::mapview(
 )
 ```
 
-## Aggregated frequencies for routes overline for 8 a.m.
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Aggregated frequencies for routes overline for 8 a.m.
 
 ```{r, cache=FALSE}
 # above 2 per hour
@@ -129,26 +135,47 @@ mapview::mapview(
 )
 ```
 
-## Improve visualization with `network_overline`
+</div>
+</div>
+
+
+## Improve visualization
 
 Using the `overline` attribute in `GTFShift::get_route_frequency_hourly` might not be the best option if the GTFS shapes do not share exactly the same geometry. In those cases, the overlapping lines might not be merged correctly, causing inconsistent results, such as a street with different frequencies along it, despite not having any bus stop in between those differences.
 
 ![Overline error example](figures/analyse_overline_error.png)
 
+
 This is a [known issue](https://github.com/ropensci/stplanr/issues/575) of `stplanr::overline2`, the method used for the network aggregation that has not been solved yet.
 
-As an alternative, `GTFShift` provides the method `GTFShift::network_overline`, that allows for the route aggregation. Given a target network, it identifies the segments corresponding to each route and uses them to aggregate the attribute defined in the parameters. It can be used to aggregate the frequencies. 
+As an alternative, `GTFShift` provides some methods that allow to overcome this issue, by correcting its geometry or aggregating the network with open data.
 
-> One approach to build a simplified road target network could be through the centerlines determination. During the development of this project, no R packages were found suiting this purpose. [Centerline](https://github.com/atsyplenkov/centerline) package has this feature in its roadmap. Currently, there are available solutions for [Python](https://uscuni.org/neatnet/index.html) or [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 
-> GTFShift provides a method that encapsulates Python [neatnet](https://uscuni.org/neatnet/index.html) package. Refer to [vignette("osm")](osm.html#get-centerlines-for-osm-road-network) for more details.
+### Correcting geometry with OSM open data
+
+GTFShift offers several methods that allow to get routes geometry from OpenStreetMaps. Refer to [vignette("osm")](osm.html#get-osm-bus-routes) for more details.
+
+
+### Aggregating the network with OSM open data
+
+There are several methods to aggregate a transit network. One approach is through the determination of the centerlines of the roads where the vehicles operate. GTFShift provides a method that encapsulates Python [neatnet](https://uscuni.org/neatnet/index.html) package for this purpose. Refer to [vignette("osm")](osm.html#get-centerlines-for-osm-road-network) for more details.
+
+> During the development of this project, no R packages were found suiting this purpose. [Centerline](https://github.com/atsyplenkov/centerline) package has this feature in its roadmap. Currently, there are available solutions for [Python](https://uscuni.org/neatnet/index.html) or [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
+
+
+# Aggregating frequencies over a target network
+
+As an alternative to the `GTFShift::get_route_frequency_hourly` method using the `overline=TRUE` parameter, `GTFShift::network_overline` provides a different frequency aggregation functionality.
+
+Given a target network, it identifies the segments corresponding to each route and uses them to aggregate the attribute defined in the parameters.
 
 Below is provided an example, that uses the centerlines for the Carris network as a target network, generated using [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 
 ```{r}
-network = sf::st_read(system.file("extdata", "centerline_carris.gpkg", 
-                                  package = "GTFShift"), 
-                      quiet = TRUE)
+network = sf::st_read(
+  system.file("extdata", "centerline_carris.gpkg", package = "GTFShift"), 
+  quiet = TRUE
+)
 
 frequencies_route_overline_improved = GTFShift::network_overline(
   network, 
@@ -158,12 +185,11 @@ frequencies_route_overline_improved = GTFShift::network_overline(
 
 quantile(frequencies_route_overline_improved$frequency)
 ```
+
 ```{r, cache=FALSE}
 mapview::mapview(
-  frequencies_route_overline_improved |>
-    filter(frequency > 12),
+  frequencies_route_overline_improved |> filter(frequency > 20),
   zcol = "frequency",
-  # lwd = "frequency",
   layer.name = "Frequency (hour)"
 )
 ```
