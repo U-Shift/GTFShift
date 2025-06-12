@@ -41,7 +41,7 @@ Get OSM routes that match shapes, based on geometrical match
 \details{
 For each route, matches its trips' shapes with OSM route relations.
 
-The match is performed considering, for each shape, the closest OSM route considering
+The match is performed considering, for each shape, the closest OSM route, based on
 the start and end points and total length.
 }
 \examples{
