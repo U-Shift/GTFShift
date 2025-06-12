@@ -154,6 +154,7 @@ mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.na
 </div>
 </div>
 
+
 ## Matching shapes geometry
 
 Despite existing, OSM `gtfs:*` keys are not widely used. In July 2025, only 3.1% of relations tagged as `route=bus` had the `gtfs:shape_id` key set (9 784 of 312 049).
@@ -168,20 +169,22 @@ gtfs_subset = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65
 shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
 
 summary(shapes_match_routes)
+
+# Visualize results
+shapes_match_routes$map_name = paste(
+  shapes_match_routes$route_short_name,
+  " | ",
+  shapes_match_routes$shape_id, 
+  " | ", 
+  shapes_match_routes$osm_id
+)
 ```
 
 
 ```{r, cache=FALSE}
-# Visualize results
-shapes_match_routes$map_name = paste(
-  shapes_match_routes$route_short_name,
-  " // ",
-  shapes_match_routes$shape_id, 
-  " // ", 
-  shapes_match_routes$osm_id
-)
-mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name="route_short_name // shape_id // osm_id")
+mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name="route_short_name | shape_id | osm_id")
 ```
+
 
 ### Updating OSM routes with shape_id
 
