@@ -58,7 +58,7 @@ mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 
 Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
 
-`osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from OpenStreetMaps, using Python [neatnet](https://uscuni.org/neatnet/) package.
+`GTFShift::osm_centerlines` allows to generate this simplification by creating the centerlines for the road network exported from OpenStreetMaps, using Python [neatnet](https://uscuni.org/neatnet/) package.
 
 <div style="display: flex; gap: 20px; overflow-x: auto;">
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
@@ -119,7 +119,7 @@ q = opq("Lisbon")  |>
 
 ## Matching GTFS ids
 
-GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*` keys. `GTFShift::osm_shapes_to_routes()` and `GTFShift::osm_trips_to_routes()` allow to query OSM for the routes matching the feed trips, given, respectively, their shape or trip id.
+GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*` keys. `GTFShift::osm_shapes_to_routes` and `GTFShift::osm_trips_to_routes` allow to query OSM for the routes matching the feed trips, given, respectively, their shape or trip id.
 
 ```{r}
 # Subset feed for some routes only, for demonstration purposes
@@ -158,7 +158,7 @@ mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.na
 
 Despite existing, OSM `gtfs:*` keys are not widely used. In July 2025, only 3.1% of relations tagged as `route=bus` had the `gtfs:shape_id` key set (9 784 of 312 049).
 
-To overcome this issue, `GTFShift::osm_shapes_match_routes()` performs the association between the OSM bus routes and the GTFS shapes considering, for each route, the start and end points and total length.
+To overcome this issue, `GTFShift::osm_shapes_match_routes` performs the association between the OSM bus routes and the GTFS shapes considering, for each route, the start and end points and total length.
 
 ```{r}
 # Subset feed for some routes only, for demonstration purposes
@@ -180,11 +180,11 @@ shapes_match_routes$map_name = paste(
   " // ", 
   shapes_match_routes$osm_id
 )
-mapview::mapview(shapes_match_routes, zcol = "map_name")
+mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name="route_short_name // shape_id // osm_id")
 ```
 
 ### Updating OSM routes with shape_id
 
-The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps dataset.
+The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes` can be used to update OpenStreetMaps dataset.
 
 Python library [OsmApi](https://osmapi.metaodi.ch/osmapi/OsmApi.html) enables to perform this batch process using OpenStreetMaps API. GTFShift provides a script to perform this operation using OsmApi. Check it at the repository, at `inst/python/OSM_routes_add_shapes.py`, or find its location on your computer, using `system.file("python", "osm_routes_add_shapes.py", package = "GTFShift")`.

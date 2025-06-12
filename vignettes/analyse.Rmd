@@ -135,7 +135,7 @@ Using the `overline` attribute in `GTFShift::get_route_frequency_hourly` might n
 
 ![Overline error example](figures/analyse_overline_error.png)
 
-This is a [known issue](https://github.com/ropensci/stplanr/issues/575) of `stplanr::overline2()`, the method used for the network aggregation that has not been solved yet.
+This is a [known issue](https://github.com/ropensci/stplanr/issues/575) of `stplanr::overline2`, the method used for the network aggregation that has not been solved yet.
 
 As an alternative, `GTFShift` provides the method `GTFShift::network_overline`, that allows for the route aggregation. Given a target network, it identifies the segments corresponding to each route and uses them to aggregate the attribute defined in the parameters. It can be used to aggregate the frequencies. 
 
