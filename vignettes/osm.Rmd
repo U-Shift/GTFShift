@@ -114,13 +114,12 @@ Despite existing, OSM `gtfs:shape_id` key is not widely used. In July 2025, only
 To overcome this issue, `GTFShift::osm_shapes_match_routes()` performs the association between the OSM bus routes and the GTFS shapes considering, for each route, the start and end points and total length.
 
 ```{r}
-
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "lisboa"
 gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
 # Subset feed for some routes only, for demonstration purposes
-gtfs = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "61B"))
+gtfs = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65B"))
 
 # Build OSM query
 library(osmdata)
@@ -146,3 +145,9 @@ shapes_match_routes$map_name = paste(
 )
 mapview::mapview(shapes_match_routes, zcol = "map_name")
 ```
+
+### Updating OSM routes with shape_id
+
+The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps dataset.
+
+Python library [OsmApi](https://osmapi.metaodi.ch/osmapi/OsmApi.html) enables to perform this batch process using OpenStreetMaps API. GTFShift provides a script to perform this operation using OsmApi. Check it at the repository, at `inst/python/OSM_routes_add_shapes.py`, or find its location on your computer, using `system.file("python", "osm_routes_add_shapes.py", package = "GTFShift")`.
