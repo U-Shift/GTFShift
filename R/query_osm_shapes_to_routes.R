@@ -39,10 +39,9 @@ osm_shapes_to_routes <- function(gtfs, q) {
     select(any_of(c("osm_id", "gtfs:shape_id")))
 
   # 2. Merge with GTFS
-  result = gtfs$trips |> select(trip_id, shape_id) |>
-    distinct(shape_id, .keep_all=TRUE) |>
-    left_join(osm_multilines_redux |> select("osm_id", "gtfs:shape_id", "geometry"), by=c("shape_id" = "gtfs:shape_id")) |>
-    select(-trip_id) |>
+  result = gtfs$trips |> select(shape_id) |>
+    distinct() |>
+    inner_join(osm_multilines_redux |> select("osm_id", "gtfs:shape_id", "geometry"), by=c("shape_id" = "gtfs:shape_id")) |>
     st_as_sf()
 
 }

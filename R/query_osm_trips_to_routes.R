@@ -40,7 +40,7 @@ osm_trips_to_routes <- function(gtfs, q) {
 
   # 2. Merge with GTFS
   result = gtfs$trips |> select(trip_id) |>
-    left_join(osm_multilines_redux |> select("osm_id", "gtfs:trip_id", "geometry"), by=c("trip_id" = "gtfs:trip_id")) |>
+    inner_join(osm_multilines_redux |> select("osm_id", "gtfs:trip_id", "geometry"), by=c("trip_id" = "gtfs:trip_id")) |>
     st_as_sf()
 
 }
