@@ -218,7 +218,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
       rowwise() |>
       mutate(
         distance_diff = abs(route_dist_gtfs - route_dist_osm),
-        points_diff = units::drop_units( st_distance(initial_osm, initial_gtfs) ) + units::drop_units( st_distance(final_osm, final_gtfs) )
+        points_diff = as.numeric( units::drop_units( st_distance(initial_osm, initial_gtfs) ) + units::drop_units( st_distance(final_osm, final_gtfs) ) )
       ) |> # absolute difference
       ungroup() |>
       select(-initial_gtfs, -final_gtfs) |>
