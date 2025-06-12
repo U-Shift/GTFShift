@@ -4,7 +4,7 @@
 #' @param q osmdata::opq. Overpass query for transit network
 #' @param geometry Boolean (Default TRUE). If TRUE, returns sf object with geometry, otherwise, a simple data.frame.
 #' @param gtfs_match String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
-#' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name.
+#' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
@@ -48,7 +48,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   if (!(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
     stop("gtfs_match should be one of: route_id, route_short_name or route_long_name")
   }
-  if (!(osm_match %in% c("ref", "name"))) {
+  if (!(osm_match %in% c("ref", "name", "gtfs:route_id"))) {
     stop("osm_match should be one of: ref, name")
   }
 
@@ -62,7 +62,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   osm = q |> osmdata_sf()
   osm_multilines = osm$osm_multilines
   osm_multilines_redux = osm_multilines |>
-    select(osm_id, ref, from, to, via, name, roundtrip)
+    select(any_of(c("osm_id", "ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id")))
 
   osm_stoppositions = osm$osm_points |>
     st_crop(st_bbox(stplanr::geo_buffer(osm_multilines_redux, dist=100) )) |>
