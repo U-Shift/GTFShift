@@ -22,6 +22,9 @@
 <url><loc>https://u-shift.github.io/GTFShift/reference/network_overline.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_bus_lanes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_centerlines.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/osm_trips_to_routes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/unify.html</loc></url>
 </urlset>
