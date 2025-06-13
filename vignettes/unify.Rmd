@@ -54,7 +54,7 @@ gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
 
 # Unify GTFS
 
-The unification is performed through `GTFShift::unify()`, producing a single GTFS instance, saved as a ZIP file. Option `create_transfers` enables the generation of `transfers.txt`, aggregating close stops, even if from different GTFS. 
+The unification is performed through `GTFShift::unify`, producing a single GTFS instance, saved as a ZIP file. Option `create_transfers` enables the generation of `transfers.txt`, aggregating close stops, even if from different GTFS. 
 
 ```{r}
 # Perform unification
