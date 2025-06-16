@@ -93,8 +93,9 @@
 <p>Public transit analysis takes advantage of the standardized GTFS
 format. However, its provision by operator makes it difficult for
 network aggregated analysis, considering connectivity and multimodality.
-<code><a href="../reference/unify.html">GTFShift::unify</a></code> proposes a simple solution to this problem,
-generating an aggregated GTFS file given several instances of these.</p>
+<code><a href="../reference/unify.html">GTFShift::unify()</a></code> proposes a simple solution to this
+problem, generating an aggregated GTFS file given several instances of
+these.</p>
 <blockquote>
 <p>This article uses GTFS feeds from the library GTFS database for
 Portugal as an example. Refer to the <a href="./download">vignette(“download”)</a> for more details.</p>
@@ -134,7 +135,7 @@ Portugal as an example. Refer to the <a href="./download">vignette(“download�
 <div class="section level2">
 <h2 id="unify-gtfs">Unify GTFS<a class="anchor" aria-label="anchor" href="#unify-gtfs"></a>
 </h2>
-<p>The unification is performed through <code><a href="../reference/unify.html">GTFShift::unify</a></code>,
+<p>The unification is performed through <code><a href="../reference/unify.html">GTFShift::unify()</a></code>,
 producing a single GTFS instance, saved as a ZIP file. Option
 <code>create_transfers</code> enables the generation of
 <code>transfers.txt</code>, aggregating close stops, even if from
