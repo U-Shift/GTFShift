@@ -41,7 +41,7 @@ GTFShift includes some built in methods that can assist gathering it, explored i
 
 GTFShift makes use of several R packages to implement its features, but most of it is built upon [tidytransit](https://r-transit.github.io/tidytransit/), so all the methods that accept a GTFS object should be a `tidygtfs` object.
 
-To create it, you can either use `GTFShift::load_feed` or the tidytransit method, `tidytransit::read_gtfs`. Actually, `GTFShift::load_feed` is an extension of the last, with the additional features of scanning the feed for any integrity errors and fixing them automatically, as well as the option to store it locally.
+To create it, you can either use `GTFShift::load_feed()` or the tidytransit method, `tidytransit::read_gtfs()`. Actually, `GTFShift::load_feed()` is an extension of the last, with the additional features of scanning the feed for any integrity errors and fixing them automatically, as well as the option to store it locally.
 
 ```{r eval = FALSE}
 # Using tidytransit
@@ -58,7 +58,7 @@ gtfs = GTFShift::load_feed("https://operator.com/gtfs.zip")
 
 The gathering of the GTFS files can be simplified by using public archives like [mobilitydatabase.org](https://mobilitydatabase.org/) or [transit.land](https://www.transit.land/).
 
-GTFShift provides a method to query Mobility Database: `GTFShift::query_mobilitydatabase`.
+GTFShift provides a method to query Mobility Database: `GTFShift::query_mobilitydatabase()`.
 It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds with information about the providers, the area they cover and an URL to download them.
 
 To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
