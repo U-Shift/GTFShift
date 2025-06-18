@@ -24,7 +24,7 @@ gtfs_list <- lapply(c("lisboa", "AML"), function(ID) {
   return(feed)
 })
 
-gtfs_united <- GTFShift::unify(gtfs_list, generateTransfers=FALSE)
+gtfs_united <- GTFShift::unify(gtfs_list, create_transfers=FALSE)
 summary(gtfs_united)
 
 frequencies_stop <- GTFShift::get_stop_frequency_hourly(gtfs_united, date=date)
@@ -53,7 +53,7 @@ frequencies_route_overline_improved = GTFShift::network_overline(
 quantile(frequencies_route_overline_improved$frequency)
 
 mapview::mapview(
-  frequencies_route_overline_improved %>% select(frequency, segment) %>% filter(frequency > quantile(frequencies_route_overline_improved$frequency, probs=0.75)),
+  frequencies_route_overline_improved %>% filter(frequency > quantile(frequencies_route_overline_improved$frequency, probs=0.75)),
   zcol = "frequency",
   layer.name = "Frequency (hour)"
 )

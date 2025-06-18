@@ -1,15 +1,21 @@
 #' Merge multiple GTFS into a single aggregated file
 #'
-#' @param gtfss tidygtfs[]. List of GTFS feeds.
-#' @param store_path. String. (Optional) If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.
-#' @param generateTransfers Boolean. (Default TRUE) When true, generates transfers.txt, aggregating close stops, even if from different GTFS.
-#' @param transfer_distance Integer. (Default 300) Upper straight-line distance limit in metres for transfers.
-#' @param transfer_time Integer. (Default 120) Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
-#' @param transfer_street_routing (Default FALSE) If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
+#' @param ... tidygtfs[]. List of GTFS feeds.
+#' @param store_path String (Optional). If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.
+#' @param create_transfers Boolean (Default TRUE). When true, generates transfers.txt, aggregating close stops, even if from different GTFS.
+#' @param transfer_distance Integer (Default 300). Upper straight-line distance limit in meters for transfers.
+#' @param transfer_time Integer (Default 120). Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
+#' @param transfer_street_routing Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
 #'
 #' @details
-#' Aggregates multiple feeds using `GTFSwizard::merge_gtfs()`.
-#' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops network of the final aggregated version. This computation is executed with `gtfsrouter::gtfs_transfer_table`, with the parameters `d_limit=transfer_distance`, `min_transfer_time=transfer_time` and `network_times=transfer_street_routing`. The other parameters are applied the library default values.
+#' Aggregates multiple feeds using \code{GTFSwizard::merge_gtfs()}`.
+#' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based
+#' on the stops network of the final aggregated version.
+#'
+#' This computation is executed with \code{gtfsrouter::gtfs_transfer_table()},
+#' with the parameters \code{d_limit=transfer_distance}, \code{min_transfer_time=transfer_time} and
+#' \code{network_times=transfer_street_routing}. The other parameters are applied the library default values.
+#'
 #' For a detailed example, see the \code{vignette("unify")}.
 #'
 #' @returns A tidygtfs object.
@@ -18,7 +24,7 @@
 #' \dontrun{
 #' gtfs1 <- GTFShift::load_feed("gtfs1.zip")
 #' gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-#' unified <- GTFShift::unify(list(gtfs1, gtfs2), generateTransfers=TRUE)
+#' unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers=TRUE)
 #' }
 #'
 #' @seealso [GTFSwizard::merge_gtfs()]
@@ -28,7 +34,9 @@
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-unify <- function(gtfss, store_path=NA, generateTransfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+unify <- function(..., store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+
+  gtfss = list(...)
 
   # Initial validation
   has_calendar = sapply(gtfss, function(g) "calendar" %in% names(g))
@@ -60,18 +68,14 @@ unify <- function(gtfss, store_path=NA, generateTransfers=TRUE, transfer_distanc
   gtfs <- tidytransit::read_gtfs(gtfs_temp)
 
   # Generate transfers.txt
-  if (generateTransfers) {
+  if (create_transfers) {
     message(sprintf("2. Generating transfers..."))
-    merged_router <- gtfsrouter::extract_gtfs(gtfs_temp)
-    # Use default parameters:
-    # 200 meters distance, 120 sec time, routing through the road network (?)
-    merged_router <- gtfsrouter::gtfs_transfer_table(merged_router, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
 
-    # gtfsrouter::extract_gtfs converts stop times to seconds, lets get it back to the format HH:mm before storing it...
-    merged_router$stop_times$arrival_time <- sapply(merged_router$stop_times$arrival_time, time_convert_seconds_to_hms)
-    merged_router$stop_times$departure_time <- sapply(merged_router$stop_times$departure_time, time_convert_seconds_to_hms)
+    suppressMessages(suppressWarnings({gtfs_transfers <- gtfsrouter::extract_gtfs(gtfs_temp)})) # Suppress warning that has no transfers, as they will be generated next
+    gtfs_transfers <- gtfsrouter::gtfs_transfer_table(gtfs_transfers, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
+    gtfs$transfers <- gtfs_transfers$transfers
 
-    gtfs <- tidytransit::as_tidygtfs(merged_router)
+    gtfs <- tidytransit::as_tidygtfs(gtfs)
   }
 
   # STORE GTFS

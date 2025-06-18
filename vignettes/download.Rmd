@@ -1,8 +1,8 @@
 ---
-title: "Download transit data"
+title: "1. Getting transit data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Download transit data}
+  %\VignetteIndexEntry{1. Getting transit data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,32 +20,66 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE,
   message = FALSE,
-  comment = "#>"
+  cache = TRUE,
+  comment = "#>",
+  engine.path = list(python = '~/.virtualenvs/r-reticulate/bin/python3.12')
 )
 ```
 
-```{r setup, message=FALSE}
+```{r setup, message=FALSE, cache=FALSE}
 library(GTFShift)
 library(tidytransit)
 ```
 
 # Introduction
 
-Performing analysis over transit requires data on the operation and infrastructure.
-GTFShift includes some built in methods that can you assist gathering it.
+Performing analysis over transit requires data on the operation and infrastructure. [GTFS](https://gtfs.org/) is an open standard that offers this information in a simple and complete way. 
 
-# Download GTFS files 
+GTFShift includes some built in methods that can assist gathering it, explored in this article.
 
-## Use open catalogues 
+# Read a GTFS file
+
+GTFShift makes use of several R packages to implement its features, but most of it is built upon [tidytransit](https://r-transit.github.io/tidytransit/), so all the methods that accept a GTFS object should be a `tidygtfs` object.
+
+To create it, you can either use `GTFShift::load_feed()` or the tidytransit method, `tidytransit::read_gtfs()`. Actually, `GTFShift::load_feed()` is an extension of the last, with the additional features of scanning the feed for any integrity errors and fixing them automatically, as well as the option to store it locally.
+
+```{r eval = FALSE}
+# Using tidytransit
+gtfs = tidytransit::load_feed("https://operator.com/gtfs.zip")
+
+# Using GTFShift
+gtfs = GTFShift::load_feed("https://operator.com/gtfs.zip")
+```
+
+
+# Find GTFS feeds
+
+## Using open catalogues 
 
 The gathering of the GTFS files can be simplified by using public archives like [mobilitydatabase.org](https://mobilitydatabase.org/) or [transit.land](https://www.transit.land/).
 
-GTFShift provides a method to query Mobility Database: `query_mobilitydatabase()`.
+GTFShift provides a method to query Mobility Database: `GTFShift::query_mobilitydatabase()`.
 It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds with information about the providers, the area they cover and an URL to download them.
 
-To use it, an access token must be provided. It can be obtained for free at Mobility Database website.
+To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
 
-## Use GTFShift incorporated database for Portugal
+```{r}
+# usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work
+
+feeds = GTFShift::query_mobilitydatabase(refresh_token = Sys.getenv("MOBILITY_DATABASE"),
+                                         subdivision_name = "Lisbon")
+
+feeds |>
+  dplyr::filter(status == "active") |>
+  dplyr::select(provider, status, producer_url) |>
+  head()
+
+gtfs = GTFShift::load_feed(feeds$producer_url[1], create_transfers=FALSE)
+summary(gtfs)
+```
+
+
+## Using GTFShift incorporated database for Portugal
 
 This library offers a small database with a compilation of GTFS files for Portuguese operators. It is a CSV file, available at `extdata/gtfs_sources_pt.csv`, and has the following attributes:
 
@@ -58,31 +92,10 @@ This library offers a small database with a compilation of GTFS files for Portug
 
 ```{r message=TRUE, warning=FALSE}
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-summary(data)
-data[1:4,]
-```
+head(data)
 
-## Download and validate integrity
-
-`GTFShift` library offers a method to download and fix any integrity violations at GTFS files: `load_feed()`.
-It fixes inconsistencies on the `stop_times.txt` and missing `shapes.txt` files and returns a tidygtfs object, that can be used in any other method of GTFShift or tidyrtransit packages.
-
-```{r message=TRUE, warning=TRUE}
-# DOWNLOAD GTFS and store it locally
-gtfs = GTFShift::load_feed(data[data$ID=="cp",]$URL)
+gtfs = GTFShift::load_feed(data$URL[1], create_transfers = FALSE) # example with CP - trains
 summary(gtfs)
 ```
 
-# Download bus lanes 
 
-Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics.
-`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMaps for a given area.
-
-```{r}
-aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
-lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
-
-bus_lanes = GTFShift::osm_bus_lanes(lisboa)
-
-mapview::mapview(bus_lanes, layer.name = "Bus lanes")
-```

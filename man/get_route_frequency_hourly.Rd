@@ -4,24 +4,28 @@
 \alias{get_route_frequency_hourly}
 \title{Get aggregated frequency per hour for each bus route}
 \usage{
-get_route_frequency_hourly(gtfs, date = NULL, overline = FALSE)
+get_route_frequency_hourly(
+  gtfs,
+  date = GTFShift::calendar_nextBusinessWednesday(),
+  overline = FALSE
+)
 }
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{date}{Date. Reference date to consider when analysing the GTFS file. Defaults to next business Wednesday in Portugal.}
+\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
 
-\item{overline}{Boolean. Defaults to FALSE. If TRUE, routes are aggregated using stplanr::overline2, overlapping lines and converting them into a single route network.}
+\item{overline}{Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.}
 }
 \value{
-An `sf` `data.frame` object with the following columns (the first three are only present if `overline=FALSE`):
+An \code{sf} \code{data.frame} object with the following columns (the first three are only present if \code{overline=FALSE}):
 \itemize{
- \item `route_id`, the `route_id` attribute from `routes.txt` file.
- \item `route_short_name`, the `route_short_name` attribute from `routes.txt` file.
- \item `direction_id`, the `direction_id` attribute from `trips.txt` file.
- \item `arrival_hour`, the hour for which the frequency applies (24 hour format).
- \item `frequency`, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
- \item `geometry`, the route shape.
+ \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
+ \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
+ \item \code{direction_id}, the \code{direction_id} attribute from \code{trips.txt} file.
+ \item \code{hour}, the hour for which the frequency applies (24 hour format).
+ \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
+ \item \code{geometry}, the route shape.
 }
 }
 \description{
@@ -31,15 +35,15 @@ For each route, returns the number of departures aggregated per hour.
 This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour.
 For a detailed example, see the \code{vignette("analyse")}.
 
-Adapted from https://github.com/Bondify/GTFS_in_R/.
+Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
 }
 \examples{
 \dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
+gtfs = GTFShift::load_feed("gtfs.zip")
+frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
 }
 
 }
 \seealso{
-[tidytransit::read_gtfs()], [stplanr::overline2]
+[tidytransit::read_gtfs()], [stplanr::overline2], [GTFShift::calendar_nextBusinessWednesday]
 }

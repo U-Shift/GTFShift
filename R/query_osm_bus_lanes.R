@@ -1,10 +1,10 @@
-#' Export bus lanes from Open Street Maps
+#' Export bus lanes from OpenStreetMaps
 #
 #'
 #' @param bbox bbox. Area from which to export bus lanes.
 #'
 #' @details
-#' Exports roads tagged as bus lanes on Open Street Map for given area.
+#' Exports roads tagged as bus lanes on OpenStreetMaps for given area.
 #'
 #' @returns osm_lines in sf format
 #'

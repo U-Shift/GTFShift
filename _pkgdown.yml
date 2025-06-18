@@ -3,9 +3,10 @@ template:
   bootstrap: 5
 
 reference:
-  - title: Read
+  - title: Get GTFS feeds
     contents:
     - load_feed
+    - query_mobilitydatabase
   - title: Filter
     contents:
     - starts_with("filter_")
@@ -17,7 +18,18 @@ reference:
     contents:
     - unify
     - starts_with("create_")
-  - title: External data
+  - title: OpenStreetMaps
     contents:
-    - starts_with("query_")
-    - osm_bus_lanes
+    - starts_with("osm_")
+  - title: Utils
+    contents:
+    - calendar_nextBusinessWednesday
+articles:
+  - title: Articles
+    navbar: ~
+    contents:
+    - download
+    - filter
+    - unify
+    - analyse
+    - osm
