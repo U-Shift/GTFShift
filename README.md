@@ -15,7 +15,7 @@ You can install the development version of GTFShift from [GitHub](https://github
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("GTFShift/GTFShift")
+remotes::install_github("U-Shift/GTFShift")
 ```
 
 ## Load the package
@@ -29,27 +29,48 @@ library(GTFShift)
 GTFShift provides methods for the entire workflow of bus network density analysis. 
 For detailed examples on their functionality, refer to the articles at https://u-shift.github.io/GTFShift/.
 
-### Read
-Starting with the load of the GTFS feed, with `load_feed()`, fixing any integrity errors that 
-might hinder the analysis process. 
+### Getting transit data
 
-### Manipulate 
-Then, to expand the scope analysis, it includes a method for aggregating multiple feeds, `unify()`. 
+Starting with a valid GTFS feed is the key for a successful analysis. 
+GTFShift includes methods to load feeds that simultaneously scans for any integrity errors and fixes them automatically. 
+
+If the feed location is unknown, it also provides a database listing GTFS for Portugal and a method to query worldwide open catalogues
+by city or country names or even a bounding box.
 
 ### Filter
-Narrowing the scope is also possible, using filtering methods according to multiple parameters, such as 
-`filter_by_agency()`, `filter_by_modes()` and `filter_by_route_name()`. 
+
+GTFS feeds do not have a defined scope regarding its coverage of the transportation system. 
+Some can be bounded to one agency, whereas others can aggregate several modes in the same city, or even national wise.
+
+From the simpler to the most complex feeds, some analysis require to narrow the perspective. GTFShift provides some to help in this process.
+
+### Aggregate 
+
+Public transit analysis takes advantage of the standardized GTFS format. 
+However, its provision by operator makes it difficult for network aggregated analysis, considering connectivity and multimodality. 
+
+GTFShift includes a method to easily generate an aggregated GTFS file given several instances.
+
+![](assets/unify.png)
+> Aggregated GTFS for Fertagus and Transportes Coletivos do Barreiro operators
 
 ### Analyse
-Finally, network density can be analyzed at the stop level, with `get_stop_frequency_hourly()`, or at the 
-route level, with `get_route_frequency_hourly()`. This analysis is aggregated by stop, route, and hour.
 
-![](assets/map.png)
+Analyzing public transit feeds is important to understand its territorial coverage and dynamics, both on its spatial and temporal dimensions. 
+
+GTFShift provides several methods that encapsulate pre-defined methodologies for them, for instance, analysing hourly frequency per stop, route 
+or road segment.
+
+![](assets/analyse_aggregated_frequencies.png)
 > Aggregated route frequency for Carris Lisboa operator, at 8:00
 
-### External data
-If the GTFS feed location is unknown, it can be queried using `query_mobilitydatabase()`, a method that 
-asks the Mobility Database API for the feeds that match the parameters provided, such as the municipality, 
-country, or even a boundary box.
+### OSM Data
 
+OpenStreetMaps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data. 
+
+GTFShift includes some methods that allow to access its information directly, namely to export bus lanes, get centerlines for the 
+road network and export the OSM transit routes.
+
+![](assets/osm_buslanes.png)
+> OSM exported bus lanes for Lisbon
 
