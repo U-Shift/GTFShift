@@ -34,7 +34,7 @@ library(mapview)
 
 # Introduction 
 
-Public transit analysis takes advantage of the standardized GTFS format. However, its provision by operator makes it difficult for network aggregated analysis, considering connectivity and multimodality. `GTFShift::unify` proposes a simple solution to this problem, generating an aggregated GTFS file given several instances of these.
+Public transit analysis takes advantage of the standardized GTFS format. However, its provision by operator makes it difficult for network aggregated analysis, considering connectivity and multimodality. `GTFShift::unify()` proposes a simple solution to this problem, generating an aggregated GTFS file given several instances of these.
 
 > This article uses GTFS feeds from the library GTFS database for Portugal as an example. Refer to the [vignette("download")](./download) for more details.
 
@@ -54,7 +54,7 @@ gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
 
 # Unify GTFS
 
-The unification is performed through `GTFShift::unify`, producing a single GTFS instance, saved as a ZIP file. Option `create_transfers` enables the generation of `transfers.txt`, aggregating close stops, even if from different GTFS. 
+The unification is performed through `GTFShift::unify()`, producing a single GTFS instance, saved as a ZIP file. Option `create_transfers` enables the generation of `transfers.txt`, aggregating close stops, even if from different GTFS. 
 
 ```{r}
 # Perform unification

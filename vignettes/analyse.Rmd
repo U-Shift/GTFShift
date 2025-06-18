@@ -51,9 +51,9 @@ gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
 
 # Analyse hourly frequency per stop
 
-To analyse frequencies at stops, use `GTFShift::get_stop_frequency_hourly`, producing, for each, an aggregated counting of bus servicing it per hour.
+To analyse frequencies at stops, use `GTFShift::get_stop_frequency_hourly()`, producing, for each, an aggregated counting of bus servicing it per hour.
 
-> By default, the analysis is performed for next business Wednesday, in Portugal. Refer to `GTFShift::calendar_nextBusinessWednesday`, for more details. You can override this, using `date` parameter.
+> By default, the analysis is performed for next business Wednesday, in Portugal. Refer to `GTFShift::calendar_nextBusinessWednesday()`, for more details. You can override this, using `date` parameter.
 
 ```{r}
 # Perform frequency analysis
@@ -83,11 +83,11 @@ mapview::mapview(
 
 # Analyse hourly frequency per route
 
-The frequency analysis can also be performed route wise. For this purpose, use `GTFShift::get_route_frequency_hourly`, returning aggregated results per hour and route.
+The frequency analysis can also be performed route wise. For this purpose, use `GTFShift::get_route_frequency_hourly()`, returning aggregated results per hour and route.
 
 The analysis can be performed for each route individually.
 
-> By default, the analysis is performed for next business Wednesday, in Portugal. Refer to `GTFShift::calendar_nextBusinessWednesday`, for more details. You can override this, using `date` parameter.
+> By default, the analysis is performed for next business Wednesday, in Portugal. Refer to `GTFShift::calendar_nextBusinessWednesday()`, for more details. You can override this, using `date` parameter.
 
 ```{r}
 frequencies_route = GTFShift::get_route_frequency_hourly(gtfs)
@@ -141,12 +141,12 @@ mapview::mapview(
 
 ## Improve visualization
 
-Using the `overline` attribute in `GTFShift::get_route_frequency_hourly` might not be the best option if the GTFS shapes do not share exactly the same geometry. In those cases, the overlapping lines might not be merged correctly, causing inconsistent results, such as a street with different frequencies along it, despite not having any bus stop in between those differences.
+Using the `overline` attribute in `GTFShift::get_route_frequency_hourly()` might not be the best option if the GTFS shapes do not share exactly the same geometry. In those cases, the overlapping lines might not be merged correctly, causing inconsistent results, such as a street with different frequencies along it, despite not having any bus stop in between those differences.
 
 ![Overline error example](figures/analyse_overline_error.png)
 
 
-This is a [known issue](https://github.com/ropensci/stplanr/issues/575) of `stplanr::overline2`, the method used for the network aggregation that has not been solved yet.
+This is a [known issue](https://github.com/ropensci/stplanr/issues/575) of `stplanr::overline2()`, the method used for the network aggregation that has not been solved yet.
 
 As an alternative, `GTFShift` provides some methods that allow to overcome this issue, by correcting its geometry or aggregating the network with open data.
 
@@ -165,7 +165,7 @@ There are several methods to aggregate a transit network. One approach is throug
 
 # Aggregating frequencies over a target network
 
-As an alternative to the `GTFShift::get_route_frequency_hourly` method using the `overline=TRUE` parameter, `GTFShift::network_overline` provides a different frequency aggregation functionality.
+As an alternative to the `GTFShift::get_route_frequency_hourly()` method using the `overline=TRUE` parameter, `GTFShift::network_overline()` provides a different frequency aggregation functionality.
 
 Given a target network, it identifies the segments corresponding to each route and uses them to aggregate the attribute defined in the parameters.
 
