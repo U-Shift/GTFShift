@@ -32,7 +32,7 @@ For detailed examples on their functionality, refer to the articles at https://u
 ### Getting transit data
 
 Starting with a valid GTFS feed is the key for a successful analysis. 
-GTFShift includes methods to load feeds that simultaneously scans for any integrity errors and fixes them automatically. 
+GTFShift includes a method to load feeds that simultaneously scans for any integrity errors and fixes them automatically. 
 
 If the feed location is unknown, it also provides a database listing GTFS for Portugal and a method to query worldwide open catalogues
 by city or country names or even a bounding box.
