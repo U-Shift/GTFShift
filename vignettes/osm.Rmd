@@ -1,0 +1,193 @@
+---
+title: "5. Get OSM data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{5. Get OSM data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+.leaflet-container {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+</style>
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  cache = TRUE,
+  comment = "#>",
+  engine.path = list(python = '~/.virtualenvs/r-reticulate/bin/python3.12')
+)
+```
+
+```{r setup, message=FALSE, cache=FALSE}
+library(GTFShift)
+library(tidytransit)
+```
+
+# Introduction
+
+OpenStreetMaps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
+GTFShift includes some methods that allow to access its information directly.
+
+
+# Download bus lanes 
+
+Bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics.
+`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMaps for a given area.
+
+```{r}
+aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
+lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
+
+bus_lanes = GTFShift::osm_bus_lanes(lisboa)
+```
+```{r, cache=FALSE}
+mapview::mapview(bus_lanes, layer.name = "Bus lanes")
+```
+
+
+
+# Get centerlines for OSM road network
+
+Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
+
+`GTFShift::osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from OpenStreetMaps, using Python [neatnet](https://uscuni.org/neatnet/) package.
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Original network
+
+```{r original_network}
+library(osmdata)
+
+road_osm = opq("Arroios, Lisboa, Portugal") |>
+    add_osm_feature(key = "highway", value = c("motorway", "trunk", "primary", "secondary", "tertiary", "residential", "unclassified", "living_street")) |>
+    add_osm_feature(key = "area", value = "!yes") |>
+    osmdata_sf() |>
+    osm_poly2line()
+
+road_osm = road_osm$osm_lines
+```
+```{r, cache=FALSE}
+mapview::mapview(road_osm)
+```
+
+
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Simplified network
+
+```{r simplified_network}
+centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
+```
+```{r, cache=FALSE}
+mapview::mapview(centerlines)
+```
+
+</div>
+</div>
+
+
+# Get OSM bus routes
+
+OpenStreetMaps defines bus routes as a [relation](https://wiki.openstreetmap.org/wiki/Tag:route%3Dbus) of ways (usually roads) and nodes (stops and platforms). GTFShift provides methods to use them in the GTFS analysis.
+
+> For demonstration purposes, the next snippets will use the Lisbon urban bus network.
+
+```{r}
+# Get GTFS from library GTFS database for Portugal
+data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_id = "lisboa"
+gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
+
+# Build OSM query
+library(osmdata)
+q = opq("Lisbon")  |>
+  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+```
+
+
+## Matching GTFS ids
+
+GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*` keys. `GTFShift::osm_shapes_to_routes()` and `GTFShift::osm_trips_to_routes()` allow to query OSM for the routes matching the feed trips, given, respectively, their shape or trip id.
+
+```{r}
+# Subset feed for some routes only, for demonstration purposes
+gtfs_794 = GTFShift::filter_by_route_name(gtfs, list("794"))
+
+# Match shapes geometry
+shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q)
+
+shapes_geometry_osm
+```
+
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### GTFS shapes
+
+```{r, cache=FALSE}
+shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
+mapview::mapview(shapes_sf, zcol = "shape_id", legend = TRUE, layer.name="GTFS shapes")
+```
+
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### OSM routes
+
+```{r, cache=FALSE}
+mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.name="OSM routes")
+```
+
+</div>
+</div>
+
+
+## Matching shapes geometry
+
+Despite existing, OSM `gtfs:*` keys are not widely used. In July 2025, only 3.1% of relations tagged as `route=bus` had the `gtfs:shape_id` key set (9 784 of 312 049).
+
+To overcome this issue, `GTFShift::osm_shapes_match_routes()` performs the association between the OSM bus routes and the GTFS shapes considering, for each route, the start and end points and total length.
+
+```{r}
+# Subset feed for some routes only, for demonstration purposes
+gtfs_subset = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65B"))
+
+# Match shapes geometry
+shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
+
+summary(shapes_match_routes)
+
+# Visualize results
+shapes_match_routes$map_name = paste(
+  shapes_match_routes$route_short_name,
+  " | ",
+  shapes_match_routes$shape_id, 
+  " | ", 
+  shapes_match_routes$osm_id
+)
+```
+
+
+```{r, cache=FALSE}
+mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name="route_short_name | shape_id | osm_id")
+```
+
+
+### Updating OSM routes with shape_id
+
+The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps dataset.
+
+Python library [OsmApi](https://osmapi.metaodi.ch/osmapi/OsmApi.html) enables to perform this batch process using OpenStreetMaps API. GTFShift provides a script to perform this operation using OsmApi. Check it at the repository, at `inst/python/OSM_routes_add_shapes.py`, or find its location on your computer, using `system.file("python", "osm_routes_add_shapes.py", package = "GTFShift")`.

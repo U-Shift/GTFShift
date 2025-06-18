@@ -4,20 +4,23 @@
 \alias{get_stop_frequency_hourly}
 \title{Get aggregated frequency per hour for each bus stop}
 \usage{
-get_stop_frequency_hourly(gtfs, date = NULL)
+get_stop_frequency_hourly(
+  gtfs,
+  date = GTFShift::calendar_nextBusinessWednesday()
+)
 }
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{date}{Date. Reference date to consider when analyzing the GTFS file. Defaults to next business Wednesday in Portugal.}
+\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
 }
 \value{
-An `sf` `data.frame` object with the following columns:
+An \code{sf} \code{data.frame} object with the following columns:
 \itemize{
- \item `stop_id`, the `stop_id` attribute from `stops.txt` file.
- \item `hour`, the hour for which the frequency applies (24 hour format).
- \item `frequency`, the number of services provided at the stop for the corresponding 60 minutes period.
- \item `geometry`, the stop coordinates.
+ \item \code{stop_id}, the \code{stop_id} attribute from \code{stops.txt} file.
+ \item \code{hour}, the hour for which the frequency applies (24 hour format).
+ \item \code{frequency}, the number of services provided at the stop for the corresponding 60 minutes period.
+ \item \code{geometry}, the stop coordinates.
 }
 }
 \description{
@@ -33,4 +36,7 @@ gtfs <- GTFShift::load_feed("gtfs.zip")
 frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
 }
 
+}
+\seealso{
+[GTFShift::calendar_nextBusinessWednesday]
 }

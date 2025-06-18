@@ -5,38 +5,38 @@
 \title{Query Mobility Database API for GTFS feeds}
 \usage{
 query_mobilitydatabase(
-  token,
+  access_token = NA,
+  refresh_token = NA,
   bounding_filter_method = "partially_enclosed",
   limit = 10,
   offset = 0,
   country_code = NA,
   subdivision_name = NA,
   municipality = NA,
-  dataset_latitudes = NA,
-  dataset_longitudes = NA,
+  bbox = NA,
   is_official = NA
 )
 }
 \arguments{
-\item{token}{String. Access token.}
+\item{access_token}{String (Optional when refresh_token). Access token.}
 
-\item{municipality}{String. (Optional) List only feeds with the specified value. Can be a partial match. Case insensitive.}
+\item{refresh_token}{String (Optional when access_token). Refresh token.}
 
-\item{dataset_latitudes}{Double[]. (Optional) Minimum and maximum latitudes of the bounding box to use for filtering.}
+\item{bounding_filter_method}{String (Default partially_enclosed). Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.}
 
-\item{dataset_longitudes}{Double[]. (Optional) Minimum and maximum longitudes of the bounding box to use for filtering.}
+\item{limit}{Integer (Default 10). The number of items to be returned.}
 
-\item{bounding_filter_method.}{String. (Default `partially_enclosed`) Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.}
+\item{offset}{Integer (Default 0). Offset of the first item to return.}
 
-\item{limit.}{Integer. (Default 10) The number of items to be returned.}
+\item{country_code}{String (Optional). Filter feeds by their exact country code.}
 
-\item{offset.}{Integer. (Default 0) Offset of the first item to return.}
+\item{subdivision_name}{String (Optional). List only feeds with the specified value. Can be a partial match.}
 
-\item{country_code.}{String. (Optional) Filter feeds by their exact country code.}
+\item{municipality}{String (Optional). List only feeds with the specified value. Can be a partial match. Case insensitive.}
 
-\item{subdivision_name.}{String. (Optional) List only feeds with the specified value. Can be a partial match.}
+\item{bbox}{bbox (Optional). Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.}
 
-\item{is_official.}{Boolean. (Optional) If true, only return official feeds.}
+\item{is_official.}{Boolean (Optional). If TRUE, only return official feeds.}
 }
 \value{
 data.frame with query results
@@ -45,18 +45,24 @@ data.frame with query results
 Query Mobility Database API for GTFS feeds
 }
 \details{
-This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform. To use it, an access token must be provided. It can be obtained for free at Mobility Database website.\cr\cr
+This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform.
+To use it, an access or a refresh token must be provided.
+It can be obtained for free at Mobility Database website.\cr\cr
 For more details on the parameters, refer to \url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
 Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:
 \itemize{
- \item `Provider`. The name of the GTFS provider.
- \item `status`. Tells if the feed is active, inactive or deprecated.
- \item `producer_url`. The GTFS feed URL. Can be used to download.
+ \item \code{provider} The name of the GTFS provider.
+ \item \code{status} Tells if the feed is active, inactive or deprecated.
+ \item \code{producer_url} The GTFS feed URL. Can be used to download.
 }
 }
 \examples{
 \dontrun{
-feeds <- GTFShift::query_mobilitydatabase(myToken, country_code="PT", is_official_=TRUE)
+feeds <- GTFShift::query_mobilitydatabase(
+  refresh_token = "myToken",
+  country_code = "PT",
+  is_official = TRUE
+)
 }
 
 }

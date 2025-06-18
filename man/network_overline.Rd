@@ -2,47 +2,52 @@
 % Please edit documentation in R/network_overline.R
 \name{network_overline}
 \alias{network_overline}
-\title{Aggregate lines based on overlap with simplified network}
+\title{Aggregate lines based on overlap with target network}
 \usage{
 network_overline(
-  network,
-  df,
+  target_network,
+  lines,
   attr,
-  network_segment_length = 100,
+  target_network_split = 100,
   fun = sum,
   join_dist = 10
 )
 }
 \arguments{
-\item{network}{sf. A spatial object representing the simplified network.}
+\item{target_network}{sf. A spatial object representing the target network.}
 
-\item{df}{sf. A spatial object representing the lines to aggregate.}
+\item{lines}{sf. A spatial object representing the lines to aggregate.}
 
 \item{attr}{String. The attribute to aggregate the lines by.}
 
-\item{network_segment_length}{Integer. (Default 100) If not NA, network is split in segments of defined meters.}
+\item{target_network_split}{Integer (Default 100). If not NA, network is split in segments of defined meters.}
 
-\item{fun.}{Method. (Default sim) Function to summarise the attributes by.}
+\item{fun}{Method (Default \code{base::sum}). Function to summarise the attributes by.}
 
-\item{join_dist.}{Integer. (Default 10) Meters to consider when joining routes and network segments.}
+\item{join_dist}{Integer (Default 10). Meters to consider when joining routes and network segments.}
 }
 \value{
-A spatial object of the network provided, extended with the aggregated values. A `segment` column will be also added to the network, as a unique identifier used for the aggregation process.
+A spatial object of the target network, extended with the aggregated values.
 }
 \description{
-Aggregate lines based on overlap with simplified network
+Aggregate lines based on overlap with target network
 }
 \details{
-This method allows for the lines aggregation. Given a simplified network, it identifies (using `stplanr::rnet_join()`)
+This method allows for the lines aggregation. Given a target network, it identifies (using \code{stplanr::rnet_join()})
 the segments corresponding to each line and uses them to aggregate the attribute defined in the parameters.
+
+It provides an alternative to \code{GTFShift::get_route_frequency_hourly()} with the attribute \code{overline=TRUE}, which
+creates an aggregated network based on the lines overlap. Instead, \code{GTFShift::network_overline()} finds, for each network
+segment, the overlapping lines and aggregates their \code{attr} values, using \code{fun}.
 }
 \examples{
 \dontrun{
-network = st_read("network_centerlines.gpkg")
-frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
+gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
+target_network = st_read("network_centerlines.gpkg")
+frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs, overline=FALSE)
 GTFShift::network_overline(
-  network, f
-  requency_analysis \%>\% filter(arrival_hour==8),
+  target_network,
+  frequency_analysis |> filter(arrival_hour==8),
   attr = "frequency"
 )
 }

@@ -5,9 +5,10 @@
 #'
 #' @details
 #' Allows to filter a GTFS feed for the type of transportation used, allowing for a more narrow analysis of multimodal files.
-#' Refer to routes.txt `route_type` parameter on \href{https://gtfs.org/documentation/schedule/reference/#routestxt}{GTFS documentation} for more details.
+#' Refer to \code{routes.txt} \code{route_type} parameter on
+#' \href{https://gtfs.org/documentation/schedule/reference/#routestxt}{GTFS documentation} for more details.
 #'
-#' @returns A `tidygtfs` object with the filtered feed.
+#' @returns A tidygtfs object with the filtered feed.
 #'
 #' @examples
 #' \dontrun{
