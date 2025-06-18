@@ -20,7 +20,7 @@ Imports:
   sf,
   tidyverse,
   lubridate,
-  gtfsrouter,
+  gtfsrouter (>= 0.1.4),
   httr,
   jsonlite,
   dplyr,
