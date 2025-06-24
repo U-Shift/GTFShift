@@ -1,10 +1,10 @@
-#' Export bus lanes from OpenStreetMaps
+#' Export designated bus lanes from OpenStreetMaps
 #
 #'
 #' @param bbox bbox. Area from which to export bus lanes.
 #'
 #' @details
-#' Exports roads tagged as bus lanes on OpenStreetMaps for given area.
+#' Exports roads tagged as designated bus lanes on OpenStreetMaps for given area.
 #'
 #' @returns osm_lines in sf format
 #'
@@ -29,14 +29,15 @@ osm_bus_lanes <- function(bbox) {
 
   road_osm = road_osm$osm_lines
 
-  osm_lanes = road_osm |> select(contains("psv"))
-  osm_lanes = osm_lanes |> filter(psv == "designated" |
-                                    `lanes:psv` == 1 |
-                                    `lanes:psv:forward` == 1 |
-                                    `lanes:psv:backward` == 1 |
-                                    `psv:lanes:backward` == "designated" |
-                                    `psv:lanes:forward` == "designated" |
-                                    !is.na(`psv:lanes`)
+  cols_to_check_access <- grep("psv:lanes|bus:lanes", names(road_osm), value = TRUE)
+  cols_to_check_count <- grep("lanes:psv|lanes:bus", names(road_osm), value = TRUE)
+
+  osm_lanes = road_osm |> filter(
+    # Based on https://wiki.openstreetmap.org/wiki/Bus_lanes
+    psv == "designated"
+    | highway == "busway"
+    | if_any(all_of(cols_to_check_access), ~ grepl("designated", .x))
+    | if_any(all_of(cols_to_check_count), ~ is.numeric(.x) & .x >= 1)
   )
 
   return(osm_lanes)
