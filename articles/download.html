@@ -124,42 +124,44 @@ download them.</p>
 <p>To use it, an access token must be provided. It can be obtained for
 free at Mobility Database <a href="https://mobilitydatabase.org/account" class="external-link">website</a>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work</span></span>
+<code class="sourceCode R"><span><span class="va">aml</span> <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="st">"https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">lisboa</span> <span class="op">=</span> <span class="va">aml</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Concelho</span> <span class="op">==</span> <span class="st">"Lisboa"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">feeds</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/query_mobilitydatabase.html">query_mobilitydatabase</a></span><span class="op">(</span>refresh_token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"MOBILITY_DATABASE"</span><span class="op">)</span>,</span>
-<span>                                         subdivision_name <span class="op">=</span> <span class="st">"Lisbon"</span><span class="op">)</span></span>
+<span><span class="co"># usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work</span></span>
+<span><span class="va">feeds</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/query_mobilitydatabase.html">query_mobilitydatabase</a></span><span class="op">(</span></span>
+<span>  refresh_token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"MOBILITY_DATABASE"</span><span class="op">)</span>,</span>
+<span>  bbox <span class="op">=</span> <span class="va">lisboa</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">feeds</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">status</span> <span class="op">==</span> <span class="st">"active"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">status</span>, <span class="va">producer_url</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                      provider status</span></span>
-<span><span class="co">#&gt; 1                      Carris active</span></span>
-<span><span class="co">#&gt; 2        Carris Metropolitana active</span></span>
-<span><span class="co">#&gt; 3 Cascais Próxima, E.M., S.A. active</span></span>
-<span><span class="co">#&gt; 4                    Fertagus active</span></span>
-<span><span class="co">#&gt; 5                     FlixBus active</span></span>
-<span><span class="co">#&gt; 6     Metro de Lisboa (Metro) active</span></span>
-<span><span class="co">#&gt;                                                                       producer_url</span></span>
-<span><span class="co">#&gt; 1                             https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS</span></span>
-<span><span class="co">#&gt; 2                                          https://api.carrismetropolitana.pt/gtfs</span></span>
-<span><span class="co">#&gt; 3 https://drive.google.com/uc?export=download&amp;id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX</span></span>
-<span><span class="co">#&gt; 4                             https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip</span></span>
-<span><span class="co">#&gt; 5                          https://transport.beta.gouv.fr/resources/11681/download</span></span>
-<span><span class="co">#&gt; 6                      https://www.metrolisboa.pt/google_transit/googleTransit.zip</span></span>
+<span><span class="co">#&gt;                                       provider status</span></span>
+<span><span class="co">#&gt; 1                                       Amtrak active</span></span>
+<span><span class="co">#&gt; 2 Capital Area Transportation Authority (CATA) active</span></span>
+<span><span class="co">#&gt; 3                                       Carris active</span></span>
+<span><span class="co">#&gt; 4                         Carris Metropolitana active</span></span>
+<span><span class="co">#&gt; 5                    CP - Comboios de Portugal active</span></span>
+<span><span class="co">#&gt;                                                                                      producer_url</span></span>
+<span><span class="co">#&gt; 1                                                https://content.amtrak.com/content/gtfs/GTFS.zip</span></span>
+<span><span class="co">#&gt; 2 http://developers.cata.org/gtfsdownload.ashx?key=5b4690ed-0a69-4320-897b-7d92def4b96f&amp;data=base</span></span>
+<span><span class="co">#&gt; 3                                            https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS</span></span>
+<span><span class="co">#&gt; 4                                                         https://api.carrismetropolitana.pt/gtfs</span></span>
+<span><span class="co">#&gt; 5                                                             https://publico.cp.pt/gtfs/gtfs.zip</span></span>
 <span></span>
 <span><span class="va">gtfs</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/load_feed.html">load_feed</a></span><span class="op">(</span><span class="va">feeds</span><span class="op">$</span><span class="va">producer_url</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, create_transfers<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidygtfs object</span></span>
-<span><span class="co">#&gt; files        agency, feed_info, routes, stop_times, trips, translations, calendar, calendar_dates, stops</span></span>
-<span><span class="co">#&gt; agency       BlaBlaCar Bus</span></span>
-<span><span class="co">#&gt; service      from 2025-06-17 to 2026-04-13</span></span>
+<span><span class="co">#&gt; files        agency, routes, stop_times, trips, shapes, calendar, feed_info, stops</span></span>
+<span><span class="co">#&gt; agencies     Temporary Amtrak Chartered Vehicle, Roadrunner Shuttle, Via Rail Canada ... 16 more</span></span>
+<span><span class="co">#&gt; service      from 2025-06-22 to 2026-06-22</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
-<span><span class="co">#&gt; # routes     3701</span></span>
-<span><span class="co">#&gt; # trips      4128</span></span>
-<span><span class="co">#&gt; # stop_ids    347</span></span>
-<span><span class="co">#&gt; # stop_names  347</span></span>
-<span><span class="co">#&gt; # shapes      667</span></span></code></pre></div>
+<span><span class="co">#&gt; # routes       61</span></span>
+<span><span class="co">#&gt; # trips      2390</span></span>
+<span><span class="co">#&gt; # stop_ids    650</span></span>
+<span><span class="co">#&gt; # stop_names  629</span></span>
+<span><span class="co">#&gt; # shapes      151</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="using-gtfshift-incorporated-database-for-portugal">Using GTFShift incorporated database for Portugal<a class="anchor" aria-label="anchor" href="#using-gtfshift-incorporated-database-for-portugal"></a>
@@ -223,11 +225,11 @@ operator GTFS.</li>
 <span><span class="co">#&gt; agency       CP - Comboios de Portugal</span></span>
 <span><span class="co">#&gt; service      from 2024-12-15 to 2025-12-13</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
-<span><span class="co">#&gt; # routes      181</span></span>
-<span><span class="co">#&gt; # trips      1865</span></span>
+<span><span class="co">#&gt; # routes      180</span></span>
+<span><span class="co">#&gt; # trips      1880</span></span>
 <span><span class="co">#&gt; # stop_ids    457</span></span>
 <span><span class="co">#&gt; # stop_names  457</span></span>
-<span><span class="co">#&gt; # shapes      266</span></span></code></pre></div>
+<span><span class="co">#&gt; # shapes      262</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
