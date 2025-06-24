@@ -35,6 +35,7 @@ osm_bus_lanes <- function(bbox) {
   osm_lanes = road_osm |> filter(
     # Based on https://wiki.openstreetmap.org/wiki/Bus_lanes
     psv == "designated"
+    | highway == "busway"
     | if_any(all_of(cols_to_check_access), ~ grepl("designated", .x))
     | if_any(all_of(cols_to_check_count), ~ is.numeric(.x) & .x >= 1)
   )
