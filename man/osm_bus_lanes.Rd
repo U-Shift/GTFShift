@@ -2,7 +2,7 @@
 % Please edit documentation in R/query_osm_bus_lanes.R
 \name{osm_bus_lanes}
 \alias{osm_bus_lanes}
-\title{Export bus lanes from OpenStreetMaps}
+\title{Export designated bus lanes from OpenStreetMaps}
 \usage{
 osm_bus_lanes(bbox)
 }
@@ -13,10 +13,10 @@ osm_bus_lanes(bbox)
 osm_lines in sf format
 }
 \description{
-Export bus lanes from OpenStreetMaps
+Export designated bus lanes from OpenStreetMaps
 }
 \details{
-Exports roads tagged as bus lanes on OpenStreetMaps for given area.
+Exports roads tagged as designated bus lanes on OpenStreetMaps for given area.
 }
 \examples{
 \dontrun{
