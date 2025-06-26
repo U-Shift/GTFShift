@@ -5,6 +5,7 @@
 #' @param geometry Boolean (Default TRUE). If TRUE, returns sf object with geometry, otherwise, a simple data.frame.
 #' @param gtfs_match String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
 #' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
+#' @param match_any Boolean (Default FALSE). If TRUE and osm_match and gtfs_match do not have any match, tries to match each shape with every OSM route, returning the one with the best correspondence.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
@@ -22,6 +23,10 @@
 #'  \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
 #' }
+#'
+#' \code{match_any} is a fallback and should be used with caution, only in cases in which there is for sure an OSM match
+#' for each GTFS shape. Otherwise, there will be wrong associations, as this option makes sure that each shape is associated
+#' to the more similar OSM route, regardless of its name.
 #'
 #'
 #' @examples
@@ -42,7 +47,7 @@
 #' @import xml2
 #'
 #' @export
-osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_short_name", osm_match="ref") {
+osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_short_name", osm_match="ref", match_any=FALSE) {
 
   # 0. Validations
   if (!(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
@@ -105,6 +110,16 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     # > Filter osm network
     osm_route_name = osm_multilines_redux |>
       filter(.data[[osm_match]] == route_name)
+
+    if (nrow(osm_route_name) == 0 && !match_any) {
+      warning("No OSM routes found for GTFS ", gtfs_match, " ", route_name)
+      return(data.frame(
+        route_name=route_name
+      ))  # Return NULL for failed elements
+    } else if (nrow(osm_route_name) == 0) {
+      osm_route_name = osm_multilines_redux
+      warning("No OSM routes found for GTFS ", gtfs_match, " ", route_name, ", considering all...")
+    }
 
     # > Filter GTFS
     gtfs_route_name = gtfs$routes |>  # Start on routes.txt to match line number with route_name
