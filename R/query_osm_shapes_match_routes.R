@@ -128,27 +128,28 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
           nr_stops = nrow(relations_df |> filter(relation_osm_id==osm_id & grepl("stop", role))),
           first_stop_osm_id = relations_df |>
             # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
-            filter(relation_osm_id==osm_id & role %in% c("stop_entry_only", "stop", "platform")) |>
+            filter(relation_osm_id==osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
             # Use sorting to give priority to entry/exit, when they exist
             arrange(
-              match(role, c("stop_entry_only", "stop", "platform")),
+              match(role, c("stop_entry_only", "platform_entry_only", "stop", "platform")),
               role
             ) |>
             slice(1)  |>
             pull(ref),
           last_stop_osm_id = relations_df |>
-            filter(relation_osm_id==osm_id & role %in% c("stop_exit_only", "stop", "platform")) |>
+            filter(relation_osm_id==osm_id & role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
             mutate( role_group = case_when(
               # When roundtrip (circular), keep normal order
               roundtrip == "yes" ~ 1,
               # Otherwise, consider first stop_exit_only or last stop (if no exit_only)
-              role == "stop_exit_only" ~ 1,role == "stop" ~ 2,role == "platform" ~ 3,TRUE ~ 4
+              role == "stop_exit_only" ~ 1,role == "platform_exit_only" ~ 2,role == "stop" ~ 4,role == "platform" ~ 4,TRUE ~ 5
             ) ) |>
             arrange(
               role_group,
               case_when(
                 roundtrip == "yes" ~ row_number(),             # When roundtrip (circular), keep normal order
                 role == "stop_exit_only" ~ row_number(),       # keep natural order
+                role == "platform_exit_only" ~ row_number(),   # keep natural order
                 role == "stop" ~ desc(row_number()),           # reverse order
                 role == "platform" ~ desc(row_number()),       # reverse order
                 TRUE ~ row_number()                            # fallback order for others
