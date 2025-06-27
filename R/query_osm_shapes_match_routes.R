@@ -118,7 +118,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
       ))  # Return NULL for failed elements
     } else if (nrow(osm_route_name) == 0) {
       osm_route_name = osm_multilines_redux
-      warning("No OSM routes found for GTFS ", gtfs_match, " ", route_name, ", considering all...")
+      message("No OSM routes found for GTFS ", gtfs_match, " ", route_name, ", considering all...")
     }
 
     # > Filter GTFS
@@ -140,7 +140,13 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
           # Geographical data
           route_dist = st_length(geometry) |> units::drop_units(),
           # Other relevant parameters
-          nr_stops = nrow(relations_df |> filter(relation_osm_id==osm_id & grepl("stop", role))),
+          nr_stops = { # If no stops, count platforms
+            nr <- nrow(relations_df |> filter(relation_osm_id==osm_id & grepl("stop", role)))
+            if (nr == 0) {
+              nr <- nrow(relations_df |> filter(relation_osm_id == osm_id & grepl("platform", role)))
+            }
+            nr
+          },
           first_stop_osm_id = relations_df |>
             # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
             filter(relation_osm_id==osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
