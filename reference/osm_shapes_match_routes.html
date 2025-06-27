@@ -52,8 +52,7 @@
 <span>  <span class="va">q</span>,</span>
 <span>  geometry <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  gtfs_match <span class="op">=</span> <span class="st">"route_short_name"</span>,</span>
-<span>  osm_match <span class="op">=</span> <span class="st">"ref"</span>,</span>
-<span>  match_any <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  osm_match <span class="op">=</span> <span class="st">"ref"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -80,10 +79,6 @@
 <dt id="arg-osm-match">osm_match<a class="anchor" aria-label="anchor" href="#arg-osm-match"></a></dt>
 <dd><p>String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.</p></dd>
 
-
-<dt id="arg-match-any">match_any<a class="anchor" aria-label="anchor" href="#arg-match-any"></a></dt>
-<dd><p>Boolean (Default FALSE). If TRUE and osm_match and gtfs_match do not have any match, tries to match each shape with every OSM route, returning the one with the best correspondence.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -94,10 +89,7 @@
 <li><p><code>route_short_name</code>, the <code>route_short_name</code> attribute from <code>routes.txt</code> file.</p></li>
 <li><p><code>route_long_name</code>, the <code>route_long_name</code> attribute from <code>routes.txt</code> file.</p></li>
 <li><p><code>geometry</code>, the geometrical data for the OSM route relation.</p></li>
-</ul><p><code>match_any</code> is a fallback and should be used with caution, only in cases in which there is for sure an OSM match
-for each GTFS shape. Otherwise, there will be wrong associations, as this option makes sure that each shape is associated
-to the more similar OSM route, regardless of its name.</p>
-    </div>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For each route, matches its trips' shapes with OSM route relations.</p>
