@@ -9,8 +9,7 @@ osm_shapes_match_routes(
   q,
   geometry = TRUE,
   gtfs_match = "route_short_name",
-  osm_match = "ref",
-  match_any = FALSE
+  osm_match = "ref"
 )
 }
 \arguments{
@@ -23,8 +22,6 @@ osm_shapes_match_routes(
 \item{gtfs_match}{String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
 
 \item{osm_match}{String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.}
-
-\item{match_any}{Boolean (Default FALSE). If TRUE and osm_match and gtfs_match do not have any match, tries to match each shape with every OSM route, returning the one with the best correspondence.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
@@ -37,10 +34,6 @@ A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following colum
  \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
  \item \code{geometry}, the geometrical data for the OSM route relation.
 }
-
-\code{match_any} is a fallback and should be used with caution, only in cases in which there is for sure an OSM match
-for each GTFS shape. Otherwise, there will be wrong associations, as this option makes sure that each shape is associated
-to the more similar OSM route, regardless of its name.
 }
 \description{
 Get OSM routes that match shapes, based on geometrical match
