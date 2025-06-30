@@ -16,10 +16,14 @@ q_cascais = opq(bbox_cascais)  |>
 # Match shapes geometry
 shapes_cascais_match_routes = GTFShift::osm_shapes_match_routes(gtfs_cascais, q_cascais)
 
-nrow(shapes_cascais_match_routes)
+total = nrow(shapes_cascais_match_routes) # 139
+total = length(unique(gtfs_cascais$shapes$shape_id)) # 139
 summary(shapes_cascais_match_routes)
 
-View(shapes_cascais_match_routes |> sf::st_drop_geometry())
+valid = nrow(shapes_cascais_match_routes |> filter(distance_diff<1000 & points_diff<500)) # 107
+valid/total*100 # 76.97842 %
 
-write.csv(shapes_cascais_match_routes, "dev/shapes_match_cascais.csv")
+# View(shapes_cascais_match_routes |> sf::st_drop_geometry())
+#
+write.csv(shapes_cascais_match_routes |> sf::st_drop_geometry() |> mutate(distance_diff=round(distance_diff), points_diff=round(points_diff)), "dev/shapes_match_cascais.csv", row.names = FALSE)
 sf::st_write(shapes_cascais_match_routes, "dev/shapes_match_cascais.gpkg")

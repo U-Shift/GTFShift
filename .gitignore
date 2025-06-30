@@ -4,3 +4,6 @@
 .Ruserdata
 inst/doc
 docs
+
+*.csv
+*.gpkg
