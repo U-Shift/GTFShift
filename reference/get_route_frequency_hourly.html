@@ -51,6 +51,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_route_frequency_hourly</span><span class="op">(</span></span>
 <span>  <span class="va">gtfs</span>,</span>
 <span>  date <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="calendar_nextBusinessWednesday.html">calendar_nextBusinessWednesday</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  use_osm_routes <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  overline <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -65,6 +66,10 @@
 
 <dt id="arg-date">date<a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
 <dd><p>Date (Default <code><a href="calendar_nextBusinessWednesday.html">GTFShift::calendar_nextBusinessWednesday()</a></code>). Reference date to consider when analyzing the GTFS file.</p></dd>
+
+
+<dt id="arg-use-osm-routes">use_osm_routes<a class="anchor" aria-label="anchor" href="#arg-use-osm-routes"></a></dt>
+<dd><p>osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using <code><a href="osm_shapes_to_routes.html">GTFShift::osm_shapes_to_routes</a></code>.</p></dd>
 
 
 <dt id="arg-overline">overline<a class="anchor" aria-label="anchor" href="#arg-overline"></a></dt>

@@ -90,7 +90,10 @@
 <li><p><code>route_short_name</code>, the <code>route_short_name</code> attribute from <code>routes.txt</code> file.</p></li>
 <li><p><code>route_long_name</code>, the <code>route_long_name</code> attribute from <code>routes.txt</code> file.</p></li>
 <li><p><code>geometry</code>, the geometrical data for the OSM route relation.</p></li>
-</ul></div>
+</ul><p>Attention! For each GTFS route, provided there is at least one OSM route, all the GTFS shapes for that route will necessarily be associated with
+an OSM one. This might generate wrong results if the number/topology of routes on OSM does not match the GTFS shapes for that route.
+Refer to  <code>distance_diff</code> and <code>points_diff</code> on the results table to validate the results and identify misassociations.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For each route, matches its trips' shapes with OSM route relations.</p>
