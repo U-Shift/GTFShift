@@ -4,6 +4,7 @@
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
+#' @param use_osm_routes osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.
 #' @param overline Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.
 #'
 #' @details
@@ -38,9 +39,12 @@
 #' @import stplanr
 #'
 #' @export
-get_route_frequency_hourly = function(gtfs,
-                                      date = GTFShift::calendar_nextBusinessWednesday(),
-                                      overline = FALSE) {
+get_route_frequency_hourly = function(
+    gtfs,
+    date = GTFShift::calendar_nextBusinessWednesday(),
+    use_osm_routes=NA,
+    overline = FALSE
+) {
   message(sprintf("Analysing GTFS for %s...", date))
 
   ## Consider transit data for one day only
@@ -50,7 +54,12 @@ get_route_frequency_hourly = function(gtfs,
   # PROCESS GTFS, generating table calculating the frequencies per route
   trips = gtfs_date$trip
   stops = gtfs_date$stops
-  shapes = tidytransit::shapes_as_sf(gtfs_date$shapes)
+  if (any(!is.na(use_osm_routes))) {
+    shapes = GTFShift::osm_shapes_to_routes(gtfs, use_osm_routes)
+  } else {
+    shapes = tidytransit::shapes_as_sf(gtfs_date$shapes)
+  }
+
   routes = gtfs_date$routes
   stop_times = gtfs_date$stop_times
 
@@ -89,7 +98,7 @@ get_route_frequency_hourly = function(gtfs,
                 select(route_id, direction_id, shape_id) |>
                 distinct()) |>
     as.data.frame() |>
-    left_join(shapes) |>
+    inner_join(shapes) |>
     st_as_sf()
 
   # Overline?

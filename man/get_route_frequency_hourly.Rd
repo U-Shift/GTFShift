@@ -7,6 +7,7 @@
 get_route_frequency_hourly(
   gtfs,
   date = GTFShift::calendar_nextBusinessWednesday(),
+  use_osm_routes = NA,
   overline = FALSE
 )
 }
@@ -14,6 +15,8 @@ get_route_frequency_hourly(
 \item{gtfs}{tidygtfs. GTFS feed.}
 
 \item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
+
+\item{use_osm_routes}{osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.}
 
 \item{overline}{Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.}
 }
