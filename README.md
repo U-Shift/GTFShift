@@ -51,7 +51,7 @@ However, its provision by operator makes it difficult for network aggregated ana
 
 GTFShift includes a method to easily generate an aggregated GTFS file given several instances.
 
-![](assets/unify.png)
+![](man/figures/unify.png)
 > Aggregated GTFS for Fertagus and Transportes Coletivos do Barreiro operators
 
 ### Analyse
@@ -61,7 +61,7 @@ Analyzing public transit feeds is important to understand its territorial covera
 GTFShift provides several methods that encapsulate pre-defined methodologies for them, for instance, analysing hourly frequency per stop, route 
 or road segment.
 
-![](assets/analyse_aggregated_frequencies.png)
+![](man/figures/analyse_aggregated_frequencies.png)
 > Aggregated route frequency for Carris Lisboa operator, at 8:00
 
 ### OSM Data
@@ -71,6 +71,6 @@ OpenStreetMaps (OSM) is an important data source for transit analysis, due to it
 GTFShift includes some methods that allow to access its information directly, namely to export bus lanes, get centerlines for the 
 road network and export the OSM transit routes.
 
-![](assets/osm_buslanes.png)
+![](man/figures/osm_buslanes.png)
 > OSM exported bus lanes for Lisbon
 
