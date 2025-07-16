@@ -39,9 +39,20 @@ osm_shapes_to_routes <- function(gtfs, q) {
     select(any_of(c("osm_id", "gtfs:shape_id")))
 
   # 2. Merge with GTFS
-  result = gtfs$trips |> select(shape_id) |>
-    distinct() |>
+  shape_ids = gtfs$trips |> select(shape_id) |>
+    distinct()
+  message(sprintf("Trying to match %d shapes with %s osm routes...", nrow(shape_ids), nrow(osm_multilines_redux)))
+  result = shape_ids |>
     inner_join(osm_multilines_redux |> select("osm_id", "gtfs:shape_id", "geometry"), by=c("shape_id" = "gtfs:shape_id")) |>
     st_as_sf()
+  message(sprintf("Matched %d shapes with OSM routes!", nrow(result)))
 
+  # 3. Log missing shapes
+  shapes_missing = shape_ids |> filter(!(shape_id %in% result$shape_id)) |> left_join(gtfs$trips, by="shape_id") |> left_join(gtfs$routes, by="route_id") |> distinct(shape_id, .keep_all = TRUE)
+  if (nrow(shapes_missing)>0) {
+    row_strings <- with(shapes_missing, sprintf("%s (%s)", shape_id, route_short_name))
+    warning(sprintf("Shapes missing (ignored in the result): %s", paste(row_strings, collapse = " ")))
+  }
+
+  return(result)
 }
