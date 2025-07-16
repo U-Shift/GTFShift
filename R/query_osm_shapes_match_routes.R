@@ -10,7 +10,7 @@
 #' For each route, matches its trips' shapes with OSM route relations.
 #'
 #' The match is performed considering, for each shape, the closest OSM route, based on
-#' the start and end points, total length and average distance between stops.
+#' the start and end points, total length and number of stops.
 #'
 #' @returns A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
 #' \itemize{
@@ -257,7 +257,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     if (length(unique(gtfs_route_name_result$osm_id)) < nrow(gtfs_route_name_result)) {
       counter_osm_duplicate_match = counter_osm_duplicate_match + 1
       warning(sprintf(
-        "GTFS route %s has %d shapes, but they were matched with only %d (out of %d) OSM routes. This might indicate a mismatch between GTFS and OSM data.\nosm_id for route: %s (the ignored ones were %s) (the duplicated ones were %s)",
+        "GTFS route %s has %d shapes, but they were matched with only %d (out of %d) OSM routes. Ignoring route...\nThis might indicate a mismatch between GTFS and OSM data!\nosm_id for route: %s (the ignored ones were %s) (the duplicated ones were %s)",
         route_name, nrow(gtfs_route_name),
         length(unique(gtfs_route_name_result$osm_id)),
         nrow(osm_route_name),
