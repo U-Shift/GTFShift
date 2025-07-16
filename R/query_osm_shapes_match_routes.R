@@ -57,7 +57,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     stop("osm_match should be one of: ref, name")
   }
 
-  message("Preparing OSM and GTFS data... (V2)")
+  message("Preparing OSM and GTFS data... (V3)")
 
   # 1. Get geometry for shapes and stops
   shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes)
@@ -137,12 +137,10 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
           # Geographical data
           route_dist = st_length(geometry) |> units::drop_units(),
           # Other relevant parameters
-          nr_stops = { # If no stops, count platforms
-            nr <- nrow(relations_df |> filter(relation_osm_id==osm_id & grepl("stop", role)))
-            if (nr == 0) {
-              nr <- nrow(relations_df |> filter(relation_osm_id == osm_id & grepl("platform", role)))
-            }
-            nr
+          nr_stops = { # Consider the number of stops to be the maximum of stops or platforms, because some routes use them mixed and miss some
+            nr_s <- nrow(relations_df |> filter(relation_osm_id==osm_id & grepl("stop", role)))
+            nr_p <- nrow(relations_df |> filter(relation_osm_id == osm_id & grepl("platform", role)))
+            max(nr_s, nr_p)
           },
           first_stop_osm_id = relations_df |>
             # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
@@ -227,7 +225,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
 
 
     # > Match OSM network and GTFS shapes considering the match with min aggregated distance (init + fin)
-    closeness = abs(init + fin + length_diff)
+    closeness = abs(init + fin + length_diff + stops_diff)
 
     gtfs_route_name_minimos = gtfs_route_name |>
       mutate(osm_id = NA)
