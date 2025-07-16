@@ -10,7 +10,7 @@
 #' For each route, matches its trips' shapes with OSM route relations.
 #'
 #' The match is performed considering, for each shape, the closest OSM route, based on
-#' the start and end points and total length.
+#' the start and end points, total length and average distance between stops.
 #'
 #' @returns A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
 #' \itemize{
@@ -18,6 +18,7 @@
 #'  \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
 #'  \item \code{distance_diff}, the difference, in meters, between GTFS shape and OSM route lengths.
 #'  \item \code{points_diff}, the sum of the difference, in meters, between GTFS shape and OSM route start and end points.
+#'  \item \code{stops_diff}, the difference between GTFS and OSM routes number of stops.
 #'  \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
 #'  \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
@@ -25,7 +26,7 @@
 #'
 #' Attention! For each GTFS route, provided there is at least one OSM route, all the GTFS shapes for that route will necessarily be associated with
 #' an OSM one. This might generate wrong results if the number/topology of routes on OSM does not match the GTFS shapes for that route.
-#' Refer to  \code{distance_diff} and \code{points_diff} on the results table to validate the results and identify misassociations.
+#' Refer to  \code{distance_diff}, \code{points_diff} and \{stops_diff} on the results table to validate the results and identify misassociations.
 #'
 #'
 #' @examples
@@ -56,7 +57,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     stop("osm_match should be one of: ref, name")
   }
 
-  message("Preparing OSM and GTFS data...")
+  message("Preparing OSM and GTFS data... (V2)")
 
   # 1. Get geometry for shapes and stops
   shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes)
@@ -215,6 +216,15 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     init = units::drop_units( st_distance(osm_route_name$initial, gtfs_route_name$initial) )
     fin = units::drop_units( st_distance(osm_route_name$final, gtfs_route_name$final) )
     length_diff = sapply(gtfs_route_name$route_dist, function(y) abs(osm_route_name$route_dist - y))
+    # Proxy for number of stops distance: average distance between stops on GTFS, times the difference between osm and gtfs stops
+    stops_diff = sapply(
+      seq_along(gtfs_route_name$nr_stops),
+      function(i) {
+        (gtfs_route_name$route_dist[i] / gtfs_route_name$nr_stops[i]) *
+          abs(osm_route_name$nr_stops - gtfs_route_name$nr_stops[i])
+      }
+    )
+
 
     # > Match OSM network and GTFS shapes considering the match with min aggregated distance (init + fin)
     closeness = abs(init + fin + length_diff)
@@ -236,7 +246,8 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
       rowwise() |>
       mutate(
         distance_diff = abs(route_dist_gtfs - route_dist_osm),
-        points_diff = as.numeric( units::drop_units( st_distance(initial_osm, initial_gtfs) ) + units::drop_units( st_distance(final_osm, final_gtfs) ) )
+        points_diff = as.numeric( units::drop_units( st_distance(initial_osm, initial_gtfs) ) + units::drop_units( st_distance(final_osm, final_gtfs) ) ),
+        stops_diff = abs(nr_stops_gtfs - nr_stops_osm)
       ) |> # absolute difference
       ungroup() |>
       select(-initial_gtfs, -final_gtfs) |>
@@ -246,10 +257,11 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   })
   result_success = bind_rows( result[lengths(result)>1] )
   message(sprintf(
-    "DONE! Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points and %.2f meters for route length.",
+    "DONE! Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops.",
     nrow(result_success),
     mean(result_success$points_diff),
-    mean(result_success$distance_diff)
+    mean(result_success$distance_diff),
+    mean(result_success$stops_diff)
   ))
 
   not_found = bind_rows( result[lengths(result)<=1] )
@@ -257,7 +269,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     warning(sprintf("%d missing matches for %s: %s", nrow(not_found), gtfs_match, paste(not_found$route_name, collapse=", ")))
   }
 
-  result_success = result_success |> select(shape_id, osm_id, distance_diff, points_diff, route_short_name, route_long_name)
+  result_success = result_success |> select(shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name)
 
   if (!geometry) {
     return (result_success |> st_drop_geometry())
