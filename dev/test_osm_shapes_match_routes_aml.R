@@ -26,7 +26,12 @@ View(shapes_aml_match_routes |> sf::st_drop_geometry())
 valid = nrow(shapes_aml_match_routes |> filter(distance_diff<1000 & points_diff<500)) # 1198
 valid/total*100 # 72.69 %
 
-write.csv(shapes_aml_match_routes |> sf::st_drop_geometry() |> mutate(distance_diff=round(distance_diff), points_diff=round(points_diff)), "dev/shapes_match_aml.csv", row.names = FALSE)
+write.csv(shapes_aml_match_routes |> sf::st_drop_geometry() |> mutate(
+  distance_diff=round(distance_diff),
+  points_diff=round(points_diff),
+  shape_id_original = shape_id,
+  shape_id = substr(shape_id, 1, nchar(shape_id) - 6) # Remove the last 6 characters (different in each GTFS feed version :/)
+), "releases/shapes_match_aml_v0_7_0_20250716.csv", row.names = FALSE)
 sf::st_write(shapes_aml_match_routes, "dev/shapes_match_aml.gpkg")
 
 # To compare with previous
