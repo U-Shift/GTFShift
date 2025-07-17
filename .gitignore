@@ -5,4 +5,8 @@
 inst/doc
 docs
 
+*.csv
+*.gpkg
 *.zip
+
+releases/

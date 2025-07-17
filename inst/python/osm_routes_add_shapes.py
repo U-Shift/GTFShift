@@ -72,6 +72,7 @@ api = osmapi.OsmApi(api=api_url, session=oauth_session)
 
 # Load your CSV file
 df = pd.read_csv("osm_match.csv") # CSV with columns oms_id and shape_id
+df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 
 # Create change set, updating relations with tag gtfs:shape_id
 # The changeset comment can be customized to better describe the change submitted 
@@ -80,10 +81,13 @@ with api.Changeset({"comment": "GTFS shapes association", "review_requested": "n
     shape_id = row["shape_id"]
     osm_id = int(row["osm_id"])
     relation = api.RelationGet(osm_id)
-    print("\t", shape_id, osm_id, relation["tag"]["gtfs:shape_id"] if "gtfs:shape_id" in relation["tag"] else "-")
-    if "gtfs:shape_id" not in relation["tag"]:
+    print(f"\tosm_id {osm_id} shape_id {shape_id} (previous {relation['tag']['gtfs:shape_id'] if 'gtfs:shape_id' in relation['tag'] else '-'})", end="\t")
+    if "gtfs:shape_id" not in relation["tag"] or relation["tag"]["gtfs:shape_id"] != shape_id:
       relation["tag"]["gtfs:shape_id"] = shape_id
       update = api.RelationUpdate(relation)
+      print("Updated!")
+    else:
+      print("Skipped...")
   
 # Rollback AVOID THIS! It should be used only if you made a mistake in the previous update and you want to rollback your changes
 # with api.Changeset({"comment": "GTFS shapes association rollback", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
