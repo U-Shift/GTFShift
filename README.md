@@ -110,4 +110,5 @@ Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
 
 <br/>
 
-[![](man/figures/logo_acknowledgement.png){width="75%"}](https://ushift.tecnico.ulisboa.pt/)
+<img src="man/figures/logo_acknowledgement.png" width="75%">
+
