@@ -50,8 +50,9 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">unify</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
+<span>  prefix <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  store_path <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  create_transfers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  create_transfers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  transfer_distance <span class="op">=</span> <span class="fl">300</span>,</span>
 <span>  transfer_time <span class="op">=</span> <span class="fl">120</span>,</span>
 <span>  transfer_street_routing <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -66,12 +67,16 @@
 <dd><p>tidygtfs[]. List of GTFS feeds.</p></dd>
 
 
+<dt id="arg-prefix">prefix<a class="anchor" aria-label="anchor" href="#arg-prefix"></a></dt>
+<dd><p>Boolean (Default FALSE). If TRUE, prefixes all tables with the agency_id, to avoid conflicts in case of same IDs in different feeds.</p></dd>
+
+
 <dt id="arg-store-path">store_path<a class="anchor" aria-label="anchor" href="#arg-store-path"></a></dt>
 <dd><p>String (Optional). If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.</p></dd>
 
 
 <dt id="arg-create-transfers">create_transfers<a class="anchor" aria-label="anchor" href="#arg-create-transfers"></a></dt>
-<dd><p>Boolean (Default TRUE). When true, generates transfers.txt, aggregating close stops, even if from different GTFS.</p></dd>
+<dd><p>Boolean (Default FALSE). When true, generates transfers table, aggregating close stops, even if from different GTFS.</p></dd>
 
 
 <dt id="arg-transfer-distance">transfer_distance<a class="anchor" aria-label="anchor" href="#arg-transfer-distance"></a></dt>
@@ -92,7 +97,7 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Aggregates multiple feeds using <code><a href="https://rdrr.io/pkg/GTFSwizard/man/merge_gtfs.html" class="external-link">GTFSwizard::merge_gtfs()</a></code>`.
+    <p>Aggregates multiple feeds using <code><a href="https://ipeagit.github.io/gtfstools/reference/merge_gtfs.html" class="external-link">gtfstools::merge_gtfs()</a></code>.
 When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based
 on the stops network of the final aggregated version.</p>
 <p>This computation is executed with <code><a href="https://rdrr.io/pkg/gtfsrouter/man/gtfs_transfer_table.html" class="external-link">gtfsrouter::gtfs_transfer_table()</a></code>,
@@ -102,7 +107,7 @@ with the parameters <code>d_limit=transfer_distance</code>, <code>min_transfer_t
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>[GTFSwizard::merge_gtfs()]</p>
+    <div class="dont-index"><p>[gtfstools::merge_gtfs()]</p>
 <p>[gtfsrouter::gtfs_transfer_table()]</p></div>
     </div>
 
