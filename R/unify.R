@@ -9,7 +9,7 @@
 #' @param transfer_street_routing Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
 #'
 #' @details
-#' Aggregates multiple feeds using \code{gtfstools::merge_gtfs()}`.
+#' Aggregates multiple feeds using \code{gtfstools::merge_gtfs()}.
 #' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based
 #' on the stops network of the final aggregated version.
 #'
