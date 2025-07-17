@@ -25,17 +25,17 @@ An \code{sf} \code{data.frame} object with the following columns (the first thre
 \itemize{
  \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
  \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
- \item \code{direction_id}, the \code{direction_id} attribute from \code{trips.txt} file.
+ \item \code{direction_id}, the \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).
  \item \code{hour}, the hour for which the frequency applies (24 hour format).
  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
  \item \code{geometry}, the route shape.
 }
 }
 \description{
-For each route, returns the number of departures aggregated per hour.
+For each route, returns the number of departures aggregated per hour and direction.
 }
 \details{
-This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour.
+This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour and direction.
 For a detailed example, see the \code{vignette("analyse")}.
 
 Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.

@@ -6,8 +6,9 @@
 \usage{
 unify(
   ...,
+  prefix = FALSE,
   store_path = NA,
-  create_transfers = TRUE,
+  create_transfers = FALSE,
   transfer_distance = 300,
   transfer_time = 120,
   transfer_street_routing = FALSE
@@ -16,9 +17,11 @@ unify(
 \arguments{
 \item{...}{tidygtfs[]. List of GTFS feeds.}
 
+\item{prefix}{Boolean (Default FALSE). If TRUE, prefixes all tables with the agency_id, to avoid conflicts in case of same IDs in different feeds.}
+
 \item{store_path}{String (Optional). If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.}
 
-\item{create_transfers}{Boolean (Default TRUE). When true, generates transfers.txt, aggregating close stops, even if from different GTFS.}
+\item{create_transfers}{Boolean (Default FALSE). When true, generates transfers table, aggregating close stops, even if from different GTFS.}
 
 \item{transfer_distance}{Integer (Default 300). Upper straight-line distance limit in meters for transfers.}
 
@@ -33,7 +36,7 @@ A tidygtfs object.
 Merge multiple GTFS into a single aggregated file
 }
 \details{
-Aggregates multiple feeds using \code{GTFSwizard::merge_gtfs()}`.
+Aggregates multiple feeds using \code{gtfstools::merge_gtfs()}.
 When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based
 on the stops network of the final aggregated version.
 
@@ -52,7 +55,7 @@ unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers=TRUE)
 
 }
 \seealso{
-[GTFSwizard::merge_gtfs()]
+[gtfstools::merge_gtfs()]
 
 [gtfsrouter::gtfs_transfer_table()]
 }
