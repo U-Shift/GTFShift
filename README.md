@@ -94,14 +94,14 @@ network and export the OSM transit routes.
 
 > OSM exported bus lanes for Lisbon
 
-# Related packages
+## Related packages
 
 -   [`{tidytransit}`](https://github.com/r-transit/tidytransit)
 -   [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
 -   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 -   [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
 
-# Acknowledgement
+## Acknowledgement
 
 **GTFShift** is developed and maintained by
 [U-shift](https://ushift.tecnico.ulisboa.pt) urban mobility research
