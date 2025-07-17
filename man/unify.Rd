@@ -17,7 +17,7 @@ unify(
 \arguments{
 \item{...}{tidygtfs[]. List of GTFS feeds.}
 
-\item{prefix}{Boolean (Default FALSE). If TRUE, prefixes all tables with the feed ID, to avoid conflicts in case of same IDs in different feeds.}
+\item{prefix}{Boolean (Default FALSE). If TRUE, prefixes all tables with the agency_id, to avoid conflicts in case of same IDs in different feeds.}
 
 \item{store_path}{String (Optional). If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.}
 
