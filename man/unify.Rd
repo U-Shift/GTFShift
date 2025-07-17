@@ -36,7 +36,7 @@ A tidygtfs object.
 Merge multiple GTFS into a single aggregated file
 }
 \details{
-Aggregates multiple feeds using \code{gtfstools::merge_gtfs()}`.
+Aggregates multiple feeds using \code{gtfstools::merge_gtfs()}.
 When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based
 on the stops network of the final aggregated version.
 
