@@ -18,8 +18,6 @@ gtfs_list <- lapply(c("lisboa", "AML"), function(ID) {
   feed = GTFShift::load_feed(data$URL[data$ID == ID])
   feed = tidytransit::filter_feed_by_area(feed, bbox)
   feed = tidytransit::filter_feed_by_date(feed, date)
-  # If some GTFS does not have calendar.txt, but another yes, so we must create it to enable unification
-  if (! ("calendar" %in% names(feed))) feed$calendar = GTFShift::create_calendar(feed)
   summary(feed)
   return(feed)
 })

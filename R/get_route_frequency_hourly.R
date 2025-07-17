@@ -1,6 +1,6 @@
 #' Get aggregated frequency per hour for each bus route
 #'
-#' For each route, returns the number of departures aggregated per hour.
+#' For each route, returns the number of departures aggregated per hour and direction.
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
@@ -8,7 +8,7 @@
 #' @param overline Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.
 #'
 #' @details
-#' This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour.
+#' This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour and direction.
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
 #' Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
@@ -17,7 +17,7 @@
 #' \itemize{
 #'  \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
 #'  \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
-#'  \item \code{direction_id}, the \code{direction_id} attribute from \code{trips.txt} file.
+#'  \item \code{direction_id}, the \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).
 #'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
 #'  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
 #'  \item \code{geometry}, the route shape.
@@ -66,18 +66,18 @@ get_route_frequency_hourly = function(
   stop_times = stop_times |>
     left_join(trips) |>
     left_join(routes) |>
-    select(
-      route_id,
-      route_short_name,
-      trip_id,
-      stop_id,
-      service_id,
-      arrival_time,
-      departure_time,
-      direction_id,
-      shape_id,
-      stop_sequence
-    )
+    select(any_of(c(
+      "route_id",
+      "route_short_name",
+      "trip_id",
+      "stop_id",
+      "service_id",
+      "arrival_time",
+      "departure_time",
+      "direction_id",
+      "shape_id",
+      "stop_sequence"
+    )))
 
   stop_times = stop_times |> # Only departures from origin (first stop)
     filter(stop_sequence == 1)
@@ -88,15 +88,15 @@ get_route_frequency_hourly = function(
     )
 
   freq_data = stop_times |>
-    group_by(route_id, route_short_name, direction_id, hour) |>
+    group_by(across(any_of(c("route_id", "route_short_name", "direction_id", "hour")))) |>
     summarize(frequency = n()) |>
     ungroup()
 
   routes_freq =
     freq_data |>
     left_join(trips |>
-                select(route_id, direction_id, shape_id) |>
-                distinct()) |>
+                select(any_of(c("route_id", "direction_id", "shape_id"))) |>
+                distinct(), relationship="many-to-many") |>
     as.data.frame() |>
     inner_join(shapes) |>
     st_as_sf()
