@@ -2,7 +2,7 @@
 #'
 #' @param ... tidygtfs[]. List of GTFS feeds.
 #' @param store_path String (Optional). If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.
-#' @param create_transfers Boolean (Default TRUE). When true, generates transfers.txt, aggregating close stops, even if from different GTFS.
+#' @param create_transfers Boolean (Default FALSE). When true, generates transfers table, aggregating close stops, even if from different GTFS.
 #' @param transfer_distance Integer (Default 300). Upper straight-line distance limit in meters for transfers.
 #' @param transfer_time Integer (Default 120). Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
 #' @param transfer_street_routing Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
@@ -34,7 +34,7 @@
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-unify <- function(..., store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+unify <- function(..., store_path=NA, create_transfers=FALSE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
 
   gtfss = list(...)
 
