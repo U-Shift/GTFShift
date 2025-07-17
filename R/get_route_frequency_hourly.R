@@ -1,6 +1,6 @@
 #' Get aggregated frequency per hour for each bus route
 #'
-#' For each route, returns the number of departures aggregated per hour.
+#' For each route, returns the number of departures aggregated per hour and direction.
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
@@ -8,7 +8,7 @@
 #' @param overline Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.
 #'
 #' @details
-#' This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour.
+#' This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour and direction.
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
 #' Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
