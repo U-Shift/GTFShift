@@ -35,7 +35,7 @@ A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following colum
  \item \code{geometry}, the geometrical data for the OSM route relation.
 }
 
-\textbf{Attention!} For each GTFS route, provided there is at least one OSM route, all the GTFS shapes for that route will necessarily be associated with
+Attention! For each GTFS route, provided there is at least one OSM route, all the GTFS shapes for that route will necessarily be associated with
 an OSM one. This might generate wrong results if the number/topology of routes on OSM does not match the GTFS shapes for that route.
 Refer to  \code{distance_diff} and \code{points_diff} on the results table to validate the results and identify misassociations.
 }

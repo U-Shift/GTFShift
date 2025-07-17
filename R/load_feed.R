@@ -30,7 +30,7 @@
 #' }
 #'
 #' @import tidytransit
-#' @importFrom GTFSWizard as_wizardgtfs
+#' @importFrom GTFSwizard as_wizardgtfs
 #'
 #' @export
 load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
