@@ -70,7 +70,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   # 1. Get geometry for shapes and stops
   pb <- progress::progress_bar$new( # Track progress
     format = "1/3: Preparing GTFS data [:bar] :percent :spin elapsed=:elapsed",
-    total = length(routes_names), clear = FALSE, show_after=0
+    clear = FALSE, show_after=0
   )
   pb$update(0)
   shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes)
@@ -81,7 +81,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   # 2. Get OSM routes and stops
   pb <- progress::progress_bar$new( # Track progress
     format = "2/3: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
-    total = length(routes_names), clear = FALSE, show_after=0
+    clear = FALSE, show_after=0
   )
   pb$update(0)
 
@@ -151,7 +151,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
 
   pb <- progress::progress_bar$new( # Track progress
     format = "3/3: Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed",
-    total = length(routes_names), clear = FALSE, show_after=0
+    clear = FALSE, show_after=0
   )
 
   warning_routes_missing = list() # Warning records
