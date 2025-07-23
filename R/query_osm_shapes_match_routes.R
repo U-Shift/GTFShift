@@ -148,18 +148,45 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
 
   warning_routes_missing = list() # Warning records
   warning_osm_repeated = list()
+  warning_osm_unsorted_stops = list()
 
   result <- lapply(routes_names, function(route_name) {
-    # message(sprintf("Running for route %s...", route_name))
-    pb$tick()
+    pb$tick() # update progress
 
     # 1. Get base data
-    # > Filter osm network
+    # > Filter OSM network
     osm_route_name = osm_multilines_redux |>
       filter(.data[[osm_match]] == route_name)
 
-    if (nrow(osm_route_name) == 0) {
+    # >> Validate OSM data
+    if (nrow(osm_route_name) == 0) { # Validate that there is an OSM match for GTFS route
       warning_routes_missing = append(warning_routes_missing, route_name)
+      return(data.frame(
+        route_name=route_name
+      ))  # Return NULL for failed elements
+    }
+    osm_route_error = FALSE
+    for(i in 1:nrow(osm_route_name)) { # Validate that if OSM route has entry/exit stops, they respect the right order
+      route = osm_route_name[i,]
+      relation_df = relations_df |> filter(type == "node" & relation_osm_id == route$osm_id)
+      entry_rows <- grep("entry", relation_df$role, ignore.case = TRUE)
+      exit_rows <- grep("exit", relation_df$role, ignore.case = TRUE)
+      if (length(entry_rows)>0) { # If entry row exists, validate that is first
+        first_entry_row <- head(entry_rows, 1)
+        if (first_entry_row != 1) {
+          warning_osm_unsorted_stops = append(warning_osm_unsorted_stops, sprintf("`osm_id` %s (`%s` %s)", route$osm_id, gtfs_match, route_name))
+          osm_route_error = TRUE
+        }
+      }
+      if (length(exit_rows)>0) { # If exit row exists, validate that is last
+        last_exit_row <- tail(exit_rows, 1)
+        if (last_exit_row != nrow(relation_df)) {
+          warning_osm_unsorted_stops = append(warning_osm_unsorted_stops, sprintf("`osm_id` %s (`%s` %s)", route$osm_id, gtfs_match, route_name))
+          osm_route_error = TRUE
+        }
+      }
+    }
+    if (osm_route_error) {
       return(data.frame(
         route_name=route_name
       ))  # Return NULL for failed elements
@@ -329,7 +356,8 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
 
 
   not_found = bind_rows( result[lengths(result)<=1] )
-  errors = length(warning_routes_missing) + length(warning_osm_repeated)
+  warning_osm_unsorted_stops = unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
+  errors = length(warning_routes_missing) + length(warning_osm_repeated) + length(warning_osm_unsorted_stops)
   if (errors>0 || nrow(not_found)) {
     warning(sprintf(
       "There were %d error(s) during the algorithm execution, which led to %d route(s) without a match (route(s) ignored), with the following `%s`:\n\n> %s",
@@ -349,6 +377,12 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     warning(sprintf("%d error(s) were GTFS routes that had multiple shapes associated to the same osm route (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s", length(warning_osm_repeated), paste(
       warning_osm_repeated,
       collapse="\n>\n "
+    )))
+  }
+  if (length(warning_osm_unsorted_stops)>0) {
+    warning(sprintf("%d error(s) were OSM routes that had entry/exit stops not respecting the right order (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s", length(warning_osm_unsorted_stops), paste(
+      warning_osm_unsorted_stops,
+      collapse="\n> "
     )))
   }
 
