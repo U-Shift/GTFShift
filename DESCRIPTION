@@ -28,7 +28,8 @@ Imports:
   osmdata,
   stplanr,
   stringr,
-  reticulate
+  reticulate,
+  progress
 URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
 RoxygenNote: 7.3.2
 Suggests: 
