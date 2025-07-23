@@ -26,6 +26,7 @@ osm_shapes_match_routes(
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
 \itemize{
+ \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
  \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
  \item \code{distance_diff}, the difference, in meters, between GTFS shape and OSM route lengths.

@@ -26,6 +26,7 @@
 #'
 #' @returns A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
 #' \itemize{
+#'  \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
 #'  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
 #'  \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
 #'  \item \code{distance_diff}, the difference, in meters, between GTFS shape and OSM route lengths.
@@ -393,7 +394,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     )))
   }
 
-  result_success = result_success |> select(shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name)
+  result_success = result_success |> select(route_id, shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name)
 
   if (!geometry) {
     return (result_success |> st_drop_geometry())
