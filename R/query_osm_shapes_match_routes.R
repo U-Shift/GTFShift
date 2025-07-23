@@ -144,7 +144,6 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   relations_df = job$get_result()
 
   pb$update(1)
-  pb$terminate()
   message(sprintf("> Found %d OSM route relations and %d bus stops/platforms", nrow(osm_multilines_redux), nrow(osm_stoppositions)))
 
   # 4. For each gtfs route, match shapes with OSM routes
