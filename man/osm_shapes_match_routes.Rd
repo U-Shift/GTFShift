@@ -24,7 +24,17 @@ osm_shapes_match_routes(
 \item{osm_match}{String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.}
 }
 \value{
-
+A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
+\itemize{
+ \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
+ \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
+ \item \code{distance_diff}, the difference, in meters, between GTFS shape and OSM route lengths.
+ \item \code{points_diff}, the sum of the difference, in meters, between GTFS shape and OSM route start and end points.
+ \item \code{stops_diff}, the difference between GTFS and OSM routes number of stops.
+ \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
+ \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
+ \item \code{geometry}, the geometrical data for the OSM route relation.
+}
 }
 \description{
 Get OSM routes that match shapes, based on geometrical match
@@ -34,6 +44,18 @@ For each route, matches its trips' shapes with OSM route relations.
 
 The match is performed considering, for each shape, the closest OSM route, based on
 the start and end points, total length and number of stops.
+
+Be aware that the result might ignore some GTFS routes, in the following cases:
+\itemize{
+ \item If there is no OSM route relation that matches the GTFS route identifier;
+ \item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order;
+ \item If, for the same route, distinct shapes are associated to the same OSM route.
+}
+If any of these errors occurs, warnings will be thrown at end of the method execution, and those GTFS route will be ignored in the results.
+
+Nevertheless, provided there are enough OSM routes, all the GTFS shapes for each route will necessarily be associated with
+an OSM one. This might generate wrong results if the topology of routes on OSM does not match the GTFS shapes for that route.
+Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the results table to validate the results and identify misassociations.
 }
 \examples{
 \dontrun{
