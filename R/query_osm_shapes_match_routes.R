@@ -46,6 +46,7 @@
 #' @import stplanr
 #' @import xml2
 #' @import progress
+#' @import callr
 #'
 #' @export
 osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_short_name", osm_match="ref") {
@@ -58,31 +59,34 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     stop("osm_match should be one of: ref, name")
   }
 
-  message("Preparing GTFS data... ", appendLF=FALSE)
-
   # 1. Get geometry for shapes and stops
-  shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes)
-  stops_sf = tidytransit::stops_as_sf(gtfs$stops)
-  message(sprintf("Found %d GTFS shapes and %d stops.", nrow(shapes_sf), nrow(stops_sf)))
-
-  # 2. Get OSM routes and stops
-  # message("Fetching OSM data... ", appendLF=FALSE)
-  pb_osm <- progress::progress_bar$new( # Track progress
-    format = "Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
+  pb <- progress::progress_bar$new( # Track progress
+    format = "1/3: Preparing GTFS data [:bar] :percent :spin elapsed=:elapsed",
     total = length(routes_names), clear = FALSE, show_after=0
   )
-  pb_osm$update(0)
+  pb$update(0)
+  shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes)
+  stops_sf = tidytransit::stops_as_sf(gtfs$stops)
+  pb$update(1)
+  message(sprintf("> Found %d GTFS shapes and %d stops", nrow(shapes_sf), nrow(stops_sf)))
+
+  # 2. Get OSM routes and stops
+  pb <- progress::progress_bar$new( # Track progress
+    format = "2/3: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
+    total = length(routes_names), clear = FALSE, show_after=0
+  )
+  pb$update(0)
 
   job <- callr::r_bg(function(q) { # update spinner while blocking method call
     return(q |> osmdata::osmdata_sf())
   }, args=list(q))
-  while (job$is_alive()) { pb_osm$update(0); Sys.sleep(0.1) }
+  while (job$is_alive()) { pb$update(0); Sys.sleep(0.1) }
   osm = job$get_result()
 
   osm_multilines = osm$osm_multilines
   osm_multilines_redux = osm_multilines |>
     select(any_of(c("osm_id", "ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id")))
-  pb_osm$update(0.25)
+  pb$update(0.25)
 
   st_agr(osm$osm_points) = "constant" # https://github.com/r-spatial/sf/issues/406
   job <- callr::r_bg(function(osm, osm_multilines_redux) { # update spinner while blocking method call
@@ -93,9 +97,9 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
          dplyr::select_if(~!all(is.na(.)))
     )
   }, args=list(osm, osm_multilines_redux))
-  while (job$is_alive()) { pb_osm$update(0.25); Sys.sleep(0.1) }
+  while (job$is_alive()) { pb$update(0.25); Sys.sleep(0.1) }
   osm_stoppositions = job$get_result()
-  pb_osm$update(0.5)
+  pb$update(0.5)
 
   # 3. Get OSM relations (to associate routes and stops)
   osm_file <- tempfile(fileext = ".osm")
@@ -103,14 +107,14 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
     osmdata::osmdata_xml(q, filename = osm_file)
   }, args=list(q, osm_file))
-  while (job$is_alive()) { pb_osm$update(0.5); Sys.sleep(0.1) }
+  while (job$is_alive()) { pb$update(0.5); Sys.sleep(0.1) }
 
-  doc <- read_xml(osm_file)
-  relations <- xml_find_all(doc, ".//relation")
-
-  job <- callr::r_bg(function(relations) { # update spinner while blocking method call
+  job <- callr::r_bg(function(osm_file) { # update spinner while blocking method call
     library(xml2)
     library(dplyr)
+
+    doc <- read_xml(osm_file)
+    relations <- xml_find_all(doc, ".//relation")
     relations_df <- lapply(relations, function(relation) { # blocking
       relation_id <- xml_attr(relation, "id")
       members <- xml_find_all(relation, "member")
@@ -127,22 +131,24 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
       return(df)
     })
     return(bind_rows(relations_df))
-  }, args=list(relations))
-  while (job$is_alive()) { pb_osm$update(0); Sys.sleep(0.1) }
+  }, args=list(osm_file))
+  while (job$is_alive()) { pb$update(0.75); Sys.sleep(0.1) }
   relations_df = job$get_result()
 
-  pb_osm$update(1)
-  message(sprintf("Found %d OSM route relations and %d bus stops/platforms.", nrow(osm_multilines_redux), nrow(osm_stoppositions)))
+  pb$update(1)
+  message(sprintf("> Found %d OSM route relations and %d bus stops/platforms", nrow(osm_multilines_redux), nrow(osm_stoppositions)))
 
   # 4. For each gtfs route, match shapes with OSM routes
   routes_names = unique( gtfs$routes |> pull( !!gtfs_match ) ) # !! to use variable value and not its literal name
-  counter_no_osm = 0
-  counter_osm_duplicate_match = 0
 
   pb <- progress::progress_bar$new( # Track progress
-    format = "Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed",
+    format = "3/3: Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed",
     total = length(routes_names), clear = FALSE, show_after=0
   )
+
+  warning_routes_missing = list() # Warning records
+  warning_osm_repeated = list()
+
   result <- lapply(routes_names, function(route_name) {
     # message(sprintf("Running for route %s...", route_name))
     pb$tick()
@@ -153,8 +159,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
       filter(.data[[osm_match]] == route_name)
 
     if (nrow(osm_route_name) == 0) {
-      counter_no_osm = counter_no_osm + 1
-      warning("No OSM routes found for GTFS ", gtfs_match, " ", route_name)
+      warning_routes_missing = append(warning_routes_missing, route_name)
       return(data.frame(
         route_name=route_name
       ))  # Return NULL for failed elements
@@ -294,12 +299,10 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
       st_as_sf(sf_column_name="geometry")
 
     if (length(unique(gtfs_route_name_result$osm_id)) < nrow(gtfs_route_name_result)) {
-      counter_osm_duplicate_match = counter_osm_duplicate_match + 1
-      warning(sprintf(
-        "GTFS route %s has %d shapes, but they were matched with only %d (out of %d) OSM routes. Ignoring route...\nThis might indicate a mismatch between GTFS and OSM data!\nosm_id for route: %s (the ignored ones were %s) (the duplicated ones were %s)",
-        route_name, nrow(gtfs_route_name),
-        length(unique(gtfs_route_name_result$osm_id)),
-        nrow(osm_route_name),
+       warning_osm_repeated = append(warning_osm_repeated, sprintf(
+        "`%s` %s has %d shapes, but the geometrical match returned only %d (out of %d) OSM routes\n>> `osm_id` for route: %s\n>> The ignored ones were: %s\n>> The duplicated ones were: %s",
+        gtfs_match, route_name, nrow(gtfs_route_name),
+        length(unique(gtfs_route_name_result$osm_id)), nrow(osm_route_name),
         paste(osm_route_name$osm_id, collapse=", "),
         paste(setdiff(
           union(gtfs_route_name_result$osm_id, osm_route_name$osm_id),
@@ -317,28 +320,36 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   result_success = bind_rows( result[lengths(result)>1] )
 
   message(sprintf(
-    "DONE! Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops.",
+    "> Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops",
     nrow(result_success),
     mean(result_success$points_diff),
     mean(result_success$distance_diff),
     mean(result_success$stops_diff)
   ))
-  if (counter_osm_duplicate_match>0) {
-    warning(sprintf(
-      "%d GTFS routes had shapes matched with duplicate OSM routes. Check the logs for more details.",
-      counter_osm_duplicate_match
-    ))
-  }
-  if (counter_no_osm>0) {
-    warning(sprintf(
-      "%d GTFS routes had no OSM routes found. Check the logs for more details.",
-      counter_no_osm
-    ))
-  }
+
 
   not_found = bind_rows( result[lengths(result)<=1] )
-  if (nrow(not_found)>0) {
-    warning(sprintf("%d missing matches for %s: %s", nrow(not_found), gtfs_match, paste(not_found$route_name, collapse=", ")))
+  errors = length(warning_routes_missing) + length(warning_osm_repeated)
+  if (errors>0 || nrow(not_found)) {
+    warning(sprintf(
+      "There were %d error(s) during the algorithm execution, which led to %d route(s) without a match (route(s) ignored), with the following `%s`:\n\n> %s",
+      errors,
+      nrow(not_found),
+      gtfs_match,
+      paste(not_found$route_name, collapse="\n> ")
+    ))
+  }
+  if (length(warning_routes_missing)>0) {
+    warning(sprintf("%d error(s) were GTFS routes `%s` that did not match any OSM route `%s`:\n\n> %s", length(warning_routes_missing), gtfs_match, osm_match, paste(
+      warning_routes_missing,
+      collapse="\n> "
+    )))
+  }
+  if (length(warning_osm_repeated)>0) {
+    warning(sprintf("%d error(s) were GTFS routes that had multiple shapes associated to the same osm route (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s", length(warning_osm_repeated), paste(
+      warning_osm_repeated,
+      collapse="\n>\n "
+    )))
   }
 
   result_success = result_success |> select(shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name)
