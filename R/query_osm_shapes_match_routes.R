@@ -5,6 +5,7 @@
 #' @param geometry Boolean (Default TRUE). If TRUE, returns sf object with geometry, otherwise, a simple data.frame.
 #' @param gtfs_match String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
 #' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
+#' @param log_file String (Optional). If provided, will log warnings to this file, in adition to the console.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
@@ -57,7 +58,11 @@
 #' @import callr
 #'
 #' @export
-osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_short_name", osm_match="ref") {
+osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", log_file = NA) {
+
+  if (!is.na(log_file)) cat(
+    sprintf("-----------------------------\n%s: Running osm_shapes_match_routes() for %s...\n\n", Sys.time(), paste(gtfs$agency$agency_name, collapse=", "))
+  , file = log_file, append = TRUE)
 
   # 0. Validations
   if (!(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
@@ -77,7 +82,10 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   stops_sf <- tidytransit::stops_as_sf(gtfs$stops)
   pb$update(1)
   pb$terminate()
-  message(sprintf("> Found %d GTFS shapes and %d stops\n", nrow(shapes_sf), nrow(stops_sf)))
+
+  m = sprintf("> Found %d GTFS shapes and %d stops\n", nrow(shapes_sf), nrow(stops_sf))
+  message(m)
+  if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
   # 2. Get OSM routes and stops
   pb <- progress::progress_bar$new( # Track progress
@@ -146,7 +154,9 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
 
   pb$update(1)
   pb$terminate()
-  message(sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", nrow(osm_multilines_redux), nrow(osm_stoppositions)))
+  m = sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", nrow(osm_multilines_redux), nrow(osm_stoppositions))
+  message(m)
+  if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
   # 4. For each gtfs route, match shapes with OSM routes
   routes_names <- unique( gtfs$routes |> pull( !!gtfs_match ) ) # !! to use variable value and not its literal name
@@ -358,38 +368,46 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   pb$update(1)
   pb$terminate()
 
-  message(sprintf(
-    "> Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops",
+  m = sprintf(
+    "> Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops\n",
     nrow(result_success),
     mean(result_success$points_diff),
     mean(result_success$distance_diff),
     mean(result_success$stops_diff)
-  ))
+  )
+  message(m)
+  if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
 
   not_found <- bind_rows( result[lengths(result)<=1] )
   warning_osm_unsorted_stops <- unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
   errors <- length(warning_routes_missing) + length(warning_osm_repeated) + length(warning_osm_unsorted_stops)
   if (errors>0 || nrow(not_found)) {
-    warning(sprintf(
-      "There were %d error(s) during the algorithm execution, which led to %d route(s) without a match (route(s) ignored), with the following `%s`:\n\n> %s",
+    w = sprintf(
+      "There were %d error(s) during the algorithm execution, which led to %d route(s) without a match (route(s) ignored), with the following `%s`:\n\n> %s\n",
       errors,
       nrow(not_found),
       gtfs_match,
       paste(not_found$route_name, collapse="\n> ")
-    ))
+    )
+    warning(w)
+    if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
   if (length(warning_routes_missing)>0) {
-    warning(sprintf("%d error(s) were GTFS routes `%s` that did not match any OSM route `%s`:\n\n> %s", length(warning_routes_missing), gtfs_match, osm_match, paste(
+    w = sprintf("%d error(s) were GTFS routes `%s` that did not match any OSM route `%s`:\n\n> %s\n", length(warning_routes_missing), gtfs_match, osm_match, paste(
       warning_routes_missing,
       collapse="\n> "
-    )))
+    ))
+    warning(w)
+    if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
   if (length(warning_osm_repeated)>0) {
-    warning(sprintf("%d error(s) were GTFS routes that had multiple shapes associated to the same osm route (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s", length(warning_osm_repeated), paste(
+    w = sprintf("%d error(s) were GTFS routes that had multiple shapes associated to the same osm route (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s\n", length(warning_osm_repeated), paste(
       warning_osm_repeated,
       collapse="\n>\n "
-    )))
+    ))
+    warning(w)
+    if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
   if (length(warning_osm_unsorted_stops)>0) {
     warning(sprintf("%d error(s) were OSM routes that had entry/exit stops not respecting the right order (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s", length(warning_osm_unsorted_stops), paste(
