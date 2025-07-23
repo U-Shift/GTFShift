@@ -170,7 +170,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
 
     # >> Validate OSM data
     if (nrow(osm_route_name) == 0) { # Validate that there is an OSM match for GTFS route
-      warning_routes_missing <- append(warning_routes_missing, route_name)
+      warning_routes_missing <<- append(warning_routes_missing, route_name)
       return(data.frame(
         route_name=route_name
       ))  # Return NULL for failed elements
@@ -184,14 +184,14 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
       if (length(entry_rows)>0) { # If entry row exists, validate that is first
         first_entry_row <- head(entry_rows, 1)
         if (first_entry_row != 1) {
-          warning_osm_unsorted_stops <- append(warning_osm_unsorted_stops, sprintf("`osm_id` %s (`%s` %s)", route$osm_id, gtfs_match, route_name))
+          warning_osm_unsorted_stops <<- append(warning_osm_unsorted_stops, sprintf("`osm_id` %s (`%s` %s)", route$osm_id, gtfs_match, route_name))
           osm_route_error <- TRUE
         }
       }
       if (length(exit_rows)>0) { # If exit row exists, validate that is last
         last_exit_row <- tail(exit_rows, 1)
         if (last_exit_row != nrow(relation_df)) {
-          warning_osm_unsorted_stops <- append(warning_osm_unsorted_stops, sprintf("`osm_id` %s (`%s` %s)", route$osm_id, gtfs_match, route_name))
+          warning_osm_unsorted_stops <<- append(warning_osm_unsorted_stops, sprintf("`osm_id` %s (`%s` %s)", route$osm_id, gtfs_match, route_name))
           osm_route_error <- TRUE
         }
       }
@@ -336,7 +336,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
       st_as_sf(sf_column_name="geometry")
 
     if (length(unique(gtfs_route_name_result$osm_id)) < nrow(gtfs_route_name_result)) {
-       warning_osm_repeated <- append(warning_osm_repeated, sprintf(
+       warning_osm_repeated <<- append(warning_osm_repeated, sprintf(
         "`%s` %s has %d shapes, but the geometrical match returned only %d (out of %d) OSM routes\n>> `osm_id` for route: %s\n>> The ignored ones were: %s\n>> The duplicated ones were: %s",
         gtfs_match, route_name, nrow(gtfs_route_name),
         length(unique(gtfs_route_name_result$osm_id)), nrow(osm_route_name),
