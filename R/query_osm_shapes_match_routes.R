@@ -88,7 +88,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   job <- callr::r_bg(function(q) { # update spinner while blocking method call
     return(q |> osmdata::osmdata_sf())
   }, args=list(q))
-  while (job$is_alive()) { pb$update(0); Sys.sleep(0.1) }
+  while (job$is_alive()) { pb$tick(0); Sys.sleep(0.1) }
   osm = job$get_result()
 
   osm_multilines = osm$osm_multilines
@@ -105,7 +105,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
          dplyr::select_if(~!all(is.na(.)))
     )
   }, args=list(osm, osm_multilines_redux))
-  while (job$is_alive()) { pb$update(0.25); Sys.sleep(0.1) }
+  while (job$is_alive()) { pb$tick(0); Sys.sleep(0.1) }
   osm_stoppositions = job$get_result()
   pb$update(0.5)
 
@@ -115,7 +115,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
     osmdata::osmdata_xml(q, filename = osm_file)
   }, args=list(q, osm_file))
-  while (job$is_alive()) { pb$update(0.5); Sys.sleep(0.1) }
+  while (job$is_alive()) { pb$tick(0); Sys.sleep(0.1) }
 
   job <- callr::r_bg(function(osm_file) { # update spinner while blocking method call
     library(xml2)
@@ -140,10 +140,11 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     })
     return(bind_rows(relations_df))
   }, args=list(osm_file))
-  while (job$is_alive()) { pb$update(0.75); Sys.sleep(0.1) }
+  while (job$is_alive()) { pb$tick(0); Sys.sleep(0.1) }
   relations_df = job$get_result()
 
   pb$update(1)
+  pb$terminate()
   message(sprintf("> Found %d OSM route relations and %d bus stops/platforms", nrow(osm_multilines_redux), nrow(osm_stoppositions)))
 
   # 4. For each gtfs route, match shapes with OSM routes
@@ -151,7 +152,8 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
 
   pb <- progress::progress_bar$new( # Track progress
     format = "3/3: Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed",
-    clear = FALSE, show_after=0
+    clear = FALSE, show_after=0,
+    total=length(routes_names)
   )
 
   warning_routes_missing = list() # Warning records
