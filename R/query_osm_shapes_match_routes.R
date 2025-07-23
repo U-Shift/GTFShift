@@ -169,6 +169,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   warning_routes_missing <- list() # Warning records
   warning_osm_repeated <- list()
   warning_osm_unsorted_stops <- list()
+  warning_osm_stops_missing <- list()
 
   result <- lapply(routes_names, function(route_name) {
     pb$update(min(head(match(route_name, routes_names), 1)/length(routes_names), 0.99)) # update progress
@@ -274,7 +275,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
         select(osm_id, name, route_dist, nr_stops, first_stop_osm_id, last_stop_osm_id, initial, final, geometry) |>
         arrange(route_dist)
     }, error = function(e) {
-      warning("Error determining start/end points for OSM route (", gtfs_match, " ", route_name, "):",e)
+      warning_osm_stops_missing <<- append(warning_osm_stops_missing, sprintf("`osm_id` %s (`%s` %s)", route$osm_id, gtfs_match, route_name))
       return(NULL)
     })
     if (is.null(osm_route_name)) {
@@ -381,7 +382,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
   not_found <- bind_rows( result[lengths(result)<=1] )
   warning_osm_unsorted_stops <- unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
-  errors <- length(warning_routes_missing) + length(warning_osm_repeated) + length(warning_osm_unsorted_stops)
+  errors <- length(warning_routes_missing) + length(warning_osm_repeated) + length(warning_osm_unsorted_stops) + length(warning_osm_stops_missing)
   if (errors>0 || nrow(not_found)) {
     w = sprintf(
       "There were %d error(s) during the algorithm execution, which led to %d route(s) without a match (route(s) ignored), with the following `%s`:\n\n> %s\n",
@@ -412,6 +413,12 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   if (length(warning_osm_unsorted_stops)>0) {
     warning(sprintf("%d error(s) were OSM routes that had entry/exit stops not respecting the right order (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s", length(warning_osm_unsorted_stops), paste(
       warning_osm_unsorted_stops,
+      collapse="\n> "
+    )))
+  }
+  if (length(warning_osm_stops_missing)>0) {
+    warning(sprintf("%d error(s) were OSM routes that had missing start/end points (routes ignored):\n(This might indicate OSM data integrity problems)\n\n> %s", length(warning_osm_stops_missing), paste(
+      warning_osm_stops_missing,
       collapse="\n> "
     )))
   }
