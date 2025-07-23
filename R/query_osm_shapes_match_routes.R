@@ -12,6 +12,18 @@
 #' The match is performed considering, for each shape, the closest OSM route, based on
 #' the start and end points, total length and number of stops.
 #'
+#' Be aware that the result might ignore some GTFS routes, in the following cases:
+#' \itemize{
+#'  \item If there is no OSM route relation that matches the GTFS route identifier;
+#'  \item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order;
+#'  \item If, for the same route, distinct shapes are associated to the same OSM route.
+#' }
+#' If any of these errors occurs, warnings will be thrown at end of the method execution, and those GTFS route will be ignored in the results.
+#'
+#' Nevertheless, provided there are enough OSM routes, all the GTFS shapes for each route will necessarily be associated with
+#' an OSM one. This might generate wrong results if the topology of routes on OSM does not match the GTFS shapes for that route.
+#' Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the results table to validate the results and identify misassociations.
+#'
 #' @returns A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
 #' \itemize{
 #'  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
@@ -23,11 +35,6 @@
 #'  \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
 #' }
-#'
-#' Attention! For each GTFS route, provided there is at least one OSM route, all the GTFS shapes for that route will necessarily be associated with
-#' an OSM one. This might generate wrong results if the number/topology of routes on OSM does not match the GTFS shapes for that route.
-#' Refer to  \code{distance_diff}, \code{points_diff} and \{stops_diff} on the results table to validate the results and identify misassociations.
-#'
 #'
 #' @examples
 #' \dontrun{
