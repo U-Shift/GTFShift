@@ -71,19 +71,22 @@ print(resp.text)
 api = osmapi.OsmApi(api=api_url, session=oauth_session)
 
 # Load your CSV file
-df = pd.read_csv("osm_match.csv") # CSV with columns oms_id and shape_id
+df = pd.read_csv("osm_match.csv") # CSV with columns oms_id, shape_id and osm_id (optional)
 df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 
 # Create change set, updating relations with tag gtfs:shape_id
 # The changeset comment can be customized to better describe the change submitted 
 with api.Changeset({"comment": "GTFS shapes association", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
   for idx, row in df.iterrows():
+    route_id = row["route_id"] if "route_id" in row else None
     shape_id = row["shape_id"]
     osm_id = int(row["osm_id"])
     relation = api.RelationGet(osm_id)
     print(f"\tosm_id {osm_id} shape_id {shape_id} (previous {relation['tag']['gtfs:shape_id'] if 'gtfs:shape_id' in relation['tag'] else '-'})", end="\t")
-    if "gtfs:shape_id" not in relation["tag"] or relation["tag"]["gtfs:shape_id"] != shape_id:
-      relation["tag"]["gtfs:shape_id"] = shape_id
+    if "gtfs:shape_id" not in relation["tag"] or relation["tag"]["gtfs:shape_id"] != shape_id or route_id and ("gtfs:route_id" not in relation["tag"] or relation["tag"]["gtfs:route_id"] != route_id):
+      relation["tag"]["gtfs:shape_id"] = shape_id # https://wiki.openstreetmap.org/wiki/Key:gtfs:shape_id
+      if route_id:
+        relation["tag"]["gtfs:route_id"] = route_id # https://wiki.openstreetmap.org/wiki/Key:gtfs:route_id
       update = api.RelationUpdate(relation)
       print("Updated!")
     else:
