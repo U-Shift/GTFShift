@@ -76,7 +76,8 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   shapes_sf <- tidytransit::shapes_as_sf(gtfs$shapes)
   stops_sf <- tidytransit::stops_as_sf(gtfs$stops)
   pb$update(1)
-  message(sprintf("> Found %d GTFS shapes and %d stops", nrow(shapes_sf), nrow(stops_sf)))
+  pb$terminate()
+  message(sprintf("> Found %d GTFS shapes and %d stops\n", nrow(shapes_sf), nrow(stops_sf)))
 
   # 2. Get OSM routes and stops
   pb <- progress::progress_bar$new( # Track progress
@@ -144,7 +145,8 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   relations_df <- job$get_result()
 
   pb$update(1)
-  message(sprintf("> Found %d OSM route relations and %d bus stops/platforms", nrow(osm_multilines_redux), nrow(osm_stoppositions)))
+  pb$terminate()
+  message(sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", nrow(osm_multilines_redux), nrow(osm_stoppositions)))
 
   # 4. For each gtfs route, match shapes with OSM routes
   routes_names <- unique( gtfs$routes |> pull( !!gtfs_match ) ) # !! to use variable value and not its literal name
@@ -159,7 +161,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   warning_osm_unsorted_stops <- list()
 
   result <- lapply(routes_names, function(route_name) {
-    pb$update(head(match(route_name, routes_names), 1)/length(routes_names)) # update progress
+    pb$update(min(head(match(route_name, routes_names), 1)/length(routes_names), 0.99)) # update progress
 
     # 1. Get base data
     # > Filter OSM network
@@ -354,6 +356,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   })
   result_success <- bind_rows( result[lengths(result)>1] )
   pb$update(1)
+  pb$terminate()
 
   message(sprintf(
     "> Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops",
