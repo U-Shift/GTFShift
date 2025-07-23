@@ -411,16 +411,20 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
   if (length(warning_osm_unsorted_stops)>0) {
-    warning(sprintf("%d error(s) were OSM routes that had entry/exit stops not respecting the right order (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s", length(warning_osm_unsorted_stops), paste(
+    w = sprintf("%d error(s) were OSM routes that had entry/exit stops not respecting the right order (routes ignored):\n(This might indicate a mismatch between GTFS and OSM data)\n\n> %s", length(warning_osm_unsorted_stops), paste(
       warning_osm_unsorted_stops,
       collapse="\n> "
-    )))
+    ))
+    warning(w)
+    if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
   if (length(warning_osm_stops_missing)>0) {
-    warning(sprintf("%d error(s) were OSM routes that had missing start/end points (routes ignored):\n(This might indicate OSM data integrity problems)\n\n> %s", length(warning_osm_stops_missing), paste(
+    w = sprintf("%d error(s) were OSM routes that had missing start/end points (routes ignored):\n(This might indicate OSM data integrity problems)\n\n> %s", length(warning_osm_stops_missing), paste(
       warning_osm_stops_missing,
       collapse="\n> "
-    )))
+    ))
+    warning(w)
+    if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
 
   result_success <- result_success |> select(route_id, shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name)
