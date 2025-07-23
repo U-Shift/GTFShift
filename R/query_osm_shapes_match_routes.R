@@ -151,8 +151,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
 
   pb <- progress::progress_bar$new( # Track progress
     format = "3/3: Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed",
-    clear = FALSE, show_after=0,
-    total=length(routes_names)
+    clear = FALSE, show_after=0
   )
 
   warning_routes_missing = list() # Warning records
@@ -160,7 +159,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
   warning_osm_unsorted_stops = list()
 
   result <- lapply(routes_names, function(route_name) {
-    pb$tick() # update progress
+    pb$update(head(match(route_name, routes_names), 1)/length(routes_names)) # update progress
 
     # 1. Get base data
     # > Filter OSM network
@@ -354,6 +353,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry=TRUE, gtfs_match="route_sh
     return(gtfs_route_name_result)
   })
   result_success = bind_rows( result[lengths(result)>1] )
+  pb$update(1)
 
   message(sprintf(
     "> Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops",
