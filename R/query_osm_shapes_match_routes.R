@@ -275,7 +275,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
         select(osm_id, name, route_dist, nr_stops, first_stop_osm_id, last_stop_osm_id, initial, final, geometry) |>
         arrange(route_dist)
     }, error = function(e) {
-      warning_osm_stops_missing <<- append(warning_osm_stops_missing, sprintf("`oms_id` %s (`%s` %s)", paste(osm_route_name$osm_id, collapse=", "), gtfs_match, route_name))
+      warning_osm_stops_missing <<- append(warning_osm_stops_missing, sprintf("`osm_id` %s (`%s` %s)", paste(osm_route_name$osm_id, collapse=", "), gtfs_match, route_name))
       return(NULL)
     })
     if (is.null(osm_route_name)) {
