@@ -9,7 +9,8 @@ osm_shapes_match_routes(
   q,
   geometry = TRUE,
   gtfs_match = "route_short_name",
-  osm_match = "ref"
+  osm_match = "ref",
+  log_file = NA
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ osm_shapes_match_routes(
 \item{gtfs_match}{String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
 
 \item{osm_match}{String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.}
+
+\item{log_file}{String (Optional). If provided, will log warnings to this file, in adition to the console.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
@@ -62,11 +65,11 @@ Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the 
 \dontrun{
 gtfs <- GTFShift::load_feed("gtfs.zip")
 
-q = opq("Lisbon")  |>
+q <- opq("Lisbon")  |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
-shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs, q)
+shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q)
 }
 
 }
