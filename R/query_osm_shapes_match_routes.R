@@ -370,15 +370,27 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   pb$terminate()
 
   m = sprintf(
-    "> Associated %d shapes with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops\n",
+    "> Associated %d shapes (%.2f%% of %d total) of %d routes (%.2f%% of %d total) with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops\n",
     nrow(result_success),
+    nrow(result_success) / nrow(shapes_sf) * 100,
+    nrow(shapes_sf),
+    nrow(result_success |> distinct(route_id)),
+    nrow(result_success |> distinct(route_id)) / length(unique(gtfs$routes$route_id)) * 100,
+    length(unique(gtfs$routes$route_id)),
     mean(result_success$points_diff),
     mean(result_success$distance_diff),
     mean(result_success$stops_diff)
   )
   message(m)
   if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
-
+  m = sprintf(
+    "> Of those, %d shapes (%.2f%% of %d matched) have a distance difference below 1000 meters, a points difference below 500 meters\n",
+    nrow(result_success |> filter(distance_diff < 1000 & points_diff < 500)),
+    nrow(result_success |> filter(distance_diff < 1000 & points_diff < 500)) / nrow(result_success) * 100,
+    nrow(result_success)
+  )
+  message(m)
+  if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
   not_found <- bind_rows( result[lengths(result)<=1] )
   warning_osm_unsorted_stops <- unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
