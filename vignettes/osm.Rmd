@@ -194,6 +194,10 @@ mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.na
 
 ### Updating OSM routes with shape_id
 
-The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps dataset.
+The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps data. Refer to [6. Update OSM data](./update_osm.html) for more details.
 
-Python library [OsmApi](https://osmapi.metaodi.ch/osmapi/OsmApi.html) enables to perform this batch process using OpenStreetMaps API. GTFShift provides a script to perform this operation using OsmApi. Check it at the repository, at `inst/python/OSM_routes_add_shapes.py`, or find its location on your computer, using `system.file("python", "osm_routes_add_shapes.py", package = "GTFShift")`.
+### Validating OSM routes
+
+The warning logs displayed by `GTFShift::osm_shapes_match_routes()` can be used to validate the OSM routes, identifying shapes without a match, or even OSM existing routes that violate OSM integrity rules, such as having stops in the wrong order.
+
+
