@@ -42,7 +42,7 @@ The environment variables can be edited using `usethis::edit_r_environ()`, on R.
 
 # Match GTFS shapes with OSM routes 
 
-This example assumes that the steps described at [Matching shapes geometry]("./osm.html#matching-shapes-geometry") have been followed, up to the definition of the variable `shapes_match_routes`. To use it in Python, it should be stored in a CSV file.
+This example assumes that the steps described at [Matching shapes geometry](./osm.html#matching-shapes-geometry) have been followed, up to the definition of the variable `shapes_match_routes`. To use it in Python, it should be stored in a CSV file.
 
 ```{r}
 write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
@@ -55,7 +55,7 @@ Then, it should be loaded into the Python environment, filtering the matches by 
 ```{python}
 import pandas as pd
 
-df = pd.read_csv("../releases/v0_7_0/shapes_match_toulouse_gtfs20250802_run20250802.csv") # CSV with columns osm_id, shape_id and route_id (optional)
+df = pd.read_csv("osm_match.csv") # CSV with columns osm_id, shape_id and route_id (optional)
 len(df)
 df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 len(df)
@@ -91,7 +91,8 @@ Set up logging
 ```{python}
 logger = logging.getLogger('my_logger')
 logger.setLevel(logging.DEBUG)  # Set the base logging level
-file_handler = logging.FileHandler('../releases/v0_7_0/shapes_match_toulouse_gtfs20250802_run20250802.osm.log')
+# Use a generic log file path; replace {city} and {date} as needed
+log_file_path = '../releases/{version}/shapes_match_{city}_gtfs{date}_run{date}.osm.log'
 file_handler.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
@@ -177,7 +178,7 @@ Attention! The script below will open a changeset and update OSM data! Make sure
 ```{python}
 # Create change set, updating relations with tag gtfs:shape_id
 # The changeset comment can be customized to better describe the change submitted 
-with api.Changeset({"comment": "Tisséo GTFS shapes and routes association (using GTFShift v0.7.0) II", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+with api.Changeset({"comment": "GTFS shapes and routes association (using GTFShift v0.7.0)", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
   logger.info(f"Running changeset {changeset_id} for {len(df)} relations")
   logger.info(f"{'route_id':20s}{'shape_id':20s} | {'osm_id':20s} | {'osm_route_id':20s}{'updated?':10s}{'osm_shape_id':20s}{'updated?':10s} | {'operation status':20s}")
   for idx, row in df.iterrows():
