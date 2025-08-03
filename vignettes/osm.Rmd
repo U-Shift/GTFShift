@@ -196,7 +196,7 @@ mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.na
 
 ### Updating OSM routes with shape_id
 
-The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps data. Refer to [6. Update OSM data](./update_osm.html) for more details.
+The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps data. Refer to [6. Update OSM data](./osm_update.html) for more details.
 
 ### Validating OSM routes
 

@@ -28,10 +28,10 @@ Python library [OsmApi](https://osmapi.metaodi.ch/osmapi/OsmApi.html) enables to
 It can be run either at the development or live version of OSM, requiring API credentials to be run on either of them, that should be stored as environment variables.
 
 > To get credentials for the development version, go to https://master.apis.dev.openstreetmap.org/oauth2/applications.
-> They should be stored as `OSM_OAUTH_CLIENT_ID_PROD` and `OSM_OAUTH_CLIENT_SECRET_PROD`.
+> They should be stored as `OSM_OAUTH_CLIENT_ID_DEV` and `OSM_OAUTH_CLIENT_SECRET_DEV`.
 
 > To get credentials for the live version, go to https://www.openstreetmap.org/oauth2/applications.
-> They should be stored as `OSM_OAUTH_CLIENT_ID_DEV` and `OSM_OAUTH_CLIENT_SECRET_DEV`.
+> They should be stored as `OSM_OAUTH_CLIENT_ID_PROD` and `OSM_OAUTH_CLIENT_SECRET_PROD`.
 
 > API registration parameters:
 > Redirect uri: `urn:ietf:wg:oauth:2.0:oob`
@@ -55,7 +55,7 @@ Then, it should be loaded into the Python environment, filtering the matches by 
 ```{python}
 import pandas as pd
 
-df = pd.read_csv("../releases/v0_7_0/shapes_match_toulouse_gtfs20250802_run20250802.csv") # CSV with columns oms_id, shape_id and osm_id (optional)
+df = pd.read_csv("../releases/v0_7_0/shapes_match_toulouse_gtfs20250802_run20250802.csv") # CSV with columns osm_id, shape_id and route_id (optional)
 len(df)
 df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 len(df)
@@ -115,7 +115,7 @@ token_url = "https://www.openstreetmap.org/oauth2/token"
 api_url = "https://api.openstreetmap.org"
 ```
 
-... or the dev one. It is recommended to try to apply the changes first at the dev version, to avoid currupting the live OSM data.
+... or the dev one. It is recommended to try to apply the changes first at the dev version, to avoid corrupting the live OSM data.
 ```{python}
 client_id = os.getenv("OSM_OAUTH_CLIENT_ID_DEV") # To edit env vars on RStudio, use usethis::edit_r_environ()
 client_secret = os.getenv("OSM_OAUTH_CLIENT_SECRET_DEV")
