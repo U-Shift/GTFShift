@@ -42,7 +42,7 @@ The environment variables can be edited using `usethis::edit_r_environ()`, on R.
 
 # Match GTFS shapes with OSM routes 
 
-This example assumes that the steps described at [Matching shapes geometry]("./osm.html#matching-shapes-geometry") have been followed, up to the definition of the variable `shapes_match_routes`.
+This example assumes that the steps described at [Matching shapes geometry]("./osm.html#matching-shapes-geometry") have been followed, up to the definition of the variable `shapes_match_routes`. To use it in Python, it should be stored in a CSV file.
 
 ```{r}
 write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
@@ -51,7 +51,7 @@ write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
 ), "osm_match.csv", row.names = FALSE)
 ```
 
-Load the data into Python environment, filtering the matches by the criteria that best suits your context.
+Then, it should be loaded into the Python environment, filtering the matches by the criteria that best suits your context.
 ```{python}
 import pandas as pd
 
