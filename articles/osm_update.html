@@ -106,8 +106,8 @@ should be stored as <code>OSM_OAUTH_CLIENT_ID_PROD</code> and
 <div class="section level2">
 <h2 id="match-gtfs-shapes-with-osm-routes">Match GTFS shapes with OSM routes<a class="anchor" aria-label="anchor" href="#match-gtfs-shapes-with-osm-routes"></a>
 </h2>
-<p>This example assumes that the steps described at <a href="%22./osm.html#matching-shapes-geometry%22">Matching shapes
-geometry</a> have been followed, up to the definition of the variable
+<p>This example assumes that the steps described at <a href="./osm.html#matching-shapes-geometry">Matching shapes geometry</a>
+have been followed, up to the definition of the variable
 <code>shapes_match_routes</code>. To use it in Python, it should be
 stored in a CSV file.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -119,7 +119,7 @@ stored in a CSV file.</p>
 matches by the criteria that best suits your context.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"../releases/v0_7_0/shapes_match_toulouse_gtfs20250802_run20250802.csv"</span>) <span class="co"># CSV with columns osm_id, shape_id and route_id (optional)</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"osm_match.csv"</span>) <span class="co"># CSV with columns osm_id, shape_id and route_id (optional)</span></span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="bu">len</span>(df)</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>df <span class="op">=</span> df[(df[<span class="st">'distance_diff'</span>] <span class="op">&lt;</span> <span class="dv">1000</span>) <span class="op">&amp;</span> (df[<span class="st">'points_diff'</span>] <span class="op">&lt;</span> <span class="dv">500</span>)] <span class="co"># Filter to only update those that meet threshold</span></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="bu">len</span>(df)</span></code></pre></div>
@@ -146,15 +146,16 @@ matches by the criteria that best suits your context.</p>
 <p>Set up logging</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>logger <span class="op">=</span> logging.getLogger(<span class="st">'my_logger'</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>logger.setLevel(logging.DEBUG)  <span class="co"># Set the base logging level</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>file_handler <span class="op">=</span> logging.FileHandler(<span class="st">'../releases/v0_7_0/shapes_match_toulouse_gtfs20250802_run20250802.osm.log'</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>file_handler.setLevel(logging.DEBUG)</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>console_handler <span class="op">=</span> logging.StreamHandler()</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>console_handler.setLevel(logging.INFO)</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>formatter <span class="op">=</span> logging.Formatter(<span class="st">'</span><span class="sc">%(asctime)s</span><span class="st"> - </span><span class="sc">%(levelname)s</span><span class="st"> - </span><span class="sc">%(message)s</span><span class="st">'</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>file_handler.setFormatter(formatter)</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>console_handler.setFormatter(formatter)</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>logger.addHandler(file_handler)</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>logger.addHandler(console_handler)</span></code></pre></div>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># Use a generic log file path; replace {city} and {date} as needed</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>log_file_path <span class="op">=</span> <span class="st">'../releases/</span><span class="sc">{version}</span><span class="st">/shapes_match_</span><span class="sc">{city}</span><span class="st">_gtfs</span><span class="sc">{date}</span><span class="st">_run</span><span class="sc">{date}</span><span class="st">.osm.log'</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>file_handler.setLevel(logging.DEBUG)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>console_handler <span class="op">=</span> logging.StreamHandler()</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>console_handler.setLevel(logging.INFO)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>formatter <span class="op">=</span> logging.Formatter(<span class="st">'</span><span class="sc">%(asctime)s</span><span class="st"> - </span><span class="sc">%(levelname)s</span><span class="st"> - </span><span class="sc">%(message)s</span><span class="st">'</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>file_handler.setFormatter(formatter)</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>console_handler.setFormatter(formatter)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>logger.addHandler(file_handler)</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>logger.addHandler(console_handler)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="connect-to-osm">Connect to OSM<a class="anchor" aria-label="anchor" href="#connect-to-osm"></a>
@@ -215,7 +216,7 @@ code. Copy it and set <code>auth_code</code> to its value.</p>
 data! Make sure you have the right data before proceeding!</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Create change set, updating relations with tag gtfs:shape_id</span></span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co"># The changeset comment can be customized to better describe the change submitted </span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="cf">with</span> api.Changeset({<span class="st">"comment"</span>: <span class="st">"Tisséo GTFS shapes and routes association (using GTFShift v0.7.0) II"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="cf">with</span> api.Changeset({<span class="st">"comment"</span>: <span class="st">"GTFS shapes and routes association (using GTFShift v0.7.0)"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  logger.info(<span class="ss">f"Running changeset </span><span class="sc">{</span>changeset_id<span class="sc">}</span><span class="ss"> for </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> relations"</span>)</span>
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  logger.info(<span class="ss">f"</span><span class="sc">{</span><span class="st">'route_id'</span><span class="sc">:20s}{</span><span class="st">'shape_id'</span><span class="sc">:20s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'osm_id'</span><span class="sc">:20s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'osm_route_id'</span><span class="sc">:20s}{</span><span class="st">'updated?'</span><span class="sc">:10s}{</span><span class="st">'osm_shape_id'</span><span class="sc">:20s}{</span><span class="st">'updated?'</span><span class="sc">:10s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'operation status'</span><span class="sc">:20s}</span><span class="ss">"</span>)</span>
 <span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="cf">for</span> idx, row <span class="kw">in</span> df.iterrows():</span>
