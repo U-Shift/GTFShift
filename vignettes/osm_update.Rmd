@@ -35,7 +35,7 @@ It can be run either at the development or live version of OSM, requiring API cr
 
 > API registration parameters:
 > Redirect uri: `urn:ietf:wg:oauth:2.0:oob`
-> Permissions: `write_api`, `write_notes`, `read_prefs`
+> Permissions: `read_prefs` (Read user preferences), `write_api` (Modify the map), `write_notes` (Modify notes)
 
 The environment variables can be edited using `usethis::edit_r_environ()`, on R.
 
