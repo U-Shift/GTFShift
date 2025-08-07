@@ -366,7 +366,16 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
     return(gtfs_route_name_result)
   })
-  result_success = data.frame()
+  result_success = data.frame(
+    route_id=character(),
+    shape_id=character(),
+    osm_id=integer(),
+    route_short_name=character(),
+    route_long_name=character(),
+    points_diff=double(),
+    distance_diff=double(),
+    stops_diff=double()
+  )
   if (length(result[lengths(result)>1]) == 0) {
     # No results, do nothing
   } else if (length(result[lengths(result)>1]) == 1) { # 1 result
