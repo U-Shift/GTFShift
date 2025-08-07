@@ -38,5 +38,5 @@ frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
 
 }
 \seealso{
-[GTFShift::calendar_nextBusinessWednesday]
+[GTFShift::calendar_nextBusinessWednesday()]
 }
