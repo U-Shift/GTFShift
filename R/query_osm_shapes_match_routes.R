@@ -170,6 +170,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   warning_osm_repeated <- list()
   warning_osm_unsorted_stops <- list()
   warning_osm_stops_missing <- list()
+  warning_gtfs_no_trips_or_shapes <- list()
 
   result <- lapply(routes_names, function(route_name) {
     pb$update(min(head(match(route_name, routes_names), 1)/length(routes_names), 0.99)) # update progress
@@ -222,6 +223,12 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       left_join(shapes_sf, by="shape_id") |>
       distinct(shape_id, .keep_all = TRUE) |>
       sf::st_as_sf()
+    if (nrow(gtfs_route_name) == 0) { # Validate that there is an OSM match for GTFS route
+      warning_gtfs_no_trips_or_shapes <<- append(warning_gtfs_no_trips_or_shapes, route_name)
+      return(data.frame(
+        route_name=route_name
+      ))  # Return NULL for failed elements
+    }
 
     # 2. Match based on initial and final points
     # > Compute osm final and initial points
@@ -411,7 +418,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
   not_found <- bind_rows( result[lengths(result)<=1] )
   warning_osm_unsorted_stops <- unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
-  errors <- length(warning_routes_missing) + length(warning_osm_repeated) + length(warning_osm_unsorted_stops) + length(warning_osm_stops_missing)
+  errors <- length(warning_gtfs_no_trips_or_shapes) + length(warning_routes_missing) + length(warning_osm_repeated) + length(warning_osm_unsorted_stops) + length(warning_osm_stops_missing)
   if (errors>0 || nrow(not_found)) {
     w = sprintf(
       "There were %d error(s) during the algorithm execution, which led to %d route(s) without a match (route(s) ignored), with the following `%s`:\n\n> %s\n",
@@ -420,6 +427,14 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       gtfs_match,
       paste(not_found$route_name, collapse="\n> ")
     )
+    warning(w)
+    if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
+  }
+  if (length(warning_gtfs_no_trips_or_shapes)>0) {
+    w = sprintf("%d error(s) were GTFS routes `%s` that did not have matching trips or shapes on GTFS file:\n\n> %s\n", length(warning_gtfs_no_trips_or_shapes), gtfs_match, paste(
+      warning_gtfs_no_trips_or_shapes,
+      collapse="\n> "
+    ))
     warning(w)
     if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
