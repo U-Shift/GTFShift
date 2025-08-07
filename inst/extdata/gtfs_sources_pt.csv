@@ -7,6 +7,7 @@ cascais,2025-02-01,2025-02-05,https://drive.google.com/u/0/uc?id=13ucYiAJRtu-gXs
 lisboa,2025-02-01,2025-02-05,https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS,Urban,https://gateway.carris.pt/apiui/#!/apis/2c05b837-1c8e-4b34-85b8-371c8edb344b/pages/d7f1c190-908d-4615-b1c1-90908d4615f5
 metroLisboa,2025-02-01,2025-02-05,https://www.metrolisboa.pt/google_transit/googleTransit.zip,Urban,https://www.transit.land/operators/o-eyckr-metrodelisboa
 fertagus,2025-02-01,2025-02-05,https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip,Urban,https://www.transit.land/operators/o-eyce-fertagus
+mts,2025-08-07,2025-02-05,https://mts.pt/imt/MTS-20240129.zip,Urban,https://nap-portugal.imt-ip.pt/nap/multimodalsupplydetail/200
 braga,2025-02-01,2025-02-05,https://tub.pt/developer/gtfs/feed/tub.zip,Urban,https://tub.pt/downloads/
 stcp,2025-02-01,2025-02-05,https://opendata.porto.digital/dataset/5275c986-592c-43f5-8f87-aabbd4e4f3a4/resource/1e0f4315-3694-42b0-a8ce-5218ad4742e5/download/horarios_gtfs_stcp_06_01_2025.zip,Urban,https://opendata.porto.digital/de/dataset/horarios-paragens-e-rotas-em-formato-gtfs-stcp/resource/1e0f4315-3694-42b0-a8ce-5218ad4742e5
 metroPorto,2025-02-01,2025-02-05,https://www.metrodoporto.pt/metrodoporto/uploads/document/file/693/google_transit_v2.zip,Urban,https://www.metrodoporto.pt/pages/337
