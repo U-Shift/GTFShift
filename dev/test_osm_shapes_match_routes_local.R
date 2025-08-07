@@ -33,7 +33,7 @@ regions = rbind( # Barreiro
     gtfs_day = gsub("-", "", Sys.Date()),
     query = I(list(list(
       list(key = "route", value = c("bus"), key_exact = TRUE),
-      list(key = "network", value = "Transportes Coletivos do Barreiro", key_exact = TRUE)
+      list(key = "network", value = c("Transportes Coletivos do Barreiro", "TCB"), key_exact = TRUE)
     )))
   )
 )
@@ -101,7 +101,7 @@ regions = rbind( # Madrid
   regions,
   data.frame(
     name = "madrid",
-    gtfs_url = data$URL[data$ID == "madrid"],
+    gtfs_url = "http://servicios.emtmadrid.es:8080/GTFS/transitEMT.zip",
     gtfs_day = gsub("-", "", Sys.Date()),
     query = I(list(list(
       list(key = "route", value = c("bus"), key_exact = TRUE),
@@ -133,9 +133,27 @@ regions = rbind( # Toulouse
     )))
   )
 )
+regions = rbind( # Portland, US
+  regions,
+  data.frame(
+    name = "portland",
+    gtfs_url = "https://developer.trimet.org/schedule/gtfs.zip",
+    gtfs_day = gsub("-", "", Sys.Date()),
+    query = I(list(list(
+      list(key = "route", value = c("bus"), key_exact = TRUE),
+      list(key = "operator", value = "TriMet", key_exact = TRUE)
+    )))
+  )
+)
 
 
 # main()
+
+# Create the folder if it doesn't exist
+if (!dir.exists(output)) {
+  dir.create(output, recursive = TRUE)
+}
+
 for(i in 1:nrow(regions)) {
   region <- regions[i, ]
   message(sprintf("\n\nRunning for %s (%s)...", region$name, region$gtfs_day))
@@ -166,6 +184,6 @@ for(i in 1:nrow(regions)) {
   write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
     distance_diff=round(distance_diff),
     points_diff=round(points_diff)
-  ), sprintf("%s/shapes_match_%s_gtfs%s_run%s.csv", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
+  ), sprintf("%s/shapes_match_%s_gtfs%s_run%s.csv", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE, append=FALSE)
   sf::st_write(shapes_match_routes, sprintf("%s/shapes_match_%s_gtfs%s_run%s.gpkg", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
 }
