@@ -366,7 +366,14 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
     return(gtfs_route_name_result)
   })
-  result_success <- bind_rows( result[lengths(result)>1] )
+  result_success = data.frame()
+  if (length(result[lengths(result)>1]) == 0) {
+    # No results, do nothing
+  } else if (length(result[lengths(result)>1]) == 1) { # 1 result
+    result_success = result[lengths(result)>1][[1]]
+  } else { # +1 result
+    result_success <- bind_rows( result[lengths(result)>1] )
+  }
   pb$update(1)
   pb$terminate()
 
