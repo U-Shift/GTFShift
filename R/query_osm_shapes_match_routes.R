@@ -218,6 +218,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       select(route_id, route_short_name, route_long_name) |>
       filter(.data[[gtfs_match]] == route_name) |>
       left_join(gtfs$trips |> select(route_id, trip_id, shape_id, direction_id), by="route_id") |>
+      filter(shape_id != "" & !is.na(shape_id)) |>
       left_join(shapes_sf, by="shape_id") |>
       distinct(shape_id, .keep_all = TRUE) |>
       sf::st_as_sf()
