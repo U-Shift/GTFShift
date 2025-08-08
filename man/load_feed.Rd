@@ -50,9 +50,9 @@ gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
 
 }
 \seealso{
-[tidytransit::read_gtfs()]
+\code{tidytransit::read_gtfs()}
 
-[GTFSwizard::get_shapes()]
+\code{GTFSwizard::get_shapes()}
 
-[gtfsrouter::gtfs_transfer_table()]
+\code{gtfsrouter::gtfs_transfer_table()}
 }
