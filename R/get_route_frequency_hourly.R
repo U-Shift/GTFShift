@@ -4,11 +4,21 @@
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
-#' @param use_osm_routes osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.
+#' @param use_osm_routes osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes()}.
 #' @param overline Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour and direction.
+#' It assumes the time of departure at the first stop as a reference for each trip geometry.
+#'
+#' By default, it estimates the next business Wednesday, relevant for the peak hour.
+#'
+#' The \code{overline} parameter enables the aggregation of bus routes that share common line segments, returning a sum of frequencies per road segment, using \code{stplanr::overline2()}.
+#'
+#' Optionally, using \code{use_osm_routes} parameter, it retrieves the geometries from OpenStreetMap by matching the tag \code{gtfs:shape_id}, overwriting the original GTFS \code{shapes.txt}.
+#' This is particularly useful if the GTFS shapes do not share the same geometry. For instance, if the edges of the lines do not overlap or do not follow the same route-over-the-road – which is very common, even besides \href{https://gtfs.org/documentation/schedule/schedule-best-practices/#shapestxt}{GTFS recommendation} – geometries might not be aggregated correctly, causing inconsistent results.
+#' By relying on a common road network, such as OSM, it is possible to overcome this issue and aggregate the bus routes correctly.
+#'
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
 #' Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
@@ -29,7 +39,9 @@
 #' frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
 #' }
 #'
-#' @seealso [tidytransit::read_gtfs()], [stplanr::overline2], [GTFShift::calendar_nextBusinessWednesday]
+#' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
+#' @seealso \code{GTFShift::osm_shapes_to_routes()}
+#' @seealso \code{stplanr::overline2()}
 #'
 #' @import tidytransit
 #' @import dplyr
