@@ -1,7 +1,7 @@
 # GTFShift
 
 <!-- badges: start -->
-
+[![](https://github.com/U-Shift/GTFShift/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/pkgdown.yaml)
 <!-- badges: end -->
 
 **GTFShift** emerged from the necessity to understand how to get an
