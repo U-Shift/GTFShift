@@ -145,6 +145,30 @@ regions = rbind( # Portland, US
     )))
   )
 )
+regions = rbind( # Chicago , US
+  regions,
+  data.frame(
+    name = "chicago",
+    gtfs_url = "https://www.transitchicago.com/downloads/sch_data/google_transit.zip",
+    gtfs_day = gsub("-", "", Sys.Date()),
+    query = I(list(list(
+      list(key = "route", value = "bus", key_exact = TRUE),
+      list(key = "operator", value = "Chicago Transit Authority", key_exact = TRUE)
+    )))
+  )
+)
+regions = rbind( # Metro Porto, Porto, PT
+  regions,
+  data.frame(
+    name = "porto_metro",
+    gtfs_url = "https://www.metrodoporto.pt/metrodoporto/uploads/document/file/693/google_transit_v2.zip",
+    gtfs_day = gsub("-", "", Sys.Date()),
+    query = I(list(list(
+      list(key = "route", value = "light_rail", key_exact = TRUE),
+      list(key = "operator", value = "ViaPorto", key_exact = TRUE)
+    )))
+  )
+)
 
 
 # main()
