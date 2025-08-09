@@ -55,7 +55,7 @@ unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers=TRUE)
 
 }
 \seealso{
-[gtfstools::merge_gtfs()]
+\code{gtfstools::merge_gtfs()}
 
-[gtfsrouter::gtfs_transfer_table()]
+\code{gtfsrouter::gtfs_transfer_table()}
 }

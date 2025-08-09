@@ -28,8 +28,8 @@
 #' unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers=TRUE)
 #' }
 #'
-#' @seealso [gtfstools::merge_gtfs()]
-#' @seealso [gtfsrouter::gtfs_transfer_table()]
+#' @seealso \code{gtfstools::merge_gtfs()}
+#' @seealso \code{gtfsrouter::gtfs_transfer_table()}
 #'
 #' @importFrom gtfstools merge_gtfs
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table

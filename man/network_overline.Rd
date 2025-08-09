@@ -54,5 +54,5 @@ GTFShift::network_overline(
 
 }
 \seealso{
-[stplanr::rnet_join]
+\code{stplanr::rnet_join()}
 }
