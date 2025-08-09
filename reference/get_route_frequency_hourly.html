@@ -26,7 +26,6 @@
     <li><a class="dropdown-item" href="../articles/osm.html">5. Get OSM data</a></li>
     <li><a class="dropdown-item" href="../articles/osm_update.html">Extra. Update OSM data</a></li>
   </ul></li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/U-Shift/GTFShift/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -70,7 +69,7 @@
 
 
 <dt id="arg-use-osm-routes">use_osm_routes<a class="anchor" aria-label="anchor" href="#arg-use-osm-routes"></a></dt>
-<dd><p>osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using <code><a href="osm_shapes_to_routes.html">GTFShift::osm_shapes_to_routes</a></code>.</p></dd>
+<dd><p>osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using <code><a href="osm_shapes_to_routes.html">GTFShift::osm_shapes_to_routes()</a></code>.</p></dd>
 
 
 <dt id="arg-overline">overline<a class="anchor" aria-label="anchor" href="#arg-overline"></a></dt>
@@ -89,12 +88,20 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour and direction.
-For a detailed example, see the <code><a href="../articles/analyse.html">vignette("analyse")</a></code>.</p>
+It assumes the time of departure at the first stop as a reference for each trip geometry.</p>
+<p>By default, it estimates the next business Wednesday, relevant for the peak hour.</p>
+<p>The <code>overline</code> parameter enables the aggregation of bus routes that share common line segments, returning a sum of frequencies per road segment, using <code><a href="https://docs.ropensci.org/stplanr/reference/overline.html" class="external-link">stplanr::overline2()</a></code>.</p>
+<p>Optionally, using <code>use_osm_routes</code> parameter, it retrieves the geometries from OpenStreetMap by matching the tag <code>gtfs:shape_id</code>, overwriting the original GTFS <code>shapes.txt</code>.
+This is particularly useful if the GTFS shapes do not share the same geometry. For instance, if the edges of the lines do not overlap or do not follow the same route-over-the-road – which is very common, even besides <a href="https://gtfs.org/documentation/schedule/schedule-best-practices/#shapestxt" class="external-link">GTFS recommendation</a> – geometries might not be aggregated correctly, causing inconsistent results.
+By relying on a common road network, such as OSM, it is possible to overcome this issue and aggregate the bus routes correctly.</p>
+<p>For a detailed example, see the <code><a href="../articles/analyse.html">vignette("analyse")</a></code>.</p>
 <p>Adapted from <a href="https://github.com/Bondify/GTFS_in_R/" class="external-link">https://github.com/Bondify/GTFS_in_R/</a>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>[tidytransit::read_gtfs()], [stplanr::overline2], [GTFShift::calendar_nextBusinessWednesday]</p></div>
+    <div class="dont-index"><p><code><a href="calendar_nextBusinessWednesday.html">GTFShift::calendar_nextBusinessWednesday()</a></code></p>
+<p><code><a href="osm_shapes_to_routes.html">GTFShift::osm_shapes_to_routes()</a></code></p>
+<p><code><a href="https://docs.ropensci.org/stplanr/reference/overline.html" class="external-link">stplanr::overline2()</a></code></p></div>
     </div>
 
     <div class="section level2">
