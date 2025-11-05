@@ -38,5 +38,7 @@ Suggests:
     rmarkdown,
     mapview,
     xml2
+Remotes:
+    OPATP/GTFSwizard
 VignetteBuilder: knitr
 Config/Needs/website: rmarkdown
