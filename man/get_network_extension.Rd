@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_network_extension.R
 \name{get_network_extension}
 \alias{get_network_extension}
-\title{Get routes extension}
+\title{Get network routes extension}
 \usage{
 get_network_extension(
   gtfs,
