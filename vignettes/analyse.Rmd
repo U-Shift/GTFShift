@@ -182,7 +182,7 @@ There are several methods to aggregate a transit network. One approach is throug
 > During the development of this project, no R packages were found suiting this purpose. [Centerline](https://github.com/atsyplenkov/centerline) package has this feature in its roadmap. Currently, there are available solutions for [Python](https://uscuni.org/neatnet/index.html) or [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 
 
-# Aggregating frequencies over a target network
+## Aggregating frequencies over a target network
 
 As an alternative to the `GTFShift::get_route_frequency_hourly()` method using the `overline=TRUE` parameter, `GTFShift::network_overline()` provides a different frequency aggregation functionality.
 
