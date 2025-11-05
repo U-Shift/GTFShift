@@ -1,4 +1,4 @@
-#' Get routes extension
+#' Get network routes extension
 #'
 #' Get total extension of GTFS feed routes
 #'
