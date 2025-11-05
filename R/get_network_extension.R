@@ -44,7 +44,6 @@ get_network_extension <- function(
   }
 
   # Compute hourly frequencies for each route
-  length(unique(gtfs$routes$route_id))
   network = gtfs |> GTFShift::get_route_frequency_hourly(date = date, use_osm_routes = use_osm_routes, overline = FALSE)
   length(unique(network$route_id))
 
