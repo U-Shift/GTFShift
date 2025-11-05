@@ -11,7 +11,6 @@
 #' In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
 #' \itemize{
 #'  \item \code{stop_times.txt} with empty \code{arrival_time} or \code{departure_time}, filtering rows that do not comply.
-#'  \item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFSwizard::get_shapes()}.
 #' }
 #' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops
 #' network of the final aggregated version. This computation is executed with \code{gtfsrouter::gtfs_transfer_table()}, with
@@ -21,7 +20,6 @@
 #' @returns A tidygtfs object.
 #'
 #' @seealso \code{tidytransit::read_gtfs()}
-#' @seealso \code{GTFSwizard::get_shapes()}
 #' @seealso \code{gtfsrouter::gtfs_transfer_table()}
 #'
 #' @examples
@@ -30,7 +28,6 @@
 #' }
 #'
 #' @import tidytransit
-#' @importFrom GTFSwizard as_wizardgtfs
 #'
 #' @export
 load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
@@ -53,13 +50,9 @@ load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_dista
     gtfs$trips$shape_id = NA
   }
 
-  ## If no shapes.txt, create them automatically with GTFSwizard
+  ## If no shapes.txt, warn user
   if (!("shapes" %in% names(gtfs))) {
-    # GTFSwizard::get_shapes is automatically applied when it detected shapes are missing
-    suppressMessages(suppressWarnings({gtfs_fixed <- GTFSwizard::as_wizardgtfs(gtfs)}))
-    gtfs$shapes <- gtfs_fixed$shapes
-    gtfs$trips <- gtfs_fixed$trips
-    warning(sprintf("> CREATED shapes.txt, the file was missing!"))
+    warning(sprintf("> GTFS has no shapes.txt! Some methods may not work properly."))
   }
 
   # Generate transfers.txt
