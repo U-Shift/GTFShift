@@ -34,8 +34,7 @@ get_network_extension <- function(
     direction_wise = TRUE,
     unified = FALSE,
     date = GTFShift::calendar_nextBusinessWednesday(),
-    use_osm_routes = NA,
-    overline = FALSE
+    use_osm_routes = NA
 ) {
 
   # 0. Validations
