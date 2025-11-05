@@ -16,7 +16,6 @@ Depends:
 Imports: 
   tidytransit,
   gtfstools,
-  GTFSwizard,
   zip,
   sf,
   tidyverse,
