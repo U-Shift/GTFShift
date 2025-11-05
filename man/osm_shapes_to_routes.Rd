@@ -18,6 +18,9 @@ A \code{sf} \code{data.frame} with the following columns:
  \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
  \item \code{geometry}, the geometrical data for the OSM route relation.
 }
+
+Shapes that do not have a match on OSM are ignored.
+If that occurs, a warning is displayed during the method execution, informing about the missing geometries.
 }
 \description{
 Get OSM routes geometry considering gtfs:shape_id match
