@@ -14,6 +14,9 @@
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
 #' }
 #'
+#' Shapes that do not have a match on OSM are ignored.
+#' If that occurs, a warning is displayed during the method execution, informing about the missing geometries.
+#'
 #' @examples
 #' \dontrun{
 #' gtfs <- GTFShift::load_feed("gtfs.zip")

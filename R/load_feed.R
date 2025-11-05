@@ -20,9 +20,9 @@
 #'
 #' @returns A tidygtfs object.
 #'
-#' @seealso [tidytransit::read_gtfs()]
-#' @seealso [GTFSwizard::get_shapes()]
-#' @seealso [gtfsrouter::gtfs_transfer_table()]
+#' @seealso \code{tidytransit::read_gtfs()}
+#' @seealso \code{GTFSwizard::get_shapes()}
+#' @seealso \code{gtfsrouter::gtfs_transfer_table()}
 #'
 #' @examples
 #' \dontrun{

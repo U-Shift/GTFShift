@@ -23,7 +23,7 @@
 #' frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
 #' }
 #'
-#' @seealso [GTFShift::calendar_nextBusinessWednesday()]
+#' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #'
 #' @import sf
 #' @import tidyverse

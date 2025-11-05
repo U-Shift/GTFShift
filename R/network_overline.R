@@ -30,7 +30,7 @@
 #' )
 #' }
 #'
-#' @seealso [stplanr::rnet_join]
+#' @seealso \code{stplanr::rnet_join()}
 #'
 #' @import stplanr
 #' @import sf
