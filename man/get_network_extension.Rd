@@ -6,6 +6,9 @@
 \usage{
 get_network_extension(
   gtfs,
+  route_identifier = "route_id",
+  direction_wise = TRUE,
+  unified = FALSE,
   date = GTFShift::calendar_nextBusinessWednesday(),
   use_osm_routes = NA,
   overline = FALSE
@@ -14,11 +17,15 @@ get_network_extension(
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
+\item{direction_wise}{Boolean (Default \code{TRUE}). If TRUE, extension considers sum of both directions. Otherwise, only one direction is considered.}
+
+\item{unified}{Boolean (Default \code{FALSE}). If TRUE, overlapping route segments are only counted once in the total extension.}
+
 \item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
 
 \item{use_osm_routes}{osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.}
 
-\item{overline}{Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.}
+\item{route_identifier.}{String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
 }
 \value{
 The routes extension, in meters.
