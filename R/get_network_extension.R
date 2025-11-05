@@ -3,11 +3,11 @@
 #' Get total extension of GTFS feed routes
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param route_identifier. String. (Default \code{"route_id"}). Column name in \code{gtfs$routes} identifying each route.
+#' @param route_identifier. String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
 #' @param direction_wise Boolean (Default \code{TRUE}). If TRUE, extension considers sum of both directions. Otherwise, only one direction is considered.
+#' @param unified Boolean (Default \code{FALSE}). If TRUE, overlapping route segments are only counted once in the total extension.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
 #' @param use_osm_routes osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.
-#' @param overline Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.
 #'
 #' @details
 #' This method calculates the sum of the GTFS feed routes length, considering, for each, the shape of the variant with the highest frequency for the given date
@@ -32,23 +32,28 @@ get_network_extension <- function(
     gtfs,
     route_identifier = "route_id",
     direction_wise = TRUE,
+    unified = FALSE,
     date = GTFShift::calendar_nextBusinessWednesday(),
     use_osm_routes = NA,
     overline = FALSE
 ) {
 
-  # Validate if route_identifier exists
-  if (!(route_identifier %in% colnames(gtfs$routes))) {
-    stop("route_identifier should be one of gtfs$routes columns")
+  # 0. Validations
+  if (!(route_identifier %in% c("route_id", "route_short_name", "route_long_name"))) {
+    stop("route_identifier should be one of: route_id, route_short_name or route_long_name")
   }
 
   # Compute hourly frequencies for each route
-  network = gtfs |> GTFShift::get_route_frequency_hourly(date = date, use_osm_routes = use_osm_routes, overline = overline)
+  length(unique(gtfs$routes$route_id))
+  network = gtfs |> GTFShift::get_route_frequency_hourly(date = date, use_osm_routes = use_osm_routes, overline = FALSE)
+  length(unique(network$route_id))
 
   # Get unique shapes
-  shapes_unique = tidytransit::shapes_as_sf(gtfs$shapes) |>
+  shapes_unique = network |>
+    st_drop_geometry() |>
     select(shape_id) |>
-    distinct()
+    distinct() |>
+    left_join(network, by = "shape_id", multiple="first")
 
   # Compute daily frequencies per route shape
   network_redux = network |>
@@ -76,6 +81,16 @@ get_network_extension <- function(
     st_as_sf() |>
     st_transform(crs = 3857) |> # For units in meters
     mutate(length = st_length(geometry))
+
+  # Compute unified network extension
+  if (unified) {
+    network_union = network_redux_shapes |>
+      st_union() |>
+      stplanr::line_cast() |>
+      st_as_sf() |>
+      mutate(length = st_length(x))
+    return(sum(network_union$length))
+  }
 
   return(sum(network_redux_shapes$length))
 }
