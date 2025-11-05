@@ -53,7 +53,7 @@ gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
 
 To analyse the extension of a transit network, use `GTFShift::get_network_extension()`, which computes the total length of all routes in the GTFS feed, considering, for each, the shape of the variant with the highest frequency for a given date.
 
-> In this example, we intent to get a value close to the official 757 km [reported by Carris](https://www.carris.pt/media/ikvdezmc/relat%C3%B3rio-e-contas-carris-2024.pdf){target="_blank"}. For this purpose, we use parameters `direction_wise=TRUE` to consider both directions for each route, but removing route overlaps (with `unified=TRUE`). Aditionally, we use OSM open data to get more accurate route geometries (through parameter `use_osm_routes`).
+> In this example, we intend to get a value close to the official 757 km [reported by Carris](https://www.carris.pt/media/ikvdezmc/relat%C3%B3rio-e-contas-carris-2024.pdf){target="_blank"}. For this purpose, we use parameters `direction_wise=TRUE` to consider both directions for each route, but removing route overlaps (with `unified=TRUE`). Additionally, we use OSM open data to get more accurate route geometries (through parameter `use_osm_routes`).
 
 ```{r}
 library(osmdata)
