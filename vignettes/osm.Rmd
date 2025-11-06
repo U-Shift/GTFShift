@@ -43,7 +43,7 @@ GTFShift includes some methods that allow to access its information directly.
 Dedicated bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics.
 `osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMaps for a given area.
 
-```{r bus_lanes_download}
+```{r, eval=FALSE}
 aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
 lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
 
