@@ -50,12 +50,8 @@ lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
 bus_lanes = GTFShift::osm_bus_lanes(lisboa) |> select(osm_id)
 ```
 
-```{r include=FALSE}
-bus_lanes = sf::st_read("https://github.com/U-Shift/busclar/releases/download/latest/bus_lanes_osm_lisbon.gpkg", quiet=TRUE)
-```
-
 ```{r, cache=FALSE}
-mapview::mapview(bus_lanes, layer.name = "Bus lanes")
+mapview::mapview(bus_lanes, layer.name = "Bus lanes", legend=FALSE, color="blue")
 ```
 
 
