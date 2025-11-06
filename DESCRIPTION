@@ -39,6 +39,6 @@ Suggests:
     mapview,
     xml2
 Remotes:
-    OPATP/GTFSwizard
+    gmatosferreira/GTFSwizard
 VignetteBuilder: knitr
 Config/Needs/website: rmarkdown
