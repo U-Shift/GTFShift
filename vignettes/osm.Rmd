@@ -50,8 +50,12 @@ lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
 bus_lanes = GTFShift::osm_bus_lanes(lisboa) |> select(osm_id)
 ```
 
-```{r bus_lanes_display}
-mapview::mapview(bus_lanes, layer.name = "Bus lanes", legend=FALSE, color="blue")
+```{r include=FALSE}
+bus_lanes = sf::st_read("https://github.com/U-Shift/busclar/releases/download/0.1/bus_lanes_osm_lisbon.gpkg", quiet=TRUE)
+```
+
+```{r, cache=FALSE}
+mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
 
 
@@ -197,5 +201,4 @@ The association between OSM route relations id and the GTFS shapes_id returned b
 ### Validating OSM routes
 
 The warning logs displayed by `GTFShift::osm_shapes_match_routes()` can be used to validate the OSM routes, identifying shapes without a match, or even OSM existing routes that violate OSM integrity rules, such as having stops in the wrong order.
-
 
