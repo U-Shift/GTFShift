@@ -28,6 +28,35 @@ gtfs_id = "lisboa"
 gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
 ```
 
+## Analyse network extension
+
+To analyse the extension of a transit network, use
+[`GTFShift::get_network_extension()`](https://u-shift.github.io/GTFShift/reference/get_network_extension.md),
+which computes the total length of all routes in the GTFS feed,
+considering, for each, the shape of the variant with the highest
+frequency for a given date.
+
+> In this example, we intend to get a value close to the official 757 km
+> [reported by
+> Carris](https://www.carris.pt/media/ikvdezmc/relat%C3%B3rio-e-contas-carris-2024.pdf).
+> For this purpose, we use parameters `direction_wise=TRUE` to consider
+> both directions for each route, but removing route overlaps (with
+> `unified=TRUE`). Additionally, we use OSM open data to get more
+> accurate route geometries (through parameter `use_osm_routes`).
+
+``` r
+library(osmdata)
+library(units)
+
+osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
+  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+
+route_extent_carris = get_network_extension(gtfs, route_identifier="route_short_name", direction_wise = TRUE, use_osm_routes = osm_q, unified = TRUE)
+drop_units(route_extent_carris/1000)
+#> [1] 811.4237
+```
+
 ## Analyse hourly frequency per stop
 
 To analyse frequencies at stops, use
@@ -205,7 +234,7 @@ for more details.
 > for [Python](https://uscuni.org/neatnet/index.html) or
 > [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 
-## Aggregating frequencies over a target network
+### Aggregating frequencies over a target network
 
 As an alternative to the
 [`GTFShift::get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)

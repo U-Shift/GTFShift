@@ -18,6 +18,8 @@
 
 ## Analyse
 
+- [`get_network_extension()`](https://u-shift.github.io/GTFShift/reference/get_network_extension.md)
+  : Get network routes extension
 - [`get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
   : Get aggregated frequency per hour for each bus route
 - [`get_stop_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.md)

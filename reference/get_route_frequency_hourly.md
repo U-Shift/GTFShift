@@ -48,6 +48,8 @@ are only present if `overline=FALSE`):
 - `route_short_name`, the `route_short_name` attribute from `routes.txt`
   file.
 
+- `shape_id`, the `shape_id` attribute from `shapes.txt` file.
+
 - `direction_id`, the `direction_id` attribute from `trips.txt` file (if
   attribute present in GTFS feed).
 
