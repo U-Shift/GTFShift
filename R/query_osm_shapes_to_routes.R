@@ -35,20 +35,40 @@
 #' @export
 osm_shapes_to_routes <- function(gtfs, q) {
 
+  pb <- progress::progress_bar$new( # Track progress
+    format = "1/2: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
+    clear = FALSE, show_after=0
+  )
+  pb$update(0)
+
   # 1. Get OSM routes
-  osm = q |> osmdata_sf()
+  job <- callr::r_bg(function(q) { # update spinner while blocking method call
+    return(q |> osmdata::osmdata_sf())
+  }, args=list(q))
+  while (job$is_alive()) { pb$tick(0); Sys.sleep(0.1) }
+  osm <- job$get_result()
+
+  pb$update(0.5)
   osm_multilines = osm$osm_multilines
   osm_multilines_redux = osm_multilines |>
     select(any_of(c("osm_id", "gtfs:shape_id")))
 
+  pb$update(1)
+
   # 2. Merge with GTFS
   shape_ids = gtfs$trips |> select(shape_id) |>
     distinct()
-  message(sprintf("Trying to match %d shapes with %s osm routes...", nrow(shape_ids), nrow(osm_multilines_redux)))
+  message(sprintf("> Trying to match %d shapes with %s osm routes...", nrow(shape_ids), nrow(osm_multilines_redux)))
+  pb <- progress::progress_bar$new( # Track progress
+    format = "2/2: Matching shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed",
+    clear = FALSE, show_after=0
+  )
+  pb$update(0)
   result = shape_ids |>
     inner_join(osm_multilines_redux |> select("osm_id", "gtfs:shape_id", "geometry"), by=c("shape_id" = "gtfs:shape_id")) |>
     st_as_sf()
-  message(sprintf("Matched %d shapes with OSM routes!", nrow(result)))
+  pb$update(1)
+  message(sprintf("> Matched %d shapes with OSM routes!", nrow(result)))
 
   # 3. Log missing shapes
   shapes_missing = shape_ids |> filter(!(shape_id %in% result$shape_id)) |> left_join(gtfs$trips, by="shape_id") |> left_join(gtfs$routes, by="route_id") |> distinct(shape_id, .keep_all = TRUE)

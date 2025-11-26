@@ -16,7 +16,6 @@ Depends:
 Imports: 
   tidytransit,
   gtfstools,
-  GTFSwizard,
   zip,
   sf,
   tidyverse,
@@ -36,6 +35,7 @@ RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
+    GTFSwizard,
     mapview,
     xml2
 Remotes:
