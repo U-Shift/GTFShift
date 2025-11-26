@@ -1,0 +1,249 @@
+# Extra. Update OSM data
+
+## Introduction
+
+The association between OSM route relations id and the GTFS shapes_id
+returned by
+[`GTFShift::osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)
+can be used to update OpenStreetMaps data.
+
+Python library [OsmApi](https://osmapi.metaodi.ch/osmapi/OsmApi.html)
+enables to perform this batch process using OpenStreetMaps API. This
+article, adapted from an [osmapi example
+script](https://github.com/metaodi/osmapi/blob/16aeb189c9ff8db607cc118842133b8cd7b60971/examples/oauth2.py),
+aims to document this procedure.
+
+It can be run either at the development or live version of OSM,
+requiring API credentials to be run on either of them, that should be
+stored as environment variables.
+
+> To get credentials for the development version, go to
+> <https://master.apis.dev.openstreetmap.org/oauth2/applications>. They
+> should be stored as `OSM_OAUTH_CLIENT_ID_DEV` and
+> `OSM_OAUTH_CLIENT_SECRET_DEV`.
+
+> To get credentials for the live version, go to
+> <https://www.openstreetmap.org/oauth2/applications>. They should be
+> stored as `OSM_OAUTH_CLIENT_ID_PROD` and
+> `OSM_OAUTH_CLIENT_SECRET_PROD`.
+
+> API registration parameters: Redirect uri: `urn:ietf:wg:oauth:2.0:oob`
+> Permissions: `write_api`, `write_notes`, `read_prefs`
+
+The environment variables can be edited using
+`usethis::edit_r_environ()`, on R.
+
+## Match GTFS shapes with OSM routes
+
+This example assumes that the steps described at [Matching shapes
+geometry](https://u-shift.github.io/GTFShift/articles/osm.html#matching-shapes-geometry)
+have been followed, up to the definition of the variable
+`shapes_match_routes`. To use it in Python, it should be stored in a CSV
+file.
+
+``` r
+write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
+  distance_diff=round(distance_diff),
+  points_diff=round(points_diff)
+), "osm_match.csv", row.names = FALSE)
+```
+
+Then, it should be loaded into the Python environment, filtering the
+matches by the criteria that best suits your context.
+
+``` python
+import pandas as pd
+
+df = pd.read_csv("osm_match.csv") # CSV with columns osm_id, shape_id and route_id (optional)
+len(df)
+df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
+len(df)
+```
+
+## Local environment set up
+
+Load dependencies
+
+``` python
+from requests_oauth2client import OAuth2Client, OAuth2AuthorizationCodeAuth
+import requests
+import webbrowser
+import osmapi
+from dotenv import load_dotenv, find_dotenv
+import os
+import pandas as pd
+import logging
+```
+
+If there is any dependency missing, just install it with
+[`reticulate::py_install()`](https://rstudio.github.io/reticulate/reference/py_install.html).
+
+``` r
+# library(reticulate)
+# py_install("geopy")
+```
+
+Load environment variables
+
+``` python
+load_dotenv(find_dotenv())
+```
+
+Set up logging
+
+``` python
+logger = logging.getLogger('my_logger')
+logger.setLevel(logging.DEBUG)  # Set the base logging level
+# Use a generic log file path; replace {city} and {date} as needed
+log_file_path = '../releases/{version}/shapes_match_{city}_gtfs{date}_run{date}.osm.log'
+file_handler.setLevel(logging.DEBUG)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+```
+
+## Connect to OSM
+
+Either connect to the live OSM version…
+
+``` python
+client_id = os.getenv("OSM_OAUTH_CLIENT_ID_PROD") # To edit env vars on RStudio, use usethis::edit_r_environ()
+client_secret = os.getenv("OSM_OAUTH_CLIENT_SECRET_PROD")
+authorization_base_url = "https://www.openstreetmap.org/oauth2/authorize"
+token_url = "https://www.openstreetmap.org/oauth2/token"
+api_url = "https://api.openstreetmap.org"
+```
+
+… or the dev one. It is recommended to try to apply the changes first at
+the dev version, to avoid corrupting the live OSM data.
+
+``` python
+client_id = os.getenv("OSM_OAUTH_CLIENT_ID_DEV") # To edit env vars on RStudio, use usethis::edit_r_environ()
+client_secret = os.getenv("OSM_OAUTH_CLIENT_SECRET_DEV")
+authorization_base_url = "https://master.apis.dev.openstreetmap.org/oauth2/authorize"
+token_url = "https://master.apis.dev.openstreetmap.org/oauth2/token"
+api_url = "https://api06.dev.openstreetmap.org"
+```
+
+If no window is opened, authenticate by clicking on the url that is
+printed in the console.
+
+``` python
+redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
+oauth2client = OAuth2Client(
+    token_endpoint=token_url,
+    authorization_endpoint=authorization_base_url,
+    redirect_uri=redirect_uri,
+    client_id=client_id,
+    client_secret=client_secret,
+    auth_method="client_secret_post",
+    code_challenge_method=None
+)
+
+# Open OSM website to authorize user using the write_api and write_notes scope
+scope = ["write_api", "write_notes", "read_prefs"]
+az_request = oauth2client.authorization_request(scope=scope)
+print(f"Authorize user using this URL: {az_request.uri}")
+webbrowser.open(az_request.uri) # If on studio web, this might not work. If so, just open the link printed in the command before and jump to next line.
+```
+
+After authenticating, you will be presented with an authorization code.
+Copy it and set `auth_code` to its value.
+
+``` python
+auth_code = "" # Replace with your authorization code
+auth_code
+auth = OAuth2AuthorizationCodeAuth(
+    oauth2client,
+    auth_code,
+    redirect_uri=redirect_uri,
+)
+oauth_session = requests.Session()
+oauth_session.auth = auth
+```
+
+Test authentication (should return 200 status code)
+
+``` python
+resp = oauth_session.get(f"{api_url}/api/0.6/user/details")
+print(resp.status_code) # 200 is expected
+# print(resp.text) # This can help debugging if something goes wrong
+```
+
+Finally, open the API connection
+
+``` python
+api = osmapi.OsmApi(api=api_url, session=oauth_session)
+```
+
+## Update OSM data
+
+Attention! The script below will open a changeset and update OSM data!
+Make sure you have the right data before proceeding!
+
+``` python
+# Create change set, updating relations with tag gtfs:shape_id
+# The changeset comment can be customized to better describe the change submitted 
+with api.Changeset({"comment": "GTFS shapes and routes association (using GTFShift v0.7.0)", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+  logger.info(f"Running changeset {changeset_id} for {len(df)} relations")
+  logger.info(f"{'route_id':20s}{'shape_id':20s} | {'osm_id':20s} | {'osm_route_id':20s}{'updated?':10s}{'osm_shape_id':20s}{'updated?':10s} | {'operation status':20s}")
+  for idx, row in df.iterrows():
+    route_id = str(row["route_id"]) if "route_id" in row else None
+    shape_id = str(row["shape_id"])
+    osm_id = int(row["osm_id"])
+    
+    relation = api.RelationGet(osm_id)
+    relation_shape = str(relation["tag"]["gtfs:shape_id"]) if "gtfs:shape_id" in relation["tag"] else "-"
+    relation_route = str(relation["tag"]["gtfs:route_id"]) if "gtfs:route_id" in relation["tag"] else "-"
+    
+    status = "-"
+    if relation_shape != shape_id or route_id and (relation_route != route_id):
+      relation["tag"]["gtfs:shape_id"] = str(shape_id) # https://wiki.openstreetmap.org/wiki/Key:gtfs:shape_id
+      if route_id:
+        relation["tag"]["gtfs:route_id"] = str(route_id) # https://wiki.openstreetmap.org/wiki/Key:gtfs:route_id
+      update = api.RelationUpdate(relation)
+      status = "Updated"
+    else:
+      status = "Skipped"
+    
+    logger.info(f"{str(route_id):20s}{str(shape_id):20s} | {osm_id:20d} | {str(relation_route):20s}{('⬜' if relation_route==route_id else '✏️'):10s}{str(relation_shape):20s}{('⬜' if relation_shape==shape_id else '✏️'):10s} | {status:20s}")
+```
+
+### Rollback (avoid this, please :/)
+
+If you need to rollback the changes, use the code below.
+
+``` python
+with api.Changeset({"comment": "GTFS shapes association rollback", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+  for idx, row in df.iterrows():
+    osm_id = int(row["osm_id"])
+    relation = api.RelationGet(osm_id)
+    relation_prev = api.RelationGet(osm_id, RelationVersion=relation["version"]-1)
+    logger.info(f"{osm_id} {relation['tag']['gtfs:shape_id'] if 'gtfs:shape_id' in relation['tag'] else '-'} Current {relation['version']} Previous {relation_prev['version']}")
+    relation_prev["version"] = relation["version"] # We need to set version to last to enable update
+    update = api.RelationUpdate(relation_prev)
+```
+
+### Validate changes
+
+``` python
+logger.info("Validating changes...")
+logger.info(f"{'route_id':20s}{'shape_id':20s} | {'osm_id':20s} | {'osm_route_id':20s}{'osm_route_id==route_id':10s}{'osm_shape_id':20s}{'osm_shape_id==shape_id':10s}")
+for idx, row in df.iterrows():
+    shape_id = str(row["shape_id"])
+    route_id = str(row["route_id"]) if "route_id" in row else None
+    osm_id = int(row["osm_id"])
+  
+    relation = api.RelationGet(osm_id)
+    
+    relation_shape = str(relation["tag"]["gtfs:shape_id"]) if "gtfs:shape_id" in relation["tag"] else "-"
+    relation_route = str(relation["tag"]["gtfs:route_id"]) if "gtfs:route_id" in relation["tag"] else "-"
+  
+    # if relation_shape!=shape_id or relation_route!=route_id: 
+    logger.info(f"{route_id:20s}{shape_id:20s} | {osm_id:20d} | {relation_route:20s}{('✅' if relation_route==route_id else '❌'):10s}{relation_shape:20s}{('✅' if relation_shape==shape_id else '❌'):10s}")
+logger.info("Validation finished!")
+```

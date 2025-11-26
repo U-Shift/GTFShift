@@ -1,0 +1,328 @@
+# 2. Filter GTFS feeds
+
+``` r
+library(GTFShift)
+library(tidytransit)
+library(dplyr)
+library(mapview)
+```
+
+## Introduction
+
+GTFS feeds do not have a defined scope regarding its coverage of the
+transportation system. Some can be bounded to one agency, whereas others
+can aggregate several modes in the same city, or even national wise.
+
+From the simpler to the most complex feeds, some analysis require to
+narrow the perspective. GTFShift provides some to help in this process.
+
+## Filters
+
+### Filter by agency
+
+> This example uses a national GTFS feed for long distance rail in
+> Germany, retrieved from <https://gtfs.de/en/feeds/de_fv/>.
+
+``` r
+# Load GTFS
+gtfs = load_feed("https://download.gtfs.de/germany/fv_free/latest.zip")
+summary(gtfs)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, attributions, shapes, transfers, ., calendar, calendar_dates, feed_info, stops
+#> agencies     Nederlandse Spoorwegen, DB Fernverkehr AG, MAV ... 10 more
+#> service      from 2025-11-23 to 2025-12-13
+#> uses         stop_times (no frequencies)
+#> # routes       98
+#> # trips      3416
+#> # stop_ids   1129
+#> # stop_names  706
+#> # shapes     1412
+```
+
+Multimodal feeds aggregate several agencies.
+[`GTFShift::filter_by_agency()`](https://u-shift.github.io/GTFShift/reference/filter_by_agency.md),
+allows to filter by the agency id, name, or both. You can filter by the
+`id` and/or `name` of the agency.
+
+``` r
+# Filter by agency id
+gtfs_5 = GTFShift::filter_by_agency(gtfs, id = 5)
+summary(gtfs_5)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, attributions, shapes, transfers, ., calendar, calendar_dates, feed_info, stops
+#> agencies     Nederlandse Spoorwegen, DB Fernverkehr AG, MAV ... 10 more
+#> service      from 2025-11-23 to 2025-12-13
+#> uses         stop_times (no frequencies)
+#> # routes      4
+#> # trips      28
+#> # stop_ids   23
+#> # stop_names 23
+#> # shapes     10
+
+# Filter by agency name
+gtfs_sncf = GTFShift::filter_by_agency(gtfs, name = "SNCF")
+summary(gtfs_sncf)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, attributions, shapes, transfers, ., calendar, calendar_dates, feed_info, stops
+#> agencies     Nederlandse Spoorwegen, DB Fernverkehr AG, MAV ... 10 more
+#> service      from 2025-11-23 to 2025-12-13
+#> uses         stop_times (no frequencies)
+#> # routes      2
+#> # trips      33
+#> # stop_ids    9
+#> # stop_names  8
+#> # shapes      7
+```
+
+#### Original GTFS
+
+``` r
+shape_agency = gtfs$trips |>
+  left_join(gtfs$routes, by = "route_id") |>
+  left_join(gtfs$agency, by = "agency_id") |>
+  select(shape_id, agency_id, agency_name) |>
+  distinct() |> 
+  mutate(name = paste(agency_id, agency_name, sep = ": "))
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) |>
+  left_join(shape_agency, by = "shape_id")
+```
+
+``` r
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Agency")
+```
+
+#### GTFS filtered for agency `id = 5`
+
+``` r
+shape_agency = gtfs_5$trips |>
+  left_join(gtfs_5$routes, by = "route_id") |>
+  left_join(gtfs_5$agency, by = "agency_id") |>
+  select(shape_id, agency_id, agency_name) |>
+  distinct() |> 
+  mutate(name = paste(agency_id, agency_name, sep = ": "))
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs_5$shapes) |>
+  left_join(shape_agency, by = "shape_id")
+```
+
+``` r
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name = "Agency")
+```
+
+#### GTFS filtered for agency `name = SNCF`
+
+``` r
+shape_agency = gtfs_sncf$trips |>
+  left_join(gtfs_sncf$routes, by = "route_id") |>
+  left_join(gtfs_sncf$agency, by = "agency_id") |>
+  select(shape_id, agency_id, agency_name) |>
+  distinct()|> 
+  mutate(name = paste(agency_id, agency_name, sep = ": "))
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs_sncf$shapes) |>
+  left_join(shape_agency, by = "shape_id")
+```
+
+``` r
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Agency")
+```
+
+### Filter by mode
+
+> This example uses a metropolitan wide GTFS feed for Los Angeles rail
+> services, retrieved from
+> <https://developer.metro.net/gtfs-schedule-data/>.
+
+``` r
+# Load GTFS
+gtfs = GTFShift::load_feed("https://gitlab.com/LACMTA/gtfs_rail/raw/master/gtfs_rail.zip", create_transfers=FALSE)
+summary(gtfs)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> agency       Metro - Los Angeles
+#> service      from 2025-11-26 to 2025-12-10
+#> uses         stop_times (no frequencies)
+#> # routes        6
+#> # trips      6171
+#> # stop_ids    448
+#> # stop_names  345
+#> # shapes       16
+```
+
+Multimodal feeds aggregate several modes. `GTFShift::filter_by_mode()`
+allows to restrict the feed to some modes only. Refer to routes.txt
+‘route_type’ parameter on [GTFS
+documentation](https://gtfs.org/documentation/schedule/reference/#routestxt)
+for more details on the modes id that should be used as parameters.
+
+``` r
+# Filter by mode tram
+gtfs_tram = GTFShift::filter_by_modes(gtfs, modes = list(0))
+summary(gtfs_tram)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> agency       Metro - Los Angeles
+#> service      from 2025-11-26 to 2025-12-10
+#> uses         stop_times (no frequencies)
+#> # routes        4
+#> # trips      4136
+#> # stop_ids     95
+#> # stop_names   95
+#> # shapes        8
+```
+
+#### Original GTFS
+
+``` r
+shape_route = gtfs$trips |>
+  left_join(gtfs$routes, by = "route_id") |>
+  select(shape_id, route_id, route_type) |>
+  distinct() |> 
+  mutate(route_type = as.character(route_type))
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) |>
+  left_join(shape_route, by = "shape_id") |>
+  filter(!is.na(route_type))
+```
+
+``` r
+mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE, layer.name="Route type")
+```
+
+#### GTFS filtered for mode tram (0)
+
+``` r
+shape_route = gtfs_tram$trips |>
+  left_join(gtfs_tram$routes, by = "route_id") |>
+  select(shape_id, route_id, route_type) |>
+  distinct() |> 
+  mutate(route_type = as.character(route_type))
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs_tram$shapes) |>
+  left_join(shape_route, by = "shape_id")
+```
+
+``` r
+mapview::mapview(shapes_sf, zcol = "route_type", legend = TRUE, layer.name="Route type")
+```
+
+### Filter by route_name
+
+> This article uses a GTFS feed from the library GTFS database for
+> Portugal as an example. Refer to the
+> [vignette(“download”)](https://u-shift.github.io/GTFShift/articles/download)
+> for more details.
+
+``` r
+# Get GTFS from library GTFS database for Portugal
+data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs = GTFShift::load_feed(data[data$ID=="faro",]$URL, create_transfers=FALSE)
+summary(gtfs)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> agency       Próximo - Transportes Urbanos de Faro
+#> service      from 2024-01-01 to 2026-12-31
+#> uses         stop_times (no frequencies)
+#> # routes      14
+#> # trips      746
+#> # stop_ids   187
+#> # stop_names 126
+#> # shapes      30
+```
+
+GTFS feeds aggregate several routes.
+[`GTFShift::filter_by_route_name()`](https://u-shift.github.io/GTFShift/reference/filter_by_route_name.md),
+allows to filter the feed for specific routes, given a partial or total
+match with the short or the long name.
+
+``` r
+# Filter by short_name with exact match
+gtfs_1 = GTFShift::filter_by_route_name(
+  gtfs,
+  values = list("1"),
+  short_name = TRUE,
+  exact_match = TRUE
+)
+summary(gtfs_1)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> agency       Próximo - Transportes Urbanos de Faro
+#> service      from 2024-01-02 to 2026-12-31
+#> uses         stop_times (no frequencies)
+#> # routes      1
+#> # trips      82
+#> # stop_ids   23
+#> # stop_names 19
+#> # shapes      1
+
+# Filter by long_name with partial match
+gtfs_terminal = GTFShift::filter_by_route_name(
+  gtfs,
+  values = list("Terminal", "Rodoviário"),
+  short_name = FALSE,
+  exact_match = FALSE
+)
+summary(gtfs_terminal)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> agency       Próximo - Transportes Urbanos de Faro
+#> service      from 2024-01-01 to 2026-12-31
+#> uses         stop_times (no frequencies)
+#> # routes       6
+#> # trips      406
+#> # stop_ids   103
+#> # stop_names  72
+#> # shapes      16
+```
+
+#### Original GTFS
+
+``` r
+route_name = gtfs$trips |>
+  left_join(gtfs$routes, by = "route_id") |>
+  select(shape_id, route_id, route_short_name, route_long_name) |>
+  distinct() |> 
+  mutate(name = paste(route_short_name, route_long_name, sep = ": "))
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes) |>
+  left_join(route_name, by = "shape_id")
+```
+
+``` r
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Route name")
+```
+
+#### GTFS filtered for route short name `1` (exact match)
+
+``` r
+route_name = gtfs_1$trips |>
+  left_join(gtfs_1$routes, by = "route_id") |>
+  select(shape_id, route_id, route_short_name, route_long_name) |>
+  distinct() |> 
+  mutate(name = paste(route_short_name, route_long_name, sep = ": "))
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs_1$shapes) |>
+  left_join(route_name, by = "shape_id")
+```
+
+``` r
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Route name")
+```
+
+#### GTFS filtered for route long name `Terminal`, `Rodoviário` (partial match)
+
+``` r
+route_name = gtfs_terminal$trips |>
+  left_join(gtfs_terminal$routes, by = "route_id") |>
+  select(shape_id, route_id, route_short_name, route_long_name) |>
+  distinct() |> 
+  mutate(name = paste(route_short_name, route_long_name, sep = ": "))
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs_terminal$shapes) |>
+  left_join(route_name, by = "shape_id")
+```
+
+``` r
+mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Route name")
+```

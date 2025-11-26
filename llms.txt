@@ -1,0 +1,177 @@
+# GTFShift
+
+**GTFShift** emerged from the necessity to understand how to get an
+overview of where bus lanes should be prioritized for a given territory,
+using General Transit Feed Specification (GTFS) files.
+
+It compiles the methods developed for this purpose, aiming to contribute
+to an open source culture.
+
+## Installation
+
+You can install the development version of **GTFShift** from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("U-Shift/GTFShift")
+```
+
+## Load the package
+
+``` r
+library(GTFShift)
+```
+
+## Key functions
+
+**GTFShift** provides methods for the entire workflow of bus network
+density analysis. For detailed examples on their functionality, refer to
+the articles at <https://u-shift.github.io/GTFShift/>.
+
+### Getting transit data
+
+Starting with a valid GTFS feed is the key for a successful analysis.
+**GTFShift** includes a method to load feeds that simultaneously scans
+for any integrity errors and fixes them automatically.
+
+If the feed location is unknown, it also provides a database listing
+GTFS for Portugal and a method to query worldwide open catalogues by
+city or country names or even a bounding box.
+
+### Filter
+
+GTFS feeds do not have a defined scope regarding its coverage of the
+transportation system. Some can be bounded to one agency, whereas others
+can aggregate several modes in the same city, or even national wise.
+
+From the simpler to the most complex feeds, some analysis require to
+narrow the perspective. **GTFShift** provides some to help in this
+process.
+
+### Aggregate
+
+Public transit analysis takes advantage of the standardized GTFS format.
+However, its provision by operator makes it difficult for network
+aggregated analysis, considering connectivity and multimodality.
+
+**GTFShift** includes a method to easily generate an aggregated GTFS
+file given several instances.
+
+![](reference/figures/unify.png)
+
+> Aggregated GTFS for Fertagus and Transportes Coletivos do Barreiro
+> operators
+
+### Analyse
+
+Analyzing public transit feeds is important to understand its
+territorial coverage and dynamics, both on its spatial and temporal
+dimensions.
+
+**GTFShift** provides several methods that encapsulate pre-defined
+methodologies for them, for instance, analysing hourly frequency per
+stop, route or road segment.
+
+![](reference/figures/analyse_aggregated_frequencies.png)
+
+> Aggregated route frequency for Carris Lisboa operator, at 8:00
+
+### OSM Data
+
+OpenStreetMaps (OSM) is an important data source for transit analysis,
+due to its rich, open, and detailed geographic data.
+
+**GTFShift** includes some methods that allow to access its information
+directly, namely to export bus lanes, get centerlines for the road
+network and export the OSM transit routes.
+
+![](reference/figures/osm_buslanes.png)
+
+> OSM exported bus lanes for Lisbon
+
+## Related packages
+
+- [`{tidytransit}`](https://github.com/r-transit/tidytransit)
+- [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
+- [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
+- [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
+
+## Acknowledgement
+
+**GTFShift** is developed and maintained by
+[U-shift](https://ushift.tecnico.ulisboa.pt) urban mobility research
+group, part of [CERIS](https://ceris.pt/) research unit, at [Instituto
+Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
+
+  
+
+![](reference/figures/logo_acknowledgement.png)
+
+# Package index
+
+## Get GTFS feeds
+
+- [`load_feed()`](https://u-shift.github.io/GTFShift/reference/load_feed.md)
+  : Read GTFS feed, fixing integrity errors
+- [`query_mobilitydatabase()`](https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.md)
+  : Query Mobility Database API for GTFS feeds
+
+## Filter
+
+- [`filter_by_agency()`](https://u-shift.github.io/GTFShift/reference/filter_by_agency.md)
+  : Filter GTFS feed by agency
+- [`filter_by_modes()`](https://u-shift.github.io/GTFShift/reference/filter_by_modes.md)
+  : Filter GTFS feed by mode
+- [`filter_by_route_name()`](https://u-shift.github.io/GTFShift/reference/filter_by_route_name.md)
+  : Filter GTFS feed by route name
+
+## Analyse
+
+- [`get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
+  : Get aggregated frequency per hour for each bus route
+- [`get_stop_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.md)
+  : Get aggregated frequency per hour for each bus stop
+- [`network_overline()`](https://u-shift.github.io/GTFShift/reference/network_overline.md)
+  : Aggregate lines based on overlap with target network
+
+## Manipulate
+
+- [`unify()`](https://u-shift.github.io/GTFShift/reference/unify.md) :
+  Merge multiple GTFS into a single aggregated file
+- [`create_calendar()`](https://u-shift.github.io/GTFShift/reference/create_calendar.md)
+  : Create calendar.txt from calendar_dates.txt
+
+## OpenStreetMaps
+
+- [`osm_bus_lanes()`](https://u-shift.github.io/GTFShift/reference/osm_bus_lanes.md)
+  : Export designated bus lanes from OpenStreetMaps
+- [`osm_centerlines()`](https://u-shift.github.io/GTFShift/reference/osm_centerlines.md)
+  : Get centerlines for OSM road network
+- [`osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)
+  : Get OSM routes that match shapes, based on geometrical match
+- [`osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
+  : Get OSM routes geometry considering gtfs:shape_id match
+- [`osm_trips_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_trips_to_routes.md)
+  : Get OSM routes geometry considering gtfs:trip_id match
+
+## Utils
+
+- [`calendar_nextBusinessWednesday()`](https://u-shift.github.io/GTFShift/reference/calendar_nextBusinessWednesday.md)
+  : Get next business Wednesday
+
+# Articles
+
+### Articles
+
+- [1. Getting transit
+  data](https://u-shift.github.io/GTFShift/articles/download.md):
+- [2. Filter GTFS
+  feeds](https://u-shift.github.io/GTFShift/articles/filter.md):
+- [3. Aggregate GTFS
+  feeds](https://u-shift.github.io/GTFShift/articles/unify.md):
+- [4. Analyse GTFS
+  feeds](https://u-shift.github.io/GTFShift/articles/analyse.md):
+- [5. Get OSM data](https://u-shift.github.io/GTFShift/articles/osm.md):
+- [Extra. Update OSM
+  data](https://u-shift.github.io/GTFShift/articles/osm_update.md):

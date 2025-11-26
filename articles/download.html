@@ -97,7 +97,7 @@ but most of it is built upon <a href="https://r-transit.github.io/tidytransit/" 
 the methods that accept a GTFS object should be a <code>tidygtfs</code>
 object.</p>
 <p>To create it, you can either use <code><a href="../reference/load_feed.html">GTFShift::load_feed()</a></code>
-or the tidytransit method, <code><a href="https://rdrr.io/pkg/tidytransit/man/read_gtfs.html" class="external-link">tidytransit::read_gtfs()</a></code>.
+or the tidytransit method, <code><a href="https://r-transit.github.io/tidytransit/reference/read_gtfs.html" class="external-link">tidytransit::read_gtfs()</a></code>.
 Actually, <code><a href="../reference/load_feed.html">GTFShift::load_feed()</a></code> is an extension of the
 last, with the additional features of scanning the feed for any
 integrity errors and fixing them automatically, as well as the option to
@@ -138,32 +138,32 @@ free at Mobility Database <a href="https://mobilitydatabase.org/account" class="
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">status</span> <span class="op">==</span> <span class="st">"active"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">status</span>, <span class="va">producer_url</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                                      provider status</span></span>
-<span><span class="co">#&gt; 1                                      Carris active</span></span>
-<span><span class="co">#&gt; 2                 Cascais Próxima, E.M., S.A. active</span></span>
-<span><span class="co">#&gt; 3                                    Fertagus active</span></span>
-<span><span class="co">#&gt; 4                     Metro de Lisboa (Metro) active</span></span>
-<span><span class="co">#&gt; 5 Metro Transportes do Sul, Metro Sul do Tejo active</span></span>
-<span><span class="co">#&gt; 6           Transportes Coletivos do Barreiro active</span></span>
+<span><span class="co">#&gt;                            provider status</span></span>
+<span><span class="co">#&gt; 1                            Carris active</span></span>
+<span><span class="co">#&gt; 2       Cascais Próxima, E.M., S.A. active</span></span>
+<span><span class="co">#&gt; 3                          Fertagus active</span></span>
+<span><span class="co">#&gt; 4           Metro de Lisboa (Metro) active</span></span>
+<span><span class="co">#&gt; 5 Transportes Coletivos do Barreiro active</span></span>
+<span><span class="co">#&gt; 6                         Transtejo active</span></span>
 <span><span class="co">#&gt;                                                                       producer_url</span></span>
 <span><span class="co">#&gt; 1                             https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS</span></span>
 <span><span class="co">#&gt; 2 https://drive.google.com/uc?export=download&amp;id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX</span></span>
 <span><span class="co">#&gt; 3                             https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip</span></span>
 <span><span class="co">#&gt; 4                      https://www.metrolisboa.pt/google_transit/googleTransit.zip</span></span>
-<span><span class="co">#&gt; 5                                              https://mts.pt/imt/MTS-20240129.zip</span></span>
-<span><span class="co">#&gt; 6                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip</span></span>
+<span><span class="co">#&gt; 5                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip</span></span>
+<span><span class="co">#&gt; 6               http://www.transporlis.pt/Portals/0/OpenData/gtfs/zip/4/gtfs_4.zip</span></span>
 <span></span>
 <span><span class="va">gtfs</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/load_feed.html">load_feed</a></span><span class="op">(</span><span class="va">feeds</span><span class="op">$</span><span class="va">producer_url</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, create_transfers<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidygtfs object</span></span>
 <span><span class="co">#&gt; files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops</span></span>
 <span><span class="co">#&gt; agency       Cascais Próxima</span></span>
-<span><span class="co">#&gt; service      from 2024-08-01 to 2025-08-31</span></span>
+<span><span class="co">#&gt; service      from 2024-08-01 to 2026-12-31</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
 <span><span class="co">#&gt; # routes       94</span></span>
 <span><span class="co">#&gt; # trips      3794</span></span>
-<span><span class="co">#&gt; # stop_ids   1065</span></span>
-<span><span class="co">#&gt; # stop_names  586</span></span>
+<span><span class="co">#&gt; # stop_ids   1073</span></span>
+<span><span class="co">#&gt; # stop_names  591</span></span>
 <span><span class="co">#&gt; # shapes      139</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -226,13 +226,13 @@ operator GTFS.</li>
 <span><span class="co">#&gt; tidygtfs object</span></span>
 <span><span class="co">#&gt; files        agency, routes, stop_times, trips, calendar, calendar_dates, stops</span></span>
 <span><span class="co">#&gt; agency       CP - Comboios de Portugal</span></span>
-<span><span class="co">#&gt; service      from 2024-12-15 to 2025-12-13</span></span>
+<span><span class="co">#&gt; service      from 2024-12-15 to 2026-12-12</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
-<span><span class="co">#&gt; # routes      174</span></span>
-<span><span class="co">#&gt; # trips      1733</span></span>
+<span><span class="co">#&gt; # routes      193</span></span>
+<span><span class="co">#&gt; # trips      3293</span></span>
 <span><span class="co">#&gt; # stop_ids    457</span></span>
 <span><span class="co">#&gt; # stop_names  457</span></span>
-<span><span class="co">#&gt; # shapes      254</span></span></code></pre></div>
+<span><span class="co">#&gt; # shapes      270</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -246,7 +246,7 @@ operator GTFS.</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
