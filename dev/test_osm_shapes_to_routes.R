@@ -10,9 +10,18 @@ q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
   add_osm_feature(key = "route", value = c("bus")) |>
   add_osm_feature(key = "operator", value = "STCP", key_exact = TRUE)
 
+# > Match route_id with shape_id
 match = osm_shapes_to_routes(gtfs, q)
 View(match)
 
 result = match |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
 nrow(result)
 length(unique(result$route_id))
+
+# > Match route_id with shape_id an osm_way_id
+match_ways = osm_shapes_to_routes(gtfs, q, TRUE)
+View(match_ways)
+
+result_ways = match |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
+nrow(result_ways)
+length(unique(result_ways$route_id))

@@ -41,12 +41,6 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
 
   total_steps = ifelse(ways, 3, 2)
 
-  pb <- progress::progress_bar$new( # Track progress
-    format = "1/2: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
-    clear = FALSE, show_after=0
-  )
-  pb$update(0)
-
   # 1. Get OSM routes
   pb <- progress::progress_bar$new( # Track progress
     format = sprintf("1/%d: Fetching OSM routes [:bar] :percent :spin elapsed=:elapsed", total_steps),
@@ -66,8 +60,6 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
   pb$update(1)
   pb$terminate()
 
-  pb$update(1)
-
   # 2. Merge with GTFS
   shape_ids = gtfs$trips |> select(shape_id) |> distinct()
   pb <- progress::progress_bar$new( # Track progress
@@ -79,8 +71,6 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
   result = shape_ids |>
     inner_join(osm_multilines_redux |> select("osm_id", "gtfs:shape_id", "geometry"), by=c("shape_id" = "gtfs:shape_id")) |>
     st_as_sf()
-  pb$update(1)
-  message(sprintf("> Matched %d shapes with OSM routes!", nrow(result)))
 
   pb$update(1)
   pb$terminate()
@@ -133,10 +123,11 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
     # 3.2. Disaggregate relations in ways
     result = result |>
       sf::st_drop_geometry() |>
-      rename(relation_osm_id = osm_id) |>
-      left_join(ways_relations |> rename(way_osm_id = ref), by = "relation_osm_id") |>
-      left_join(osm$osm_lines |> select(osm_id, geometry) |> rename(way_osm_id = osm_id), by = "way_osm_id") |>
-      sf::st_as_sf()
+      left_join(ways_relations |> rename(way_osm_id = ref) |> rename(osm_id = relation_osm_id), by = "osm_id")
+    geom <- osm$osm_lines$geometry
+    names(geom) <- NULL
+    result$geometry <- geom[match(result$way_osm_id, osm$osm_lines$osm_id)]
+    result <- sf::st_as_sf(result, sf_column_name = "geometry", crs = st_crs(osm_ways_unique))
 
     pb$update(1)
     pb$terminate()
