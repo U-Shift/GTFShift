@@ -41,6 +41,12 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
 
   total_steps = ifelse(ways, 3, 2)
 
+  pb <- progress::progress_bar$new( # Track progress
+    format = "1/2: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
+    clear = FALSE, show_after=0
+  )
+  pb$update(0)
+
   # 1. Get OSM routes
   pb <- progress::progress_bar$new( # Track progress
     format = sprintf("1/%d: Fetching OSM routes [:bar] :percent :spin elapsed=:elapsed", total_steps),
@@ -53,11 +59,14 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
   while (job$is_alive()) { pb$tick(0); Sys.sleep(0.1) }
   osm <- job$get_result()
 
+  pb$update(0.5)
   osm_multilines <- osm$osm_multilines
   osm_multilines_redux = osm_multilines |>
     select(any_of(c("osm_id", "gtfs:shape_id")))
   pb$update(1)
   pb$terminate()
+
+  pb$update(1)
 
   # 2. Merge with GTFS
   shape_ids = gtfs$trips |> select(shape_id) |> distinct()
@@ -70,6 +79,8 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
   result = shape_ids |>
     inner_join(osm_multilines_redux |> select("osm_id", "gtfs:shape_id", "geometry"), by=c("shape_id" = "gtfs:shape_id")) |>
     st_as_sf()
+  pb$update(1)
+  message(sprintf("> Matched %d shapes with OSM routes!", nrow(result)))
 
   pb$update(1)
   pb$terminate()
