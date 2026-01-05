@@ -127,7 +127,7 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
     geom <- osm$osm_lines$geometry
     names(geom) <- NULL
     result$geometry <- geom[match(result$way_osm_id, osm$osm_lines$osm_id)]
-    result <- sf::st_as_sf(result, sf_column_name = "geometry", crs = st_crs(osm_ways_unique))
+    result <- sf::st_as_sf(result, sf_column_name = "geometry", crs = st_crs(osm$osm_lines))
 
     pb$update(1)
     pb$terminate()
