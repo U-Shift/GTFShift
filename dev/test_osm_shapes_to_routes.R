@@ -24,6 +24,7 @@ mapview::mapview(match |> filter(shape_id=="107_0_1_shp"), zcol="shape_id")
 # > Match route_id with shape_id an osm_way_id
 match_ways = osm_shapes_to_routes(gtfs, q, TRUE)
 View(match_ways |> sf::st_drop_geometry())
+names(match_ways)
 
 result_ways = match_ways |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
 nrow(result_ways)
