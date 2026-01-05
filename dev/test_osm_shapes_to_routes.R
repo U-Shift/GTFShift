@@ -12,16 +12,25 @@ q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 
 # > Match route_id with shape_id
 match = osm_shapes_to_routes(gtfs, q)
-View(match)
+View(match |> sf::st_drop_geometry())
+
 
 result = match |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
 nrow(result)
 length(unique(result$route_id))
 
+mapview::mapview(match |> filter(shape_id=="107_0_1_shp"), zcol="shape_id")
+
 # > Match route_id with shape_id an osm_way_id
 match_ways = osm_shapes_to_routes(gtfs, q, TRUE)
-View(match_ways)
+View(match_ways |> sf::st_drop_geometry())
 
-result_ways = match |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
+result_ways = match_ways |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
 nrow(result_ways)
 length(unique(result_ways$route_id))
+
+length(result_ways$way_osm_id)
+length(unique(result_ways$way_osm_id))
+
+mapview::mapview(match_ways |> filter(shape_id=="107_0_1_shp"), zcol="way_osm_id")
+
