@@ -15,9 +15,9 @@ match = osm_shapes_to_routes(gtfs, q)
 View(match |> sf::st_drop_geometry())
 
 
-result = match |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
-nrow(result)
-length(unique(result$route_id))
+result_shapes = match |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
+nrow(result_shapes)
+length(unique(result_shapes$route_id))
 
 mapview::mapview(match |> filter(shape_id=="107_0_1_shp"), zcol="shape_id")
 
@@ -28,9 +28,12 @@ View(match_ways |> sf::st_drop_geometry())
 result_ways = match_ways |> sf::st_drop_geometry() |> left_join(gtfs$trips |> select(shape_id, route_id), by=c("shape_id"="shape_id"), multiple="first")
 nrow(result_ways)
 length(unique(result_ways$route_id))
+View(result_ways)
 
 length(result_ways$way_osm_id)
 length(unique(result_ways$way_osm_id))
 
-mapview::mapview(match_ways |> filter(shape_id=="107_0_1_shp"), zcol="way_osm_id")
+mapview::mapview(match_ways |> filter(shape_id=="12M_1_1_shp"), zcol="way_osm_id")
+mapview::mapview(match_ways |> filter(shape_id=="12M_1_1_shp"), zcol="lanes")
+mapview::mapview(match_ways |> filter(shape_id=="12M_1_1_shp"), zcol="lanes:bus")
 
