@@ -12,7 +12,10 @@
 #' \itemize{
 #'  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
 #'  \item \code{relation_osm_id}, the \code{osm_id} attribute from OSM route relation.
-#'  \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way (if \code{ways} parameter is set to true).
+#'  \item \code{way_osm_id}, the \href{https://wiki.openstreetmap.org/wiki/Key:osm_id}{\code{osm_id}} attribute from OSM way (if \code{ways} parameter is set to true).
+#'  \item \code{lanes:*}, the \href{https://wiki.openstreetmap.org/wiki/Key:lanes}{\code{lanes}} and extended attributes from OSM way (if \code{ways} parameter is set to true).
+#'  \item \code{psv:*}, the \href{https://wiki.openstreetmap.org/wiki/Key:psv}{\code{psv}} and extended attributes from OSM way (if \code{ways} parameter is set to true).
+#'  \item \code{bus:*}, the \href{https://wiki.openstreetmap.org/wiki/Key:bus}{\code{bus}} and extended attributes from OSM way (if \code{ways} parameter is set to true).
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
 #' }
 #'
@@ -123,7 +126,9 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
     # 3.2. Disaggregate relations in ways
     result = result |>
       sf::st_drop_geometry() |>
-      left_join(ways_relations |> rename(way_osm_id = ref) |> rename(osm_id = relation_osm_id), by = "osm_id")
+      left_join(ways_relations |> rename(way_osm_id = ref) |> rename(osm_id = relation_osm_id), by = "osm_id") |>
+      left_join(as_tibble(osm$osm_lines) |> select(osm_id, starts_with("lanes"), starts_with("psv"), starts_with("bus")), by = c("way_osm_id" = "osm_id"))
+
     geom <- osm$osm_lines$geometry
     names(geom) <- NULL
     result$geometry <- geom[match(result$way_osm_id, osm$osm_lines$osm_id)]
