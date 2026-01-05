@@ -3,6 +3,7 @@
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param q osmdata::opq. Overpass query for transit network.
 #' @param ways boolean (Default False). If true, relation is dissagregated in ways.
+#' @param ways_tags character vector (Default \code{c("lanes", "psv", "bus", "way")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations, considering the
@@ -13,9 +14,7 @@
 #'  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
 #'  \item \code{relation_osm_id}, the \code{osm_id} attribute from OSM route relation.
 #'  \item \code{way_osm_id}, the \href{https://wiki.openstreetmap.org/wiki/Key:osm_id}{\code{osm_id}} attribute from OSM way (if \code{ways} parameter is set to true).
-#'  \item \code{lanes:*}, the \href{https://wiki.openstreetmap.org/wiki/Key:lanes}{\code{lanes}} and extended attributes from OSM way (if \code{ways} parameter is set to true).
-#'  \item \code{psv:*}, the \href{https://wiki.openstreetmap.org/wiki/Key:psv}{\code{psv}} and extended attributes from OSM way (if \code{ways} parameter is set to true).
-#'  \item \code{bus:*}, the \href{https://wiki.openstreetmap.org/wiki/Key:bus}{\code{bus}} and extended attributes from OSM way (if \code{ways} parameter is set to true).
+#'  \item \code{*}, any column that matches \code{ways_tags} parameter.
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
 #' }
 #'
@@ -40,7 +39,7 @@
 #' @import callr
 #'
 #' @export
-osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
+osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "psv", "bus", "way")) {
 
   total_steps = ifelse(ways, 3, 2)
 
@@ -127,7 +126,7 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE) {
     result = result |>
       sf::st_drop_geometry() |>
       left_join(ways_relations |> rename(way_osm_id = ref) |> rename(osm_id = relation_osm_id), by = "osm_id") |>
-      left_join(as_tibble(osm$osm_lines) |> select(osm_id, starts_with("lanes"), starts_with("psv"), starts_with("bus")), by = c("way_osm_id" = "osm_id"))
+      left_join(as_tibble(osm$osm_lines) |> select(osm_id, contains(ways_tags)), by = c("way_osm_id" = "osm_id"))
 
     geom <- osm$osm_lines$geometry
     names(geom) <- NULL
