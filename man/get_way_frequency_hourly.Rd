@@ -30,8 +30,8 @@ An \code{sf} \code{data.frame} object with the following columns:
 For each OSM way with GTFS service, returns the number of departures aggregated per hour and direction.
 }
 \details{
-This method analyses the GTFS feed for a representative day, finding for each route the corresponding OSM ways using \code{GTFShift::osm_shapes_to_routes()},
-aggregating the the number of services per hour and direction for each.
+This method analyses the GTFS feed for a representative day, finding for each route the corresponding OSM ways using \code{GTFShift::osm_shapes_to_routes()}
+(routes not on OSM are ignored), aggregating the the number of services per hour and direction for each.
 
 For a detailed example, see the \code{vignette("analyse")}.
 }
