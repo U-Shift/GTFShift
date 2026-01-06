@@ -99,6 +99,27 @@ mapview::mapview(
 ```
 
 
+# Analyse hourly frequency per road segment
+
+To analyse frequencies at road segments, use `GTFShift::get_way_frequency_hourly()`, returning aggregated results per hour and road segment, using OSM ways.
+
+> Mind that routs without an OSM match are ignored. Refer to `GTFShift::osm_shapes_to_routes()` for more details.
+
+```{r}
+frequencies_way = GTFShift::get_way_frequency_hourly(gtfs, osm_q)
+summary(frequencies_way)
+quantile(frequencies_way$frequency)
+```
+
+It returns an `sf` `data.frame` that can be displayed using mapview.
+
+```{r, cache=FALSE}
+mapview::mapview(
+  frequencies_way |> filter(hour == 8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
+```
 
 # Analyse hourly frequency per route
 

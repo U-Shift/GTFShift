@@ -12,8 +12,8 @@
 #' @returns A \code{sf} \code{data.frame} with the following columns:
 #' \itemize{
 #'  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
-#'  \item \code{relation_osm_id}, the \code{osm_id} attribute from OSM route relation.
-#'  \item \code{way_osm_id}, the \href{https://wiki.openstreetmap.org/wiki/Key:osm_id}{\code{osm_id}} attribute from OSM way (if \code{ways} parameter is set to true).
+#'  \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
+#'  \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way (if \code{ways} parameter is set to true).
 #'  \item \code{*}, any column that matches \code{ways_tags} parameter.
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
 #' }
