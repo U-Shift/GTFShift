@@ -54,7 +54,7 @@ osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 
 route_extent_carris = get_network_extension(gtfs, route_identifier="route_short_name", direction_wise = TRUE, use_osm_routes = osm_q, unified = TRUE)
 drop_units(route_extent_carris/1000)
-#> [1] 811.4237
+#> [1] 810.5296
 ```
 
 ## Analyse hourly frequency per stop
@@ -74,10 +74,10 @@ hour.
 frequencies_stop = GTFShift::get_stop_frequency_hourly(gtfs)
 summary(frequencies_stop)
 #>    stop_id               hour         frequency               geometry    
-#>  Length:39303       Min.   : 6.00   Min.   : 1.000   POINT        :39303  
+#>  Length:39212       Min.   : 6.00   Min.   : 1.000   POINT        :39212  
 #>  Class :character   1st Qu.:10.00   1st Qu.: 3.000   epsg:4326    :    0  
 #>  Mode  :character   Median :14.00   Median : 6.000   +proj=long...:    0  
-#>                     Mean   :14.21   Mean   : 7.676                        
+#>                     Mean   :14.22   Mean   : 7.704                        
 #>                     3rd Qu.:18.00   3rd Qu.:10.000                        
 #>                     Max.   :23.00   Max.   :45.000
 ```
@@ -132,7 +132,7 @@ summary(frequencies_route)
 #>  Min.   : 1.000   Length:3397        LINESTRING   :3397  
 #>  1st Qu.: 2.000   Class :character   epsg:4326    :   0  
 #>  Median : 3.000   Mode  :character   +proj=long...:   0  
-#>  Mean   : 3.416                                          
+#>  Mean   : 3.415                                          
 #>  3rd Qu.: 4.000                                          
 #>  Max.   :12.000
 quantile(frequencies_route$frequency)
@@ -150,10 +150,10 @@ prioritizing interventions in the network.
 frequencies_route_overline = GTFShift::get_route_frequency_hourly(gtfs, overline = TRUE)
 summary(frequencies_route_overline)
 #>    frequency           hour                geometry     
-#>  Min.   :  1.00   Min.   : 0.00   LINESTRING   :138486  
+#>  Min.   :  1.00   Min.   : 0.00   LINESTRING   :138297  
 #>  1st Qu.:  4.00   1st Qu.: 9.00   epsg:4326    :     0  
 #>  Median :  7.00   Median :13.00   +proj=long...:     0  
-#>  Mean   : 10.13   Mean   :13.03                         
+#>  Mean   : 10.12   Mean   :13.03                         
 #>  3rd Qu.: 13.00   3rd Qu.:18.00                         
 #>  Max.   :121.00   Max.   :23.00
 quantile(frequencies_route_overline$frequency)

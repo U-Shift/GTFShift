@@ -74,29 +74,25 @@ feeds |>
 #> 1                            Carris active
 #> 2       Cascais Próxima, E.M., S.A. active
 #> 3                          Fertagus active
-#> 4           Metro de Lisboa (Metro) active
-#> 5 Transportes Coletivos do Barreiro active
-#> 6                         Transtejo active
+#> 4 Transportes Coletivos do Barreiro active
 #>                                                                       producer_url
-#> 1                             https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS
+#> 1                            https://gateway.carris.pt/gateway/gtfs/api/v2.11/GTFS
 #> 2 https://drive.google.com/uc?export=download&id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX
 #> 3                             https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip
-#> 4                      https://www.metrolisboa.pt/google_transit/googleTransit.zip
-#> 5                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
-#> 6               http://www.transporlis.pt/Portals/0/OpenData/gtfs/zip/4/gtfs_4.zip
+#> 4                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
 
 gtfs = GTFShift::load_feed(feeds$producer_url[2], create_transfers=FALSE)
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops
-#> agency       Cascais Próxima
-#> service      from 2024-08-01 to 2026-12-31
+#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> agency       Carris
+#> service      from 2025-12-02 to 2026-06-05
 #> uses         stop_times (no frequencies)
-#> # routes       94
-#> # trips      3794
-#> # stop_ids   1073
-#> # stop_names  591
-#> # shapes      139
+#> # routes        175
+#> # trips      167449
+#> # stop_ids     2337
+#> # stop_names   1138
+#> # shapes        308
 ```
 
 ### Using GTFShift incorporated database for Portugal
@@ -150,11 +146,11 @@ summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, calendar, calendar_dates, stops
 #> agency       CP - Comboios de Portugal
-#> service      from 2024-12-15 to 2026-12-12
+#> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      193
-#> # trips      3293
+#> # routes      181
+#> # trips      1795
 #> # stop_ids    457
 #> # stop_names  457
-#> # shapes      270
+#> # shapes      252
 ```

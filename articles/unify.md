@@ -31,19 +31,19 @@ gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
   return(feed)
 })
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, shapes, dead_runs, layover, blocks, calendar, calendar_dates, feed_info, stops
 #> agency       Transportes Colectivos do Barreiro
-#> service      from 2025-09-15 to 2025-12-31
+#> service      from 2025-12-17 to 2026-12-31
 #> uses         stop_times (no frequencies)
-#> # routes       20
-#> # trips      2384
-#> # stop_ids    279
-#> # stop_names  161
-#> # shapes      111
+#> # routes       75
+#> # trips      2460
+#> # stop_ids    278
+#> # stop_names  160
+#> # shapes       75
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops
 #> agency       Fertagus
-#> service      from 2025-06-03 to 2025-12-03
+#> service      from 2026-01-01 to 2026-07-01
 #> uses         stop_times (no frequencies)
 #> # routes       3
 #> # trips      260
@@ -66,23 +66,23 @@ gtfs_united = GTFShift::unify(gtfs_list[[1]], gtfs_list[[2]], create_transfers =
 
 summary(gtfs_united)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, transfers, vehicles, ., calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, transfers, dead_runs, layover, blocks, vehicles, ., calendar, calendar_dates, feed_info, stops
 #> agencies     Transportes Colectivos do Barreiro, Fertagus
-#> service      from 2025-06-03 to 2025-12-31
+#> service      from 2025-12-17 to 2026-12-31
 #> uses         stop_times (no frequencies)
-#> # routes       23
-#> # trips      2644
-#> # stop_ids    293
-#> # stop_names  175
-#> # shapes      117
+#> # routes       78
+#> # trips      2720
+#> # stop_ids    292
+#> # stop_names  174
+#> # shapes       81
 
 summary(gtfs_united$transfers)
 #>  from_stop_id        to_stop_id        transfer_type min_transfer_time
-#>  Length:1130        Length:1130        Min.   :2     Min.   :120.0    
+#>  Length:1140        Length:1140        Min.   :2     Min.   :120.0    
 #>  Class :character   Class :character   1st Qu.:2     1st Qu.:120.0    
-#>  Mode  :character   Mode  :character   Median :2     Median :255.0    
-#>                                        Mean   :2     Mean   :246.8    
-#>                                        3rd Qu.:2     3rd Qu.:351.0    
+#>  Mode  :character   Mode  :character   Median :2     Median :250.0    
+#>                                        Mean   :2     Mean   :245.4    
+#>                                        3rd Qu.:2     3rd Qu.:350.0    
 #>                                        Max.   :2     Max.   :416.0
 ```
 
