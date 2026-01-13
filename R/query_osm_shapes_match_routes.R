@@ -102,7 +102,8 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
   osm_multilines <- osm$osm_multilines
   osm_multilines_redux <- osm_multilines |>
-    select(any_of(c("osm_id", "ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id")))
+    select(any_of(c("osm_id", "ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id"))) |>
+    distinct(osm_id, .keep_all = TRUE)
   pb$update(0.25)
 
   st_agr(osm$osm_points) <- "constant" # https://github.com/r-spatial/sf/issues/406
@@ -176,8 +177,10 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
     # 1. Get base data
     # > Filter OSM network
-    osm_route_name <- osm_multilines_redux |>
-      filter(.data[[osm_match]] == route_name)
+    osm_route_name <- osm_multilines_redux |> dplyr::filter( grepl(route_name, .data[[osm_match]], fixed = TRUE) )
+    if (nrow(osm_route_name) == 0) { # Try case insensitive match
+      osm_route_name <- osm_multilines_redux |> dplyr::filter(grepl(.data[[osm_match]], route_name, fixed = TRUE) )
+    }
 
     # >> Validate OSM data
     if (nrow(osm_route_name) == 0) { # Validate that there is an OSM match for GTFS route
@@ -268,8 +271,8 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
             ) |>
             slice(1) |>
             pull(ref),
-          initial = osm_stoppositions |> filter(osm_id==first_stop_osm_id) |> slice(1) |> pull(geometry),
-          final = osm_stoppositions |> filter(osm_id==last_stop_osm_id) |> slice(1) |> pull(geometry)
+          initial = osm_stoppositions |> filter(osm_id==first_stop_osm_id) |> slice(1) |> pull(geometry) |> first(default = NA),
+          final = osm_stoppositions |> filter(osm_id==last_stop_osm_id) |> slice(1) |> pull(geometry) |> first(default = NA)
         ) |>
         ungroup() |>
         select(osm_id, name, route_dist, nr_stops, first_stop_osm_id, last_stop_osm_id, initial, final, geometry) |>
@@ -365,32 +368,39 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
     return(gtfs_route_name_result)
   })
-  result_success <- bind_rows( result[lengths(result)>1] )
+  if (length(result[lengths(result)>1]) == 1) {
+    result_success <- result[[ which(lengths(result)>1) ]]
+  } else {
+    result_success <- bind_rows( result[lengths(result)>1] )
+  }
   pb$update(1)
   pb$terminate()
 
-  m = sprintf(
-    "> Associated %d shapes (%.2f%% of %d total) of %d routes (%.2f%% of %d total) with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops\n",
-    nrow(result_success),
-    nrow(result_success) / nrow(shapes_sf) * 100,
-    nrow(shapes_sf),
-    nrow(result_success |> distinct(route_id)),
-    nrow(result_success |> distinct(route_id)) / length(unique(gtfs$routes$route_id)) * 100,
-    length(unique(gtfs$routes$route_id)),
-    mean(result_success$points_diff),
-    mean(result_success$distance_diff),
-    mean(result_success$stops_diff)
-  )
-  message(m)
-  if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
-  m = sprintf(
-    "> Of those, %d shapes (%.2f%% of %d matched) have a distance difference below 1000 meters, a points difference below 500 meters\n",
-    nrow(result_success |> filter(distance_diff < 1000 & points_diff < 500)),
-    nrow(result_success |> filter(distance_diff < 1000 & points_diff < 500)) / nrow(result_success) * 100,
-    nrow(result_success)
-  )
-  message(m)
-  if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
+  if (nrow(result_success) > 0) {
+    m = sprintf(
+      "> Associated %d shapes (%.2f%% of %d total) of %d routes (%.2f%% of %d total) with OSM routes, with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops\n",
+      nrow(result_success),
+      nrow(result_success) / nrow(shapes_sf) * 100,
+      nrow(shapes_sf),
+      nrow(result_success |> distinct(route_id)),
+      nrow(result_success |> distinct(route_id)) / length(unique(gtfs$routes$route_id)) * 100,
+      length(unique(gtfs$routes$route_id)),
+      mean(result_success$points_diff),
+      mean(result_success$distance_diff),
+      mean(result_success$stops_diff)
+    )
+    message(m)
+    if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
+
+    m = sprintf(
+      "> Of those, %d shapes (%.2f%% of %d matched) have a distance difference below 1000 meters, a points difference below 500 meters\n",
+      nrow(result_success |> filter(distance_diff < 1000 & points_diff < 500)),
+      nrow(result_success |> filter(distance_diff < 1000 & points_diff < 500)) / nrow(result_success) * 100,
+      nrow(result_success)
+    )
+    message(m)
+    if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
+  }
 
   not_found <- bind_rows( result[lengths(result)<=1] )
   warning_osm_unsorted_stops <- unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
@@ -437,6 +447,13 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     ))
     warning(w)
     if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
+  }
+
+  if (nrow(result_success) == 0) {
+    m = "> No shapes were matched with OSM routes!\n"
+    message(m)
+    if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
+    return (if (geometry) st_sf(data.frame()) else data.frame())
   }
 
   result_success <- result_success |> select(route_id, shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name)
