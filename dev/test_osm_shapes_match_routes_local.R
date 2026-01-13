@@ -134,6 +134,21 @@ regions = rbind( # Toulouse
   )
 )
 
+regions = rbind( # CP Portugal
+  regions,
+  data.frame(
+    name = "cp_pt",
+    gtfs_url = "https://publico.cp.pt/gtfs/gtfs.zip",
+    gtfs_day = gsub("-", "", Sys.Date()),
+    query = I(list(list(
+      list(key = "route", value = c("train"), key_exact = TRUE),
+      list(key = "operator", value = "Comboios de Portugal", key_exact = TRUE)
+    ))),
+    gtfs_match = "route_short_name",
+    osm_match = "name"
+  )
+)
+
 
 # main()
 for(i in 1:nrow(regions)) {
@@ -160,7 +175,12 @@ for(i in 1:nrow(regions)) {
   assign(sprintf("q_%s_gtfs%s", region$name, region$gtfs_day), q)
 
   # Match shapes geometry
-  shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs, q, log_file = sprintf("%s/shapes_match_%s_gtfs%s_run%s.r.log", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date())))
+  shapes_match_routes = GTFShift::osm_shapes_match_routes(
+    gtfs, q,
+    gtfs_match = if (!is.null(region$gtfs_match)) region$gtfs_match else "route_short_name",
+    osm_match = if (!is.null(region$osm_match)) region$osm_match else "ref",
+    log_file = sprintf("%s/shapes_match_%s_gtfs%s_run%s.r.log", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date()))
+  )
   assign(sprintf("shapes_match_routes_%s_gtfs%s", region$name, region$gtfs_day), shapes_match_routes)
 
   write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
@@ -169,3 +189,19 @@ for(i in 1:nrow(regions)) {
   ), sprintf("%s/shapes_match_%s_gtfs%s_run%s.csv", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
   sf::st_write(shapes_match_routes, sprintf("%s/shapes_match_%s_gtfs%s_run%s.gpkg", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
 }
+
+
+# CP debug
+summary(gtfs)
+
+routes = gtfs$routes |>
+  filter(grepl("Sintra", route_short_name)) |>
+  mutate(
+    from = str_split_fixed(route_id, "-", 3)[, 2],
+    to = str_split_fixed(route_id, "-", 3)[, 3]
+  ) |>
+  left_join(gtfs$stops |> select(stop_id, stop_name) |> rename(from_name = stop_name), by = c("from" = "stop_id")) |>
+  left_join(gtfs$stops |> select(stop_id, stop_name) |> rename(to_name = stop_name), by = c("to" = "stop_id"))
+
+routes
+View(routes)
