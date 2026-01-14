@@ -5,6 +5,7 @@
 #' @param geometry Boolean (Default TRUE). If TRUE, returns sf object with geometry, otherwise, a simple data.frame.
 #' @param gtfs_match String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
 #' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
+#' @param gtfs_osm_match_exact Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered.
 #' @param log_file String (Optional). If provided, will log warnings to this file, in adition to the console.
 #'
 #' @details
@@ -58,7 +59,7 @@
 #' @import callr
 #'
 #' @export
-osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", log_file = NA) {
+osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA) {
 
   if (!is.na(log_file)) cat(
     sprintf("-----------------------------\n%s: Running osm_shapes_match_routes() for %s...\n\n", Sys.time(), paste(gtfs$agency$agency_name, collapse=", "))
@@ -177,10 +178,17 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
     # 1. Get base data
     # > Filter OSM network
-    osm_route_name <- osm_multilines_redux |> dplyr::filter( grepl(route_name, .data[[osm_match]], fixed = TRUE) )
-    if (nrow(osm_route_name) == 0) { # Try case insensitive match
-      osm_route_name <- osm_multilines_redux |> dplyr::filter(grepl(.data[[osm_match]], route_name, fixed = TRUE) )
+    if (gtfs_osm_match_exact) {
+      osm_route_name <- osm_multilines_redux |>
+        filter(.data[[osm_match]] == route_name)
+    } else {
+      osm_route_name <- osm_multilines_redux |> dplyr::filter( grepl(route_name, .data[[osm_match]], fixed = TRUE) )
+      if (nrow(osm_route_name) == 0) {
+        osm_route_name <- osm_multilines_redux |> dplyr::filter(grepl(.data[[osm_match]], route_name, fixed = TRUE) )
+      }
     }
+
+
 
     # >> Validate OSM data
     if (nrow(osm_route_name) == 0) { # Validate that there is an OSM match for GTFS route
