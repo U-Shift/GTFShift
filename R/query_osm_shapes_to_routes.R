@@ -2,7 +2,7 @@
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param q osmdata::opq. Overpass query for transit network.
-#' @param ways boolean (Default False). If true, relation is dissagregated in ways.
+#' @param ways boolean (Default False). If true, relation is disaggregated in ways.
 #' @param ways_tags character vector (Default \code{c("lanes", "psv", "bus", "way")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.
 #'
 #' @details
@@ -125,7 +125,7 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
     # 3.2. Disaggregate relations in ways
     result = result |>
       sf::st_drop_geometry() |>
-      left_join(ways_relations |> rename(way_osm_id = ref) |> rename(osm_id = relation_osm_id), by = "osm_id") |>
+      left_join(ways_relations |> rename(way_osm_id = ref, osm_id = relation_osm_id), by = "osm_id") |>
       left_join(as_tibble(osm$osm_lines) |> select(osm_id, contains(ways_tags)), by = c("way_osm_id" = "osm_id"))
 
     geom <- osm$osm_lines$geometry
