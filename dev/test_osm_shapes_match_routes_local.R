@@ -190,18 +190,31 @@ for(i in 1:nrow(regions)) {
   sf::st_write(shapes_match_routes, sprintf("%s/shapes_match_%s_gtfs%s_run%s.gpkg", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
 }
 
+shapes_match_routes
 
 # CP debug
+library(stringr)
+
 summary(gtfs)
 
 routes = gtfs$routes |>
-  filter(grepl("Sintra", route_short_name)) |>
+  # filter(grepl("Sintra", route_short_name)) |>
   mutate(
     from = str_split_fixed(route_id, "-", 3)[, 2],
     to = str_split_fixed(route_id, "-", 3)[, 3]
   ) |>
   left_join(gtfs$stops |> select(stop_id, stop_name) |> rename(from_name = stop_name), by = c("from" = "stop_id")) |>
-  left_join(gtfs$stops |> select(stop_id, stop_name) |> rename(to_name = stop_name), by = c("to" = "stop_id"))
+  left_join(gtfs$stops |> select(stop_id, stop_name) |> rename(to_name = stop_name), by = c("to" = "stop_id")) |>
+  right_join(shapes_match_routes |> select(osm_id, route_id, shape_id), by="route_id") |>
+  sf::st_as_sf()
 
 routes
-View(routes)
+mapview::mapview(routes, zcol="osm_id")
+
+# > Draw original shapes for those routes
+shapes_sf = tidytransit::shapes_as_sf(gtfs)
+routes_original = routes |> sf::st_drop_geometry() |>
+    left_join(shapes_sf, by="shape_id") |>
+    sf::st_as_sf()
+
+mapview::mapview(routes_original, zcol="osm_id")
