@@ -25,7 +25,7 @@ osm_shapes_match_routes(
 
 \item{osm_match}{String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.}
 
-\item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered.}
+\item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
 
 \item{log_file}{String (Optional). If provided, will log warnings to this file, in adition to the console.}
 }
@@ -40,6 +40,8 @@ A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following colum
  \item \code{stops_diff}, the difference between GTFS and OSM routes number of stops.
  \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
  \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
+ \item \code{osm_ref}, the \code{ref} attribute from OSM route relation.
+ \item \code{osm_name}, the \code{name} attribute from OSM route relation.
  \item \code{geometry}, the geometrical data for the OSM route relation.
 }
 }

@@ -5,7 +5,7 @@
 #' @param geometry Boolean (Default TRUE). If TRUE, returns sf object with geometry, otherwise, a simple data.frame.
 #' @param gtfs_match String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
 #' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
-#' @param gtfs_osm_match_exact Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered.
+#' @param gtfs_osm_match_exact Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).
 #' @param log_file String (Optional). If provided, will log warnings to this file, in adition to the console.
 #'
 #' @details
@@ -36,6 +36,8 @@
 #'  \item \code{stops_diff}, the difference between GTFS and OSM routes number of stops.
 #'  \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
 #'  \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
+#'  \item \code{osm_ref}, the \code{ref} attribute from OSM route relation.
+#'  \item \code{osm_name}, the \code{name} attribute from OSM route relation.
 #'  \item \code{geometry}, the geometrical data for the OSM route relation.
 #' }
 #'
@@ -57,6 +59,7 @@
 #' @import xml2
 #' @import progress
 #' @import callr
+#' @import stringi
 #'
 #' @export
 osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA) {
@@ -182,10 +185,16 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       osm_route_name <- osm_multilines_redux |>
         filter(.data[[osm_match]] == route_name)
     } else {
-      osm_route_name <- osm_multilines_redux |> dplyr::filter( grepl(route_name, .data[[osm_match]], fixed = TRUE) )
-      if (nrow(osm_route_name) == 0) {
-        osm_route_name <- osm_multilines_redux |> dplyr::filter(grepl(.data[[osm_match]], route_name, fixed = TRUE) )
-      }
+      words <- tolower(strsplit(route_name, "\\s+")[[1]])
+      words_norm <- stri_trans_general(words, "Latin-ASCII")
+      osm_route_name <- osm_multilines_redux |>
+        dplyr::filter(
+          vapply(
+            stri_trans_general(tolower(.data[[osm_match]]), "Latin-ASCII"),
+            function(x) all(vapply(words_norm, grepl, logical(1), x = x, fixed = TRUE)),
+            logical(1)
+          )
+        )
     }
 
 
@@ -283,7 +292,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
           final = osm_stoppositions |> filter(osm_id==last_stop_osm_id) |> slice(1) |> pull(geometry) |> first(default = NA)
         ) |>
         ungroup() |>
-        select(osm_id, name, route_dist, nr_stops, first_stop_osm_id, last_stop_osm_id, initial, final, geometry) |>
+        select(osm_id, ref, name, route_dist, nr_stops, first_stop_osm_id, last_stop_osm_id, initial, final, geometry) |>
         arrange(route_dist)
     }, error = function(e) {
       warning_osm_stops_missing <<- append(warning_osm_stops_missing, sprintf("`osm_id` %s (`%s` %s)", paste(osm_route_name$osm_id, collapse=", "), gtfs_match, route_name))
@@ -343,7 +352,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     gtfs_route_name_result <- gtfs_route_name_minimos |>
       st_drop_geometry() |>
       left_join(
-        osm_route_name |> select(osm_id, name, route_dist, nr_stops, geometry, initial, final),
+        osm_route_name |> select(osm_id, name, ref, route_dist, nr_stops, geometry, initial, final) |> rename(osm_name = name, osm_ref = ref),
         by = "osm_id",
         suffix = c("_gtfs", "_osm")
       ) |>
@@ -464,7 +473,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     return (if (geometry) st_sf(data.frame()) else data.frame())
   }
 
-  result_success <- result_success |> select(route_id, shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name)
+  result_success <- result_success |> select(route_id, shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name, osm_name, osm_ref)
 
   if (!geometry) {
     return (result_success |> st_drop_geometry())
