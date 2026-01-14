@@ -1,6 +1,7 @@
 library(GTFShift)
 library(dplyr)
 library(osmdata)
+library(stringr)
 
 # Parameters
 output = "releases/v0_7_1"
@@ -145,9 +146,38 @@ regions = rbind( # CP Portugal
       list(key = "operator", value = "Comboios de Portugal", key_exact = TRUE)
     ))),
     gtfs_match = "route_short_name",
-    osm_match = "name"
+    osm_match = "name",
+    gtfs_manipulate = "manipulate_gtfs_cp",
+    gtfs_osm_match_exact = FALSE
   )
 )
+
+# Helpers
+
+manipulate_gtfs_cp = function(gtfs) {
+  # Method to manipulate GTFS routes names, to enable match with OSM names
+  # See https://github.com/U-Shift/GTFShift/issues/35 for more details
+
+  # String replace service acronym in gtfs$routes$route_short_name by extended name
+  # Example: "AP" by "Alfa Pendular",  "IC" by "Intercidades"
+  gtfs$routes$route_short_name = gsub("AP", "Alfa Pendular", gtfs$routes$route_short_name)
+  gtfs$routes$route_short_name = gsub("IC", "Intercidades", gtfs$routes$route_short_name)
+  gtfs$routes$route_short_name = gsub("IR", "InterR", gtfs$routes$route_short_name)
+  gtfs$routes$route_short_name = gsub("R", "Regional", gtfs$routes$route_short_name)
+  gtfs$routes$route_short_name = gsub("U", "Urbano", gtfs$routes$route_short_name)
+
+  # Extend gtfs$routes$route_short_name with origin/destination station names
+  gtfs$routes = gtfs$routes |> mutate(
+    from = str_split_fixed(route_id, "-", 3)[, 2],
+    to = str_split_fixed(route_id, "-", 3)[, 3]
+  ) |>
+    left_join(gtfs$stops |> select(stop_id, stop_name) |> rename(from_name = stop_name), by = c("from" = "stop_id")) |>
+    left_join(gtfs$stops |> select(stop_id, stop_name) |> rename(to_name = stop_name), by = c("to" = "stop_id")) |>
+    mutate(route_short_name = sprintf("%s %s %s", route_short_name, from_name, to_name))
+
+  return(gtfs)
+}
+
 
 
 # main()
@@ -161,6 +191,10 @@ for(i in 1:nrow(regions)) {
 
   gtfs_shapes = tidytransit::shapes_as_sf(gtfs$shapes)
   bbox = sf::st_bbox(gtfs_shapes)
+
+  if (!is.null(region$gtfs_manipulate)) {
+    gtfs = get(regions$gtfs_manipulate)(gtfs)
+  }
 
   # Build OSM query
   q <- opq(bbox = bbox)
@@ -179,6 +213,7 @@ for(i in 1:nrow(regions)) {
     gtfs, q,
     gtfs_match = if (!is.null(region$gtfs_match)) region$gtfs_match else "route_short_name",
     osm_match = if (!is.null(region$osm_match)) region$osm_match else "ref",
+    gtfs_osm_match_exact = if (!is.null(region$gtfs_osm_match_exact)) region$gtfs_osm_match_exact else TRUE,
     log_file = sprintf("%s/shapes_match_%s_gtfs%s_run%s.r.log", output, region$name, region$gtfs_day, gsub("-", "", Sys.Date()))
   )
   assign(sprintf("shapes_match_routes_%s_gtfs%s", region$name, region$gtfs_day), shapes_match_routes)
@@ -191,10 +226,9 @@ for(i in 1:nrow(regions)) {
 }
 
 shapes_match_routes
+nrow(shapes_match_routes)
 
 # CP debug
-library(stringr)
-
 summary(gtfs)
 
 routes = gtfs$routes |>
@@ -212,9 +246,8 @@ routes
 mapview::mapview(routes, zcol="osm_id")
 
 # > Draw original shapes for those routes
-shapes_sf = tidytransit::shapes_as_sf(gtfs)
 routes_original = routes |> sf::st_drop_geometry() |>
-    left_join(shapes_sf, by="shape_id") |>
+    left_join(gtfs_shapes, by="shape_id") |>
     sf::st_as_sf()
 
 mapview::mapview(routes_original, zcol="osm_id")
