@@ -8,7 +8,7 @@
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, finding for each route the corresponding OSM ways using \code{GTFShift::osm_shapes_to_routes()}
-#' (routes not on OSM are ignored), aggregating the the number of services per hour and direction for each.
+#' (routes not on OSM are ignored), aggregating the number of services per hour and direction for each.
 #'
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
@@ -48,7 +48,7 @@ get_way_frequency_hourly = function(
   gtfs_date = tidytransit::filter_feed_by_date(gtfs, extract_date = date)
 
   # PROCESS GTFS, generating table calculating the frequencies per route
-  trips = gtfs_date$trip
+  trips = gtfs_date$trips
   stops = gtfs_date$stops
   ways = GTFShift::osm_shapes_to_routes(gtfs, q, TRUE)
 

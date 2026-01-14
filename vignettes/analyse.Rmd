@@ -103,7 +103,7 @@ mapview::mapview(
 
 To analyse frequencies at road segments, use `GTFShift::get_way_frequency_hourly()`, returning aggregated results per hour and road segment, using OSM ways.
 
-> Mind that routs without an OSM match are ignored. Refer to `GTFShift::osm_shapes_to_routes()` for more details.
+> Mind that routes without an OSM match are ignored. Refer to `GTFShift::osm_shapes_to_routes()` for more details.
 
 ```{r}
 frequencies_way = GTFShift::get_way_frequency_hourly(gtfs, osm_q)
