@@ -86,13 +86,13 @@ summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
 #> agency       Carris
-#> service      from 2025-12-02 to 2026-06-05
+#> service      from 2026-01-01 to 2026-06-05
 #> uses         stop_times (no frequencies)
-#> # routes        175
-#> # trips      167449
-#> # stop_ids     2337
-#> # stop_names   1138
-#> # shapes        308
+#> # routes       175
+#> # trips      78651
+#> # stop_ids    2337
+#> # stop_names  1138
+#> # shapes       308
 ```
 
 ### Using GTFShift incorporated database for Portugal
@@ -148,9 +148,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      181
-#> # trips      1795
+#> # routes      183
+#> # trips      2058
 #> # stop_ids    457
 #> # stop_names  457
-#> # shapes      252
+#> # shapes      254
 ```

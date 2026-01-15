@@ -24,6 +24,8 @@
   : Get aggregated frequency per hour for each bus route
 - [`get_stop_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.md)
   : Get aggregated frequency per hour for each bus stop
+- [`get_way_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_way_frequency_hourly.md)
+  : Get aggregated frequency per hour for each OSM way
 - [`network_overline()`](https://u-shift.github.io/GTFShift/reference/network_overline.md)
   : Aggregate lines based on overlap with target network
 

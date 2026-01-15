@@ -54,7 +54,7 @@ osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 
 route_extent_carris = get_network_extension(gtfs, route_identifier="route_short_name", direction_wise = TRUE, use_osm_routes = osm_q, unified = TRUE)
 drop_units(route_extent_carris/1000)
-#> [1] 810.5296
+#> [1] 810.5305
 ```
 
 ## Analyse hourly frequency per stop
@@ -74,10 +74,10 @@ hour.
 frequencies_stop = GTFShift::get_stop_frequency_hourly(gtfs)
 summary(frequencies_stop)
 #>    stop_id               hour         frequency               geometry    
-#>  Length:39212       Min.   : 6.00   Min.   : 1.000   POINT        :39212  
+#>  Length:39214       Min.   : 6.00   Min.   : 1.000   POINT        :39214  
 #>  Class :character   1st Qu.:10.00   1st Qu.: 3.000   epsg:4326    :    0  
 #>  Mode  :character   Median :14.00   Median : 6.000   +proj=long...:    0  
-#>                     Mean   :14.22   Mean   : 7.704                        
+#>                     Mean   :14.22   Mean   : 7.705                        
 #>                     3rd Qu.:18.00   3rd Qu.:10.000                        
 #>                     Max.   :23.00   Max.   :45.000
 ```
@@ -102,6 +102,41 @@ mapview::mapview(
 
 # Store in GeoPackage format
 # st_write(frequencies_stop, "database/transit/bus_stop_frequency.gpkg", append=FALSE, quiet = TRUE)
+```
+
+## Analyse hourly frequency per road segment
+
+To analyse frequencies at road segments, use
+[`GTFShift::get_way_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_way_frequency_hourly.md),
+returning aggregated results per hour and road segment, using OSM ways.
+
+> Mind that routes without an OSM match are ignored. Refer to
+> [`GTFShift::osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
+> for more details.
+
+``` r
+frequencies_way = GTFShift::get_way_frequency_hourly(gtfs, osm_q)
+summary(frequencies_way)
+#>   way_osm_id             hour         frequency               geometry     
+#>  Length:133206      Min.   : 0.00   Min.   : 1.000   LINESTRING   :133206  
+#>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   epsg:4326    :     0  
+#>  Mode  :character   Median :13.00   Median : 6.000   +proj=long...:     0  
+#>                     Mean   :12.56   Mean   : 9.638                         
+#>                     3rd Qu.:18.00   3rd Qu.:13.000                         
+#>                     Max.   :23.00   Max.   :99.000
+quantile(frequencies_way$frequency)
+#>   0%  25%  50%  75% 100% 
+#>    1    3    6   13   99
+```
+
+It returns an `sf` `data.frame` that can be displayed using mapview.
+
+``` r
+mapview::mapview(
+  frequencies_way |> filter(hour == 8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour)"
+)
 ```
 
 ## Analyse hourly frequency per route

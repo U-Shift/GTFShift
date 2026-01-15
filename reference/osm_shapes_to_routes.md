@@ -5,7 +5,12 @@ Get OSM routes geometry considering gtfs:shape_id match
 ## Usage
 
 ``` r
-osm_shapes_to_routes(gtfs, q)
+osm_shapes_to_routes(
+  gtfs,
+  q,
+  ways = FALSE,
+  ways_tags = c("lanes", "psv", "bus", "way")
+)
 ```
 
 ## Arguments
@@ -18,6 +23,17 @@ osm_shapes_to_routes(gtfs, q)
 
   osmdata::opq. Overpass query for transit network.
 
+- ways:
+
+  boolean (Default False). If true, relation is dissagregated in ways.
+
+- ways_tags:
+
+  character vector (Default `c("lanes", "psv", "bus", "way")`). List of
+  OSM way tags to extract when `ways` parameter is set to true. Match is
+  done using
+  [`tidyselect::contains()`](https://tidyselect.r-lib.org/reference/starts_with.html).
+
 ## Value
 
 A `sf` `data.frame` with the following columns:
@@ -25,6 +41,11 @@ A `sf` `data.frame` with the following columns:
 - `shape_id`, the `shape_id` attribute from `shapes.txt` file.
 
 - `osm_id`, the `osm_id` attribute from OSM route relation.
+
+- `way_osm_id`, the `osm_id` attribute from OSM way (if `ways` parameter
+  is set to true).
+
+- `*`, any column that matches `ways_tags` parameter.
 
 - `geometry`, the geometrical data for the OSM route relation.
 
