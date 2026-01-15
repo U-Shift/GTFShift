@@ -10,6 +10,7 @@ osm_shapes_match_routes(
   geometry = TRUE,
   gtfs_match = "route_short_name",
   osm_match = "ref",
+  gtfs_osm_match_exact = TRUE,
   log_file = NA
 )
 }
@@ -24,7 +25,9 @@ osm_shapes_match_routes(
 
 \item{osm_match}{String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.}
 
-\item{log_file}{String (Optional). If provided, will log warnings to this file, in adition to the console.}
+\item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
+
+\item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
@@ -37,6 +40,8 @@ A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following colum
  \item \code{stops_diff}, the difference between GTFS and OSM routes number of stops.
  \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
  \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
+ \item \code{osm_ref}, the \code{ref} attribute from OSM route relation.
+ \item \code{osm_name}, the \code{name} attribute from OSM route relation.
  \item \code{geometry}, the geometrical data for the OSM route relation.
 }
 }
@@ -46,8 +51,10 @@ Get OSM routes that match shapes, based on geometrical match
 \details{
 For each route, matches its trips' shapes with OSM route relations.
 
-The match is performed considering, for each shape, the closest OSM route, based on
-the start and end points, total length and number of stops.
+The calculation is performed considering, for each GTFS route, the subset of OSM routes that match
+the route identifier (based on \code{gtfs_match} and \code{osm_match}). Then, for each shape,
+the geometrical match is performed considering the OSM route that minimizes the distance between
+start and end points, total length and number of stops.
 
 Be aware that the result might ignore some GTFS routes, in the following cases:
 \itemize{
