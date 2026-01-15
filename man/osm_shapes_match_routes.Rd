@@ -27,7 +27,7 @@ osm_shapes_match_routes(
 
 \item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
 
-\item{log_file}{String (Optional). If provided, will log warnings to this file, in adition to the console.}
+\item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
