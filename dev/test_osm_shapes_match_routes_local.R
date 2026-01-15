@@ -228,9 +228,9 @@ for(i in 1:nrow(regions)) {
 shapes_match_routes
 nrow(shapes_match_routes)
 
-# CP debug
-summary(gtfs)
+# DEBUG
 
+# > See OSM routes geometry
 routes = gtfs$routes |>
   # filter(grepl("Sintra", route_short_name)) |>
   mutate(

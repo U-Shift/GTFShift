@@ -11,8 +11,10 @@
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
 #'
-#' The match is performed considering, for each shape, the closest OSM route, based on
-#' the start and end points, total length and number of stops.
+#' The calculation is performed considering, for each GTFS route, the subset of OSM routes that match
+#' the route identifier (based on \code{gtfs_match} and \code{osm_match}). Then, for each shape,
+#' the geometrical match is performed considering the OSM route that minimizes the distance between
+#' start and end points, total length and number of stops.
 #'
 #' Be aware that the result might ignore some GTFS routes, in the following cases:
 #' \itemize{
