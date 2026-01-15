@@ -136,7 +136,9 @@ mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.nam
 
 Despite existing, OSM `gtfs:*` keys are not widely used. In July 2025, only 3.1% of relations tagged as `route=bus` had the `gtfs:shape_id` key set (9 784 of 312 049).
 
-To overcome this issue, `GTFShift::osm_shapes_match_routes()` performs the association between the OSM bus routes and the GTFS shapes considering, for each route, the start and end points and total length.
+To overcome this issue, `GTFShift::osm_shapes_match_routes()` performs the association between the OSM bus routes and the GTFS shapes considering a geometrical match. For each GTFS route identifier (provided as a parameter), the function first selects the subset of OSM route relations that match it. Then, for each GTFS shape associated with the route, it identifies the most similar OSM route relation by minimizing a cost function that combines the distance between start and end points, total length, and number of stops.
+
+> The match between the GTFS and OSM identifiers is strict by default, but parameter `gtfs_osm_match_exact` can be set to `FALSE` to allow a partial match (e.g., matching GTFS route `15E` with OSM routes `Carris/15E`, `15E-1`, etc.).
 
 > GTFShift provides a test script that runs this method for several cities around the world at [dev/test_osm_shapes_match_routes_local.R](https://github.com/U-Shift/GTFShift/blob/main/dev/test_osm_shapes_match_routes_local.R).
 
