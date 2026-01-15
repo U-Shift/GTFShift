@@ -79,7 +79,7 @@ q = opq("Lisbon")  |>
 ```
 
 
-## Routes (matching GTFS ids)
+## Routes (matching GTFS id)
 
 GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*` keys. `GTFShift::osm_shapes_to_routes()` and `GTFShift::osm_trips_to_routes()` allow to query OSM for the routes matching the feed trips, given, respectively, their shape or trip id.
 
@@ -117,7 +117,7 @@ mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.na
 </div>
 
 
-## Ways (matching GTFS ids)
+## Ways (matching GTFS id)
 
 By setting the `ways` parameter to `TRUE`, `GTFShift::osm_shapes_to_routes()` enables the retrieval of the OSM routes disaggregated by the individual ways that compose them.
 
