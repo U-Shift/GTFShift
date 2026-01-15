@@ -103,7 +103,7 @@ mapview::mapview(centerlines)
 </div>
 
 
-# Get OSM bus routes
+# Get OSM data for bus routes
 
 OpenStreetMaps defines bus routes as a [relation](https://wiki.openstreetmap.org/wiki/Tag:route%3Dbus) of ways (usually roads) and nodes (stops and platforms). GTFShift provides methods to use them in the GTFS analysis.
 
@@ -123,7 +123,7 @@ q = opq("Lisbon")  |>
 ```
 
 
-## Matching GTFS ids
+## Routes (matching GTFS ids)
 
 GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*` keys. `GTFShift::osm_shapes_to_routes()` and `GTFShift::osm_trips_to_routes()` allow to query OSM for the routes matching the feed trips, given, respectively, their shape or trip id.
 
@@ -161,7 +161,22 @@ mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.na
 </div>
 
 
-## Matching shapes geometry
+## Ways (matching GTFS ids)
+
+By setting the `ways` parameter to `TRUE`, `GTFShift::osm_shapes_to_routes()` enables the retrieval of the OSM routes disaggregated by the individual ways that compose them.
+
+```{r}
+# Match shapes geometry disaggregated by ways
+shapes_ways_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q, ways=TRUE)
+shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
+```
+
+```{r, cache=FALSE}
+mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.name="OSM ways")
+```
+
+
+## Routes (matching shapes geometry)
 
 Despite existing, OSM `gtfs:*` keys are not widely used. In July 2025, only 3.1% of relations tagged as `route=bus` had the `gtfs:shape_id` key set (9 784 of 312 049).
 

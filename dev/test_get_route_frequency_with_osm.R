@@ -8,6 +8,7 @@ mapviewOptions(
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "lisboa"
 gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
+summary(gtfs)
 
 # Normal
 frequencies_route = GTFShift::get_route_frequency_hourly(gtfs)
@@ -37,3 +38,10 @@ mapview::mapview(
   layer.name = "Frequency (hour) using OSM routes with overline"
 )
 
+# OSM ways
+frequencies_way_osm = get_way_frequency_hourly(gtfs, q)
+mapview::mapview(
+  frequencies_way_osm |> filter(hour == 8 & frequency > 2),
+  zcol = "frequency",
+  layer.name = "Frequency (hour) using OSM ways"
+)
