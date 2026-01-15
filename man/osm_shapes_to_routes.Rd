@@ -16,7 +16,7 @@ osm_shapes_to_routes(
 
 \item{q}{osmdata::opq. Overpass query for transit network.}
 
-\item{ways}{boolean (Default False). If true, relation is dissagregated in ways.}
+\item{ways}{boolean (Default False). If true, relation is disaggregated in ways.}
 
 \item{ways_tags}{character vector (Default \code{c("lanes", "psv", "bus", "way")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.}
 }

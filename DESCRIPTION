@@ -29,7 +29,8 @@ Imports:
   stringr,
   reticulate,
   progress,
-  callr
+  callr,
+  stringi
 URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
 RoxygenNote: 7.3.3
 Suggests: 

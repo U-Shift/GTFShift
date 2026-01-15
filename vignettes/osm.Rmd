@@ -59,6 +59,122 @@ mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
 
 
+# Get OSM data for bus routes
+
+OpenStreetMaps defines bus routes as a [relation](https://wiki.openstreetmap.org/wiki/Tag:route%3Dbus) of ways (usually roads) and nodes (stops and platforms). GTFShift provides methods to use them in the GTFS analysis.
+
+> For demonstration purposes, the next snippets will use the Lisbon urban bus network.
+
+```{r}
+# Get GTFS from library GTFS database for Portugal
+data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_id = "lisboa"
+gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
+
+# Build OSM query
+library(osmdata)
+q = opq("Lisbon")  |>
+  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+```
+
+
+## Routes (matching GTFS id)
+
+GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*` keys. `GTFShift::osm_shapes_to_routes()` and `GTFShift::osm_trips_to_routes()` allow to query OSM for the routes matching the feed trips, given, respectively, their shape or trip id.
+
+```{r}
+# Subset feed for some routes only, for demonstration purposes
+gtfs_794 = GTFShift::filter_by_route_name(gtfs, list("794"))
+
+# Match shapes geometry
+shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q)
+
+shapes_geometry_osm
+```
+
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### GTFS shapes
+
+```{r, cache=FALSE}
+shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
+mapview::mapview(shapes_sf, zcol = "shape_id", legend = TRUE, layer.name="GTFS shapes")
+```
+
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### OSM routes
+
+```{r, cache=FALSE}
+mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.name="OSM routes")
+```
+
+</div>
+</div>
+
+
+## Ways (matching GTFS id)
+
+By setting the `ways` parameter to `TRUE`, `GTFShift::osm_shapes_to_routes()` enables the retrieval of the OSM routes disaggregated by the individual ways that compose them.
+
+```{r}
+# Match shapes geometry disaggregated by ways
+shapes_ways_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q, ways=TRUE)
+shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
+```
+
+```{r, cache=FALSE}
+mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.name="OSM ways")
+```
+
+
+## Routes (matching shapes geometry)
+
+Despite existing, OSM `gtfs:*` keys are not widely used. In July 2025, only 3.1% of relations tagged as `route=bus` had the `gtfs:shape_id` key set (9 784 of 312 049).
+
+To overcome this issue, `GTFShift::osm_shapes_match_routes()` performs the association between the OSM bus routes and the GTFS shapes considering a geometrical match. For each GTFS route identifier (provided as a parameter), the function first selects the subset of OSM route relations that match it. Then, for each GTFS shape associated with the route, it identifies the most similar OSM route relation by minimizing a cost function that combines the distance between start and end points, total length, and number of stops.
+
+> The match between the GTFS and OSM identifiers is strict by default, but parameter `gtfs_osm_match_exact` can be set to `FALSE` to allow a partial match (e.g., matching GTFS route `15E` with OSM routes `Carris/15E`, `15E-1`, etc.).
+
+> GTFShift provides a test script that runs this method for several cities around the world at [dev/test_osm_shapes_match_routes_local.R](https://github.com/U-Shift/GTFShift/blob/main/dev/test_osm_shapes_match_routes_local.R).
+
+```{r message=TRUE, warning=TRUE}
+# Subset feed for some routes only, for demonstration purposes
+gtfs_subset = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65B"))
+
+# Match shapes geometry
+shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
+
+summary(shapes_match_routes)
+
+# Visualize results
+shapes_match_routes$map_name = paste(
+  shapes_match_routes$route_short_name,
+  " | ",
+  shapes_match_routes$shape_id, 
+  " | ", 
+  shapes_match_routes$osm_id
+)
+```
+
+
+```{r, cache=FALSE}
+mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name="route_short_name | shape_id | osm_id")
+```
+
+
+### Updating OSM routes with shape_id
+
+The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps data. Refer to [Extra. Update OSM data](./osm_update.html) for more details.
+
+### Validating OSM routes
+
+The warning logs displayed by `GTFShift::osm_shapes_match_routes()` can be used to validate the OSM routes, identifying shapes without a match, or even OSM existing routes that violate OSM integrity rules, such as having stops in the wrong order.
+
 
 # Get centerlines for OSM road network
 
@@ -101,119 +217,4 @@ mapview::mapview(centerlines)
 
 </div>
 </div>
-
-
-# Get OSM data for bus routes
-
-OpenStreetMaps defines bus routes as a [relation](https://wiki.openstreetmap.org/wiki/Tag:route%3Dbus) of ways (usually roads) and nodes (stops and platforms). GTFShift provides methods to use them in the GTFS analysis.
-
-> For demonstration purposes, the next snippets will use the Lisbon urban bus network.
-
-```{r}
-# Get GTFS from library GTFS database for Portugal
-data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_id = "lisboa"
-gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
-
-# Build OSM query
-library(osmdata)
-q = opq("Lisbon")  |>
-  add_osm_feature(key = "route", value = c("bus", "tram")) |>
-  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
-```
-
-
-## Routes (matching GTFS ids)
-
-GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*` keys. `GTFShift::osm_shapes_to_routes()` and `GTFShift::osm_trips_to_routes()` allow to query OSM for the routes matching the feed trips, given, respectively, their shape or trip id.
-
-```{r}
-# Subset feed for some routes only, for demonstration purposes
-gtfs_794 = GTFShift::filter_by_route_name(gtfs, list("794"))
-
-# Match shapes geometry
-shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q)
-
-shapes_geometry_osm
-```
-
-
-<div style="display: flex; gap: 20px; overflow-x: auto;">
-<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
-
-### GTFS shapes
-
-```{r, cache=FALSE}
-shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
-mapview::mapview(shapes_sf, zcol = "shape_id", legend = TRUE, layer.name="GTFS shapes")
-```
-
-</div>
-<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
-
-### OSM routes
-
-```{r, cache=FALSE}
-mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.name="OSM routes")
-```
-
-</div>
-</div>
-
-
-## Ways (matching GTFS ids)
-
-By setting the `ways` parameter to `TRUE`, `GTFShift::osm_shapes_to_routes()` enables the retrieval of the OSM routes disaggregated by the individual ways that compose them.
-
-```{r}
-# Match shapes geometry disaggregated by ways
-shapes_ways_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q, ways=TRUE)
-shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
-```
-
-```{r, cache=FALSE}
-mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.name="OSM ways")
-```
-
-
-## Routes (matching shapes geometry)
-
-Despite existing, OSM `gtfs:*` keys are not widely used. In July 2025, only 3.1% of relations tagged as `route=bus` had the `gtfs:shape_id` key set (9 784 of 312 049).
-
-To overcome this issue, `GTFShift::osm_shapes_match_routes()` performs the association between the OSM bus routes and the GTFS shapes considering, for each route, the start and end points and total length.
-
-> GTFShift provides a test script that runs this method for several cities around the world at [dev/test_osm_shapes_match_routes_local.R](https://github.com/U-Shift/GTFShift/blob/main/dev/test_osm_shapes_match_routes_local.R).
-
-```{r message=TRUE, warning=TRUE}
-# Subset feed for some routes only, for demonstration purposes
-gtfs_subset = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65B"))
-
-# Match shapes geometry
-shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
-
-summary(shapes_match_routes)
-
-# Visualize results
-shapes_match_routes$map_name = paste(
-  shapes_match_routes$route_short_name,
-  " | ",
-  shapes_match_routes$shape_id, 
-  " | ", 
-  shapes_match_routes$osm_id
-)
-```
-
-
-```{r, cache=FALSE}
-mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name="route_short_name | shape_id | osm_id")
-```
-
-
-### Updating OSM routes with shape_id
-
-The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps data. Refer to [Extra. Update OSM data](./osm_update.html) for more details.
-
-### Validating OSM routes
-
-The warning logs displayed by `GTFShift::osm_shapes_match_routes()` can be used to validate the OSM routes, identifying shapes without a match, or even OSM existing routes that violate OSM integrity rules, such as having stops in the wrong order.
 
