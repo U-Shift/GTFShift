@@ -4,18 +4,29 @@
 \alias{osm_shapes_to_routes}
 \title{Get OSM routes geometry considering gtfs:shape_id match}
 \usage{
-osm_shapes_to_routes(gtfs, q)
+osm_shapes_to_routes(
+  gtfs,
+  q,
+  ways = FALSE,
+  ways_tags = c("lanes", "psv", "bus", "way")
+)
 }
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
 \item{q}{osmdata::opq. Overpass query for transit network.}
+
+\item{ways}{boolean (Default False). If true, relation is disaggregated in ways.}
+
+\item{ways_tags}{character vector (Default \code{c("lanes", "psv", "bus", "way")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.}
 }
 \value{
 A \code{sf} \code{data.frame} with the following columns:
 \itemize{
  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
  \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
+ \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way (if \code{ways} parameter is set to true).
+ \item \code{*}, any column that matches \code{ways_tags} parameter.
  \item \code{geometry}, the geometrical data for the OSM route relation.
 }
 
