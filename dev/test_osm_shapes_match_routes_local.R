@@ -193,7 +193,7 @@ for(i in 1:nrow(regions)) {
   bbox = sf::st_bbox(gtfs_shapes)
 
   if (!is.null(region$gtfs_manipulate)) {
-    gtfs = get(regions$gtfs_manipulate)(gtfs)
+    gtfs = get(region$gtfs_manipulate)(gtfs)
   }
 
   # Build OSM query
