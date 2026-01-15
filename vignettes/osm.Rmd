@@ -59,50 +59,6 @@ mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
 
 
-
-# Get centerlines for OSM road network
-
-Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
-
-`GTFShift::osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from OpenStreetMaps, using Python [neatnet](https://uscuni.org/neatnet/) package.
-
-<div style="display: flex; gap: 20px; overflow-x: auto;">
-<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
-
-### Original network
-
-```{r original_network}
-library(osmdata)
-
-road_osm = opq("Arroios, Lisboa, Portugal") |>
-    add_osm_feature(key = "highway", value = c("motorway", "trunk", "primary", "secondary", "tertiary", "residential", "unclassified", "living_street")) |>
-    add_osm_feature(key = "area", value = "!yes") |>
-    osmdata_sf() |>
-    osm_poly2line()
-
-road_osm = road_osm$osm_lines
-```
-```{r, cache=FALSE}
-mapview::mapview(road_osm)
-```
-
-
-</div>
-<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
-
-### Simplified network
-
-```{r simplified_network}
-centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
-```
-```{r, cache=FALSE}
-mapview::mapview(centerlines)
-```
-
-</div>
-</div>
-
-
 # Get OSM data for bus routes
 
 OpenStreetMaps defines bus routes as a [relation](https://wiki.openstreetmap.org/wiki/Tag:route%3Dbus) of ways (usually roads) and nodes (stops and platforms). GTFShift provides methods to use them in the GTFS analysis.
@@ -216,4 +172,47 @@ The association between OSM route relations id and the GTFS shapes_id returned b
 ### Validating OSM routes
 
 The warning logs displayed by `GTFShift::osm_shapes_match_routes()` can be used to validate the OSM routes, identifying shapes without a match, or even OSM existing routes that violate OSM integrity rules, such as having stops in the wrong order.
+
+
+# Get centerlines for OSM road network
+
+Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
+
+`GTFShift::osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from OpenStreetMaps, using Python [neatnet](https://uscuni.org/neatnet/) package.
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Original network
+
+```{r original_network}
+library(osmdata)
+
+road_osm = opq("Arroios, Lisboa, Portugal") |>
+    add_osm_feature(key = "highway", value = c("motorway", "trunk", "primary", "secondary", "tertiary", "residential", "unclassified", "living_street")) |>
+    add_osm_feature(key = "area", value = "!yes") |>
+    osmdata_sf() |>
+    osm_poly2line()
+
+road_osm = road_osm$osm_lines
+```
+```{r, cache=FALSE}
+mapview::mapview(road_osm)
+```
+
+
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Simplified network
+
+```{r simplified_network}
+centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
+```
+```{r, cache=FALSE}
+mapview::mapview(centerlines)
+```
+
+</div>
+</div>
 
