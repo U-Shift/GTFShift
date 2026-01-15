@@ -6,7 +6,7 @@
 #' @param gtfs_match String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
 #' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
 #' @param gtfs_osm_match_exact Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).
-#' @param log_file String (Optional). If provided, will log warnings to this file, in adition to the console.
+#' @param log_file String (Optional). If provided, will log warnings to this file, in addition to the console.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
