@@ -68,7 +68,6 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
     as.data.frame() |>
     select(shape_id, length, -geometry)
 
-
   ## Get statistics: for each service pattern, get nr of trips, routes, total and avg distance and number of stops covered
   service_pattern_summary <- pattern_gtfs$trips |> # Join trips
     left_join(pattern_gtfs$.$servicepatterns, by="service_id") |> # with service pattern
@@ -103,7 +102,13 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   frame = data.frame()
 
-  for (i in 6:23) {
+  stop_times = gtfs$stop_times |>mutate(hour = lubridate::hour(departure_time))
+  min_hour = min(stop_times$hour, na.rm=TRUE)
+  max_hour = max(stop_times$hour, na.rm=TRUE)
+
+  message(sprintf("> Calculating stop frequencies for hours %d to %d...", min_hour, max_hour))
+
+  for (i in min_hour:max_hour) {
     stop_frequency <- tidytransit::get_stop_frequency(
       gtfs_date,
       start_time = sprintf("%.2d:00:00", i),
