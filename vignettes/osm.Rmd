@@ -1,8 +1,8 @@
 ---
-title: "5. Get OSM data"
+title: "6. Get OSM data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{5. Get OSM data}
+  %\VignetteIndexEntry{6. Get OSM data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
