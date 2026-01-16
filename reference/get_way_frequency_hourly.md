@@ -49,8 +49,8 @@ An `sf` `data.frame` object with the following columns:
 This method analyses the GTFS feed for a representative day, finding for
 each route the corresponding OSM ways using
 [`GTFShift::osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
-(routes not on OSM are ignored), aggregating the the number of services
-per hour and direction for each.
+(routes not on OSM are ignored), aggregating the number of services per
+hour and direction for each.
 
 For a detailed example, see the
 [`vignette("analyse")`](https://u-shift.github.io/GTFShift/articles/analyse.md).

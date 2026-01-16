@@ -25,7 +25,7 @@ osm_shapes_to_routes(
 
 - ways:
 
-  boolean (Default False). If true, relation is dissagregated in ways.
+  boolean (Default False). If true, relation is disaggregated in ways.
 
 - ways_tags:
 

@@ -284,6 +284,11 @@ parameters.
 Below is provided an example, that uses the centerlines for the Carris
 network as a target network, generated using
 [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
+GTFShift provides
+[`GTFShift::osm_centerlines()`](https://u-shift.github.io/GTFShift/reference/osm_centerlines.md)
+method to generate this kind of network from OSM data. Refer to
+[vignette(“osm”)](https://u-shift.github.io/GTFShift/articles/osm.html#get-centerlines-for-osm-road-network)
+for more details.
 
 ``` r
 network = sf::st_read(

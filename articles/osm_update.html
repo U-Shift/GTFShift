@@ -147,14 +147,15 @@ matches by the criteria that best suits your context.</p>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>logger.setLevel(logging.DEBUG)  <span class="co"># Set the base logging level</span></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># Use a generic log file path; replace {city} and {date} as needed</span></span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>log_file_path <span class="op">=</span> <span class="st">'../releases/</span><span class="sc">{version}</span><span class="st">/shapes_match_</span><span class="sc">{city}</span><span class="st">_gtfs</span><span class="sc">{date}</span><span class="st">_run</span><span class="sc">{date}</span><span class="st">.osm.log'</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>file_handler.setLevel(logging.DEBUG)</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>console_handler <span class="op">=</span> logging.StreamHandler()</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>console_handler.setLevel(logging.INFO)</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>formatter <span class="op">=</span> logging.Formatter(<span class="st">'</span><span class="sc">%(asctime)s</span><span class="st"> - </span><span class="sc">%(levelname)s</span><span class="st"> - </span><span class="sc">%(message)s</span><span class="st">'</span>)</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>file_handler.setFormatter(formatter)</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>console_handler.setFormatter(formatter)</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>logger.addHandler(file_handler)</span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>logger.addHandler(console_handler)</span></code></pre></div>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>file_handler <span class="op">=</span> logging.FileHandler(log_file_path)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>file_handler.setLevel(logging.DEBUG)</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>console_handler <span class="op">=</span> logging.StreamHandler()</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>console_handler.setLevel(logging.INFO)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>formatter <span class="op">=</span> logging.Formatter(<span class="st">'</span><span class="sc">%(asctime)s</span><span class="st"> - </span><span class="sc">%(levelname)s</span><span class="st"> - </span><span class="sc">%(message)s</span><span class="st">'</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>file_handler.setFormatter(formatter)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>console_handler.setFormatter(formatter)</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>logger.addHandler(file_handler)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>logger.addHandler(console_handler)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="connect-to-osm">Connect to OSM<a class="anchor" aria-label="anchor" href="#connect-to-osm"></a>

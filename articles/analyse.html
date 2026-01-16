@@ -349,7 +349,10 @@ aggregation functionality.</p>
 each route and uses them to aggregate the attribute defined in the
 parameters.</p>
 <p>Below is provided an example, that uses the centerlines for the
-Carris network as a target network, generated using <a href="https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm" class="external-link">ArcGis</a>.</p>
+Carris network as a target network, generated using <a href="https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm" class="external-link">ArcGis</a>.
+GTFShift provides <code><a href="../reference/osm_centerlines.html">GTFShift::osm_centerlines()</a></code> method to
+generate this kind of network from OSM data. Refer to <a href="osm.html#get-centerlines-for-osm-road-network">vignette(“osm”)</a>
+for more details.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">network</span> <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"centerline_carris.gpkg"</span>, package <span class="op">=</span> <span class="st">"GTFShift"</span><span class="op">)</span>, </span>

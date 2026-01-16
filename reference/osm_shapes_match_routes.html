@@ -54,6 +54,7 @@
 <span>  geometry <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  gtfs_match <span class="op">=</span> <span class="st">"route_short_name"</span>,</span>
 <span>  osm_match <span class="op">=</span> <span class="st">"ref"</span>,</span>
+<span>  gtfs_osm_match_exact <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  log_file <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -82,8 +83,12 @@
 <dd><p>String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.</p></dd>
 
 
+<dt id="arg-gtfs-osm-match-exact">gtfs_osm_match_exact<a class="anchor" aria-label="anchor" href="#arg-gtfs-osm-match-exact"></a></dt>
+<dd><p>Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).</p></dd>
+
+
 <dt id="arg-log-file">log_file<a class="anchor" aria-label="anchor" href="#arg-log-file"></a></dt>
-<dd><p>String (Optional). If provided, will log warnings to this file, in adition to the console.</p></dd>
+<dd><p>String (Optional). If provided, will log warnings to this file, in addition to the console.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -96,13 +101,17 @@
 <li><p><code>stops_diff</code>, the difference between GTFS and OSM routes number of stops.</p></li>
 <li><p><code>route_short_name</code>, the <code>route_short_name</code> attribute from <code>routes.txt</code> file.</p></li>
 <li><p><code>route_long_name</code>, the <code>route_long_name</code> attribute from <code>routes.txt</code> file.</p></li>
+<li><p><code>osm_ref</code>, the <code>ref</code> attribute from OSM route relation.</p></li>
+<li><p><code>osm_name</code>, the <code>name</code> attribute from OSM route relation.</p></li>
 <li><p><code>geometry</code>, the geometrical data for the OSM route relation.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For each route, matches its trips' shapes with OSM route relations.</p>
-<p>The match is performed considering, for each shape, the closest OSM route, based on
-the start and end points, total length and number of stops.</p>
+<p>The calculation is performed considering, for each GTFS route, the subset of OSM routes that match
+the route identifier (based on <code>gtfs_match</code> and <code>osm_match</code>). Then, for each shape,
+the geometrical match is performed considering the OSM route that minimizes the distance between
+start and end points, total length and number of stops.</p>
 <p>Be aware that the result might ignore some GTFS routes, in the following cases:</p><ul><li><p>If there is no OSM route relation that matches the GTFS route identifier;</p></li>
 <li><p>If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order;</p></li>
 <li><p>If, for the same route, distinct shapes are associated to the same OSM route.</p></li>

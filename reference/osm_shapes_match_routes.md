@@ -11,6 +11,7 @@ osm_shapes_match_routes(
   geometry = TRUE,
   gtfs_match = "route_short_name",
   osm_match = "ref",
+  gtfs_osm_match_exact = TRUE,
   log_file = NA
 )
 ```
@@ -41,10 +42,16 @@ osm_shapes_match_routes(
   String (Default ref). OSM attribute that identifies routes by matching
   with gtfs_match. Accepted values: ref, name, gtfs:route_id.
 
+- gtfs_osm_match_exact:
+
+  Boolean (Default TRUE). If TRUE, gtfs and route names are matched
+  strictly. Otherwise, partial string match is considered (all words in
+  gtfs_match must be in osm_match, ignoring case).
+
 - log_file:
 
   String (Optional). If provided, will log warnings to this file, in
-  adition to the console.
+  addition to the console.
 
 ## Value
 
@@ -71,15 +78,21 @@ A `data.frame` (`sf` if `geometry=TRUE`) with the following columns:
 - `route_long_name`, the `route_long_name` attribute from `routes.txt`
   file.
 
+- `osm_ref`, the `ref` attribute from OSM route relation.
+
+- `osm_name`, the `name` attribute from OSM route relation.
+
 - `geometry`, the geometrical data for the OSM route relation.
 
 ## Details
 
 For each route, matches its trips' shapes with OSM route relations.
 
-The match is performed considering, for each shape, the closest OSM
-route, based on the start and end points, total length and number of
-stops.
+The calculation is performed considering, for each GTFS route, the
+subset of OSM routes that match the route identifier (based on
+`gtfs_match` and `osm_match`). Then, for each shape, the geometrical
+match is performed considering the OSM route that minimizes the distance
+between start and end points, total length and number of stops.
 
 Be aware that the result might ignore some GTFS routes, in the following
 cases:
