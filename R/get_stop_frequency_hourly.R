@@ -102,7 +102,7 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   frame = data.frame()
 
-  stop_times = gtfs$stop_times |>mutate(hour = lubridate::hour(departure_time))
+  stop_times = gtfs_date$stop_times |> mutate(hour = lubridate::hour(departure_time))
   min_hour = min(stop_times$hour, na.rm=TRUE)
   max_hour = max(stop_times$hour, na.rm=TRUE)
 
