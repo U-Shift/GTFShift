@@ -54,7 +54,7 @@ osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 
 route_extent_carris = get_network_extension(gtfs, route_identifier="route_short_name", direction_wise = TRUE, use_osm_routes = osm_q, unified = TRUE)
 drop_units(route_extent_carris/1000)
-#> [1] 810.5306
+#> [1] 810.5305
 ```
 
 ## Analyse hourly frequency per stop
@@ -74,10 +74,10 @@ hour.
 frequencies_stop = GTFShift::get_stop_frequency_hourly(gtfs)
 summary(frequencies_stop)
 #>    stop_id               hour         frequency               geometry    
-#>  Length:39214       Min.   : 6.00   Min.   : 1.000   POINT        :39214  
-#>  Class :character   1st Qu.:10.00   1st Qu.: 3.000   epsg:4326    :    0  
-#>  Mode  :character   Median :14.00   Median : 6.000   +proj=long...:    0  
-#>                     Mean   :14.22   Mean   : 7.705                        
+#>  Length:44762       Min.   : 0.00   Min.   : 1.000   POINT        :44762  
+#>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   epsg:4326    :    0  
+#>  Mode  :character   Median :13.00   Median : 5.000   +proj=long...:    0  
+#>                     Mean   :12.76   Mean   : 7.045                        
 #>                     3rd Qu.:18.00   3rd Qu.:10.000                        
 #>                     Max.   :23.00   Max.   :45.000
 ```
@@ -118,10 +118,10 @@ returning aggregated results per hour and road segment, using OSM ways.
 frequencies_way = GTFShift::get_way_frequency_hourly(gtfs, osm_q)
 summary(frequencies_way)
 #>   way_osm_id             hour         frequency               geometry     
-#>  Length:133206      Min.   : 0.00   Min.   : 1.000   LINESTRING   :133206  
+#>  Length:133226      Min.   : 0.00   Min.   : 1.000   LINESTRING   :133226  
 #>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   epsg:4326    :     0  
 #>  Mode  :character   Median :13.00   Median : 6.000   +proj=long...:     0  
-#>                     Mean   :12.56   Mean   : 9.638                         
+#>                     Mean   :12.56   Mean   : 9.637                         
 #>                     3rd Qu.:18.00   3rd Qu.:13.000                         
 #>                     Max.   :23.00   Max.   :99.000
 quantile(frequencies_way$frequency)
