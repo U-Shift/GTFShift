@@ -54,7 +54,7 @@ osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 
 route_extent_carris = get_network_extension(gtfs, route_identifier="route_short_name", direction_wise = TRUE, use_osm_routes = osm_q, unified = TRUE)
 drop_units(route_extent_carris/1000)
-#> [1] 810.5305
+#> [1] 810.5306
 ```
 
 ## Analyse hourly frequency per stop

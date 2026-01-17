@@ -38,7 +38,8 @@
     <li><a class="dropdown-item" href="../articles/filter.html">2. Filter GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/unify.html">3. Aggregate GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/analyse.html">4. Analyse GTFS feeds</a></li>
-    <li><a class="dropdown-item" href="../articles/osm.html">5. Get OSM data</a></li>
+    <li><a class="dropdown-item" href="../articles/classify.html">5. Classify transit data</a></li>
+    <li><a class="dropdown-item" href="../articles/osm.html">6. Get OSM data</a></li>
     <li><a class="dropdown-item" href="../articles/osm_update.html">Extra. Update OSM data</a></li>
   </ul>
 </li>
@@ -133,7 +134,7 @@ more accurate route geometries (through parameter
 <span></span>
 <span><span class="va">route_extent_carris</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_network_extension.html">get_network_extension</a></span><span class="op">(</span><span class="va">gtfs</span>, route_identifier<span class="op">=</span><span class="st">"route_short_name"</span>, direction_wise <span class="op">=</span> <span class="cn">TRUE</span>, use_osm_routes <span class="op">=</span> <span class="va">osm_q</span>, unified <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://r-quantities.github.io/units/reference/drop_units.html" class="external-link">drop_units</a></span><span class="op">(</span><span class="va">route_extent_carris</span><span class="op">/</span><span class="fl">1000</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 810.5305</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 810.5306</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="analyse-hourly-frequency-per-stop">Analyse hourly frequency per stop<a class="anchor" aria-label="anchor" href="#analyse-hourly-frequency-per-stop"></a>

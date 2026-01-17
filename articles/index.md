@@ -10,6 +10,8 @@
   feeds](https://u-shift.github.io/GTFShift/articles/unify.md):
 - [4. Analyse GTFS
   feeds](https://u-shift.github.io/GTFShift/articles/analyse.md):
-- [5. Get OSM data](https://u-shift.github.io/GTFShift/articles/osm.md):
+- [5. Classify transit
+  data](https://u-shift.github.io/GTFShift/articles/classify.md):
+- [6. Get OSM data](https://u-shift.github.io/GTFShift/articles/osm.md):
 - [Extra. Update OSM
   data](https://u-shift.github.io/GTFShift/articles/osm_update.md):

@@ -139,6 +139,11 @@ Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
 - [`network_overline()`](https://u-shift.github.io/GTFShift/reference/network_overline.md)
   : Aggregate lines based on overlap with target network
 
+## Classify
+
+- [`classify_frequency_los()`](https://u-shift.github.io/GTFShift/reference/classify_frequency_los.md)
+  : Classify bus frequency level of service based on HCM
+
 ## Manipulate
 
 - [`unify()`](https://u-shift.github.io/GTFShift/reference/unify.md) :
@@ -176,6 +181,8 @@ Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
   feeds](https://u-shift.github.io/GTFShift/articles/unify.md):
 - [4. Analyse GTFS
   feeds](https://u-shift.github.io/GTFShift/articles/analyse.md):
-- [5. Get OSM data](https://u-shift.github.io/GTFShift/articles/osm.md):
+- [5. Classify transit
+  data](https://u-shift.github.io/GTFShift/articles/classify.md):
+- [6. Get OSM data](https://u-shift.github.io/GTFShift/articles/osm.md):
 - [Extra. Update OSM
   data](https://u-shift.github.io/GTFShift/articles/osm_update.md):

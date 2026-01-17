@@ -29,6 +29,11 @@
 - [`network_overline()`](https://u-shift.github.io/GTFShift/reference/network_overline.md)
   : Aggregate lines based on overlap with target network
 
+## Classify
+
+- [`classify_frequency_los()`](https://u-shift.github.io/GTFShift/reference/classify_frequency_los.md)
+  : Classify bus frequency level of service based on HCM
+
 ## Manipulate
 
 - [`unify()`](https://u-shift.github.io/GTFShift/reference/unify.md) :
