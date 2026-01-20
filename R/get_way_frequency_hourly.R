@@ -5,6 +5,7 @@
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param q osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
+#' @param keep_osm_attributes Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, finding for each route the corresponding OSM ways using \code{GTFShift::osm_shapes_to_routes()}
@@ -18,12 +19,14 @@
 #'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
 #'  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
 #'  \item \code{geometry}, the route shape.
+#'  \ietm (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 #' }
 #'
 #' @examples
 #' \dontrun{
 #' gtfs = GTFShift::load_feed("gtfs.zip")
-#' frequency_analysis = GTFShift::get_way_frequency_hourly(gtfs)
+#' q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+#' frequency_analysis = GTFShift::get_way_frequency_hourly(gtfs, q)
 #' }
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
@@ -39,7 +42,8 @@
 get_way_frequency_hourly = function(
     gtfs,
     q,
-    date = GTFShift::calendar_nextBusinessWednesday()
+    date = GTFShift::calendar_nextBusinessWednesday(),
+    keep_osm_attributes = FALSE
 ) {
   message(sprintf("Analysing GTFS for %s...", date))
 
@@ -93,8 +97,12 @@ get_way_frequency_hourly = function(
 
   # Join with ways
   ways_unique_geometry = ways |>
-    select(way_osm_id, geometry) |>
-    distinct()
+    distinct(way_osm_id, .keep_all = TRUE)
+
+  if (!keep_osm_attributes) {
+    ways_unique_geometry = ways_unique_geometry |>
+      select(way_osm_id, geometry)
+  }
 
   ways_freq = routes_freq |>
     inner_join(ways |> sf::st_drop_geometry() |> select(shape_id, way_osm_id), by="shape_id", relationship = "many-to-many") |>
