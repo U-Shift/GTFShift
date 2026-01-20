@@ -10,7 +10,7 @@ q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
-lanes_global = classify_lanes(gtfs, q)
+lanes_global = prioritize_lanes(gtfs, q)
 nrow(lanes_global)
 
 lanes = lanes_global |> filter(hour == 8)

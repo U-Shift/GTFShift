@@ -1,10 +1,11 @@
-#' Classify road network lanes for bus lane prioritization
+#' Prioritize road network lanes for bus lane implementation
 #'
 #' For each OSM way with GTFS service, aggregates its characteristics to assist in the bus lane implementation prioritization
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param q osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
+#' @param keep_osm_attributes Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, returning a data.frame with the road segments where transit routes
@@ -26,21 +27,21 @@
 #'  \item \code{n_directions}, the number of travel directions.
 #'  \item \code{n_lanes_direction}, the number of lanes per direction.
 #'  \item \code{geometry}, the route shape.
-#'  \ietm (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
+#'  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 #' }
 #'
 #' @examples
 #' \dontrun{
 #' gtfs = GTFShift::load_feed("gtfs.zip")
 #' q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
-#' lanes_analysis = GTFShift::classify_lanes(gtfs, q)
+#' lanes_analysis = GTFShift::prioritize_lanes(gtfs, q)
 #' }
 #'
 #' @import dplyr
 #' @import tidytransit
 #'
 #' @export
-classify_lanes <- function(
+prioritize_lanes <- function(
     gtfs,
     q,
     date = GTFShift::calendar_nextBusinessWednesday(),
