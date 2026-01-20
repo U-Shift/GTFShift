@@ -93,11 +93,11 @@ map_aggregated_simplified = mapview::mapview(
   color="#DAD887"
 ) + mapview::mapview(
   lanes |> filter(frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & is_bus_lane),
-  layer.name="+5 bus/h + 1 lane/dir, with bus lane",
+  layer.name="Bus lane with +5 bus/h + 1 lane/dir",
   color="#3BC1A8"
 ) + mapview::mapview(
   lanes |> filter(frequency>5 & !is.na(n_lanes) & n_lanes_direction>1 & !is_bus_lane),
-  layer.name="+5 bus/h + 1 lane/dir, NO bus lane",
+  layer.name="NO bus lane with +5 bus/h + 1 lane/dir",
   color="#F63049"
 )
 map_aggregated_simplified

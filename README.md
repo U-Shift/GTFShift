@@ -6,10 +6,50 @@
 
 **GTFShift** emerged from the necessity to understand how to get an
 overview of where bus lanes should be prioritized for a given territory,
-using General Transit Feed Specification (GTFS) files.
+using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM) data.
 
-It compiles the methods developed for this purpose, aiming to contribute
-to an open source culture.
+It provides a simple bundle for an aggregated analysis, that with one execution 
+compiles in a few seconds the following indicators:
+
+-   Frequency of buses (and trams) per hour and direction, at a peak hour;
+-   Number of lanes in the same direction.
+
+Together, these can be used to identify road segments where bus lanes should be implemented, 
+enabling for a transparent and data-driven decision-making process, suitable to different contexts
+and criteria. 
+
+```r
+library(GTFShift)
+library(osmdata)
+
+data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_id = "lisboa"
+gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
+osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
+  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+
+lanes = prioritize_lanes(gtfs, osm_q)
+
+mapview::mapview(
+  lanes |> filter((frequency<5 | (is.na(n_lanes) | n_lanes_direction<=1)) & is_bus_lane),
+  layer.name="Bus lane with -6 bus/h OR - 1 lane/dir",
+  color="#DAD887"
+) + mapview::mapview(
+  lanes |> filter(frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & is_bus_lane),
+  layer.name="Bus lane with +5 bus/h + 1 lane/dir",
+  color="#3BC1A8"
+) + mapview::mapview(
+  lanes |> filter(frequency>5 & !is.na(n_lanes) & n_lanes_direction>1 & !is_bus_lane),
+  layer.name="NO bus lane with +5 bus/h + 1 lane/dir",
+  color="#F63049"
+)
+```
+
+![](man/figures/prioritization.png)
+
+> Example of bus lane prioritization analysis for Lisbon city, considering road segments with
+a minimum frequency of 5 buses/hour and more than 1 lane per direction. 
 
 ## Installation
 
