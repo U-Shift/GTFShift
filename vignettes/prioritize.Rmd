@@ -1,8 +1,8 @@
 ---
-title: "7. Prioritize bus lane implementation"
+title: "Prioritize bus lane implementation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{7. Prioritize bus lane implementation}
+  %\VignetteIndexEntry{Prioritize bus lane implementation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

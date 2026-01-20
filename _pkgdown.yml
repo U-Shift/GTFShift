@@ -34,8 +34,8 @@ articles:
   - title: Articles
     navbar: ~
     contents:
-    - download
     - prioritize
+    - download
     - filter
     - unify
     - analyse
