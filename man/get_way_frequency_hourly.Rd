@@ -7,7 +7,8 @@
 get_way_frequency_hourly(
   gtfs,
   q,
-  date = GTFShift::calendar_nextBusinessWednesday()
+  date = GTFShift::calendar_nextBusinessWednesday(),
+  keep_osm_attributes = FALSE
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ get_way_frequency_hourly(
 \item{q}{osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.}
 
 \item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
+
+\item{keep_osm_attributes}{Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.}
 }
 \value{
 An \code{sf} \code{data.frame} object with the following columns:
@@ -24,6 +27,7 @@ An \code{sf} \code{data.frame} object with the following columns:
  \item \code{hour}, the hour for which the frequency applies (24 hour format).
  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
  \item \code{geometry}, the route shape.
+ \ietm (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 }
 }
 \description{
@@ -38,7 +42,8 @@ For a detailed example, see the \code{vignette("analyse")}.
 \examples{
 \dontrun{
 gtfs = GTFShift::load_feed("gtfs.zip")
-frequency_analysis = GTFShift::get_way_frequency_hourly(gtfs)
+q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+frequency_analysis = GTFShift::get_way_frequency_hourly(gtfs, q)
 }
 
 }
