@@ -27,7 +27,7 @@ An \code{sf} \code{data.frame} object with the following columns:
  \item \code{hour}, the hour for which the frequency applies (24 hour format).
  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
  \item \code{geometry}, the route shape.
- \ietm (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
+ \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 }
 }
 \description{

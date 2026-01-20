@@ -17,6 +17,8 @@ prioritize_lanes(
 \item{q}{osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.}
 
 \item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
+
+\item{keep_osm_attributes}{Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.}
 }
 \value{
 An \code{sf} \code{data.frame} object with the following columns:
@@ -29,7 +31,7 @@ An \code{sf} \code{data.frame} object with the following columns:
  \item \code{n_directions}, the number of travel directions.
  \item \code{n_lanes_direction}, the number of lanes per direction.
  \item \code{geometry}, the route shape.
- \ietm (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
+ \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 }
 }
 \description{
