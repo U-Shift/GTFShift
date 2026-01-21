@@ -32,16 +32,16 @@ osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 lanes = prioritize_lanes(gtfs, osm_q)
 
 mapview::mapview(
-  lanes |> filter((frequency<5 | (is.na(n_lanes) | n_lanes_direction<=1)) & is_bus_lane),
-  layer.name="Bus lane with -6 bus/h OR - 1 lane/dir",
+  lanes |> filter((frequency<=4 | (is.na(n_lanes) | n_lanes_direction<=1)) & is_bus_lane),
+  layer.name="Bus lane with - 5 bus/h OR - 1 lane/dir",
   color="#DAD887"
 ) + mapview::mapview(
   lanes |> filter(frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & is_bus_lane),
-  layer.name="Bus lane with +5 bus/h + 1 lane/dir",
+  layer.name="Bus lane with 5 or + bus/h + 1 lane/dir",
   color="#3BC1A8"
 ) + mapview::mapview(
-  lanes |> filter(frequency>5 & !is.na(n_lanes) & n_lanes_direction>1 & !is_bus_lane),
-  layer.name="NO bus lane with +5 bus/h + 1 lane/dir",
+  lanes |> filter(frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & !is_bus_lane),
+  layer.name="NO bus lane with 5 or + bus/h + 1 lane/dir",
   color="#F63049"
 )
 ```
