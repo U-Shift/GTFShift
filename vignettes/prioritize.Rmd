@@ -33,6 +33,9 @@ library(dplyr)
 library(osmdata)
 ```
 
+```{r include=FALSE}
+Sys.sleep(60)
+```
 
 # Introduction
 
