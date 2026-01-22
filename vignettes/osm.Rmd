@@ -32,6 +32,10 @@ library(tidytransit)
 library(dplyr)
 ```
 
+```{r include=FALSE}
+Sys.sleep(60)
+```
+
 # Introduction
 
 OpenStreetMaps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
@@ -56,6 +60,10 @@ bus_lanes = sf::st_read("https://github.com/U-Shift/busclar/releases/download/0.
 
 ```{r, cache=FALSE}
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
+```
+
+```{r include=FALSE}
+Sys.sleep(60)
 ```
 
 
@@ -116,6 +124,9 @@ mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.na
 </div>
 </div>
 
+```{r include=FALSE}
+Sys.sleep(60)
+```
 
 ## Ways (matching GTFS id)
 
@@ -131,6 +142,9 @@ shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
 mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.name="OSM ways")
 ```
 
+```{r include=FALSE}
+Sys.sleep(60)
+```
 
 ## Routes (matching shapes geometry)
 
