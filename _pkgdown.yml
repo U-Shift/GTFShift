@@ -7,6 +7,9 @@ reference:
     contents:
     - load_feed
     - query_mobilitydatabase
+  - title: Prioritize
+    contents:
+    - starts_with("prioritize_")
   - title: Filter
     contents:
     - starts_with("filter_")
@@ -31,6 +34,7 @@ articles:
   - title: Articles
     navbar: ~
     contents:
+    - prioritize
     - download
     - filter
     - unify

@@ -31,6 +31,11 @@ library(GTFShift)
 library(tidytransit)
 ```
 
+```{r include=FALSE}
+Sys.sleep(60)
+```
+
+
 # Introduction
 
 Performing analysis over transit requires data on the operation and infrastructure. [GTFS](https://gtfs.org/) is an open standard that offers this information in a simple and complete way. 
