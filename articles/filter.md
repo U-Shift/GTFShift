@@ -29,14 +29,14 @@ gtfs = load_feed("https://download.gtfs.de/germany/fv_free/latest.zip")
 summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, shapes, transfers, ., calendar, calendar_dates, feed_info, stops
-#> agencies     Ceske Drahy, Dänische Staatsbahnen, ZSSK ... 10 more
-#> service      from 2026-01-17 to 2026-02-16
+#> agencies     DB Fernverkehr AG, SÜWEX, SNCF ... 10 more
+#> service      from 2026-01-24 to 2026-02-23
 #> uses         stop_times (no frequencies)
 #> # routes       94
-#> # trips      4119
-#> # stop_ids   1233
-#> # stop_names  743
-#> # shapes     1552
+#> # trips      4178
+#> # stop_ids   1251
+#> # stop_names  754
+#> # shapes     1550
 ```
 
 Multimodal feeds aggregate several agencies.
@@ -50,25 +50,25 @@ gtfs_5 = GTFShift::filter_by_agency(gtfs, id = 5)
 summary(gtfs_5)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, shapes, transfers, ., calendar, calendar_dates, feed_info, stops
-#> agencies     Ceske Drahy, Dänische Staatsbahnen, ZSSK ... 10 more
-#> service      from 2026-01-17 to 2026-02-16
+#> agencies     DB Fernverkehr AG, SÜWEX, SNCF ... 10 more
+#> service      from 2026-01-24 to 2026-02-23
 #> uses         stop_times (no frequencies)
-#> # routes       3
-#> # trips      239
-#> # stop_ids    19
-#> # stop_names  19
-#> # shapes      14
+#> # routes      3
+#> # trips      43
+#> # stop_ids   23
+#> # stop_names 23
+#> # shapes     10
 
 # Filter by agency name
 gtfs_sncf = GTFShift::filter_by_agency(gtfs, name = "SNCF")
 summary(gtfs_sncf)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, shapes, transfers, ., calendar, calendar_dates, feed_info, stops
-#> agencies     Ceske Drahy, Dänische Staatsbahnen, ZSSK ... 10 more
-#> service      from 2026-01-17 to 2026-02-16
+#> agencies     DB Fernverkehr AG, SÜWEX, SNCF ... 10 more
+#> service      from 2026-01-24 to 2026-02-23
 #> uses         stop_times (no frequencies)
 #> # routes      2
-#> # trips      31
+#> # trips      22
 #> # stop_ids    6
 #> # stop_names  5
 #> # shapes      6
@@ -141,10 +141,10 @@ summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Metro - Los Angeles
-#> service      from 2026-01-16 to 2026-01-30
+#> service      from 2026-01-24 to 2026-02-07
 #> uses         stop_times (no frequencies)
 #> # routes        6
-#> # trips      5644
+#> # trips      6126
 #> # stop_ids    448
 #> # stop_names  345
 #> # shapes       16
@@ -163,10 +163,10 @@ summary(gtfs_tram)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Metro - Los Angeles
-#> service      from 2026-01-16 to 2026-01-30
+#> service      from 2026-01-24 to 2026-02-07
 #> uses         stop_times (no frequencies)
 #> # routes        4
-#> # trips      3601
+#> # trips      4081
 #> # stop_ids     95
 #> # stop_names   95
 #> # shapes        8

@@ -7,6 +7,11 @@
 - [`query_mobilitydatabase()`](https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.md)
   : Query Mobility Database API for GTFS feeds
 
+## Prioritize
+
+- [`prioritize_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritize_lanes.md)
+  : Prioritize road network lanes for bus lane implementation
+
 ## Filter
 
 - [`filter_by_agency()`](https://u-shift.github.io/GTFShift/reference/filter_by_agency.md)

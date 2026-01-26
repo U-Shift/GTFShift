@@ -14,9 +14,9 @@ Data classification helps to categorize transit data into meaningful
 groups based on specific criteria or thresholds. This process is
 essential for interpreting complex datasets, enabling transit planners
 and analysts to make informed decisions regarding service improvements,
-resource allocation, and policy development. `GTFShift` provides several
-methods that encapsulate several methodologies for this purpose. This
-document explores their applicability with simple examples.
+resource allocation, and policy development. `GTFShift` provides methods
+that encapsulate methodologies for this purpose. This document explores
+their applicability with simple examples.
 
 > This article uses a GTFS feed from the library GTFS database for
 > Portugal as an example. Refer to the

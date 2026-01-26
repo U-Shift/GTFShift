@@ -9,7 +9,8 @@ aggregated per hour and direction.
 get_way_frequency_hourly(
   gtfs,
   q,
-  date = GTFShift::calendar_nextBusinessWednesday()
+  date = GTFShift::calendar_nextBusinessWednesday(),
+  keep_osm_attributes = FALSE
 )
 ```
 
@@ -31,6 +32,11 @@ get_way_frequency_hourly(
   [`GTFShift::calendar_nextBusinessWednesday()`](https://u-shift.github.io/GTFShift/reference/calendar_nextBusinessWednesday.md)).
   Reference date to consider when analyzing the GTFS file.
 
+- keep_osm_attributes:
+
+  Boolean (Default FALSE). Whether to keep all OSM way attributes in the
+  output `sf` object.
+
 ## Value
 
 An `sf` `data.frame` object with the following columns:
@@ -43,6 +49,8 @@ An `sf` `data.frame` object with the following columns:
   first stop for the corresponding 60 minutes period.
 
 - `geometry`, the route shape.
+
+- (if `keep_osm_attributes = TRUE`) all OSM way attributes.
 
 ## Details
 
@@ -66,6 +74,7 @@ For a detailed example, see the
 ``` r
 if (FALSE) { # \dontrun{
 gtfs = GTFShift::load_feed("gtfs.zip")
-frequency_analysis = GTFShift::get_way_frequency_hourly(gtfs)
+q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+frequency_analysis = GTFShift::get_way_frequency_hourly(gtfs, q)
 } # }
 ```

@@ -163,19 +163,19 @@ gtfs_subset = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65
 
 # Match shapes geometry
 shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
-#> > Found 14 GTFS shapes and 232 stops
+#> > Found 14 GTFS shapes and 231 stops
 #> > Found 300 OSM route relations and 4909 bus stops/platforms
-#> > Associated 14 shapes (100.00% of 14 total) of 8 routes (100.00% of 8 total) with OSM routes, with a mean distance of 25.42 meters for points, 32.29 meters for route length and a mean difference of 0.43 stops
+#> > Associated 14 shapes (100.00% of 14 total) of 8 routes (100.00% of 8 total) with OSM routes, with a mean distance of 25.42 meters for points, 49.82 meters for route length and a mean difference of 0.43 stops
 #> > Of those, 14 shapes (100.00% of 14 matched) have a distance difference below 1000 meters, a points difference below 500 meters
 
 summary(shapes_match_routes)
-#>    route_id           shape_id            osm_id          distance_diff  
-#>  Length:14          Length:14          Length:14          Min.   : 5.22  
-#>  Class :character   Class :character   Class :character   1st Qu.:19.97  
-#>  Mode  :character   Mode  :character   Mode  :character   Median :31.36  
-#>                                                           Mean   :32.29  
-#>                                                           3rd Qu.:39.74  
-#>                                                           Max.   :73.10  
+#>    route_id           shape_id            osm_id          distance_diff   
+#>  Length:14          Length:14          Length:14          Min.   :  5.22  
+#>  Class :character   Class :character   Class :character   1st Qu.: 19.97  
+#>  Mode  :character   Mode  :character   Mode  :character   Median : 31.36  
+#>                                                           Mean   : 49.82  
+#>                                                           3rd Qu.: 43.68  
+#>                                                           Max.   :278.50  
 #>   points_diff       stops_diff     route_short_name   route_long_name   
 #>  Min.   : 7.851   Min.   :0.0000   Length:14          Length:14         
 #>  1st Qu.:12.197   1st Qu.:0.0000   Class :character   Class :character  

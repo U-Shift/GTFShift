@@ -36,7 +36,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/download.html">1. Getting transit data</a></li>
+<li><a class="dropdown-item" href="articles/prioritize.html">Prioritize bus lane implementation</a></li>
+    <li><a class="dropdown-item" href="articles/download.html">1. Getting transit data</a></li>
     <li><a class="dropdown-item" href="articles/filter.html">2. Filter GTFS feeds</a></li>
     <li><a class="dropdown-item" href="articles/unify.html">3. Aggregate GTFS feeds</a></li>
     <li><a class="dropdown-item" href="articles/analyse.html">4. Analyse GTFS feeds</a></li>
@@ -63,20 +64,55 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><strong>GTFShift</strong> emerged from the necessity to understand how to get an overview of where bus lanes should be prioritized for a given territory, using General Transit Feed Specification (GTFS) files.</p>
-<p>It compiles the methods developed for this purpose, aiming to contribute to an open source culture.</p>
+<p><strong>GTFShift</strong> emerged from the necessity to understand how to get an overview of where bus lanes should be prioritized for a given territory, using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM) data.</p>
+<p>It provides a simple bundle for an aggregated analysis, that with one execution compiles in a few seconds the following indicators:</p>
+<ul>
+<li>Frequency of buses (and trams) per hour and direction, at a peak hour;</li>
+<li>Number of lanes in the same direction.</li>
+</ul>
+<p>Together, these can be used to identify road segments where bus lanes should be implemented, enabling for a transparent and data-driven decision-making process, suitable to different contexts and criteria.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/U-Shift/GTFShift" class="external-link">GTFShift</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/osmdata/" class="external-link">osmdata</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"gtfs_sources_pt.csv"</span>, package <span class="op">=</span> <span class="st">"GTFShift"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">gtfs_id</span> <span class="op">=</span> <span class="st">"lisboa"</span></span>
+<span><span class="va">gtfs</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="reference/load_feed.html">load_feed</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">URL</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">ID</span> <span class="op">==</span> <span class="va">gtfs_id</span><span class="op">]</span>, create_transfers<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">osm_q</span> <span class="op">=</span> <span class="fu"><a href="https://docs.ropensci.org/osmdata/reference/opq.html" class="external-link">opq</a></span><span class="op">(</span>bbox<span class="op">=</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="fu">tidytransit</span><span class="fu">::</span><span class="fu"><a href="https://r-transit.github.io/tidytransit/reference/shapes_as_sf.html" class="external-link">shapes_as_sf</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">$</span><span class="va">shapes</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://docs.ropensci.org/osmdata/reference/add_osm_feature.html" class="external-link">add_osm_feature</a></span><span class="op">(</span>key <span class="op">=</span> <span class="st">"route"</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bus"</span>, <span class="st">"tram"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://docs.ropensci.org/osmdata/reference/add_osm_feature.html" class="external-link">add_osm_feature</a></span><span class="op">(</span>key <span class="op">=</span> <span class="st">"network"</span>, value <span class="op">=</span> <span class="st">"Carris"</span>, key_exact <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">lanes</span> <span class="op">=</span> <span class="fu"><a href="reference/prioritize_lanes.html">prioritize_lanes</a></span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">osm_q</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">mapview</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/mapview/reference/mapView.html" class="external-link">mapview</a></span><span class="op">(</span></span>
+<span>  <span class="va">lanes</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">(</span><span class="va">frequency</span><span class="op">&lt;=</span><span class="fl">4</span> <span class="op">|</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">n_lanes</span><span class="op">)</span> <span class="op">|</span> <span class="va">n_lanes_direction</span><span class="op">&lt;=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">is_bus_lane</span><span class="op">)</span>,</span>
+<span>  layer.name<span class="op">=</span><span class="st">"Bus lane with - 5 bus/h OR - 1 lane/dir"</span>,</span>
+<span>  color<span class="op">=</span><span class="st">"#DAD887"</span></span>
+<span><span class="op">)</span> <span class="op">+</span> <span class="fu">mapview</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/mapview/reference/mapView.html" class="external-link">mapview</a></span><span class="op">(</span></span>
+<span>  <span class="va">lanes</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">frequency</span><span class="op">&gt;=</span><span class="fl">5</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">n_lanes</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">n_lanes_direction</span><span class="op">&gt;</span><span class="fl">1</span> <span class="op">&amp;</span> <span class="va">is_bus_lane</span><span class="op">)</span>,</span>
+<span>  layer.name<span class="op">=</span><span class="st">"Bus lane with 5 or + bus/h + 1 lane/dir"</span>,</span>
+<span>  color<span class="op">=</span><span class="st">"#3BC1A8"</span></span>
+<span><span class="op">)</span> <span class="op">+</span> <span class="fu">mapview</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/mapview/reference/mapView.html" class="external-link">mapview</a></span><span class="op">(</span></span>
+<span>  <span class="va">lanes</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">frequency</span><span class="op">&gt;=</span><span class="fl">5</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">n_lanes</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">n_lanes_direction</span><span class="op">&gt;</span><span class="fl">1</span> <span class="op">&amp;</span> <span class="op">!</span><span class="va">is_bus_lane</span><span class="op">)</span>,</span>
+<span>  layer.name<span class="op">=</span><span class="st">"NO bus lane with 5 or + bus/h + 1 lane/dir"</span>,</span>
+<span>  color<span class="op">=</span><span class="st">"#F63049"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/prioritization.png"></p>
+<blockquote>
+<p>Example of bus lane prioritization analysis for Lisbon city, considering road segments with a minimum frequency of 5 buses/hour and more than 1 lane per direction.</p>
+</blockquote>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of <strong>GTFShift</strong> from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"U-Shift/GTFShift"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="load-the-package">Load the package<a class="anchor" aria-label="anchor" href="#load-the-package"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/U-Shift/GTFShift" class="external-link">GTFShift</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
