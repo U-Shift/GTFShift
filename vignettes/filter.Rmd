@@ -32,6 +32,10 @@ library(dplyr)
 library(mapview)
 ```
 
+```{r include=FALSE}
+Sys.sleep(60)
+```
+
 
 # Introduction 
 
