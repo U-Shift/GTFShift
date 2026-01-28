@@ -137,12 +137,24 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
     pb$terminate()
   }
 
-  # 4. Log missing shapes
-  message(sprintf("Matched %d shapes with OSM routes!", length(unique(result$shape_id))))
-  shapes_missing = shape_ids |> filter(!(shape_id %in% result$shape_id)) |> left_join(gtfs$trips, by="shape_id") |> left_join(gtfs$routes, by="route_id") |> distinct(shape_id, .keep_all = TRUE)
-  if (nrow(shapes_missing)>0) {
-    row_strings <- with(shapes_missing, sprintf("%s (%s)", shape_id, route_short_name))
-    warning(sprintf("Shapes missing (ignored in the result): %s", paste(row_strings, collapse = " ")))
+  # 4. Log missing shapes/routes
+  routes_shapes = gtfs$routes |> select(route_id, route_short_name, route_long_name) |>
+    right_join(gtfs$trips |> select(trip_id, route_id, shape_id), by="route_id") |>
+    distinct(route_id, shape_id, .keep_all = TRUE)
+
+  shapes_matched_n = result |> distinct(shape_id) |> nrow()
+  shapes_gtfs_n = gtfs$shapes |> distinct(shape_id) |> nrow()
+  routes_matched_n = routes_shapes |> filter(shape_id %in% result$shape_id) |> distinct(route_id) |> nrow()
+  routes_gtfs_n = gtfs$routes |> distinct(route_id) |> nrow()
+
+  message(sprintf("Matched %d shapes (%.2f%% of %d in GTFS) of %d routes (%.2f%% of %d in GTFS) with OSM routes!",
+      shapes_matched_n, shapes_matched_n/shapes_gtfs_n*100, shapes_gtfs_n,
+      routes_matched_n, routes_matched_n/routes_gtfs_n*100, routes_gtfs_n
+  ))
+  routes_shapes_missing = routes_shapes |> filter(!(shape_id %in% result$shape_id))
+  if (nrow(routes_shapes_missing)>0) {
+    row_strings <- with(routes_shapes_missing, sprintf("| %s | %s | %s | %s |", route_id, shape_id, route_short_name, route_long_name))
+    warning(sprintf("Shapes missing (ignored in the result):\n| route_id | shape_id | route_short_name | route_long_name |\n%s", paste(row_strings, collapse = "\n")))
   }
 
   return(result)
