@@ -36,8 +36,8 @@ osm_bus_lanes <- function(bbox) {
     # Based on https://wiki.openstreetmap.org/wiki/Bus_lanes
     psv == "designated"
     | highway == "busway"
-    | if_any(all_of(cols_to_check_access), ~ grepl("designated", .x))
-    | if_any(all_of(cols_to_check_count), ~ is.numeric(.x) & .x >= 1)
+    | (length(cols_to_check_access) & if_any(all_of(cols_to_check_access), ~ grepl("designated", .x)))
+    | (length(cols_to_check_count) & if_any(all_of(cols_to_check_count), ~ is.numeric(.x) & .x >= 1))
   )
 
   return(osm_lanes)
