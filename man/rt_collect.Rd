@@ -6,18 +6,27 @@
 \usage{
 rt_collect(
   gtfs_rt_url,
-  destination_folder,
+  destination_file,
+  header_key = "header",
+  entity_key = "entity",
+  fields_collect = c("id", "trip.trip_id", "vehicle.position.latitude",
+    "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp"),
   scrap_interval = 60,
-  log_file = NA,
-  proto_buffer = FALSE
+  log_file = NA
 )
 }
 \arguments{
 \item{gtfs_rt_url}{String. URL of the GTFS-RT feed in JSON format.}
 
-\item{destination_folder}{String. Folder to save the downloaded GTFS-RT files.}
+\item{destination_file}{String. File to save the downloaded GTFS-RT data. Content is appended in each iteration.}
 
-\item{scrap_interval}{Integer (Default 60). Interval in seconds between each download.}
+\item{header_key}{String (Default "header"). Key in the JSON corresponding to the feed header. Set to NA if not present.}
+
+\item{entity_key}{String (Default "entity"). Key in the JSON corresponding to the feed entities. Set to NA if response is a flat list.}
+
+\item{fields_collect}{Character vector. Fields to extract from each entity in the feed.}
+
+\item{scrap_interval}{Integer (Default 60). Interval in seconds between each download. Negative to run only once.}
 
 \item{log_file}{String (Optional). Path to a log file to save download logs.}
 }
@@ -25,14 +34,13 @@ rt_collect(
 Collect GTFS-RT data
 }
 \details{
-Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination folder.
+Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
 
-This function will run indefinitely until manually stopped. Each downloaded file is named with a timestamp to ensure uniqueness.
+This function will run indefinitely until manually stopped.
 }
 \examples{
 \dontrun{
-GTFShift::rt_collect("https://api.example.com/gtfs-rt", "gtfs_rt_data")
+GTFShift::rt_collect("https://api.example.com/gtfs-rt", "gtfs_rt_data.csv")
 }
-
 
 }
