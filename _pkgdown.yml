@@ -27,6 +27,9 @@ reference:
   - title: OpenStreetMaps
     contents:
     - starts_with("osm_")
+  - title: Realtime
+    contents:
+    - starts_with("rt_")
   - title: Utils
     contents:
     - calendar_nextBusinessWednesday

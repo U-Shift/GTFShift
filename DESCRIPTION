@@ -38,7 +38,9 @@ Suggests:
     rmarkdown,
     GTFSwizard,
     mapview,
-    xml2
+    xml2,
+    RProtoBuf,
+    jsonlite
 Remotes:
     gmatosferreira/GTFSwizard
 VignetteBuilder: knitr
