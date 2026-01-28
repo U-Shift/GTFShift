@@ -2,31 +2,31 @@
 #'
 #'
 #' @param gtfs_rt_url String. URL of the Protocol Buffers GTFS-RT feed.
-#' @param destination_folder String. Folder to save the downloaded GTFS-RT files.
-#' @param scrap_interval Integer (Default 60). Interval in seconds between each download.
+#' @param destination_file String. File to save the downloaded GTFS-RT data. Content is appended in each iteration.
+#' @param fields_collect Character vector. Fields to extract from each entity in the feed.
+#' @param scrap_interval Integer (Default 60). Interval in seconds between each download. Negative to run only once.
 #' @param log_file String (Optional). Path to a log file to save download logs.
 #'
 #' @details
-#' Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination folder.
+#' Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
 #'
 #' This function will run indefinitely until manually stopped. Each downloaded file is named with a timestamp to ensure uniqueness.
 #'
 #'
 #' @examples
 #' \dontrun{
-#' GTFShift::rt_collect("https://api.example.com/gtfs-rt", "gtfs_rt_data")
+#' GTFShift::rt_collect_protobuf("https://api.example.com/gtfs-rt-protobuf", "gtfs_rt_data.csv")
 #' }
 #'
 #' @import RProtoBuf
 #' @import jsonlite
 #'
 #' @export
-rt_collect_protobuf <- function(gtfs_rt_url, destination_folder, scrap_interval = 60, log_file = NA, proto_buffer=FALSE) {
-  # Create destination folder if it doesn't exist
-  if (!dir.exists(destination_folder)) {
-    dir.create(destination_folder, recursive = TRUE)
-  }
-
+rt_collect_protobuf <- function(
+    gtfs_rt_url, destination_file,
+    fields_collect = c("id", "trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp"),
+    scrap_interval = 60, log_file = NA
+) {
   # Log script start
   m = sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
   message(m)
@@ -37,7 +37,6 @@ rt_collect_protobuf <- function(gtfs_rt_url, destination_folder, scrap_interval 
   repeat {
     count = count + 1
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-    destination_file <- file.path(destination_folder, paste0(timestamp, ".json"))
 
     # Load protobuf
     RProtoBuf::readProtoFiles((system.file("extdata", "gtfs-realtime.proto", package = "GTFShift")))
@@ -48,30 +47,50 @@ rt_collect_protobuf <- function(gtfs_rt_url, destination_folder, scrap_interval 
     # Convert to R list
     fields <- names(feed)
 
-    feed_list <- lapply(fields, function(f) {
-      value <- feed[[f]]
+    protobuf_to_list <- function(msg) {
+      if (!inherits(msg, "Message")) return(msg)
 
-      # recursively convert nested Message objects
-      if (inherits(value, "Message")) {
-        protobuf_to_list(value)
-      } else if (is.list(value)) {
-        lapply(value, protobuf_to_list)
-      } else {
-        value
-      }
-    }) |> setNames(fields)
+      # get all fields
+      fields <- names(msg)
 
+      lapply(fields, function(f) {
+        value <- msg[[f]]
+
+        # recursively convert nested Message objects
+        if (inherits(value, "Message")) {
+          protobuf_to_list(value)
+        } else if (is.list(value)) {
+          lapply(value, protobuf_to_list)
+        } else {
+          value
+        }
+      }) |> setNames(fields)
+    }
+
+    feed_list <- protobuf_to_list(feed)
+    temp_json = tempfile(fileext = ".json")
     write_json(
       feed_list,
-      destination_file,
+      temp_json,
       pretty = TRUE,
       auto_unbox = TRUE
     )
 
-    m = sprintf("[%s] %d files downloaded", timestamp, count)
+    suppressMessages({
+      rt_collect(
+        gtfs_rt_url = temp_json,
+        destination_file = destination_file,
+        fields_collect = fields_collect,
+        scrap_interval = -1,
+        log_file = NA
+      )
+    })
+
+    m = sprintf("[%s] Iteration %d completed", timestamp, count)
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
+    if (scrap_interval <= 0) break  # Exit the loop if scrap_interval is non-positive
     Sys.sleep(scrap_interval)  # Wait for scrap_interval seconds before the next download
   }
 }
