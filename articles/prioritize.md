@@ -26,7 +26,7 @@ Common criteria for implementing bus lanes include:
 - **Frequency of buses (and trams) per hour and direction, at a peak
   hour;**
 - **Number of lanes in the same direction;**
-- Existing traffic conditions;
+- **Existing traffic conditions**;
 - Existing bus lanes in the area (from a network continuity
   perspective).
 
@@ -34,14 +34,20 @@ GTFShift provides methods to analyse the dimensions in bold, namely:
 
 - [`GTFShift::get_way_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_way_frequency_hourly.md),
   to obtain the frequency of services per hour for each road segment
-  with transit service and the characteristics of such each segments
-  (such as number os lanes).
+  with transit service and its associated characteristics (such as
+  number of lanes).
 
-> [`GTFShift:: get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
+> [`GTFShift::get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
 > is an alternative
 
 - [`GTFShift::osm_bus_lanes()`](https://u-shift.github.io/GTFShift/reference/osm_bus_lanes.md),
   to identify existing bus lanes in the road network.
+
+- [`GTFShift::rt_collect()`](https://u-shift.github.io/GTFShift/reference/rt_collect.md),
+  to collect GTFS-RT data, which can be later used with
+  [`GTFShift::rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
+  to include real-time operational metrics in the prioritization
+  analysis.
 
 This document explores how to use these methods in a combined way to
 assist public transport planners in prioritizing bus lane
@@ -51,11 +57,13 @@ the specific approaches followed.
 
 ## Prioritize lanes
 
+### Generate base indicators
+
 [`GTFShift::prioritize_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritize_lanes.md)
-is a simple method that bundles the logic of the ones mentioned above,
-returning a data.frame with the relevant characteristics for each road
-segment with transit service. With a single call, it returns all the
-aggregated information needed to prioritize bus lane implementations.
+is a simple method that generates indicators for most of the criteria
+mentioned above using GTFS and OpenStreetMaps data (service frequency
+and lane characteristics). With a single call, it returns a data.frame
+with the relevant metrics for each road segment with transit service.
 
 ``` r
 # Get GTFS from library GTFS database for Portugal
@@ -70,30 +78,41 @@ osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 lanes = prioritize_lanes(gtfs, osm_q)
 summary(lanes)
 #>   way_osm_id             hour         frequency      is_bus_lane    
-#>  Length:133226      Min.   : 0.00   Min.   : 1.000   Mode :logical  
-#>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   FALSE:121210   
+#>  Length:132782      Min.   : 0.00   Min.   : 1.000   Mode :logical  
+#>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   FALSE:120766   
 #>  Mode  :character   Median :13.00   Median : 6.000   TRUE :12016    
-#>                     Mean   :12.56   Mean   : 9.637                  
+#>                     Mean   :12.56   Mean   : 9.654                  
 #>                     3rd Qu.:18.00   3rd Qu.:13.000                  
 #>                     Max.   :23.00   Max.   :99.000                  
 #>     n_lanes       n_directions   n_lanes_direction          geometry     
-#>  Min.   :1.000   Min.   :1.000   Min.   :0.500     LINESTRING   :133226  
+#>  Min.   :1.000   Min.   :1.000   Min.   :0.500     LINESTRING   :132782  
 #>  1st Qu.:1.000   1st Qu.:1.000   1st Qu.:1.000     epsg:4326    :     0  
 #>  Median :2.000   Median :1.000   Median :1.000     +proj=long...:     0  
-#>  Mean   :2.141   Mean   :1.369   Mean   :1.693                           
+#>  Mean   :2.143   Mean   :1.368   Mean   :1.696                           
 #>  3rd Qu.:3.000   3rd Qu.:2.000   3rd Qu.:2.000                           
 #>  Max.   :7.000   Max.   :2.000   Max.   :6.000
 ```
+
+### Extend with GTFS-RT data
+
+If GTFS-RT data is available, it can be used to extend the
+prioritization analysis with real-time operational metrics, such as
+average speed. This can help identify road segments where buses are
+experiencing significant delays due to traffic congestion, which may
+benefit from bus lane implementation.
+
+Refer to the [GTFS Real
+Time](https://u-shift.github.io/GTFShift/articles/rt.md) article for
+details on how to collect GTFS-RT data and extend the prioritization
+analysis.
+
+### Visualize results
 
 The aggregated data can then be manipulated according to the
 prioritization criteria defined by the user. For instance, the following
 code classifies (in red) the road segments considering a minimum
 frequency of 5 buses/hour and more than 1 lane per direction as high
 priority for bus lane implementation.
-
-Additionally, it displays the current bus lane network, highlighting in
-green the segments that meet the frequency and lane criteria, and in
-yellow those that do not meet the criteria but still have bus lanes.
 
 > The classification of frequent service as 5 buses/hour is based on the
 > HCM guidelines for level of service, where a frequency of 5 buses/hour
@@ -104,15 +123,11 @@ yellow those that do not meet the criteria but still have bus lanes.
 
 ``` r
 mapview::mapview(
-  lanes |> filter((frequency<=4 | (is.na(n_lanes) | n_lanes_direction<=1)) & is_bus_lane),
-  layer.name="Bus lane with - 5 bus/h OR - 1 lane/dir",
-  color="#DAD887"
-) + mapview::mapview(
-  lanes |> filter(frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & is_bus_lane),
-  layer.name="Bus lane with 5 or + bus/h + 1 lane/dir",
+  lanes |> filter(is_bus_lane),
+  layer.name="Bus lane",
   color="#3BC1A8"
 ) + mapview::mapview(
-  lanes |> filter(frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & !is_bus_lane),
+  lanes |> filter(!is_bus_lane & frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1),
   layer.name="NO bus lane with 5 or + bus/h + 1 lane/dir",
   color="#F63049"
 )

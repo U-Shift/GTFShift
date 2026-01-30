@@ -11,6 +11,8 @@
 
 - [`prioritize_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritize_lanes.md)
   : Prioritize road network lanes for bus lane implementation
+- [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
+  : Extend prioritization with GTFS-RT metrics
 
 ## Filter
 
@@ -58,6 +60,15 @@
   : Get OSM routes geometry considering gtfs:shape_id match
 - [`osm_trips_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_trips_to_routes.md)
   : Get OSM routes geometry considering gtfs:trip_id match
+
+## Realtime
+
+- [`rt_collect()`](https://u-shift.github.io/GTFShift/reference/rt_collect.md)
+  : Collect GTFS-RT data
+- [`rt_collect_protobuf()`](https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.md)
+  : Collect GTFS-RT data (with Protocol Buffers support)
+- [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
+  : Extend prioritization with GTFS-RT metrics
 
 ## Utils
 

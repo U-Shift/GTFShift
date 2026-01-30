@@ -54,7 +54,7 @@ osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 
 route_extent_carris = get_network_extension(gtfs, route_identifier="route_short_name", direction_wise = TRUE, use_osm_routes = osm_q, unified = TRUE)
 drop_units(route_extent_carris/1000)
-#> [1] 810.5389
+#> [1] 810.5296
 ```
 
 ## Analyse hourly frequency per stop
@@ -118,10 +118,10 @@ returning aggregated results per hour and road segment, using OSM ways.
 frequencies_way = GTFShift::get_way_frequency_hourly(gtfs, osm_q)
 summary(frequencies_way)
 #>   way_osm_id             hour         frequency               geometry     
-#>  Length:133265      Min.   : 0.00   Min.   : 1.000   LINESTRING   :133265  
+#>  Length:132782      Min.   : 0.00   Min.   : 1.000   LINESTRING   :132782  
 #>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   epsg:4326    :     0  
 #>  Mode  :character   Median :13.00   Median : 6.000   +proj=long...:     0  
-#>                     Mean   :12.56   Mean   : 9.639                         
+#>                     Mean   :12.56   Mean   : 9.654                         
 #>                     3rd Qu.:18.00   3rd Qu.:13.000                         
 #>                     Max.   :23.00   Max.   :99.000
 quantile(frequencies_way$frequency)

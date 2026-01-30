@@ -126,6 +126,13 @@ head(data)
 #> 4                    https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
 #> 5 https://drive.google.com/u/0/uc?id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX&export=download
 #> 6                                 https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS
+#>                                                                           URL.RT
+#> 1                                                                               
+#> 2                                                                               
+#> 3                                 https://api.carrismetropolitana.pt/v1/vehicles
+#> 4                                                                               
+#> 5                                                                               
+#> 6 https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS/realtime/vehiclepositions
 #>            Type
 #> 1 Long distance
 #> 2 Long distance
@@ -148,9 +155,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      198
-#> # trips      2463
+#> # routes      200
+#> # trips      2459
 #> # stop_ids    457
 #> # stop_names  457
-#> # shapes      278
+#> # shapes      281
 ```
