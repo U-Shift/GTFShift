@@ -5,7 +5,7 @@ rt_collect(
   entity_key = NA,
   fields_collect = c("block_id", "trip_id", "lat", "lon", "current_status", "stop_id", "speed", "timestamp"),
   destination_file = "releases/gtfs_rt_data/cm.csv",
-  scrap_interval = 5,
+  scrape_interval = 5,
   log_file = "releases/gtfs_rt_data/cm_collect_log.txt"
 )
 
@@ -13,7 +13,7 @@ rt_collect(
 rt_collect_protobuf(
   gtfs_rt_url="https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS/realtime/vehiclepositions",
   destination_file = "releases/gtfs_rt_data/carris.csv",
-  scrap_interval = 5,
+  scrape_interval = 5,
   log_file = "releases/gtfs_rt_data/carris_collect_log.txt"
 )
 
