@@ -57,3 +57,11 @@ map_aggregated_simplified_extended = mapview::mapview(
   color="#F63049"
 )
 map_aggregated_simplified_extended
+
+output = "releases/web"
+library(mapview)
+mapshot(
+  map_aggregated_simplified_extended,
+  file = file.path(output, "map_rt_extended_prioritization.html"),
+  selfcontained = TRUE
+)

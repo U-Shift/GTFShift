@@ -3,11 +3,13 @@
 #' This function extends lane segment indicators for prioritization with metrics produced with GTFS-RT data.
 #'
 #' @param lane_prioritization sf data.frame. Result of \code{GTFShift::prioritize_lanes()}
-#' @param rt_collection sf data.frame. GTFS-RT data collection. Must include `speed` column.
-#' @param lane_buffer numeric (Default 5). Buffer distance (in meters) to create around lane segments to capture nearby GTFS-RT points.
+#' @param rt_collection sf data.frame. GTFS-RT data collection. Must include \code{speed} column.
+#' @param lane_buffer numeric (Default 15). Buffer distance (in meters) to create around lane segments to capture nearby GTFS-RT points.
 #'
 #' @details
 #' Extends the \code{lane_prioritization} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
+#'
+#' Refer to \code{GTFShift::rt_collect()} for details on GTFS-RT data collection.
 #'
 #'
 #' @returns The \code{lane_prioritization} \code{sf} \code{data.frame}, extended with the following columns:
