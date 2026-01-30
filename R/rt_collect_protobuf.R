@@ -4,7 +4,7 @@
 #' @param gtfs_rt_url String. URL of the Protocol Buffers GTFS-RT feed.
 #' @param destination_file String. File to save the downloaded GTFS-RT data. Content is appended in each iteration.
 #' @param fields_collect Character vector. Fields to extract from each entity in the feed.
-#' @param scrap_interval Integer (Default 60). Interval in seconds between each download. Negative to run only once.
+#' @param scrape_interval Integer (Default 60). Interval in seconds between each download. Negative to run only once.
 #' @param log_file String (Optional). Path to a log file to save download logs.
 #'
 #' @details
@@ -25,14 +25,14 @@
 rt_collect_protobuf <- function(
     gtfs_rt_url, destination_file,
     fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
-    scrap_interval = 60, log_file = NA
+    scrape_interval = 60, log_file = NA
 ) {
   # Log script start
   m = sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
   message(m)
   if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
-  # Each scrap_interval seconds, download the GTFS-RT feed and save it to the destination folder
+  # Each scrape_interval seconds, download the GTFS-RT feed and save it to the destination folder
   count = 0
   repeat {
     count = count + 1
@@ -81,7 +81,7 @@ rt_collect_protobuf <- function(
         gtfs_rt_url = temp_json,
         destination_file = destination_file,
         fields_collect = fields_collect,
-        scrap_interval = -1,
+        scrape_interval = -1,
         log_file = NA
       )
     })
@@ -90,8 +90,8 @@ rt_collect_protobuf <- function(
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
-    # Wait for scrap_interval seconds before the next download
-    if (scrap_interval<0) {
+    # Wait for scrape_interval seconds before the next download
+    if (scrape_interval<0) {
       break
     }
     interval_start <- Sys.time()
@@ -102,8 +102,8 @@ rt_collect_protobuf <- function(
     pb$update(0)
     repeat {
       elapsed_time <- as.numeric(difftime(Sys.time(), interval_start, units="secs"))
-      if (elapsed_time >= scrap_interval) break;
-      pb$update( min(elapsed_time / scrap_interval, 1) );
+      if (elapsed_time >= scrape_interval) break;
+      pb$update( min(elapsed_time / scrape_interval, 1) );
       Sys.sleep(0.1);
     }
     pb$update(1)

@@ -12,7 +12,7 @@ rt_collect(
   fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude",
     "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp",
     "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
-  scrap_interval = 60,
+  scrape_interval = 60,
   log_file = NA
 )
 }
@@ -27,7 +27,7 @@ rt_collect(
 
 \item{fields_collect}{Character vector. Fields to extract from each entity in the feed.}
 
-\item{scrap_interval}{Integer (Default 60). Interval in seconds between each download. Negative to run only once.}
+\item{scrape_interval}{Integer (Default 60). Interval in seconds between each download. Negative to run only once.}
 
 \item{log_file}{String (Optional). Path to a log file to save download logs.}
 }
