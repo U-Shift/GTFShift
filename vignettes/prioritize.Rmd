@@ -52,7 +52,7 @@ Common criteria for implementing bus lanes include:
 
 GTFShift provides methods to analyse the dimensions in bold, namely:
 
--  `GTFShift::get_way_frequency_hourly()`, to obtain the frequency of services per hour for each road segment with transit service and the characteristics of such each segments (such as number os lanes).
+-  `GTFShift::get_way_frequency_hourly()`, to obtain the frequency of services per hour for each road segment with transit service and its associated characteristics (such as number of lanes).
 
 > `GTFShift::get_route_frequency_hourly()` is an alternative
 

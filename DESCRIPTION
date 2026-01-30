@@ -39,8 +39,7 @@ Suggests:
     GTFSwizard,
     mapview,
     xml2,
-    RProtoBuf,
-    jsonlite
+    RProtoBuf
 Remotes:
     gmatosferreira/GTFSwizard
 VignetteBuilder: knitr
