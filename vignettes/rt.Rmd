@@ -52,7 +52,7 @@ Once GTFS-RT data is collected, it can be used to extend lane prioritization ana
 ```{r, eval=FALSE}
 lane_prioritization <- GTFShift::prioritize_lanes(gtfs, osm_query)
 
-rt_collection <- csv.read(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+rt_collection <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
 
 lane_prioritization_extended <- GTFShift::rt_extend_prioritization(
   lane_prioritization = lane_prioritization,
@@ -70,11 +70,11 @@ mapview::mapview(
 )
 
 mapview::mapview(
-  lanes |> filter(is_bus_lane),
+  lane_prioritization_extended |> dplyr::filter(is_bus_lane),
   layer.name="Bus lane",
   color="#3BC1A8"
 ) + mapview::mapview(
-  lanes |> filter(!is_bus_lane & frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & avg_speed<15),
+  lane_prioritization_extended |> dplyr::filter(!is_bus_lane & frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & avg_speed<15),
   layer.name="NO bus lane with 5 or + bus/h + 1 lane/dir and avg_speed < 15km/h",
   color="#F63049"
 )

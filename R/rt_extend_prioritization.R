@@ -27,7 +27,7 @@
 #' GTFShift::rt_collect("https://api.example.com/gtfs-rt", rt_collect_file)
 #' lane_prioritization <- GTFShift::prioritize_lanes(gtfs, osm_query)
 #'
-#' rt_collection <- csv.read(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+#' rt_collection <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
 #' lane_prioritization_extended <- GTFShift::rt_extend_prioritization(
 #'   lane_prioritization = lane_prioritization,
 #'   rt_collection = rt_collection
@@ -36,6 +36,7 @@
 #'
 #' @import progress
 #' @import dplyr
+#' @import callr
 #'
 #' @export
 rt_extend_prioritization <- function(
