@@ -24,7 +24,7 @@
 #' @export
 rt_collect_protobuf <- function(
     gtfs_rt_url, destination_file,
-    fields_collect = c("id", "trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp"),
+    fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
     scrap_interval = 60, log_file = NA
 ) {
   # Log script start
@@ -90,7 +90,22 @@ rt_collect_protobuf <- function(
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
-    if (scrap_interval <= 0) break  # Exit the loop if scrap_interval is non-positive
-    Sys.sleep(scrap_interval)  # Wait for scrap_interval seconds before the next download
+    # Wait for scrap_interval seconds before the next download
+    if (scrap_interval<0) {
+      break
+    }
+    interval_start <- Sys.time()
+    pb <- progress::progress_bar$new( # Track progress
+      format = "Sleeping [:bar] :percent :spin elapsed=:elapsed",
+      clear = FALSE, show_after=0
+    )
+    pb$update(0)
+    repeat {
+      elapsed_time <- as.numeric(difftime(Sys.time(), interval_start, units="secs"))
+      if (elapsed_time >= scrap_interval) break;
+      pb$update( min(elapsed_time / scrap_interval, 1) );
+      Sys.sleep(0.1);
+    }
+    pb$update(1)
   }
 }
