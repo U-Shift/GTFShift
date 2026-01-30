@@ -20,6 +20,7 @@
 #'
 #' @import RProtoBuf
 #' @import jsonlite
+#' @import progress
 #'
 #' @export
 rt_collect_protobuf <- function(
