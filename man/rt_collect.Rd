@@ -9,8 +9,9 @@ rt_collect(
   destination_file,
   header_key = "header",
   entity_key = "entity",
-  fields_collect = c("id", "trip.trip_id", "vehicle.position.latitude",
-    "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp"),
+  fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude",
+    "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp",
+    "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
   scrap_interval = 60,
   log_file = NA
 )

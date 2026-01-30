@@ -10,6 +10,7 @@ reference:
   - title: Prioritize
     contents:
     - starts_with("prioritize_")
+    - rt_extend_prioritization
   - title: Filter
     contents:
     - starts_with("filter_")
@@ -44,4 +45,5 @@ articles:
     - analyse
     - classify
     - osm
+    - rt
     - osm_update
