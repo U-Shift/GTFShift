@@ -38,7 +38,8 @@ Suggests:
     rmarkdown,
     GTFSwizard,
     mapview,
-    xml2
+    xml2,
+    RProtoBuf
 Remotes:
     gmatosferreira/GTFSwizard
 VignetteBuilder: knitr
