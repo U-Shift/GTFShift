@@ -21,7 +21,7 @@ rt_collect_protobuf(
 # Extend prioritization with rt data
 # lane_prioritization <- readRDS("releases/lane_prioritization/lisbon_lane_prioritization.rds")
 lane_prioritization <- lanes_global
-rt_collection_cm <- sf::st_read("releases/gtfs_rt_data/updates_more15MBusStop.csv") |>
+rt_collection_cm <- sf::st_read("releases/gtfs_rt_data/carris_updates_more15MBusStop.csv") |>
   mutate(
     lon = str_replace(lon, "c\\(", ""),
     lat = str_replace(lat, "\\)", ""),
