@@ -1,4 +1,4 @@
-#' Collect GTFS-RT data
+#' Collect GTFS-RT data from a JSON feed at regular intervals
 #'
 #'
 #' @param gtfs_rt_url String. URL of the GTFS-RT feed in JSON format.
@@ -12,19 +12,19 @@
 #' @details
 #' Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
 #'
-#' This function will run indefinitely until manually stopped.
+#' This function will run indefinitely until manually stopped (CTRL + C).
 #'
 #'
 #' @examples
 #' \dontrun{
-#' GTFShift::rt_collect("https://api.example.com/gtfs-rt", "gtfs_rt_data.csv")
+#' GTFShift::rt_collect_json("https://api.example.com/gtfs-rt", "gtfs_rt_data.csv")
 #' }
 #'
 #' @import jsonlite
 #' @import progress
 #'
 #' @export
-rt_collect <- function(
+rt_collect_json <- function(
     gtfs_rt_url, destination_file,
     header_key="header", # Optional
     entity_key="entity",
