@@ -26,7 +26,7 @@
 #'  \item \code{n_lanes}, the total number of lanes.
 #'  \item \code{n_directions}, the number of travel directions.
 #'  \item \code{n_lanes_direction}, the number of lanes per direction.
-#'  \ietm \code{routes}, the list of route_ids that use the way, separated by semicolon.
+#'  \item \code{routes}, the list of route_ids that use the way, separated by semicolon.
 #'  \item \code{geometry}, the route shape.
 #'  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 #' }
