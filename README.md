@@ -8,48 +8,22 @@
 overview of where bus lanes should be prioritized for a given territory,
 using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM) data.
 
-It provides a simple bundle for an aggregated analysis, that with one execution 
-compiles in a few seconds the following indicators:
+It provides a comprehensive bundle of methods that cover several dimensions of this 
+problem, namely:
 
 -   Frequency of buses (and trams) per hour and direction, at a peak hour;
--   Number of lanes in the same direction.
+-   Number of lanes in the same direction;
+-   Existing traffic conditions;
+-   Existing bus lanes in the area (from a network continuity perspective).
 
 Together, these can be used to identify road segments where bus lanes should be implemented, 
 enabling for a transparent and data-driven decision-making process, suitable to different contexts
 and criteria. 
 
-```r
-library(GTFShift)
-library(osmdata)
-
-data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_id = "lisboa"
-gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
-osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
-  add_osm_feature(key = "route", value = c("bus", "tram")) |>
-  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
-
-lanes = prioritize_lanes(gtfs, osm_q)
-
-mapview::mapview(
-  lanes |> filter((frequency<=4 | (is.na(n_lanes) | n_lanes_direction<=1)) & is_bus_lane),
-  layer.name="Bus lane with - 5 bus/h OR - 1 lane/dir",
-  color="#DAD887"
-) + mapview::mapview(
-  lanes |> filter(frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & is_bus_lane),
-  layer.name="Bus lane with 5 or + bus/h + 1 lane/dir",
-  color="#3BC1A8"
-) + mapview::mapview(
-  lanes |> filter(frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & !is_bus_lane),
-  layer.name="NO bus lane with 5 or + bus/h + 1 lane/dir",
-  color="#F63049"
-)
-```
-
 ![](man/figures/prioritization.png)
 
 > Example of bus lane prioritization analysis for Lisbon city, considering road segments with
-a minimum frequency of 5 buses/hour and more than 1 lane per direction. 
+a minimum frequency of 10 buses/hour, average commercial speed below 9.76 km/h and more than 1 lane per direction. 
 
 ## Installation
 
@@ -69,11 +43,18 @@ library(GTFShift)
 
 ## Key functions
 
-**GTFShift** provides methods for the entire workflow of bus network
-density analysis. For detailed examples on their functionality, refer to
-the articles at <https://u-shift.github.io/GTFShift/>.
+**GTFShift** provides methods for the entire workflow of bus lane implementation
+prioritization, but also other useful functions for GTFS and OSM data gathering
+and manipulation. For detailed examples on their functionality, refer to
+the articles at <https://u-shift.github.io/GTFShift/articles>.
 
-### Getting transit data
+### [Prioritize](./articles/prioritize.html)
+
+The main purpose of **GTFShift** is to support the decision-making process for 
+bus lane implementation prioritization. This article presents a step-by-step guide
+on how to use the package to achieve this goal, from data gathering to analysis and visualization.
+
+### [Getting transit data](./articles/download.html)
 
 Starting with a valid GTFS feed is the key for a successful analysis.
 **GTFShift** includes a method to load feeds that simultaneously scans
@@ -83,7 +64,7 @@ If the feed location is unknown, it also provides a database listing
 GTFS for Portugal and a method to query worldwide open catalogues by
 city or country names or even a bounding box.
 
-### Filter
+### [Filter](./articles/filter.html)
 
 GTFS feeds do not have a defined scope regarding its coverage of the
 transportation system. Some can be bounded to one agency, whereas others
@@ -93,7 +74,7 @@ From the simpler to the most complex feeds, some analysis require to
 narrow the perspective. **GTFShift** provides some to help in this
 process.
 
-### Aggregate
+### [Aggregate](./articles/unify.html)
 
 Public transit analysis takes advantage of the standardized GTFS format.
 However, its provision by operator makes it difficult for network
@@ -107,7 +88,7 @@ file given several instances.
 > Aggregated GTFS for Fertagus and Transportes Coletivos do Barreiro
 > operators
 
-### Analyse
+### [Analyse](./articles/analyse.html)
 
 Analyzing public transit feeds is important to understand its
 territorial coverage and dynamics, both on its spatial and temporal
@@ -121,7 +102,7 @@ stop, route or road segment.
 
 > Aggregated route frequency for Carris Lisboa operator, at 8:00
 
-### OSM Data
+### [OSM Data](./articles/osm.html)
 
 OpenStreetMaps (OSM) is an important data source for transit analysis,
 due to its rich, open, and detailed geographic data.
@@ -133,6 +114,20 @@ network and export the OSM transit routes.
 ![](man/figures/osm_buslanes.png)
 
 > OSM exported bus lanes for Lisbon
+
+### [Real Time transit data](./articles/rt.html)
+
+Real time operational data provides valuable insights about how planned operation 
+performs in practice and how it interacts with the urban traffic conditions.
+
+**GTFShift** provides several methods to enable this data collection and analysis.
+
+### [Contribute to OSM](./articles/osm_update.html)
+
+OpenStreetMap (OSM) is a collaborative project that relies on community contributions.
+
+**GTFShift** includes methods to facilitate the process of contributing
+to OSM, specifically for updating bus lane information based on the analysis results.
 
 ## Related packages
 
