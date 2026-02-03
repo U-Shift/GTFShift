@@ -97,13 +97,20 @@ for(i in 1:nrow(regions)) {
   prioritization = prioritize_lanes(gtfs, q, date=region$gtfs_day)
   assign(sprintf("prioritization_%s_gtfs%s", region$name, region$gtfs_day), prioritization)
 
+  write.csv(prioritization |> sf::st_drop_geometry(), sprintf("%s/prioritization_%s_gtfs%s_run%s.csv", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
+  sf::st_write(prioritization, sprintf("%s/prioritization_%s_gtfs%s_run%s.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
+
+  # prioritization = st_read(sprintf("%s/prioritization_%s_gtfs%s_run%s.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())))
+
   # Extend with real-time data if available
   if (!is.na(region$rt_collection)) {
     rt_collection = region$rt_collection[[1]]
     # Filter updates, to remove those close to bus stops
     gtfs_stops = tidytransit::stops_as_sf(gtfs$stops, crs=4326)
-    gtfs_stops_buffered = sf::st_buffer(sf::st_transform(gtfs_stops, 3857), stop_buffer_size) |> sf::st_transform(4326)
-    rt_collection_filtered = rt_collection[!sf::st_intersects(rt_collection, gtfs_stops_buffered, sparse = FALSE), ]
+
+    within_distance <- st_is_within_distance(rt_collection |> st_transform(crs=3857), gtfs_stops |> st_transform(crs=3857), dist = stop_buffer_size)
+
+    rt_collection_filtered = rt_collection[lengths(within_distance) == 0, ]
 
     # Extend prioritization with real-time data
     prioritization = rt_extend_prioritization(
@@ -141,46 +148,78 @@ for(i in 1:nrow(regions)) {
     select(-row_n)
 
   # Save outputs
-  write.csv(prioritization |> sf::st_drop_geometry(), sprintf("%s/prioritization_%s_gtfs%s_run%s.csv", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
-  sf::st_write(prioritization, sprintf("%s/prioritization_%s_gtfs%s_run%s.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
-  geojson_file = sprintf("%s/prioritization_%s_gtfs%s_run%s.geojson", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date()))
+  write.csv(prioritization |> sf::st_drop_geometry(), sprintf("%s/prioritization_%s_gtfs%s_run%s_extended.csv", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
+  sf::st_write(prioritization, sprintf("%s/prioritization_%s_gtfs%s_run%s_extended.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
+  geojson_file = sprintf("%s/prioritization_%s_gtfs%s_run%s_extended.geojson", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date()))
   sf::st_write(prioritization, geojson_file, append=FALSE, delete_dsn = TRUE)
 
   # Open geojson with jsonlite, to extend with technical metadata
   geojson_data = jsonlite::read_json(geojson_file, digits=NA) # To avoid precision loss in coordinates
 
+  dataCensus = function (numberArray) {
+    return(list(
+      min = min(numberArray, na.rm=TRUE),
+      max = max(numberArray, na.rm=TRUE),
+      p25 = as.numeric(quantile(numberArray, 0.25, na.rm=TRUE)),
+      p75 = as.numeric(quantile(numberArray, 0.75, na.rm=TRUE)),
+      mean = mean(numberArray, na.rm=TRUE),
+      median = as.numeric(median(numberArray, na.rm=TRUE)),
+      variance = var(numberArray, na.rm=TRUE),
+      sd = sd(numberArray, na.rm=TRUE)
+    ))
+  }
+
+  rt_list = NA
+  if(!is.na(region$rt_collection)) {
+    rt_list = list(
+      url = "", # To be edited manually
+      period = region$rt_interval,
+      stop_buffer_size = stop_buffer_size
+    )
+  }
+  census_frequency_hour = list()
+  for(h in 0:23) {
+    prioritization_hour = prioritization |> filter(hour == h)
+    census_frequency_hour[[as.character(h)]] = dataCensus(prioritization_hour$frequency)
+  }
+
   metadata = list(
     region = region$name_long,
-    generated_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
-    gtfs_source = region$gtfs_url,
-    gtfs_date = region$gtfs_day,
-    stop_buffer_size_meters = stop_buffer_size,
-    rt_data_included = !is.na(region$rt_collection),
-    rt_data_url = "", # Manual
-    rt_interval = region$rt_interval,
-    r_version = R.version.string,
-    gtfshift_version = as.character(packageVersion("GTFShift")),
-    routes_missing = paste(gtfs$routes |> filter(!route_id %in% routes_covered$routes) |> pull(route_short_name), collapse = ";"),
-    routes_covered = nrow(routes_covered),
-    routes_total = nrow(gtfs$routes),
+    gtfs = list(
+      date = region$gtfs_day,
+      url = region$gtfs_url
+    ),
     osm_query = lapply(region$query[[1]], function(feat) {
       list(
         key = feat$key,
         value = feat$value,
         key_exact = if (!is.null(feat$key_exact)) feat$key_exact else FALSE
       )
-    })
+    }),
+    prioritization = list(
+      routes_missing = paste(gtfs$routes |> filter(!route_id %in% routes_covered$routes) |> pull(route_short_name), collapse = ";"),
+      routes_covered = nrow(routes_covered),
+      routes_total = nrow(gtfs$routes)
+    ),
+    data_census = list(
+      frequency = dataCensus(prioritization$frequency),
+      frequency_hour = census_frequency_hour,
+      speed_avg = dataCensus(prioritization$speed_avg),
+      lanes = dataCensus(prioritization$n_lanes_direction)
+    ),
+    rt = rt_list,
+    execution = list(
+      moment = format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
+      script = "dev/web_version.R",
+      git_commit = system("git rev-parse HEAD", intern=TRUE)
+    ),
+    environment = list(
+      r = R.version.string,
+      GTFShift = as.character(packageVersion("GTFShift")),
+      os = Sys.info()[["sysname"]],
+      os_release = Sys.info()[["release"]]
+    )
   )
-  # unbox_recursive <- function(x) {
-  #   if (is.atomic(x) && length(x) == 1) {
-  #     jsonlite::unbox(x)
-  #   } else if (is.list(x)) {
-  #     lapply(x, unbox_recursive)
-  #   } else {
-  #     x
-  #   }
-  # }
-
 
   geojson_data$metadata <- metadata
   # Save at geojson_file.replace(".geojson", "_with_metadata.geojson")
