@@ -63,19 +63,30 @@ lane_prioritization_extended <- GTFShift::rt_extend_prioritization(
 The resulting `lane_prioritization_extended` data frame includes additional columns with speed metrics, such as average speed, median speed, and speed percentiles, providing a more comprehensive view of lane performance based on real-time data.
 
 ```{r, eval=FALSE}
+lane_prioritization_0800 = lane_prioritization_extended |> filter(hour==8)
+
 mapview::mapview(
-  lane_prioritization_extended,
+  lane_prioritization_0800,
   zcol = "speed_avg",
   layer.name = "Average speed per lane"
 )
 
+p50_frequency = quantile(lane_prioritization_0800$frequency, 0.5, na.rm=TRUE)
+p50_speed = quantile(lane_prioritization_0800$speed_avg, 0.5, na.rm=TRUE)
 mapview::mapview(
-  lane_prioritization_extended |> dplyr::filter(is_bus_lane),
-  layer.name="Bus lane",
+  lane_prioritization_0800 |> filter(is_bus_lane & (frequency<p50_frequency | (is.na(n_lanes) | n_lanes_direction<=1) | speed_avg<=p50_speed)),
+  layer.name=sprintf("Bus lane with - %d bus/h OR -1 lane/dir OR -%.2f km/h avg. speed", p50_frequency, p50_speed),
+  color="#DAD887"
+) + mapview::mapview(
+  lane_prioritization_0800 |> filter(is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg>p50_speed),
+  layer.name=sprintf("Bus lane with +%d bus/h AND +1 lane/dir AND +%.2f km/h avg.speed", p50_frequency-1, p50_speed),
   color="#3BC1A8"
 ) + mapview::mapview(
-  lane_prioritization_extended |> dplyr::filter(!is_bus_lane & frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg<15),
-  layer.name="NO bus lane with 5 or + bus/h + 1 lane/dir and avg_speed < 15km/h",
+  lane_prioritization_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg<=p50_speed),
+  layer.name=sprintf("NO bus lane with +%d bus/h AND +1 lane/dir AND -%.2f km/h avg.speed", p50_frequency-1, p50_speed),
   color="#F63049"
 )
 ```
+
+![](figures/prioritization.png)
+
