@@ -85,11 +85,13 @@ prioritize_lanes <- function(
         2 # NA_integer_
       ),
       n_directions = case_when(
+        n_lanes == 1 ~ 1, # When only one lane, assume one direction
         oneway %in% c("yes", "1", "-1", "true") ~ 1,
         oneway %in% c("no", "0", "false") ~ 2,
         TRUE ~ 2
       ),
       n_lanes_direction = case_when(
+        n_lanes / n_directions < 1 ~ 1,
         !is.na(n_lanes) & !is.na(n_directions) ~ n_lanes / n_directions,
         TRUE ~ NA_real_
       )
