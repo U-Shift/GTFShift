@@ -92,13 +92,12 @@ get_route_frequency_hourly = function(
       "stop_sequence"
     )))
 
-  stop_times = stop_times |> # Only departures from origin (first stop)
-    filter(stop_sequence == 1)
-
   stop_times = stop_times |>
-    mutate(
-      hour = lubridate::hour(departure_time)
-    )
+    arrange(stop_sequence) |>
+    group_by(trip_id) |>
+    slice(1) |> # Only departures from origin (first stop)
+    ungroup() |>
+    mutate(hour = lubridate::hour(departure_time))
 
   freq_data = stop_times |>
     group_by(across(any_of(c("route_id", "route_short_name", "direction_id", "hour")))) |>
