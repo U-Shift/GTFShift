@@ -45,7 +45,7 @@ rt_extend_prioritization <- function(
   lane_buffer = 15 # in meters
 ) {
   # 1. Validate inputs
-  required_cols = c("way_osm_id", "geometry")
+  required_cols = c("way_osm_id")
   missing_cols = setdiff(required_cols, colnames(lane_prioritization))
   if (length(missing_cols) > 0) {
     stop(paste("lane_prioritization is missing required columns:", paste(missing_cols, collapse = ", ")))
