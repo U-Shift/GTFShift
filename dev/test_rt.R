@@ -1,5 +1,5 @@
 # Carris Metropolitana (plain JSON)
-rt_collect(
+rt_collect_json(
   gtfs_rt_url = "https://api.carrismetropolitana.pt/v1/vehicles",
   header_key = NA,
   entity_key = NA,

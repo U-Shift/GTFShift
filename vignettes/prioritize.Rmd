@@ -58,7 +58,7 @@ GTFShift provides methods to analyse the dimensions in bold, namely:
 
 - `GTFShift::osm_bus_lanes()`, to identify existing bus lanes in the road network.
 
-- `GTFShift::rt_collect()`, to collect GTFS-RT data, which can be later used with `GTFShift::rt_extend_prioritization()` to include real-time operational metrics in the prioritization analysis.
+- `GTFShift::rt_collect_json()` or `GTFShift::rt_collect_protobuf()`, to collect GTFS-RT data, which can be later used with `GTFShift::rt_extend_prioritization()` to include real-time operational metrics in the prioritization analysis.
 
 This document explores how to use these methods in a combined way to assist public transport planners in prioritizing bus lane implementations. For details on the several encapsulated features, refer to the numerated articles in the menu, that explore in detail each of the specific approaches followed. 
 

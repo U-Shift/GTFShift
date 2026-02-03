@@ -9,7 +9,7 @@
 #' @details
 #' Extends the \code{lane_prioritization} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
 #'
-#' Refer to \code{GTFShift::rt_collect()} for details on GTFS-RT data collection.
+#' Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 #'
 #'
 #' @returns The \code{lane_prioritization} \code{sf} \code{data.frame}, extended with the following columns:
@@ -24,7 +24,7 @@
 #' @examples
 #' \dontrun{
 #' rt_collect_file <- "gtfs_rt_data.csv"
-#' GTFShift::rt_collect("https://api.example.com/gtfs-rt", rt_collect_file)
+#' GTFShift::rt_collect_json("https://api.example.com/gtfs-rt", rt_collect_file)
 #' lane_prioritization <- GTFShift::prioritize_lanes(gtfs, osm_query)
 #'
 #' rt_collection <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/rt_collect_protobuf.R
 \name{rt_collect_protobuf}
 \alias{rt_collect_protobuf}
-\title{Collect GTFS-RT data (with Protocol Buffers support)}
+\title{Collect GTFS-RT data from a Protocol Buffers feed at regular intervals}
 \usage{
 rt_collect_protobuf(
   gtfs_rt_url,
@@ -26,12 +26,12 @@ rt_collect_protobuf(
 \item{log_file}{String (Optional). Path to a log file to save download logs.}
 }
 \description{
-Collect GTFS-RT data (with Protocol Buffers support)
+Collect GTFS-RT data from a Protocol Buffers feed at regular intervals
 }
 \details{
 Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
 
-This function will run indefinitely until manually stopped. Each downloaded file is named with a timestamp to ensure uniqueness.
+This function will run indefinitely until manually stopped (CTRL + C).
 }
 \examples{
 \dontrun{
