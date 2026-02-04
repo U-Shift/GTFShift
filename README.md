@@ -43,30 +43,30 @@ library(GTFShift)
 
 ## Get started
 
-For more details on the package and how to get started, please visit the [Get started](./articles/GTFShift.html) page.
+For more details on the package and how to get started, please visit the [Get started](https://u-shift.github.io/GTFShift/articles/GTFShift.html) page.
 
 ## Dashboard 
 
 **GTFShift** provides an interactive dashboard that allows users to explore and visualize results for real case studies, 
 aiming to illustrate its potential and capabilities to a non-technical audience, while disseminating the outputs of these real world scenarios.
 
-Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift){target="_blank}.
+Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
 
-[![](man/figures/web.png)](https://ushift.pt/apps/gtfshift){target="_blank"}
+[![](man/figures/web.png)](https://ushift.pt/apps/gtfshift)
 
 ## Related packages
 
--   [`{tidytransit}`](https://github.com/r-transit/tidytransit){target="_blank"}
--   [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/){target="_blank"}
--   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard){target="_blank"}
--   [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter){target="_blank"}
+-   [`{tidytransit}`](https://github.com/r-transit/tidytransit)
+-   [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
+-   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
+-   [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
 
 ## Acknowledgement
 
 **GTFShift** is developed and maintained by
-[U-Shift](https://ushift.tecnico.ulisboa.pt){target="_blank"} urban mobility research
-group, part of [CERIS](https://ceris.pt/){target="_blank"} research unit, at [Instituto
-Superior Técnico](https://tecnico.ulisboa.pt/pt/){target="_blank"}, Lisbon, Portugal.
+[U-Shift](https://ushift.tecnico.ulisboa.pt) urban mobility research
+group, part of [CERIS](https://ceris.pt/) research unit, at [Instituto
+Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
 
 <br/>
 

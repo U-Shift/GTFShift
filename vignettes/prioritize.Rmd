@@ -50,7 +50,7 @@ Common criteria for implementing bus lanes include:
 -   Existing traffic conditions;
 -   Existing bus lanes in the area (from a network continuity perspective).
 
-GTFShift to analyse these dimensions, namely:
+GTFShift provides methods to analyse these dimensions, namely:
 
 -  `GTFShift::get_way_frequency_hourly()`, to obtain the frequency of services per hour for each road segment with transit service and its associated characteristics (such as number of lanes).
 
@@ -58,7 +58,7 @@ GTFShift to analyse these dimensions, namely:
 
 - `GTFShift::rt_collect_json()` or `GTFShift::rt_collect_protobuf()`, to collect GTFS-RT data, which can be later used with `GTFShift::rt_extend_prioritization()` to include real-time operational metrics in the prioritization analysis.
 
-This document explores how to use these methods in a combined way to assist public transport planners in prioritizing bus lane implementations. For details on the several encapsulated features and method variations, refer to the numerated articles in the menu, that explore in detail each of the specific approaches followed. 
+This document explores how to use these methods in a combined way to assist public transport planners in prioritizing bus lane implementations. For details on the several encapsulated features and method variations, refer to the numbered articles in the menu, that explore in detail each of the specific approaches followed. 
 
 # Prioritize lanes
 
