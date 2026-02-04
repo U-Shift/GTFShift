@@ -71,6 +71,10 @@ drop_units(route_extent_carris/1000)
 ```
 
 
+```{r include=FALSE}
+Sys.sleep(60)
+```
+
 # Analyse hourly frequency per stop
 
 To analyse frequencies at stops, use `GTFShift::get_stop_frequency_hourly()`, producing, for each, an aggregated counting of bus servicing it per hour.
