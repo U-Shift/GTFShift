@@ -1,4 +1,4 @@
-#' Collect GTFS-RT data (with Protocol Buffers support)
+#' Collect GTFS-RT data from a Protocol Buffers feed at regular intervals
 #'
 #'
 #' @param gtfs_rt_url String. URL of the Protocol Buffers GTFS-RT feed.
@@ -10,7 +10,7 @@
 #' @details
 #' Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
 #'
-#' This function will run indefinitely until manually stopped. Each downloaded file is named with a timestamp to ensure uniqueness.
+#' This function will run indefinitely until manually stopped (CTRL + C).
 #'
 #'
 #' @examples
@@ -78,7 +78,7 @@ rt_collect_protobuf <- function(
     )
 
     suppressMessages({
-      rt_collect(
+      rt_collect_json(
         gtfs_rt_url = temp_json,
         destination_file = destination_file,
         fields_collect = fields_collect,
