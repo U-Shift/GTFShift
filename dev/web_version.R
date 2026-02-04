@@ -65,7 +65,7 @@ for(i in 1:nrow(regions)) {
   region <- regions[i, ]
   message(sprintf("\n\nRunning for %s (%s)...", region$name, region$gtfs_day))
 
-  output_region = sprintf("%s/%s/%s", output, regions$name, region$gtfs_day)
+  output_region = sprintf("%s/%s/%s", output, region$name, region$gtfs_day)
   if (!dir.exists(output_region)) {
     dir.create(output_region, recursive = TRUE)
   }
