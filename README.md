@@ -41,107 +41,32 @@ remotes::install_github("U-Shift/GTFShift")
 library(GTFShift)
 ```
 
-## Key functions
+## Get started
 
-**GTFShift** provides methods for the entire workflow of bus lane implementation
-prioritization, but also other useful functions for GTFS and OSM data gathering
-and manipulation. For detailed examples on their functionality, refer to
-the articles at <https://u-shift.github.io/GTFShift/articles>.
+For more details on the package and how to get started, please visit the [Get started](./articles/GTFShift.html) page.
 
-### [Prioritize](./articles/prioritize.html)
+## Dashboard 
 
-The main purpose of **GTFShift** is to support the decision-making process for 
-bus lane implementation prioritization. This article presents a step-by-step guide
-on how to use the package to achieve this goal, from data gathering to analysis and visualization.
+**GTFShift** provides an interactive dashboard that allows users to explore and visualize results for real case studies, 
+aiming to illustrate its potential and capabilities to a non-technical audience, while disseminating the outputs of these real world scenarios.
 
-### [Getting transit data](./articles/download.html)
+Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift){target="_blank}.
 
-Starting with a valid GTFS feed is the key for a successful analysis.
-**GTFShift** includes a method to load feeds that simultaneously scans
-for any integrity errors and fixes them automatically.
-
-If the feed location is unknown, it also provides a database listing
-GTFS for Portugal and a method to query worldwide open catalogues by
-city or country names or even a bounding box.
-
-### [Filter](./articles/filter.html)
-
-GTFS feeds do not have a defined scope regarding its coverage of the
-transportation system. Some can be bounded to one agency, whereas others
-can aggregate several modes in the same city, or even national wise.
-
-From the simpler to the most complex feeds, some analysis require to
-narrow the perspective. **GTFShift** provides some to help in this
-process.
-
-### [Aggregate](./articles/unify.html)
-
-Public transit analysis takes advantage of the standardized GTFS format.
-However, its provision by operator makes it difficult for network
-aggregated analysis, considering connectivity and multimodality.
-
-**GTFShift** includes a method to easily generate an aggregated GTFS
-file given several instances.
-
-![](man/figures/unify.png)
-
-> Aggregated GTFS for Fertagus and Transportes Coletivos do Barreiro
-> operators
-
-### [Analyse](./articles/analyse.html)
-
-Analyzing public transit feeds is important to understand its
-territorial coverage and dynamics, both on its spatial and temporal
-dimensions.
-
-**GTFShift** provides several methods that encapsulate pre-defined
-methodologies for them, for instance, analysing hourly frequency per
-stop, route or road segment.
-
-![](man/figures/analyse_aggregated_frequencies.png)
-
-> Aggregated route frequency for Carris Lisboa operator, at 8:00
-
-### [OSM Data](./articles/osm.html)
-
-OpenStreetMaps (OSM) is an important data source for transit analysis,
-due to its rich, open, and detailed geographic data.
-
-**GTFShift** includes some methods that allow to access its information
-directly, namely to export bus lanes, get centerlines for the road
-network and export the OSM transit routes.
-
-![](man/figures/osm_buslanes.png)
-
-> OSM exported bus lanes for Lisbon
-
-### [Real Time transit data](./articles/rt.html)
-
-Real time operational data provides valuable insights about how planned operation 
-performs in practice and how it interacts with the urban traffic conditions.
-
-**GTFShift** provides several methods to enable this data collection and analysis.
-
-### [Contribute to OSM](./articles/osm_update.html)
-
-OpenStreetMap (OSM) is a collaborative project that relies on community contributions.
-
-**GTFShift** includes methods to facilitate the process of contributing
-to OSM, specifically for updating bus lane information based on the analysis results.
+[![](man/figures/web.png)](https://ushift.pt/apps/gtfshift){target="_blank"}
 
 ## Related packages
 
--   [`{tidytransit}`](https://github.com/r-transit/tidytransit)
--   [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
--   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
--   [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
+-   [`{tidytransit}`](https://github.com/r-transit/tidytransit){target="_blank"}
+-   [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/){target="_blank"}
+-   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard){target="_blank"}
+-   [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter){target="_blank"}
 
 ## Acknowledgement
 
 **GTFShift** is developed and maintained by
-[U-shift](https://ushift.tecnico.ulisboa.pt) urban mobility research
-group, part of [CERIS](https://ceris.pt/) research unit, at [Instituto
-Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
+[U-Shift](https://ushift.tecnico.ulisboa.pt){target="_blank"} urban mobility research
+group, part of [CERIS](https://ceris.pt/){target="_blank"} research unit, at [Instituto
+Superior Técnico](https://tecnico.ulisboa.pt/pt/){target="_blank"}, Lisbon, Portugal.
 
 <br/>
 
