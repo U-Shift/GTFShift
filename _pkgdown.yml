@@ -2,6 +2,19 @@ url: https://u-shift.github.io/GTFShift/
 template:
   bootstrap: 5
   light-switch: true
+  bslib:
+    primary: "#15AF97FF"
+
+navbar:
+  structure:
+   left:  [intro, reference, articles, dashboard]
+
+  components:
+    dashboard:
+      text: "Dashboard"
+      href: "https://ushift.pt/apps/gtfshift"
+      target: "_blank"
+
 
 reference:
   - title: Get GTFS feeds
