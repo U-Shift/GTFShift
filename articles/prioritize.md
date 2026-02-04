@@ -23,27 +23,25 @@ public acceptance.
 
 Common criteria for implementing bus lanes include:
 
-- **Frequency of buses (and trams) per hour and direction, at a peak
-  hour;**
-- **Number of lanes in the same direction;**
-- **Existing traffic conditions**;
+- Frequency of buses (and trams) per hour and direction, at a peak hour;
+- Number of lanes in the same direction;
+- Existing traffic conditions;
 - Existing bus lanes in the area (from a network continuity
   perspective).
 
-GTFShift provides methods to analyse the dimensions in bold, namely:
+GTFShift provides methods to analyse these dimensions, namely:
 
 - [`GTFShift::get_way_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_way_frequency_hourly.md),
   to obtain the frequency of services per hour for each road segment
   with transit service and its associated characteristics (such as
   number of lanes).
 
-> [`GTFShift::get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
-> is an alternative
-
 - [`GTFShift::osm_bus_lanes()`](https://u-shift.github.io/GTFShift/reference/osm_bus_lanes.md),
   to identify existing bus lanes in the road network.
 
-- [`GTFShift::rt_collect()`](https://u-shift.github.io/GTFShift/reference/rt_collect.md),
+- [`GTFShift::rt_collect_json()`](https://u-shift.github.io/GTFShift/reference/rt_collect_json.md)
+  or
+  [`GTFShift::rt_collect_protobuf()`](https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.md),
   to collect GTFS-RT data, which can be later used with
   [`GTFShift::rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
   to include real-time operational metrics in the prioritization
@@ -51,9 +49,9 @@ GTFShift provides methods to analyse the dimensions in bold, namely:
 
 This document explores how to use these methods in a combined way to
 assist public transport planners in prioritizing bus lane
-implementations. For details on the several encapsulated features, refer
-to the numerated articles in the menu, that explore in detail each of
-the specific approaches followed.
+implementations. For details on the several encapsulated features and
+method variations, refer to the numbered articles in the menu, that
+explore in detail each of the specific approaches followed.
 
 ## Prioritize lanes
 
@@ -78,19 +76,26 @@ osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
 lanes = prioritize_lanes(gtfs, osm_q)
 summary(lanes)
 #>   way_osm_id             hour         frequency      is_bus_lane    
-#>  Length:132782      Min.   : 0.00   Min.   : 1.000   Mode :logical  
-#>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   FALSE:120766   
+#>  Length:132794      Min.   : 0.00   Min.   : 1.000   Mode :logical  
+#>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   FALSE:120778   
 #>  Mode  :character   Median :13.00   Median : 6.000   TRUE :12016    
 #>                     Mean   :12.56   Mean   : 9.654                  
 #>                     3rd Qu.:18.00   3rd Qu.:13.000                  
 #>                     Max.   :23.00   Max.   :99.000                  
-#>     n_lanes       n_directions   n_lanes_direction          geometry     
-#>  Min.   :1.000   Min.   :1.000   Min.   :0.500     LINESTRING   :132782  
-#>  1st Qu.:1.000   1st Qu.:1.000   1st Qu.:1.000     epsg:4326    :     0  
-#>  Median :2.000   Median :1.000   Median :1.000     +proj=long...:     0  
-#>  Mean   :2.143   Mean   :1.368   Mean   :1.696                           
-#>  3rd Qu.:3.000   3rd Qu.:2.000   3rd Qu.:2.000                           
-#>  Max.   :7.000   Max.   :2.000   Max.   :6.000
+#>     n_lanes       n_directions   n_lanes_direction    routes         
+#>  Min.   :1.000   Min.   :1.000   Min.   :1.000     Length:132794     
+#>  1st Qu.:1.000   1st Qu.:1.000   1st Qu.:1.000     Class :character  
+#>  Median :2.000   Median :1.000   Median :1.000     Mode  :character  
+#>  Mean   :2.143   Mean   :1.362   Mean   :1.699                       
+#>  3rd Qu.:3.000   3rd Qu.:2.000   3rd Qu.:2.000                       
+#>  Max.   :7.000   Max.   :2.000   Max.   :6.000                       
+#>           geometry     
+#>  LINESTRING   :132794  
+#>  epsg:4326    :     0  
+#>  +proj=long...:     0  
+#>                        
+#>                        
+#> 
 ```
 
 ### Extend with GTFS-RT data
@@ -110,25 +115,48 @@ analysis.
 
 The aggregated data can then be manipulated according to the
 prioritization criteria defined by the user. For instance, the following
-code classifies (in red) the road segments considering a minimum
-frequency of 5 buses/hour and more than 1 lane per direction as high
-priority for bus lane implementation.
+code highlights (in red) the road segments as high priority for bus lane
+implementation if they have more than 1 lane per direction and a
+frequency above the median number of buses per hour registered at 8:00.
 
-> The classification of frequent service as 5 buses/hour is based on the
-> HCM guidelines for level of service, where a frequency of 5 buses/hour
-> corresponds to a level of service C or better. Refer to the [Classify
-> transit
-> data](https://u-shift.github.io/GTFShift/articles/classify.html#bus-frequency-los)
-> article for more details.
+``` r
+lanes_0800 = lanes |> filter(hour==8)
+summary(lanes_0800)
+#>   way_osm_id             hour     frequency     is_bus_lane        n_lanes     
+#>  Length:6704        Min.   :8   Min.   : 1.00   Mode :logical   Min.   :1.000  
+#>  Class :character   1st Qu.:8   1st Qu.: 5.00   FALSE:6153      1st Qu.:1.000  
+#>  Mode  :character   Median :8   Median :10.00   TRUE :551       Median :2.000  
+#>                     Mean   :8   Mean   :13.28                   Mean   :2.115  
+#>                     3rd Qu.:8   3rd Qu.:18.00                   3rd Qu.:3.000  
+#>                     Max.   :8   Max.   :99.00                   Max.   :7.000  
+#>   n_directions   n_lanes_direction    routes                   geometry   
+#>  Min.   :1.000   Min.   :1.000     Length:6704        LINESTRING   :6704  
+#>  1st Qu.:1.000   1st Qu.:1.000     Class :character   epsg:4326    :   0  
+#>  Median :1.000   Median :1.000     Mode  :character   +proj=long...:   0  
+#>  Mean   :1.362   Mean   :1.675                                            
+#>  3rd Qu.:2.000   3rd Qu.:2.000                                            
+#>  Max.   :2.000   Max.   :6.000
+
+p50_frequency = quantile(lanes_0800$frequency, 0.5, na.rm=TRUE)
+```
 
 ``` r
 mapview::mapview(
-  lanes |> filter(is_bus_lane),
+  lanes_0800 |> filter(is_bus_lane),
   layer.name="Bus lane",
-  color="#3BC1A8"
+  color="#3BC1A8",
+  homebutton=FALSE
 ) + mapview::mapview(
-  lanes |> filter(!is_bus_lane & frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1),
-  layer.name="NO bus lane with 5 or + bus/h + 1 lane/dir",
-  color="#F63049"
+  lanes_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1),
+  layer.name=sprintf("NO bus lane with +%d bus/h +1 lane/dir", p50_frequency-1),
+  color="#F63049",
+  homebutton=FALSE
 )
 ```
+
+This visual representation allows to easily identify not only the
+high-priority segments for bus lane implementation, but also their
+spatial distribution across the existent network. A process that extends
+the results by incorporating the network continuity perspective,
+enabling the identification and eventual prioritization of critical
+segments that connect bus lanes but have a bad performance.

@@ -63,10 +63,11 @@
 
 ## Realtime
 
-- [`rt_collect()`](https://u-shift.github.io/GTFShift/reference/rt_collect.md)
-  : Collect GTFS-RT data
+- [`rt_collect_json()`](https://u-shift.github.io/GTFShift/reference/rt_collect_json.md)
+  : Collect GTFS-RT data from a JSON feed at regular intervals
 - [`rt_collect_protobuf()`](https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.md)
-  : Collect GTFS-RT data (with Protocol Buffers support)
+  : Collect GTFS-RT data from a Protocol Buffers feed at regular
+  intervals
 - [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
   : Extend prioritization with GTFS-RT metrics
 

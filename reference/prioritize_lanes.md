@@ -56,6 +56,9 @@ An `sf` `data.frame` object with the following columns:
 
 - `n_lanes_direction`, the number of lanes per direction.
 
+- `routes`, the list of route_ids that use the way, separated by
+  semicolon.
+
 - `geometry`, the route shape.
 
 - (if `keep_osm_attributes = TRUE`) all OSM way attributes.

@@ -1,13 +1,15 @@
-# Collect GTFS-RT data from a Protocol Buffers feed at regular intervals
+# Collect GTFS-RT data from a JSON feed at regular intervals
 
-Collect GTFS-RT data from a Protocol Buffers feed at regular intervals
+Collect GTFS-RT data from a JSON feed at regular intervals
 
 ## Usage
 
 ``` r
-rt_collect_protobuf(
+rt_collect_json(
   gtfs_rt_url,
   destination_file,
+  header_key = "header",
+  entity_key = "entity",
   fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude",
     "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp",
     "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
@@ -20,12 +22,22 @@ rt_collect_protobuf(
 
 - gtfs_rt_url:
 
-  String. URL of the Protocol Buffers GTFS-RT feed.
+  String. URL of the GTFS-RT feed in JSON format.
 
 - destination_file:
 
   String. File to save the downloaded GTFS-RT data. Content is appended
   in each iteration.
+
+- header_key:
+
+  String (Default "header"). Key in the JSON corresponding to the feed
+  header. Set to NA if not present.
+
+- entity_key:
+
+  String (Default "entity"). Key in the JSON corresponding to the feed
+  entities. Set to NA if response is a flat list.
 
 - fields_collect:
 
@@ -51,6 +63,6 @@ This function will run indefinitely until manually stopped (CTRL + C).
 
 ``` r
 if (FALSE) { # \dontrun{
-GTFShift::rt_collect_protobuf("https://api.example.com/gtfs-rt-protobuf", "gtfs_rt_data.csv")
+GTFShift::rt_collect_json("https://api.example.com/gtfs-rt", "gtfs_rt_data.csv")
 } # }
 ```
