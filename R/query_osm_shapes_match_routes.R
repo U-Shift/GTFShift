@@ -314,7 +314,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
         route_dist = st_length(geometry) |> units::drop_units(),
         trip_id_copy = trip_id,
 
-        first_stop_id = gtfs$stop_times |> filter(trip_id == trip_id_copy & stop_sequence == 1) |> slice(1) |> pull(stop_id),
+        first_stop_id = gtfs$stop_times |> filter(trip_id == trip_id_copy) |> arrange(stop_sequence) |> slice(1) |> pull(stop_id),
         last_stop_id = gtfs$stop_times |> filter(trip_id == trip_id_copy) |> arrange(desc(stop_sequence)) |> slice(1) |> pull(stop_id),
         initial = stops_sf |> filter(stop_id == first_stop_id) |> slice(1) |> pull(geometry),
         final = stops_sf |> filter(stop_id == last_stop_id) |> slice(1) |> pull(geometry),

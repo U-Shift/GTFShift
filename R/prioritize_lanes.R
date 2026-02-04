@@ -26,6 +26,7 @@
 #'  \item \code{n_lanes}, the total number of lanes.
 #'  \item \code{n_directions}, the number of travel directions.
 #'  \item \code{n_lanes_direction}, the number of lanes per direction.
+#'  \item \code{routes}, the list of route_ids that use the way, separated by semicolon.
 #'  \item \code{geometry}, the route shape.
 #'  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 #' }
@@ -84,11 +85,13 @@ prioritize_lanes <- function(
         2 # NA_integer_
       ),
       n_directions = case_when(
+        n_lanes == 1 ~ 1, # When only one lane, assume one direction
         oneway %in% c("yes", "1", "-1", "true") ~ 1,
         oneway %in% c("no", "0", "false") ~ 2,
         TRUE ~ 2
       ),
       n_lanes_direction = case_when(
+        n_lanes / n_directions < 1 ~ 1,
         !is.na(n_lanes) & !is.na(n_directions) ~ n_lanes / n_directions,
         TRUE ~ NA_real_
       )
@@ -96,7 +99,7 @@ prioritize_lanes <- function(
 
   if (!keep_osm_attributes) {
     lanes = lanes |>
-      select(way_osm_id, hour, frequency, is_bus_lane, n_lanes, n_directions, n_lanes_direction, geometry)
+      select(way_osm_id, hour, frequency, is_bus_lane, n_lanes, n_directions, n_lanes_direction, routes, geometry)
   }
 
   return(lanes)

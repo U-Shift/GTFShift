@@ -45,22 +45,20 @@ However, introducing them on road infrastructure affects other modes, such as pr
 
 Common criteria for implementing bus lanes include:
 
--   **Frequency of buses (and trams) per hour and direction, at a peak hour;**
--   **Number of lanes in the same direction;**
--   **Existing traffic conditions**;
+-   Frequency of buses (and trams) per hour and direction, at a peak hour;
+-   Number of lanes in the same direction;
+-   Existing traffic conditions;
 -   Existing bus lanes in the area (from a network continuity perspective).
 
-GTFShift provides methods to analyse the dimensions in bold, namely:
+GTFShift provides methods to analyse these dimensions, namely:
 
 -  `GTFShift::get_way_frequency_hourly()`, to obtain the frequency of services per hour for each road segment with transit service and its associated characteristics (such as number of lanes).
 
-> `GTFShift::get_route_frequency_hourly()` is an alternative
-
 - `GTFShift::osm_bus_lanes()`, to identify existing bus lanes in the road network.
 
-- `GTFShift::rt_collect()`, to collect GTFS-RT data, which can be later used with `GTFShift::rt_extend_prioritization()` to include real-time operational metrics in the prioritization analysis.
+- `GTFShift::rt_collect_json()` or `GTFShift::rt_collect_protobuf()`, to collect GTFS-RT data, which can be later used with `GTFShift::rt_extend_prioritization()` to include real-time operational metrics in the prioritization analysis.
 
-This document explores how to use these methods in a combined way to assist public transport planners in prioritizing bus lane implementations. For details on the several encapsulated features, refer to the numerated articles in the menu, that explore in detail each of the specific approaches followed. 
+This document explores how to use these methods in a combined way to assist public transport planners in prioritizing bus lane implementations. For details on the several encapsulated features and method variations, refer to the numbered articles in the menu, that explore in detail each of the specific approaches followed. 
 
 # Prioritize lanes
 
@@ -91,25 +89,35 @@ Refer to the [GTFS Real Time](./rt.html) article for details on how to collect G
 
 ## Visualize results
 
-The aggregated data can then be manipulated according to the prioritization criteria defined by the user. For instance, the following code classifies (in red) the road segments considering a minimum frequency of 5 buses/hour and more than 1 lane per direction as high priority for bus lane implementation. 
-
-> The classification of frequent service as 5 buses/hour is based on the HCM guidelines for level of service, where a frequency of 5 buses/hour corresponds to a level of service C or better. Refer to the [Classify transit data](./classify.html#bus-frequency-los) article for more details.
+The aggregated data can then be manipulated according to the prioritization criteria defined by the user. For instance, the following code highlights (in red) the road segments as high priority for bus lane implementation if they have more than 1 lane per direction and a frequency above the median number of buses per hour registered at 8:00.
 
 ```{r cache=FALSE, include=FALSE}
 mapviewOptions(
-  basemaps = c("OpenStreetMap", "CartoDB.Positron")
+  basemaps = c("CartoDB.Positron")
 )
+```
+
+
+```{r}
+lanes_0800 = lanes |> filter(hour==8)
+summary(lanes_0800)
+
+p50_frequency = quantile(lanes_0800$frequency, 0.5, na.rm=TRUE)
 ```
 
 
 ```{r, cache=FALSE}
 mapview::mapview(
-  lanes |> filter(is_bus_lane),
+  lanes_0800 |> filter(is_bus_lane),
   layer.name="Bus lane",
-  color="#3BC1A8"
+  color="#3BC1A8",
+  homebutton=FALSE
 ) + mapview::mapview(
-  lanes |> filter(!is_bus_lane & frequency>=5 & !is.na(n_lanes) & n_lanes_direction>1),
-  layer.name="NO bus lane with 5 or + bus/h + 1 lane/dir",
-  color="#F63049"
+  lanes_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1),
+  layer.name=sprintf("NO bus lane with +%d bus/h +1 lane/dir", p50_frequency-1),
+  color="#F63049",
+  homebutton=FALSE
 )
 ```
+
+This visual representation allows to easily identify not only the high-priority segments for bus lane implementation, but also their spatial distribution across the existent network. A process that extends the results by incorporating the network continuity perspective, enabling the identification and eventual prioritization of critical segments that connect bus lanes but have a bad performance.

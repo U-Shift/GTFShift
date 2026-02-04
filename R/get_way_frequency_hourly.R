@@ -18,6 +18,7 @@
 #'  \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way.
 #'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
 #'  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
+#'  \item \code{routes}, the list of route_ids that use the way, separated by semicolon.
 #'  \item \code{geometry}, the route shape.
 #'  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 #' }
@@ -75,13 +76,12 @@ get_way_frequency_hourly = function(
       "stop_sequence"
     )))
 
-  stop_times = stop_times |> # Only departures from origin (first stop)
-    filter(stop_sequence == 1)
-
   stop_times = stop_times |>
-    mutate(
-      hour = lubridate::hour(departure_time)
-    )
+    arrange(stop_sequence) |>
+    group_by(trip_id) |>
+    slice(1) |> # Only departures from origin (first stop)
+    ungroup() |>
+    mutate(hour = lubridate::hour(departure_time))
 
   freq_data = stop_times |>
     group_by(across(any_of(c("route_id", "route_short_name", "direction_id", "hour")))) |>
@@ -107,7 +107,10 @@ get_way_frequency_hourly = function(
   ways_freq = routes_freq |>
     inner_join(ways |> sf::st_drop_geometry() |> select(shape_id, way_osm_id), by="shape_id", relationship = "many-to-many") |>
     group_by(way_osm_id, hour) |>
-    summarize(frequency = sum(frequency)) |>
+    summarize(
+      frequency = sum(frequency),
+      routes = paste(unique(route_id), collapse = ";")
+    ) |>
     ungroup() |>
     inner_join(ways_unique_geometry, by="way_osm_id") |>
     st_as_sf()
