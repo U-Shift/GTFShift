@@ -233,22 +233,28 @@ for(i in 1:nrow(regions)) {
 }
 
 # Debug
-# prioritization_0800 = prioritization |> filter(hour==8)
-# p50_frequency = quantile(prioritization_0800$frequency, 0.5, na.rm=TRUE)
-# p50_speed = quantile(prioritization_0800$speed_avg, 0.5, na.rm=TRUE)
-# mapview::mapview(
-#   prioritization_0800 |> filter(is_bus_lane & (frequency<p50_frequency | (is.na(n_lanes) | n_lanes_direction<=1) | speed_avg<=p50_speed)),
-#   layer.name=sprintf("Bus lane with - %d bus/h OR -1 lane/dir OR -%.2f km/h avg. speed", p50_frequency, p50_speed),
-#   color="#DAD887",
-#   homebutton=FALSE
-# ) + mapview::mapview(
-#   prioritization_0800 |> filter(is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg>p50_speed),
-#   layer.name=sprintf("Bus lane with +%d bus/h AND +1 lane/dir AND +%.2f km/h avg.speed", p50_frequency-1, p50_speed),
-#   color="#3BC1A8",
-#   homebutton=FALSE
-# ) + mapview::mapview(
-#   prioritization_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg<=p50_speed),
-#   layer.name=sprintf("NO bus lane with +%d bus/h AND +1 lane/dir AND -%.2f km/h avg.speed", p50_frequency-1, p50_speed),
-#   color="#F63049",
-#   homebutton=FALSE
-# )
+library(sf)
+prioritization = st_read("releases/web/lisboa/2026-02-04/prioritization_lisboa_rt_gtfs2026-02-04_run20260203_extended.geojson")
+prioritization_0800 = prioritization |> filter(hour==8)
+p50_frequency = quantile(prioritization_0800$frequency, 0.5, na.rm=TRUE)
+p50_speed = quantile(prioritization_0800$speed_avg, 0.5, na.rm=TRUE)
+mapview::mapview(
+  prioritization_0800 |> filter(is_bus_lane & (frequency<p50_frequency | (is.na(n_lanes) | n_lanes_direction<=1) | speed_avg<=p50_speed)),
+  layer.name=sprintf("Bus lane with -%d bus/h OR -2 lane/dir OR %.2f km/h or - avg. speed", p50_frequency, p50_speed),
+  color="#DAD887",
+  homebutton=FALSE,
+  lwd=3
+
+) + mapview::mapview(
+  prioritization_0800 |> filter(is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg>p50_speed),
+  layer.name=sprintf("Bus lane with +%d bus/h AND +1 lane/dir AND +%.2f km/h avg.speed", p50_frequency-1, p50_speed),
+  color="#3BC1A8",
+  homebutton=FALSE,
+  lwd=3
+) + mapview::mapview(
+  prioritization_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg<=p50_speed),
+  layer.name=sprintf("NO bus lane with +%d bus/h AND +1 lane/dir AND %.2f km/h or - avg.speed", p50_frequency-1, p50_speed),
+  color="#F63049",
+  homebutton=FALSE,
+  lwd=3
+)
