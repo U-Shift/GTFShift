@@ -1,4 +1,4 @@
-# GTFShift
+# GTFShift <img align="right" src="man/figures/logo.png" alt="logo" width="180">
 
 <!-- badges: start -->
 [![](https://github.com/U-Shift/GTFShift/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/pkgdown.yaml)
@@ -23,7 +23,7 @@ and criteria.
 ![](man/figures/prioritization.png)
 
 > Example of bus lane prioritization analysis for Lisbon city, considering road segments with
-a minimum frequency of 10 buses/hour, average commercial speed below 9.76 km/h and more than 1 lane per direction. 
+a minimum frequency of 10 buses/hour, average commercial speed below 9.7 km/h and more than 1 lane per direction. 
 
 ## Installation
 
