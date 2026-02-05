@@ -72,8 +72,11 @@ hour.
 ``` r
 # Perform frequency analysis
 frequencies_stop = GTFShift::get_stop_frequency_hourly(gtfs)
+```
+
+``` r
 summary(frequencies_stop)
-#>    stop_id               hour         frequency               geometry    
+#>    stop_id               hour         frequency                 geom      
 #>  Length:44664       Min.   : 0.00   Min.   : 1.000   POINT        :44664  
 #>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   epsg:4326    :    0  
 #>  Mode  :character   Median :13.00   Median : 5.000   +proj=long...:    0  
@@ -99,9 +102,8 @@ mapview::mapview(
 ```
 
 ``` r
-
 # Store in GeoPackage format
-# st_write(frequencies_stop, "database/transit/bus_stop_frequency.gpkg", append=FALSE, quiet = TRUE)
+st_write(frequencies_stop, "database/transit/bus_stop_frequency.gpkg", append=FALSE, quiet = TRUE)
 ```
 
 ## Analyse hourly frequency per road segment
@@ -116,6 +118,9 @@ returning aggregated results per hour and road segment, using OSM ways.
 
 ``` r
 frequencies_way = GTFShift::get_way_frequency_hourly(gtfs, osm_q)
+```
+
+``` r
 summary(frequencies_way)
 #>   way_osm_id             hour         frequency         routes         
 #>  Length:132794      Min.   : 0.00   Min.   : 1.000   Length:132794     
@@ -124,7 +129,7 @@ summary(frequencies_way)
 #>                     Mean   :12.56   Mean   : 9.654                     
 #>                     3rd Qu.:18.00   3rd Qu.:13.000                     
 #>                     Max.   :23.00   Max.   :99.000                     
-#>           geometry     
+#>             geom       
 #>  LINESTRING   :132794  
 #>  epsg:4326    :     0  
 #>  +proj=long...:     0  
@@ -162,6 +167,9 @@ The analysis can be performed for each route individually.
 
 ``` r
 frequencies_route = GTFShift::get_route_frequency_hourly(gtfs)
+```
+
+``` r
 summary(frequencies_route)
 #>    route_id         route_short_name    direction_id         hour      
 #>  Length:3359        Length:3359        Min.   :0.0000   Min.   : 0.00  
@@ -170,7 +178,7 @@ summary(frequencies_route)
 #>                                        Mean   :0.4475   Mean   :13.15  
 #>                                        3rd Qu.:1.0000   3rd Qu.:18.00  
 #>                                        Max.   :1.0000   Max.   :23.00  
-#>    frequency        shape_id                  geometry   
+#>    frequency        shape_id                    geom     
 #>  Min.   : 1.000   Length:3359        LINESTRING   :3359  
 #>  1st Qu.: 2.000   Class :character   epsg:4326    :   0  
 #>  Median : 3.000   Mode  :character   +proj=long...:   0  
@@ -190,8 +198,11 @@ prioritizing interventions in the network.
 
 ``` r
 frequencies_route_overline = GTFShift::get_route_frequency_hourly(gtfs, overline = TRUE)
+```
+
+``` r
 summary(frequencies_route_overline)
-#>    frequency           hour                geometry     
+#>    frequency           hour                  geom       
 #>  Min.   :  1.00   Min.   : 0.00   LINESTRING   :138406  
 #>  1st Qu.:  4.00   1st Qu.: 9.00   epsg:4326    :     0  
 #>  Median :  7.00   Median :13.00   +proj=long...:     0  
@@ -308,7 +319,9 @@ frequencies_route_overline_improved = GTFShift::network_overline(
   frequencies_route |> filter(hour == 8),
   attr = "frequency"
 )
+```
 
+``` r
 quantile(frequencies_route_overline_improved$frequency)
 #>   0%  25%  50%  75% 100% 
 #>    1    6   11   20  121

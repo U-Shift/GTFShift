@@ -69,24 +69,28 @@ gtfs_794 = GTFShift::filter_by_route_name(gtfs, list("794"))
 
 # Match shapes geometry
 shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q)
+```
 
+``` r
 shapes_geometry_osm
 #> Simple feature collection with 2 features and 2 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -9.133896 ymin: 38.70714 xmax: -9.099847 ymax: 38.76858
 #> Geodetic CRS:  WGS 84
-#> # A tibble: 2 × 3
-#>   shape_id       osm_id                                                 geometry
-#>   <chr>          <chr>                                     <MULTILINESTRING [°]>
-#> 1 115_0_DESC_shp 15470712 ((-9.09986 38.76819, -9.099875 38.76803, -9.099904 38…
-#> 2 115_0_ASC_shp  15470713 ((-9.13309 38.70745, -9.133067 38.70747), (-9.133067 …
+#>         shape_id   osm_id                           geom
+#> 1 115_0_DESC_shp 15470712 MULTILINESTRING ((-9.09986 ...
+#> 2  115_0_ASC_shp 15470713 MULTILINESTRING ((-9.13309 ...
+```
+
+``` r
+# Get original shapes, for comparison
+shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
 ```
 
 #### GTFS shapes
 
 ``` r
-shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
 mapview::mapview(shapes_sf, zcol = "shape_id", legend = TRUE, layer.name="GTFS shapes")
 ```
 
@@ -106,26 +110,27 @@ ways that compose them.
 ``` r
 # Match shapes geometry disaggregated by ways
 shapes_ways_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q, ways=TRUE)
+```
+
+``` r
 shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
 #> Simple feature collection with 324 features and 4 fields
 #> Geometry type: LINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -9.133896 ymin: 38.70714 xmax: -9.099847 ymax: 38.76858
 #> Geodetic CRS:  WGS 84
-#> # A tibble: 324 × 5
-#>    shape_id       osm_id   way_osm_id lanes                             geometry
-#>    <chr>          <chr>    <chr>      <chr>                     <LINESTRING [°]>
-#>  1 115_0_DESC_shp 15470712 992933214  NA    (-9.09986 38.76819, -9.099875 38.76…
-#>  2 115_0_DESC_shp 15470712 1011258338 NA    (-9.099918 38.76754, -9.099932 38.7…
-#>  3 115_0_DESC_shp 15470712 999581059  NA    (-9.099932 38.7674, -9.100159 38.76…
-#>  4 115_0_DESC_shp 15470712 992933213  NA    (-9.100159 38.76741, -9.100426 38.7…
-#>  5 115_0_DESC_shp 15470712 999581060  NA    (-9.100426 38.76743, -9.100692 38.7…
-#>  6 115_0_DESC_shp 15470712 999581062  NA    (-9.100692 38.76744, -9.100959 38.7…
-#>  7 115_0_DESC_shp 15470712 999581061  NA    (-9.100959 38.76746, -9.101227 38.7…
-#>  8 115_0_DESC_shp 15470712 990897632  NA    (-9.101227 38.76747, -9.101232 38.7…
-#>  9 115_0_DESC_shp 15470712 232018440  2     (-9.101357 38.76734, -9.101718 38.7…
-#> 10 115_0_DESC_shp 15470712 1415272770 2     (-9.102562 38.76747, -9.102947 38.7…
-#> # ℹ 314 more rows
+#> First 10 features:
+#>          shape_id   osm_id way_osm_id lanes                           geom
+#> 1  115_0_DESC_shp 15470712  992933214  <NA> LINESTRING (-9.09986 38.768...
+#> 2  115_0_DESC_shp 15470712 1011258338  <NA> LINESTRING (-9.099918 38.76...
+#> 3  115_0_DESC_shp 15470712  999581059  <NA> LINESTRING (-9.099932 38.76...
+#> 4  115_0_DESC_shp 15470712  992933213  <NA> LINESTRING (-9.100159 38.76...
+#> 5  115_0_DESC_shp 15470712  999581060  <NA> LINESTRING (-9.100426 38.76...
+#> 6  115_0_DESC_shp 15470712  999581062  <NA> LINESTRING (-9.100692 38.76...
+#> 7  115_0_DESC_shp 15470712  999581061  <NA> LINESTRING (-9.100959 38.76...
+#> 8  115_0_DESC_shp 15470712  990897632  <NA> LINESTRING (-9.101227 38.76...
+#> 9  115_0_DESC_shp 15470712  232018440     2 LINESTRING (-9.101357 38.76...
+#> 10 115_0_DESC_shp 15470712 1415272770     2 LINESTRING (-9.102562 38.76...
 ```
 
 ``` r
@@ -167,7 +172,9 @@ shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
 #> > Found 300 OSM route relations and 4911 bus stops/platforms
 #> > Associated 14 shapes (100.00% of 14 total) of 8 routes (100.00% of 8 total) with OSM routes, with a mean distance of 25.42 meters for points, 49.86 meters for route length and a mean difference of 0.43 stops
 #> > Of those, 14 shapes (100.00% of 14 matched) have a distance difference below 1000 meters, a points difference below 500 meters
+```
 
+``` r
 summary(shapes_match_routes)
 #>    route_id           shape_id            osm_id          distance_diff   
 #>  Length:14          Length:14          Length:14          Min.   :  5.22  
@@ -183,7 +190,7 @@ summary(shapes_match_routes)
 #>  Mean   :25.424   Mean   :0.4286                                        
 #>  3rd Qu.:37.073   3rd Qu.:0.7500                                        
 #>  Max.   :49.869   Max.   :3.0000                                        
-#>    osm_name           osm_ref                     geometry 
+#>    osm_name           osm_ref                       geom   
 #>  Length:14          Length:14          MULTILINESTRING:14  
 #>  Class :character   Class :character   epsg:4326      : 0  
 #>  Mode  :character   Mode  :character   +proj=long...  : 0  
