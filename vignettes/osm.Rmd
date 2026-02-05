@@ -222,7 +222,12 @@ Performing an aggregated analysis for the spatial distribution of the route freq
 
 ### Original network
 
-```{r original_network}
+```{r include=FALSE}
+road_osm = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.7.0/osm_arroios.gpkg")
+```
+
+
+```{r eval=FALSE}
 library(osmdata)
 
 road_osm = opq("Arroios, Lisboa, Portugal") |>
@@ -243,8 +248,20 @@ mapview::mapview(road_osm)
 
 ### Simplified network
 
-```{r simplified_network}
+```{r include=FALSE}
+centerlines = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.7.0/osm_arroios_centerlines.gpkg")
+```
+
+
+```{r eval=FALSE}
 centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
+#> Using Python: /usr/bin/python3.12
+#> Creating virtual environment '~/.virtualenvs/r-reticulate' ...
+#> Done!
+#> Installing packages: pip, wheel, setuptools
+#> Installing packages: numpy
+#> Virtual environment '~/.virtualenvs/r-reticulate' successfully created.
+#> Using virtual environment '/home/runner/.virtualenvs/r-reticulate' ...
 ```
 ```{r, cache=FALSE}
 mapview::mapview(centerlines)
