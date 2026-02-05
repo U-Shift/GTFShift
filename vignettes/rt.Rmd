@@ -101,7 +101,6 @@ lane_prioritization_0800 = lane_prioritization_extended |> filter(hour==8)
 mapview::mapview(
   lane_prioritization_0800,
   zcol = "speed_avg",
-  col.regions =  viridis::rocket(nrow(lane_prioritization_0800)),
   layer.name = "Average speed per lane"
 )
 
