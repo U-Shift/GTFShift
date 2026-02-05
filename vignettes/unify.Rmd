@@ -32,10 +32,6 @@ library(dplyr)
 library(mapview)
 ```
 
-```{r include=FALSE}
-Sys.sleep(60)
-```
-
 # Introduction 
 
 Public transit analysis takes advantage of the standardized GTFS format. However, its provision by operator makes it difficult for network aggregated analysis, considering connectivity and multimodality. `GTFShift::unify()` proposes a simple solution to this problem, generating an aggregated GTFS file given several instances of these.

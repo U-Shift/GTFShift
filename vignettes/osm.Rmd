@@ -32,10 +32,6 @@ library(tidytransit)
 library(dplyr)
 ```
 
-```{r include=FALSE}
-Sys.sleep(60)
-```
-
 # Introduction
 
 OpenStreetMaps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
@@ -62,10 +58,6 @@ bus_lanes = sf::st_read("https://github.com/U-Shift/busclar/releases/download/0.
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
 
-```{r include=FALSE}
-Sys.sleep(60)
-```
-
 
 # Get OSM data for bus routes
 
@@ -73,7 +65,7 @@ OpenStreetMaps defines bus routes as a [relation](https://wiki.openstreetmap.org
 
 > For demonstration purposes, the next snippets will use the Lisbon urban bus network.
 
-```{r}
+```{r eval=FALSE}
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "lisboa"
@@ -91,15 +83,33 @@ q = opq("Lisbon")  |>
 
 GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*` keys. `GTFShift::osm_shapes_to_routes()` and `GTFShift::osm_trips_to_routes()` allow to query OSM for the routes matching the feed trips, given, respectively, their shape or trip id.
 
-```{r}
+```{r include=FALSE}
+shapes_geometry_osm = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.7.0/osm_carris_shapes_to_routes_794.gpkg")
+```
+
+
+```{r eval=FALSE}
 # Subset feed for some routes only, for demonstration purposes
 gtfs_794 = GTFShift::filter_by_route_name(gtfs, list("794"))
 
 # Match shapes geometry
 shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q)
+```
 
+```{r}
 shapes_geometry_osm
 ```
+
+```{r include=FALSE}
+shapes_sf = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.7.0/osm_carris_shapes_to_routes_794_original.gpkg")
+```
+
+```{r eval=FALSE}
+# Get original shapes, for comparison
+shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
+```
+
+
 
 
 <div style="display: flex; gap: 20px; overflow-x: auto;">
@@ -108,7 +118,6 @@ shapes_geometry_osm
 ### GTFS shapes
 
 ```{r, cache=FALSE}
-shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
 mapview::mapview(shapes_sf, zcol = "shape_id", legend = TRUE, layer.name="GTFS shapes")
 ```
 
@@ -124,26 +133,27 @@ mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.na
 </div>
 </div>
 
-```{r include=FALSE}
-Sys.sleep(60)
-```
-
 ## Ways (matching GTFS id)
 
 By setting the `ways` parameter to `TRUE`, `GTFShift::osm_shapes_to_routes()` enables the retrieval of the OSM routes disaggregated by the individual ways that compose them.
 
-```{r}
+```{r include=FALSE}
+shapes_ways_osm = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.7.0/osm_carris_shapes_to_routes_794_ways.gpkg")
+```
+
+
+```{r eval=FALSE}
 # Match shapes geometry disaggregated by ways
 shapes_ways_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q, ways=TRUE)
+```
+
+```{r}
 shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
 ```
 
+
 ```{r, cache=FALSE}
 mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.name="OSM ways")
-```
-
-```{r include=FALSE}
-Sys.sleep(60)
 ```
 
 ## Routes (matching shapes geometry)
@@ -156,13 +166,24 @@ To overcome this issue, `GTFShift::osm_shapes_match_routes()` performs the assoc
 
 > GTFShift provides a test script that runs this method for several cities around the world at [dev/test_osm_shapes_match_routes_local.R](https://github.com/U-Shift/GTFShift/blob/main/dev/test_osm_shapes_match_routes_local.R).
 
-```{r message=TRUE, warning=TRUE}
+```{r include=FALSE}
+shapes_match_routes = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.7.0/osm_carris_shapes_match_routes_736_750_15E_65B.gpkg")
+```
+
+
+```{r eval=FALSE}
 # Subset feed for some routes only, for demonstration purposes
 gtfs_subset = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65B"))
 
 # Match shapes geometry
 shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
+#> > Found 14 GTFS shapes and 231 stops
+#> > Found 300 OSM route relations and 4911 bus stops/platforms
+#> > Associated 14 shapes (100.00% of 14 total) of 8 routes (100.00% of 8 total) with OSM routes, with a mean distance of 25.42 meters for points, 49.86 meters for route length and a mean difference of 0.43 stops
+#> > Of those, 14 shapes (100.00% of 14 matched) have a distance difference below 1000 meters, a points difference below 500 meters
+```
 
+```{r}
 summary(shapes_match_routes)
 
 # Visualize results

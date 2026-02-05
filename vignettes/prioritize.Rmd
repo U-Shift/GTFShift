@@ -33,10 +33,6 @@ library(dplyr)
 library(osmdata)
 ```
 
-```{r include=FALSE}
-Sys.sleep(60)
-```
-
 # Introduction
 
 Bus lanes have the potential to improve the reliability of bus operations by limiting the negative impacts of traffic congestion, reducing the variability of travel times, and increasing the average commercial speed - which can ultimately be used to increase service frequency.
