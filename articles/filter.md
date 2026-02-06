@@ -141,7 +141,7 @@ summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Metro - Los Angeles
-#> service      from 2026-02-05 to 2026-02-19
+#> service      from 2026-02-06 to 2026-02-20
 #> uses         stop_times (no frequencies)
 #> # routes        6
 #> # trips      5365
@@ -163,7 +163,7 @@ summary(gtfs_tram)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Metro - Los Angeles
-#> service      from 2026-02-05 to 2026-02-19
+#> service      from 2026-02-06 to 2026-02-20
 #> uses         stop_times (no frequencies)
 #> # routes        4
 #> # trips      3652
