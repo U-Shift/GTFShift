@@ -77,13 +77,24 @@ prioritize_lanes <- function(
     left_join(bus_lanes |> sf::st_drop_geometry() |> select(osm_id) |> mutate(is_bus_lane = TRUE), by = c("way_osm_id" = "osm_id")) |>
     mutate(
       is_bus_lane = ifelse(is.na(is_bus_lane), FALSE, is_bus_lane),
-      n_lanes_parking = case_when(
-        # Check if any 'parking:both' column is present with value different from 'no'
-        if_any(starts_with("parking:both"), ~ !is.na(.) & . != "no") ~ 2,
-        # Check if any 'parking' column is present with value different from 'no'
-        if_any(starts_with("parking"), ~ !is.na(.) & . != "no") ~ 1,
-        # Default to 0 if all are NA or "no"
-        TRUE ~ 0
+      n_lanes_parking = dplyr::case_when(
+        # Any 'parking:both' or 'parking:lane:both' column present with value different from 'no'
+        if_any(starts_with("parking:both"), ~ !is.na(.) & . != "no") ~ 2L,
+        # Otherwise, count left and right sides separately based on specific tags
+        TRUE ~ (
+          as.integer(
+            if_any(
+              any_of(c("parking:left", "parking:lane:left")),
+              ~ !is.na(.) & . != "no"
+            )
+          ) +
+          as.integer(
+            if_any(
+              any_of(c("parking:right", "parking:lane:right")),
+              ~ !is.na(.) & . != "no"
+            )
+          )
+        )
       ),
       n_lanes_circulation = coalesce(
         # Global count
