@@ -83,7 +83,7 @@ lane_prioritization_extended <- GTFShift::rt_extend_prioritization(
 ```
 
 ```{r include=FALSE}
-lane_prioritization_extended = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.8.0/prioritization_lisboa_rt_gtfs2026-02-04_run20260203_extended.gpkg")
+lane_prioritization_extended = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.8.1/prioritization_lisboa_rt_gtfs2026-02-04_run20260226_extended.gpkg")
 ```
 
 ```{r cache=FALSE, include=FALSE}
