@@ -36,11 +36,8 @@ RoxygenNote: 7.3.3
 Suggests: 
     knitr,
     rmarkdown,
-    GTFSwizard,
     mapview,
     xml2,
     RProtoBuf
-Remotes:
-    gmatosferreira/GTFSwizard
 VignetteBuilder: knitr
 Config/Needs/website: rmarkdown
