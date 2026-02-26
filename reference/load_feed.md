@@ -63,7 +63,7 @@ the following validations:
   filtering rows that do not comply.
 
 - Feeds with missing `shapes.txt` file, generating it using
-  [`GTFSwizard::get_shapes()`](https://rdrr.io/pkg/GTFSwizard/man/get_shapes.html).
+  [`GTFShift::build_shapes()`](https://u-shift.github.io/GTFShift/reference/build_shapes.md).
 
 When generating transfers, those already existing in each GTFS file are
 kept, extended with new ones computed based on the stops network of the
@@ -76,9 +76,9 @@ applied the library default values.
 
 ## See also
 
-[`tidytransit::read_gtfs()`](https://r-transit.github.io/tidytransit/reference/read_gtfs.html)
+[`GTFShift::build_shapes()`](https://u-shift.github.io/GTFShift/reference/build_shapes.md)
 
-[`GTFSwizard::get_shapes()`](https://rdrr.io/pkg/GTFSwizard/man/get_shapes.html)
+[`tidytransit::read_gtfs()`](https://r-transit.github.io/tidytransit/reference/read_gtfs.html)
 
 [`gtfsrouter::gtfs_transfer_table()`](https://rdrr.io/pkg/gtfsrouter/man/gtfs_transfer_table.html)
 

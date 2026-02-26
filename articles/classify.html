@@ -156,7 +156,7 @@ method to other scenarios should consider this aspect.</p>
 <span><span class="va">frequency_los</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/classify_frequency_los.html">classify_frequency_los</a></span><span class="op">(</span><span class="va">frequency_analysis</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">frequency_los</span></span>
-<span><span class="co">#&gt; Simple feature collection with 433 features and 7 fields</span></span>
+<span><span class="co">#&gt; Simple feature collection with 432 features and 7 fields</span></span>
 <span><span class="co">#&gt; Geometry type: LINESTRING</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
 <span><span class="co">#&gt; Bounding box:  xmin: -9.084467 ymin: 38.57161 xmax: -9.01185 ymax: 38.67369</span></span>
@@ -188,7 +188,7 @@ method to other scenarios should consider this aspect.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">frequency_los</span><span class="op">$</span><span class="va">frequency_los</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   A   B   C   D   E </span></span>
-<span><span class="co">#&gt;   4  38  95 104 192</span></span></code></pre></div>
+<span><span class="co">#&gt;   4  38  95 105 190</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">mapview</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/mapview/reference/mapView.html" class="external-link">mapview</a></span><span class="op">(</span></span>
 <span>  <span class="va">frequency_los</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">hour</span> <span class="op">==</span> <span class="fl">8</span><span class="op">)</span>,</span>

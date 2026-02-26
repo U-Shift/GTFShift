@@ -47,6 +47,8 @@
   Merge multiple GTFS into a single aggregated file
 - [`create_calendar()`](https://u-shift.github.io/GTFShift/reference/create_calendar.md)
   : Create calendar.txt from calendar_dates.txt
+- [`build_shapes()`](https://u-shift.github.io/GTFShift/reference/build_shapes.md)
+  : Build shapes from GTFS data
 
 ## OpenStreetMaps
 

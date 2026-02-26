@@ -66,7 +66,7 @@ frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
 frequency_los = GTFShift::classify_frequency_los(frequency_analysis)
 
 frequency_los
-#> Simple feature collection with 433 features and 7 fields
+#> Simple feature collection with 432 features and 7 fields
 #> Geometry type: LINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -9.084467 ymin: 38.57161 xmax: -9.01185 ymax: 38.67369
@@ -98,7 +98,7 @@ frequency_los
 table(frequency_los$frequency_los)
 #> 
 #>   A   B   C   D   E 
-#>   4  38  95 104 192
+#>   4  38  95 105 190
 ```
 
 ``` r

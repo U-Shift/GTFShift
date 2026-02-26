@@ -62,8 +62,8 @@ Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
 
 - [`{tidytransit}`](https://github.com/r-transit/tidytransit)
 - [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
-- [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 - [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
+- [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 
 ## Acknowledgement
 
@@ -125,6 +125,8 @@ Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
   Merge multiple GTFS into a single aggregated file
 - [`create_calendar()`](https://u-shift.github.io/GTFShift/reference/create_calendar.md)
   : Create calendar.txt from calendar_dates.txt
+- [`build_shapes()`](https://u-shift.github.io/GTFShift/reference/build_shapes.md)
+  : Build shapes from GTFS data
 
 ## OpenStreetMaps
 
