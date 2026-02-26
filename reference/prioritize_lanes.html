@@ -47,7 +47,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Prioritize road network lanes for bus lane implementation</h1>
-      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/v0.8.1/R/prioritize_lanes.R" class="external-link"><code>R/prioritize_lanes.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/main/R/prioritize_lanes.R" class="external-link"><code>R/prioritize_lanes.R</code></a></small>
       <div class="d-none name"><code>prioritize_lanes.Rd</code></div>
     </div>
 
@@ -91,9 +91,12 @@
 <li><p><code>hour</code>, the hour for which the frequency applies (24 hour format).</p></li>
 <li><p><code>frequency</code>, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.</p></li>
 <li><p><code>is_bus_lane</code>, whether the way has a bus lane.</p></li>
+<li><p><code>n_lanes_parking</code>, the number of parking lanes.</p></li>
+<li><p><code>n_lanes_circulation</code>, the number of circulation lanes.</p></li>
 <li><p><code>n_lanes</code>, the total number of lanes.</p></li>
 <li><p><code>n_directions</code>, the number of travel directions.</p></li>
-<li><p><code>n_lanes_direction</code>, the number of lanes per direction.</p></li>
+<li><p><code>n_lanes_circulation_direction</code>, the number of circulation lanes per direction.</p></li>
+<li><p><code>n_lanes_direction</code>, the number of total lanes per direction.</p></li>
 <li><p><code>routes</code>, the list of route_ids that use the way, separated by semicolon.</p></li>
 <li><p><code>geometry</code>, the route shape.</p></li>
 <li><p>(if <code>keep_osm_attributes = TRUE</code>) all OSM way attributes.</p></li>

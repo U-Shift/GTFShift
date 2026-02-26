@@ -50,11 +50,18 @@ An `sf` `data.frame` object with the following columns:
 
 - `is_bus_lane`, whether the way has a bus lane.
 
+- `n_lanes_parking`, the number of parking lanes.
+
+- `n_lanes_circulation`, the number of circulation lanes.
+
 - `n_lanes`, the total number of lanes.
 
 - `n_directions`, the number of travel directions.
 
-- `n_lanes_direction`, the number of lanes per direction.
+- `n_lanes_circulation_direction`, the number of circulation lanes per
+  direction.
+
+- `n_lanes_direction`, the number of total lanes per direction.
 
 - `routes`, the list of route_ids that use the way, separated by
   semicolon.

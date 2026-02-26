@@ -85,13 +85,20 @@ summary(lanes)
 #>                     Mean   :12.56   Mean   : 9.673                  
 #>                     3rd Qu.:18.00   3rd Qu.:13.000                  
 #>                     Max.   :23.00   Max.   :99.000                  
-#>     n_lanes       n_directions   n_lanes_direction    routes         
-#>  Min.   :1.000   Min.   :1.000   Min.   :1.000     Length:132056     
-#>  1st Qu.:1.000   1st Qu.:1.000   1st Qu.:1.000     Class :character  
-#>  Median :2.000   Median :1.000   Median :1.000     Mode  :character  
-#>  Mean   :2.149   Mean   :1.364   Mean   :1.703                       
-#>  3rd Qu.:3.000   3rd Qu.:2.000   3rd Qu.:2.000                       
-#>  Max.   :7.000   Max.   :2.000   Max.   :6.000                       
+#>  n_lanes_parking   n_lanes_circulation    n_lanes       n_directions  
+#>  Min.   :0.00000   Min.   :1.00        Min.   :1.000   Min.   :1.000  
+#>  1st Qu.:0.00000   1st Qu.:1.00        1st Qu.:1.000   1st Qu.:1.000  
+#>  Median :0.00000   Median :2.00        Median :2.000   Median :1.000  
+#>  Mean   :0.01438   Mean   :2.15        Mean   :2.165   Mean   :1.364  
+#>  3rd Qu.:0.00000   3rd Qu.:3.00        3rd Qu.:3.000   3rd Qu.:2.000  
+#>  Max.   :2.00000   Max.   :7.00        Max.   :7.000   Max.   :2.000  
+#>  n_lanes_circulation_direction n_lanes_direction    routes         
+#>  Min.   :1.000                 Min.   :1.000     Length:132056     
+#>  1st Qu.:1.000                 1st Qu.:1.000     Class :character  
+#>  Median :1.000                 Median :1.000     Mode  :character  
+#>  Mean   :1.703                 Mean   :1.713                       
+#>  3rd Qu.:2.000                 3rd Qu.:2.000                       
+#>  Max.   :6.000                 Max.   :6.000                       
 #>             geom       
 #>  LINESTRING   :132056  
 #>  epsg:4326    :     0  
@@ -135,38 +142,46 @@ frequency above the median number of buses per hour registered at 8:00.
 ``` r
 lanes_0800 = lanes |> filter(hour==8)
 summary(lanes_0800)
-#>   way_osm_id             hour     frequency     is_bus_lane        n_lanes     
-#>  Length:6665        Min.   :8   Min.   : 1.00   Mode :logical   Min.   :1.000  
-#>  Class :character   1st Qu.:8   1st Qu.: 5.00   FALSE:6114      1st Qu.:1.000  
-#>  Mode  :character   Median :8   Median :10.00   TRUE :551       Median :2.000  
-#>                     Mean   :8   Mean   :13.32                   Mean   :2.121  
-#>                     3rd Qu.:8   3rd Qu.:18.00                   3rd Qu.:3.000  
-#>                     Max.   :8   Max.   :99.00                   Max.   :7.000  
-#>                                                                                
-#>   n_directions   n_lanes_direction    routes            speed_avg       
-#>  Min.   :1.000   Min.   :1.000     Length:6665        Min.   : 0.01819  
-#>  1st Qu.:1.000   1st Qu.:1.000     Class :character   1st Qu.: 8.42633  
-#>  Median :1.000   Median :1.000     Mode  :character   Median : 9.76760  
-#>  Mean   :1.364   Mean   :1.679                        Mean   :10.13130  
-#>  3rd Qu.:2.000   3rd Qu.:2.000                        3rd Qu.:11.27158  
-#>  Max.   :2.000   Max.   :6.000                        Max.   :43.63347  
-#>                                                       NA's   :186       
-#>   speed_median         speed_p25        speed_p75         speed_count  
-#>  Min.   : 0.007136   Min.   : 0.000   Min.   : 0.01992   Min.   :   1  
-#>  1st Qu.: 7.862506   1st Qu.: 5.979   1st Qu.:10.10566   1st Qu.:  41  
-#>  Median : 9.150032   Median : 7.122   Median :11.65674   Median : 104  
-#>  Mean   : 9.400438   Mean   : 7.198   Mean   :12.26544   Mean   : 181  
-#>  3rd Qu.:10.546549   3rd Qu.: 8.276   3rd Qu.:13.58913   3rd Qu.: 223  
-#>  Max.   :47.008923   Max.   :42.811   Max.   :61.81473   Max.   :5760  
-#>  NA's   :186         NA's   :186      NA's   :186        NA's   :186   
-#>  route_names                   geom     
-#>  Length:6665        LINESTRING   :6665  
-#>  Class :character   epsg:4326    :   0  
-#>  Mode  :character   +proj=long...:   0  
-#>                                         
-#>                                         
-#>                                         
-#> 
+#>   way_osm_id             hour     frequency     is_bus_lane    
+#>  Length:6665        Min.   :8   Min.   : 1.00   Mode :logical  
+#>  Class :character   1st Qu.:8   1st Qu.: 5.00   FALSE:6114     
+#>  Mode  :character   Median :8   Median :10.00   TRUE :551      
+#>                     Mean   :8   Mean   :13.32                  
+#>                     3rd Qu.:8   3rd Qu.:18.00                  
+#>                     Max.   :8   Max.   :99.00                  
+#>                                                                
+#>  n_lanes_parking   n_lanes_circulation    n_lanes       n_directions  
+#>  Min.   :0.00000   Min.   :1.000       Min.   :1.000   Min.   :1.000  
+#>  1st Qu.:0.00000   1st Qu.:1.000       1st Qu.:1.000   1st Qu.:1.000  
+#>  Median :0.00000   Median :2.000       Median :2.000   Median :1.000  
+#>  Mean   :0.01425   Mean   :2.122       Mean   :2.136   Mean   :1.365  
+#>  3rd Qu.:0.00000   3rd Qu.:3.000       3rd Qu.:3.000   3rd Qu.:2.000  
+#>  Max.   :2.00000   Max.   :7.000       Max.   :7.000   Max.   :2.000  
+#>                                                                       
+#>  n_lanes_circulation_direction n_lanes_direction    routes         
+#>  Min.   :1.000                 Min.   :1.000     Length:6665       
+#>  1st Qu.:1.000                 1st Qu.:1.000     Class :character  
+#>  Median :1.000                 Median :1.000     Mode  :character  
+#>  Mean   :1.679                 Mean   :1.689                       
+#>  3rd Qu.:2.000                 3rd Qu.:2.000                       
+#>  Max.   :6.000                 Max.   :6.000                       
+#>                                                                    
+#>    speed_avg         speed_median      speed_p25        speed_p75       
+#>  Min.   : 0.01694   Min.   : 0.000   Min.   : 0.000   Min.   : 0.01694  
+#>  1st Qu.: 8.53002   1st Qu.: 7.994   1st Qu.: 6.138   1st Qu.:10.19889  
+#>  Median : 9.83646   Median : 9.259   Median : 7.251   Median :11.79780  
+#>  Mean   :10.24983   Mean   : 9.589   Mean   : 7.377   Mean   :12.39146  
+#>  3rd Qu.:11.48475   3rd Qu.:10.886   3rd Qu.: 8.469   3rd Qu.:13.90043  
+#>  Max.   :64.79895   Max.   :44.118   Max.   :41.508   Max.   :77.74918  
+#>  NA's   :128        NA's   :128      NA's   :128      NA's   :128       
+#>   speed_count     route_names                   geom     
+#>  Min.   :   1.0   Length:6665        LINESTRING   :6665  
+#>  1st Qu.:  42.0   Class :character   epsg:4326    :   0  
+#>  Median : 101.0   Mode  :character   +proj=long...:   0  
+#>  Mean   : 176.5                                          
+#>  3rd Qu.: 217.0                                          
+#>  Max.   :5541.0                                          
+#>  NA's   :128
 
 p50_frequency = quantile(lanes_0800$frequency, 0.5, na.rm=TRUE)
 p50_speed = quantile(lanes_0800$speed_avg, 0.5, na.rm=TRUE)
