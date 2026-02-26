@@ -199,8 +199,6 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
         )
     }
 
-
-
     # >> Validate OSM data
     if (nrow(osm_route_name) == 0) { # Validate that there is an OSM match for GTFS route
       warning_routes_missing <<- append(warning_routes_missing, route_name)
@@ -368,21 +366,31 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       select(-initial_gtfs, -final_gtfs) |>
       st_as_sf(sf_column_name="geometry")
 
+    # When multiple osm_id, return those with min distance_diff + points_diff + then stops_diff
     if (length(unique(gtfs_route_name_result$osm_id)) < nrow(gtfs_route_name_result)) {
+      gtfs_route_name_result_unique = gtfs_route_name_result |>
+        group_by(osm_id) |>
+        slice_min(order_by = distance_diff + points_diff + stops_diff, with_ties = FALSE) |>
+        ungroup()
+
        warning_osm_repeated <<- append(warning_osm_repeated, sprintf(
-        "`%s` %s has %d shapes, but the geometrical match returned only %d (out of %d) OSM routes\n>> `osm_id` for route: %s\n>> The ignored ones were: %s\n>> The duplicated ones were: %s",
+        "`%s` %s has %d shapes, but the geometrical match returned only %d (out of %d) OSM routes\n>> `osm_id` for route: %s\n>> The ignored ones were: %s\n>> The duplicated ones were: %s\n>> Returning shapes that have greatest geometrical match: %s\n>> Shapes ignored: %s",
         gtfs_match, route_name, nrow(gtfs_route_name),
         length(unique(gtfs_route_name_result$osm_id)), nrow(osm_route_name),
         paste(osm_route_name$osm_id, collapse=", "),
+        # osm ignored
         paste(setdiff(
           union(gtfs_route_name_result$osm_id, osm_route_name$osm_id),
           intersect(gtfs_route_name_result$osm_id, osm_route_name$osm_id)
         ), collapse=", "),
-        paste(unique(gtfs_route_name_result$osm_id[duplicated(gtfs_route_name_result$osm_id)]), collapse=", ")
+        # osm duplicated
+        paste(unique(gtfs_route_name_result$osm_id[duplicated(gtfs_route_name_result$osm_id)]), collapse=", "),
+        # shapes returned
+        paste(gtfs_route_name_result_unique$shape_id, collapse=", "),
+        # shapes ignored
+        paste(setdiff(gtfs_route_name$shape_id, gtfs_route_name_result_unique$shape_id), collapse=", ")
       ))
-      return(data.frame(
-        route_name=route_name
-      ))  # Return NULL for failed elements
+      gtfs_route_name_result = gtfs_route_name_result_unique
     }
 
     return(gtfs_route_name_result)
@@ -422,15 +430,34 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   }
 
   not_found <- bind_rows( result[lengths(result)<=1] )
+  routes_shapes_n =  gtfs$routes |>  # Start on routes.txt to match line number with route_name
+    select(route_id, !!gtfs_match) |>
+    left_join(gtfs$trips |> select(route_id, trip_id, shape_id, direction_id), by="route_id") |>
+    left_join(shapes_sf, by="shape_id") |>
+    distinct(.data[[gtfs_match]], shape_id) |>
+    group_by(.data[[gtfs_match]]) |>
+    summarise(shapes_n = n())
+  partial_match = result_success |>
+    st_drop_geometry() |>
+    group_by(.data[[gtfs_match]]) |>
+    summarise(shapes_n = n()) |>
+    left_join(routes_shapes_n, by=gtfs_match) |>
+    rename(matched = shapes_n.x, gtfs = shapes_n.y) |>
+    filter(matched < gtfs)
+
   warning_osm_unsorted_stops <- unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
   errors <- length(warning_routes_missing) + length(warning_osm_repeated) + length(warning_osm_unsorted_stops) + length(warning_osm_stops_missing)
   if (errors>0 || nrow(not_found)) {
     w = sprintf(
-      "There were %d error(s) during the algorithm execution, which led to %d route(s) without a match (route(s) ignored), with the following `%s`:\n\n> %s\n",
+      "There were %d error(s) during the algorithm execution, which led to %d route(s) without a match (route(s) ignored), with the following `%s`:\n\n> %s\n\nAdditionally, %d routes had partial matches (only some of its shapes had a match):\n\n> %s\n",
       errors,
       nrow(not_found),
+      # Not found
       gtfs_match,
-      paste(not_found$route_name, collapse="\n> ")
+      paste(not_found$route_name, collapse="\n> "),
+      # Partial match
+      nrow(partial_match),
+      paste(partial_match[[gtfs_match]], " (matched ", partial_match[["matched"]], " of ", partial_match[["gtfs"]], " shapes)", collapse="\n> ", sep = "")
     )
     warning(w)
     if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
