@@ -83,16 +83,10 @@ prioritize_lanes <- function(
         # Otherwise, count left and right sides separately based on specific tags
         TRUE ~ (
           as.integer(
-            if_any(
-              any_of(c("parking:left", "parking:lane:left")),
-              ~ !is.na(.) & . != "no"
-            )
+            if_any(starts_with("parking:left"),~ !is.na(.) & . != "no")
           ) +
           as.integer(
-            if_any(
-              any_of(c("parking:right", "parking:lane:right")),
-              ~ !is.na(.) & . != "no"
-            )
+            if_any(starts_with("parking:right"), ~ !is.na(.) & . != "no")
           )
         )
       ),
