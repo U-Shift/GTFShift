@@ -63,7 +63,7 @@ This document explores how to use these methods in a combined way to assist publ
 `GTFShift::prioritize_lanes()` is a simple method that generates indicators for most of the criteria mentioned above using GTFS and OpenStreetMaps data (service frequency and lane characteristics). With a single call, it returns a data.frame with the relevant metrics for each road segment with transit service. 
 
 ```{r include=FALSE}
-lanes = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.8.0/prioritization_lisboa_rt_gtfs2026-02-04_run20260203.gpkg")
+lanes = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.8.1/prioritization_lisboa_rt_gtfs2026-02-04_run20260226.gpkg")
 ```
 
 
@@ -101,7 +101,7 @@ lanes = GTFShift::rt_extend_prioritization(
 ```
 
 ```{r include=FALSE}
-lanes = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.8.0/prioritization_lisboa_rt_gtfs2026-02-04_run20260203_extended.gpkg")
+lanes = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.8.1/prioritization_lisboa_rt_gtfs2026-02-04_run20260226_extended.gpkg")
 ```
 
 Refer to the [GTFS Real Time](./rt.html) article for details on how to collect GTFS-RT data and extend the prioritization analysis.
