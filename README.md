@@ -58,8 +58,8 @@ Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
 
 -   [`{tidytransit}`](https://github.com/r-transit/tidytransit)
 -   [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
--   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 -   [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
+-   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 
 ## Acknowledgement
 
