@@ -27,9 +27,12 @@ An \code{sf} \code{data.frame} object with the following columns:
  \item \code{hour}, the hour for which the frequency applies (24 hour format).
  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
  \item \code{is_bus_lane}, whether the way has a bus lane.
+ \item \code{n_lanes_parking}, the number of parking lanes.
+ \item \code{n_lanes_circulation}, the number of circulation lanes.
  \item \code{n_lanes}, the total number of lanes.
  \item \code{n_directions}, the number of travel directions.
- \item \code{n_lanes_direction}, the number of lanes per direction.
+ \item \code{n_lanes_circulation_direction}, the number of circulation lanes per direction.
+ \item \code{n_lanes_direction}, the number of total lanes per direction.
  \item \code{routes}, the list of route_ids that use the way, separated by semicolon.
  \item \code{geometry}, the route shape.
  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
