@@ -42,6 +42,8 @@ mapview::mapview(way_frequency)
 mapview::mapview(lanes, zcol="is_bus_lane")
 mapview::mapview(lanes, zcol="n_directions")
 mapview::mapview(lanes, zcol="n_lanes_direction")
+mapview::mapview(lanes, zcol="n_lanes_circulation_direction")
+mapview::mapview(lanes |> mutate(n_lanes_parking = as.character(n_lanes_parking)), zcol="n_lanes_parking")
 
 # Prioritization
 # Color pallete from https://colorhunt.co/palette/f63049d027528a244b111f35
