@@ -18,7 +18,8 @@
 #'  \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way.
 #'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
 #'  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
-#'  \item \code{routes}, the list of route_ids that use the way, separated by semicolon.
+#'  \item \code{routes}, the list of route_ids that use the way.
+#'  \item \code{shapes}, the list of shape_ids that use the way.
 #'  \item \code{geometry}, the route shape.
 #'  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 #' }
@@ -109,7 +110,8 @@ get_way_frequency_hourly = function(
     group_by(way_osm_id, hour) |>
     summarize(
       frequency = sum(frequency),
-      routes = paste(unique(route_id), collapse = ";")
+      routes = list(unique(route_id)),
+      shapes = list(unique(shape_id))
     ) |>
     ungroup() |>
     inner_join(ways_unique_geometry, by="way_osm_id") |>
