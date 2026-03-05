@@ -33,7 +33,8 @@ An \code{sf} \code{data.frame} object with the following columns:
  \item \code{n_directions}, the number of travel directions.
  \item \code{n_lanes_circulation_direction}, the number of circulation lanes per direction.
  \item \code{n_lanes_direction}, the number of total lanes per direction.
- \item \code{routes}, the list of route_ids that use the way, separated by semicolon.
+ \item \code{routes}, the list of route_id that use the way.
+ \item \code{shapes}, the list of shape_id that use the way.
  \item \code{geometry}, the route shape.
  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
 }
