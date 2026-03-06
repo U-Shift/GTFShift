@@ -48,8 +48,9 @@ An `sf` `data.frame` object with the following columns:
 - `frequency`, the number of services for the route that depart from the
   first stop for the corresponding 60 minutes period.
 
-- `routes`, the list of route_ids that use the way, separated by
-  semicolon.
+- `routes`, the list of route_ids that use the way.
+
+- `shapes`, the list of shape_ids that use the way.
 
 - `geometry`, the route shape.
 

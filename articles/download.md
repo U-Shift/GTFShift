@@ -88,11 +88,11 @@ summary(gtfs)
 #> agency       Carris
 #> service      from 2026-01-01 to 2026-06-05
 #> uses         stop_times (no frequencies)
-#> # routes       174
-#> # trips      77512
-#> # stop_ids    2333
-#> # stop_names  1139
-#> # shapes       306
+#> # routes       173
+#> # trips      77453
+#> # stop_ids    2320
+#> # stop_names  1136
+#> # shapes       305
 ```
 
 ### Using GTFShift incorporated database for Portugal
@@ -155,9 +155,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      180
-#> # trips      2371
-#> # stop_ids    438
-#> # stop_names  438
-#> # shapes      256
+#> # routes      182
+#> # trips      2022
+#> # stop_ids    453
+#> # stop_names  453
+#> # shapes      258
 ```

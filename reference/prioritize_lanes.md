@@ -63,8 +63,9 @@ An `sf` `data.frame` object with the following columns:
 
 - `n_lanes_direction`, the number of total lanes per direction.
 
-- `routes`, the list of route_ids that use the way, separated by
-  semicolon.
+- `routes`, the list of route_id that use the way.
+
+- `shapes`, the list of shape_id that use the way.
 
 - `geometry`, the route shape.
 
