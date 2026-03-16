@@ -18,7 +18,7 @@ osm_shapes_to_routes(
 
 \item{ways}{boolean (Default False). If true, relation is disaggregated in ways.}
 
-\item{ways_tags}{character vector (Default \code{c("lanes", "psv", "bus", "way")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.}
+\item{ways_tags}{character vector (Default \code{c("lanes", "psv", "bus", "way", "parking", "name")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.}
 }
 \value{
 A \code{sf} \code{data.frame} with the following columns:
