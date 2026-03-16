@@ -2,7 +2,7 @@ ID,LastUpdate,ReferenceDate,URL,URL-RT,Type,GTFSDocs
 cp,2025-02-01,2025-02-05,https://publico.cp.pt/gtfs/gtfs.zip,,Long distance,https://www.transit.land/operators/o-eyc-cp
 autna,2025-02-01,2025-02-05,https://drive.google.com/uc?export=download&id=1gah1x10RyFu7gJPweBcCXPd9vcFJFQ7c,,Long distance,https://www.transit.land/operators/o-ez-autnatransportes
 AML,2025-02-01,2025-02-05,https://api.carrismetropolitana.pt/gtfs,https://api.carrismetropolitana.pt/v1/vehicles,Inter-urban,https://github.com/carrismetropolitana/api
-barreiro,2025-02-01,2025-02-05,https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip,,Urban,https://www.tcbarreiro.pt/
+barreiro,2025-02-01,2025-02-05,https://backend.tcbarreiro.pt/download-gtfs,,Urban,https://www.tcbarreiro.pt/
 cascais,2025-02-01,2025-02-05,https://drive.google.com/u/0/uc?id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX&export=download,,Urban,https://dadosabertos.cascais.pt/pt_PT/dataset/gtfs-mobicascais
 lisboa,2025-02-01,2025-02-05,https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS,https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS/realtime/vehiclepositions,Urban,https://gateway.carris.pt/apiui/#!/apis/2c05b837-1c8e-4b34-85b8-371c8edb344b/pages/d7f1c190-908d-4615-b1c1-90908d4615f5
 metroLisboa,2025-02-01,2025-02-05,https://www.metrolisboa.pt/google_transit/googleTransit.zip,,Urban,https://www.transit.land/operators/o-eyckr-metrodelisboa
