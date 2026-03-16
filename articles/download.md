@@ -89,7 +89,7 @@ summary(gtfs)
 #> service      from 2026-01-01 to 2026-06-05
 #> uses         stop_times (no frequencies)
 #> # routes       173
-#> # trips      77453
+#> # trips      77519
 #> # stop_ids    2320
 #> # stop_names  1136
 #> # shapes       305
@@ -123,7 +123,7 @@ head(data)
 #> 1                                                  https://publico.cp.pt/gtfs/gtfs.zip
 #> 2     https://drive.google.com/uc?export=download&id=1gah1x10RyFu7gJPweBcCXPd9vcFJFQ7c
 #> 3                                              https://api.carrismetropolitana.pt/gtfs
-#> 4                    https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
+#> 4                                          https://backend.tcbarreiro.pt/download-gtfs
 #> 5 https://drive.google.com/u/0/uc?id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX&export=download
 #> 6                                 https://gateway.carris.pt/gateway/gtfs/api/v2.8/GTFS
 #>                                                                           URL.RT
@@ -155,9 +155,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      182
-#> # trips      2022
+#> # routes      197
+#> # trips      2480
 #> # stop_ids    453
 #> # stop_names  453
-#> # shapes      258
+#> # shapes      270
 ```

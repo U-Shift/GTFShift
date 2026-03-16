@@ -9,7 +9,7 @@ osm_shapes_to_routes(
   gtfs,
   q,
   ways = FALSE,
-  ways_tags = c("lanes", "psv", "bus", "way", "parking")
+  ways_tags = c("lanes", "psv", "bus", "way", "parking", "name")
 )
 ```
 
@@ -29,9 +29,10 @@ osm_shapes_to_routes(
 
 - ways_tags:
 
-  character vector (Default `c("lanes", "psv", "bus", "way")`). List of
-  OSM way tags to extract when `ways` parameter is set to true. Match is
-  done using
+  character vector (Default
+  `c("lanes", "psv", "bus", "way", "parking", "name")`). List of OSM way
+  tags to extract when `ways` parameter is set to true. Match is done
+  using
   [`tidyselect::contains()`](https://tidyselect.r-lib.org/reference/starts_with.html).
 
 ## Value

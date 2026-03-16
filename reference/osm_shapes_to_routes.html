@@ -61,7 +61,7 @@
 <span>  <span class="va">gtfs</span>,</span>
 <span>  <span class="va">q</span>,</span>
 <span>  ways <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ways_tags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lanes"</span>, <span class="st">"psv"</span>, <span class="st">"bus"</span>, <span class="st">"way"</span>, <span class="st">"parking"</span><span class="op">)</span></span>
+<span>  ways_tags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lanes"</span>, <span class="st">"psv"</span>, <span class="st">"bus"</span>, <span class="st">"way"</span>, <span class="st">"parking"</span>, <span class="st">"name"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -82,7 +82,7 @@
 
 
 <dt id="arg-ways-tags">ways_tags<a class="anchor" aria-label="anchor" href="#arg-ways-tags"></a></dt>
-<dd><p>character vector (Default <code>c("lanes", "psv", "bus", "way")</code>). List of OSM way tags to extract when <code>ways</code> parameter is set to true. Match is done using <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">tidyselect::contains()</a></code>.</p></dd>
+<dd><p>character vector (Default <code>c("lanes", "psv", "bus", "way", "parking", "name")</code>). List of OSM way tags to extract when <code>ways</code> parameter is set to true. Match is done using <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">tidyselect::contains()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
