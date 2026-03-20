@@ -238,9 +238,15 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       select(route_id, route_short_name, route_long_name) |>
       filter(.data[[gtfs_match]] == route_name) |>
       left_join(gtfs$trips |> select(route_id, trip_id, shape_id, direction_id), by="route_id") |>
+      filter(!is.na(trip_id)) |>
       left_join(shapes_sf, by="shape_id") |>
       distinct(shape_id, .keep_all = TRUE) |>
       sf::st_as_sf()
+    if (nrow(gtfs_route_name)==0) { # In case route does not have trips, nor shapes (no need to log error, as it had no geometries anyway)
+      return(data.frame(
+        route_name=route_name
+      ))  # Return NULL for failed elements
+    }
 
     # 2. Match based on initial and final points
     # > Compute osm final and initial points
@@ -433,6 +439,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   routes_shapes_n =  gtfs$routes |>  # Start on routes.txt to match line number with route_name
     select(route_id, !!gtfs_match) |>
     left_join(gtfs$trips |> select(route_id, trip_id, shape_id, direction_id), by="route_id") |>
+    filter(!is.na(trip_id)) |> # Ignore routes without trips, because they do not have shapes, so they are not expected to be matched with OSM routes (and thus, not expected to be in the results, so no need to log them as errors)
     left_join(shapes_sf, by="shape_id") |>
     distinct(.data[[gtfs_match]], shape_id) |>
     group_by(.data[[gtfs_match]]) |>
