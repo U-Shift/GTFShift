@@ -170,6 +170,19 @@ regions = rbind( # NYC, Bronx
   )
 )
 
+# Fuenlabrada, ES
+regions = rbind(
+  regions,
+  data.frame(
+    name = "fuenlabrada",
+    gtfs_url = "https://api.control.optibus.co/opendata/v1/gtfs?uid=c-5cfcd2d1",
+    gtfs_day = Sys.Date(),
+    query = I(list(list(
+      list(key = "route", value = c("bus"), key_exact = TRUE),
+      list(key = "operator", value = "EMT Fuenlabrada", key_exact = TRUE)
+    )))
+  )
+)
 
 
 # Helpers

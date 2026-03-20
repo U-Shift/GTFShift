@@ -445,12 +445,15 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     group_by(.data[[gtfs_match]]) |>
     summarise(shapes_n = n())
   partial_match = result_success |>
-    st_drop_geometry() |>
+    st_drop_geometry()
+  if (nrow(partial_match)) {
+    partial_match = partial_match |>
     group_by(.data[[gtfs_match]]) |>
     summarise(shapes_n = n()) |>
     left_join(routes_shapes_n, by=gtfs_match) |>
     rename(matched = shapes_n.x, gtfs = shapes_n.y) |>
     filter(matched < gtfs)
+  }
 
   warning_osm_unsorted_stops <- unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
   errors <- length(warning_routes_missing) + length(warning_osm_repeated) + length(warning_osm_unsorted_stops) + length(warning_osm_stops_missing)
@@ -509,7 +512,9 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     return (if (geometry) st_sf(data.frame()) else data.frame())
   }
 
-  result_success <- result_success |> select(route_id, shape_id, osm_id, distance_diff, points_diff, stops_diff, route_short_name, route_long_name, osm_name, osm_ref)
+  result_success <- result_success |> select(
+    any_of(c("route_id", "shape_id", "osm_id", "distance_diff", "points_diff", "stops_diff", "route_short_name", "route_long_name", "osm_name", "osm_ref", "geometry"))
+  )
 
   if (!geometry) {
     return (result_success |> st_drop_geometry())
