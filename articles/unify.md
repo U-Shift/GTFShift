@@ -33,7 +33,7 @@ gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, shapes, dead_runs, layover, blocks, calendar, calendar_dates, feed_info, stops
 #> agency       Transportes Colectivos do Barreiro
-#> service      from 2026-02-13 to 2026-12-31
+#> service      from 2026-03-18 to 2026-12-31
 #> uses         stop_times (no frequencies)
 #> # routes       75
 #> # trips      2460
