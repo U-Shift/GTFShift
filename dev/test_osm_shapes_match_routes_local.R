@@ -1,10 +1,15 @@
 library(GTFShift)
 library(dplyr)
-library(osmdata)
 library(stringr)
 
+library(osmdata)
+get_overpass_url()
+# set_overpass_url("https://maps.mail.ru/osm/tools/overpass/api/interpreter")
+set_overpass_url("https://overpass.private.coffee/api/interpreter") # 4 servers with 20 cores, 256GB RAM, SSD each
+get_overpass_url()
+
 # Parameters
-output = "releases/v0_7_1"
+output_root = "releases/v0_8_2"
 
 regions = data.frame(
   name = character(),
@@ -152,6 +157,21 @@ regions = rbind( # CP Portugal
   )
 )
 
+regions = rbind( # NYC, Bronx
+  regions,
+  data.frame(
+    name = "nyc_bronx",
+    gtfs_url = "https://rrgtfsfeeds.s3.amazonaws.com/gtfs_bx.zip",
+    gtfs_day = Sys.Date(),
+    query = I(list(list(
+      list(key = "route", value = c("bus"), key_exact = TRUE),
+      list(key = "operator", value = "Metropolitan Transportation Authority", key_exact = TRUE)
+    )))
+  )
+)
+
+
+
 # Helpers
 
 manipulate_gtfs_cp = function(gtfs) {
@@ -184,6 +204,11 @@ manipulate_gtfs_cp = function(gtfs) {
 for(i in 1:nrow(regions)) {
   region <- regions[i, ]
   message(sprintf("\n\nRunning for %s (%s)...", region$name, region$gtfs_day))
+
+  output = sprintf("%s/%s/%s", output_root, region$name, region$gtfs_day)
+  if(!dir.exists(output)) {
+    dir.create(output, recursive = TRUE)
+  }
 
   gtfs = GTFShift::load_feed(region$gtfs_url)
   assign(sprintf("gtfs_%s_%s", region$name, region$gtfs_day), gtfs)
