@@ -4,7 +4,7 @@ library(stringr)
 
 library(osmdata)
 get_overpass_url()
-# set_overpass_url("https://maps.mail.ru/osm/tools/overpass/api/interpreter")
+set_overpass_url("https://maps.mail.ru/osm/tools/overpass/api/interpreter")
 set_overpass_url("https://overpass.private.coffee/api/interpreter") # 4 servers with 20 cores, 256GB RAM, SSD each
 get_overpass_url()
 
@@ -96,7 +96,7 @@ regions = rbind( # Lisboa
   data.frame(
     name = "lisboa",
     gtfs_url = data$URL[data$ID == "lisboa"],
-    gtfs_day = gsub("-", "", Sys.Date()),
+    gtfs_day = Sys.Date(),
     query = I(list(list(
       list(key = "route", value = c("bus", "tram"), key_exact = TRUE),
       list(key = "network", value = "Carris", key_exact = TRUE)
@@ -177,6 +177,7 @@ regions = rbind(
     name = "fuenlabrada",
     gtfs_url = "https://api.control.optibus.co/opendata/v1/gtfs?uid=c-5cfcd2d1",
     gtfs_day = Sys.Date(),
+    gtfs_manipulate = "manipulate_gtfs_fuenlabrada",
     query = I(list(list(
       list(key = "route", value = c("bus"), key_exact = TRUE),
       list(key = "operator", value = "EMT Fuenlabrada", key_exact = TRUE)
@@ -208,6 +209,12 @@ manipulate_gtfs_cp = function(gtfs) {
     left_join(gtfs$stops |> select(stop_id, stop_name) |> rename(to_name = stop_name), by = c("to" = "stop_id")) |>
     mutate(route_short_name = sprintf("%s %s %s", route_short_name, from_name, to_name))
 
+  return(gtfs)
+}
+
+manipulate_gtfs_fuenlabrada = function(gtfs) {
+  # Append "L" suffix to route_short_name
+  gtfs$routes$route_short_name = paste0("L", gtfs$routes$route_short_name)
   return(gtfs)
 }
 
