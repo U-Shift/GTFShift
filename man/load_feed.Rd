@@ -10,7 +10,8 @@ load_feed(
   create_transfers = TRUE,
   transfer_distance = 300,
   transfer_time = 120,
-  transfer_street_routing = FALSE
+  transfer_street_routing = FALSE,
+  headers = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ load_feed(
 \item{transfer_time}{Integer (Default 120). Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.}
 
 \item{transfer_street_routing}{Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).}
+
+\item{headers}{Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS zip file URL.}
 }
 \value{
 A tidygtfs object.
