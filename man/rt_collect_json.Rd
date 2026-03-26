@@ -13,7 +13,8 @@ rt_collect_json(
     "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp",
     "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
   scrape_interval = 60,
-  log_file = NA
+  log_file = NA,
+  headers = NULL
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ rt_collect_json(
 \item{scrape_interval}{Integer (Default 60). Interval in seconds between each download. Negative to run only once.}
 
 \item{log_file}{String (Optional). Path to a log file to save download logs.}
+
+\item{headers}{Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.}
 }
 \description{
 Collect GTFS-RT data from a JSON feed at regular intervals
