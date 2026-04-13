@@ -25,6 +25,7 @@ reference:
     contents:
     - starts_with("prioritize_")
     - rt_extend_prioritization
+    - get_prioritization_stats
   - title: Filter
     contents:
     - starts_with("filter_")
