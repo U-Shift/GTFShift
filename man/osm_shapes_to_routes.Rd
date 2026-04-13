@@ -8,7 +8,8 @@ osm_shapes_to_routes(
   gtfs,
   q,
   ways = FALSE,
-  ways_tags = c("lanes", "psv", "bus", "way", "parking", "name")
+  ways_tags = c("lanes", "psv", "bus", "way", "parking", "name"),
+  sleep_duration = 30
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ osm_shapes_to_routes(
 \item{ways}{boolean (Default False). If true, relation is disaggregated in ways.}
 
 \item{ways_tags}{character vector (Default \code{c("lanes", "psv", "bus", "way", "parking", "name")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.}
+
+\item{sleep_duration}{Numeric (Default 30). Time to sleep, in seconds, before fetching OSM data to avoid overloading the server.}
 }
 \value{
 A \code{sf} \code{data.frame} with the following columns:
@@ -44,11 +47,11 @@ OSM \code{gtfs:shape_id} attribute.
 \dontrun{
 gtfs <- GTFShift::load_feed("gtfs.zip")
 
-q = opq("Lisbon")  |>
+q <- opq("Lisbon") |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
-shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs, q)
+shapes_geometry_osm <- GTFShift::osm_shapes_to_routes(gtfs, q)
 }
 
 }

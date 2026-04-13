@@ -7,6 +7,7 @@
 #' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
 #' @param gtfs_osm_match_exact Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).
 #' @param log_file String (Optional). If provided, will log warnings to this file, in addition to the console.
+#' @param sleep_duration Numeric (Default 30). Time to sleep, in seconds, before fetching OSM data to avoid overloading the server.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
@@ -64,7 +65,7 @@
 #' @import stringi
 #'
 #' @export
-osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA) {
+osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA, sleep_duration = 30) {
 
   if (!is.na(log_file)) cat(
     sprintf("-----------------------------\n%s: Running osm_shapes_match_routes() for %s...\n\n", Sys.time(), paste(gtfs$agency$agency_name, collapse=", "))
@@ -126,10 +127,10 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
 
   # 3. Get OSM relations (to associate routes and stops)
-  if (TRUE) {
-    # Sleep for 5 seconds to avoid overloading the server with multiple requests in a short period of time, which can cause errors
+  if (sleep_duration > 0) {
+    # Sleep to avoid overloading the server with multiple requests in a short period of time, which can cause errors
     pb$update(0.25)
-    Sys.sleep(5)
+    Sys.sleep(sleep_duration)
   }
   pb$update(0.5)
   osm_file <- tempfile(fileext = ".osm")
