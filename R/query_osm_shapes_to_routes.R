@@ -41,7 +41,7 @@
 #'
 #' @export
 osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "psv", "bus", "way", "parking", "name"), sleep_duration = 30) {
-  total_steps <- ifelse(ways, 3, 2)
+  total_steps <- 2 + (if (ways) { 1 + (sleep_duration > 0) } else { 0 })
 
   # 1. Get OSM routes
   pb <- progress::progress_bar$new( # Track progress
@@ -84,18 +84,24 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
 
   # If relation disaggregation
   if (ways) {
+    # 3.1. Get OSM relations (to associate relations and ways)
+    if (sleep_duration > 0) {
+      pb_wait <- progress::progress_bar$new(
+        format = sprintf("3/%d: Waiting to avoid server overloading [:bar] :percent :spin elapsed=:elapsed", total_steps),
+        total = sleep_duration * 10, clear = FALSE, show_after = 0
+      )
+      for (i in seq_len(sleep_duration * 10)) {
+        pb_wait$tick()
+        Sys.sleep(0.1)
+      }
+      pb_wait$terminate()
+    }
+
     pb <- progress::progress_bar$new( # Track progress
-      format = sprintf("3/%d: Matching OSM routes with ways  [:bar] :percent :spin elapsed=:elapsed", total_steps),
+      format = sprintf("%d/%d: Matching OSM routes with ways [:bar] :percent :spin elapsed=:elapsed", 3 + (sleep_duration > 0), total_steps),
       clear = FALSE, show_after = 0
     )
     pb$update(0)
-
-    # 3.1. Get OSM relations (to associate relations and ways)
-    if (sleep_duration > 0) {
-      # Sleep to avoid overloading the server with multiple requests in a short period of time, which can cause errors
-      pb$update(0.05)
-      Sys.sleep(sleep_duration)
-    }
 
     osm_file <- tempfile(fileext = ".osm")
     job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
