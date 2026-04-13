@@ -37,9 +37,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs = GTFShift::load_feed("gtfs.zip")
-#' q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
-#' lanes_analysis = GTFShift::prioritize_lanes(gtfs, q)
+#' gtfs <- GTFShift::load_feed("gtfs.zip")
+#' q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+#' lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q)
 #' }
 #'
 #' @import dplyr
@@ -47,26 +47,25 @@
 #'
 #' @export
 prioritize_lanes <- function(
-    gtfs,
-    q,
-    date = GTFShift::calendar_nextBusinessWednesday(),
-    keep_osm_attributes = FALSE
+  gtfs,
+  q,
+  date = GTFShift::calendar_nextBusinessWednesday(),
+  keep_osm_attributes = FALSE
 ) {
-
   # Get way frequency hourly
-  way_frequency = GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE)
+  way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE)
 
   # Get bus lanes
-  shapes_sf = tidytransit::shapes_as_sf(gtfs$shapes)
-  shapes_bbox = sf::st_bbox(shapes_sf)
-  bus_lanes = GTFShift::osm_bus_lanes(shapes_bbox)
+  shapes_sf <- tidytransit::shapes_as_sf(gtfs$shapes)
+  shapes_bbox <- sf::st_bbox(shapes_sf)
+  bus_lanes <- GTFShift::osm_bus_lanes(shapes_bbox)
 
   # Aggregate data
   # > Add missing lanes columns, to prevent errors
-  lane_cols = c("lanes", "lanes:forward", "lanes:backward", "lanes:both_ways", "oneway")
+  lane_cols <- c("lanes", "lanes:forward", "lanes:backward", "lanes:both_ways", "oneway")
   for (col in lane_cols) {
     if (!(col %in% colnames(way_frequency))) {
-      way_frequency[[col]] = NA_character_
+      way_frequency[[col]] <- NA_character_
     }
   }
   parse_lanes <- function(x) {
@@ -74,28 +73,33 @@ prioritize_lanes <- function(
   }
 
   # > Compute aggregation
-  lanes = way_frequency |>
+  lanes <- way_frequency |>
     left_join(bus_lanes |> sf::st_drop_geometry() |> select(osm_id) |> mutate(is_bus_lane = TRUE), by = c("way_osm_id" = "osm_id")) |>
     mutate(
       is_bus_lane = ifelse(is.na(is_bus_lane), FALSE, is_bus_lane),
       n_lanes_parking = dplyr::case_when(
         # Any 'parking:both' or 'parking:lane:both' column present with value different from 'no'
-        if_any(starts_with("parking:both"), ~ !is.na(.) & . != "no") ~ 2L,
-        # Otherwise, count left and right sides separately based on specific tags
+        if_any(matches("^parking(:lane)?:both"), ~ !is.na(.) & . != "no") ~ 2L,
+        # Otherwise, count left and right sides separately based on specific tags (parking:lane:left/right or parking:left/right)
         TRUE ~ (
           as.integer(
-            if_any(starts_with("parking:left"),~ !is.na(.) & . != "no")
+            if_any(matches("^parking(:lane)?:left"), ~ !is.na(.) & . != "no")
           ) +
-          as.integer(
-            if_any(starts_with("parking:right"), ~ !is.na(.) & . != "no")
-          )
+            as.integer(
+              if_any(matches("^parking(:lane)?:right"), ~ !is.na(.) & . != "no")
+            )
         )
       ),
       n_lanes_circulation = coalesce(
         # Global count
         parse_lanes(lanes),
-        # Directional count
-        parse_lanes(`lanes:forward`) + parse_lanes(`lanes:backward`) + parse_lanes(`lanes:both_ways`),
+        # Directional count (sum existing ones; returns NA if all are missing)
+        na_if(
+          coalesce(parse_lanes(`lanes:forward`), 0) +
+            coalesce(parse_lanes(`lanes:backward`), 0) +
+            coalesce(parse_lanes(`lanes:both_ways`), 0),
+          0
+        ),
         # If oneway=="yes", then 1
         ifelse(oneway == "yes", 1, NA_integer_),
         # Else, assume 2 lanes, one per direction
@@ -121,7 +125,7 @@ prioritize_lanes <- function(
     )
 
   if (!keep_osm_attributes) {
-    lanes = lanes |>
+    lanes <- lanes |>
       select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_parking, n_lanes_circulation, n_lanes, n_directions, n_lanes_circulation_direction, n_lanes_direction, routes, shapes, geometry)
   }
 
