@@ -56,9 +56,7 @@ prioritize_lanes <- function(
   way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE)
 
   # Get bus lanes
-  shapes_sf <- tidytransit::shapes_as_sf(gtfs$shapes)
-  shapes_bbox <- sf::st_bbox(shapes_sf)
-  bus_lanes <- GTFShift::osm_bus_lanes(shapes_bbox)
+  bus_lanes <- filter_osm_bus_lanes(way_frequency |> distinct(way_osm_id, .keep_all = TRUE))
 
   # Aggregate data
   # > Add missing lanes columns, to prevent errors
