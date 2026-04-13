@@ -66,6 +66,7 @@
 #'
 #' @export
 osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA, sleep_duration = 30) {
+  total_steps <- 4 + (sleep_duration > 0)
 
   if (!is.na(log_file)) cat(
     sprintf("-----------------------------\n%s: Running osm_shapes_match_routes() for %s...\n\n", Sys.time(), paste(gtfs$agency$agency_name, collapse=", "))
@@ -81,7 +82,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
   # 1. Get geometry for shapes and stops
   pb <- progress::progress_bar$new( # Track progress
-    format = "1/3: Preparing GTFS data [:bar] :percent :spin elapsed=:elapsed",
+    format = sprintf("1/%d: Preparing GTFS data [:bar] :percent :spin elapsed=:elapsed", total_steps),
     clear = FALSE, show_after=0
   )
   pb$update(0)
@@ -96,7 +97,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
   # 2. Get OSM routes and stops
   pb <- progress::progress_bar$new( # Track progress
-    format = "2/3: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
+    format = sprintf("2/%d: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed", total_steps),
     clear = FALSE, show_after=0
   )
   pb$update(0)
@@ -124,14 +125,27 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   }, args=list(osm, osm_multilines_redux))
   while (job$is_alive()) { pb$tick(0); Sys.sleep(0.1) }
   osm_stoppositions <- job$get_result()
-
+  pb$update(1)
+  pb$terminate()
 
   # 3. Get OSM relations (to associate routes and stops)
   if (sleep_duration > 0) {
-    # Sleep to avoid overloading the server with multiple requests in a short period of time, which can cause errors
-    pb$update(0.25)
-    Sys.sleep(sleep_duration)
+    pb_wait <- progress::progress_bar$new(
+      format = sprintf("3/%d: Waiting to avoid server overloading [:bar] :percent :spin elapsed=:elapsed", total_steps),
+      total = sleep_duration * 10, clear = FALSE, show_after = 0
+    )
+    for (i in seq_len(sleep_duration * 10)) {
+      pb_wait$tick()
+      Sys.sleep(0.1)
+    }
+    pb_wait$terminate()
   }
+
+  pb <- progress::progress_bar$new(
+    format = sprintf("%d/%d: Processing OSM relations [:bar] :percent :spin elapsed=:elapsed", 3 + (sleep_duration > 0), total_steps),
+    clear = FALSE, show_after = 0
+  )
+  pb$update(0)
   pb$update(0.5)
   osm_file <- tempfile(fileext = ".osm")
 
@@ -176,7 +190,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   routes_names <- unique( gtfs$routes |> pull( !!gtfs_match ) ) # !! to use variable value and not its literal name
 
   pb <- progress::progress_bar$new( # Track progress
-    format = "3/3: Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed",
+    format = sprintf("%d/%d: Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed", 4 + (sleep_duration > 0), total_steps),
     clear = FALSE, show_after=0
   )
 
