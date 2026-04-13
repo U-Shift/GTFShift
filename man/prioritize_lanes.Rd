@@ -54,9 +54,9 @@ OSM relation mapping is well defined for the transit routes. Routes that do not 
 }
 \examples{
 \dontrun{
-gtfs = GTFShift::load_feed("gtfs.zip")
-q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
-lanes_analysis = GTFShift::prioritize_lanes(gtfs, q)
+gtfs <- GTFShift::load_feed("gtfs.zip")
+q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q)
 }
 
 }

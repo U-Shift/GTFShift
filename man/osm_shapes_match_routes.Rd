@@ -11,7 +11,8 @@ osm_shapes_match_routes(
   gtfs_match = "route_short_name",
   osm_match = "ref",
   gtfs_osm_match_exact = TRUE,
-  log_file = NA
+  log_file = NA,
+  sleep_duration = 30
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ osm_shapes_match_routes(
 \item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
 
 \item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
+
+\item{sleep_duration}{Numeric (Default 30). Time to sleep, in seconds, before fetching OSM data to avoid overloading the server.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
