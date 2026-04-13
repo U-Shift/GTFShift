@@ -11,8 +11,7 @@ osm_shapes_match_routes(
   gtfs_match = "route_short_name",
   osm_match = "ref",
   gtfs_osm_match_exact = TRUE,
-  log_file = NA,
-  sleep_duration = 30
+  log_file = NA
 )
 }
 \arguments{
@@ -29,8 +28,6 @@ osm_shapes_match_routes(
 \item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
 
 \item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
-
-\item{sleep_duration}{Numeric (Default 30). Time to sleep, in seconds, before fetching OSM data to avoid overloading the server.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
@@ -75,7 +72,7 @@ Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the 
 \dontrun{
 gtfs <- GTFShift::load_feed("gtfs.zip")
 
-q <- opq("Lisbon")  |>
+q <- opq("Lisbon") |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
