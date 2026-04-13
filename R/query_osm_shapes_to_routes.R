@@ -50,7 +50,7 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
   )
   pb$update(0)
 
-  osm_file <- tempfile(fileext = ".osm", check = TRUE)
+  osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
   job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
     osmdata::osmdata_xml(q, filename = osm_file, quiet = FALSE)
   }, args = list(q, osm_file))
