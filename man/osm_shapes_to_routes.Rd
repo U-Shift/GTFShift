@@ -8,8 +8,7 @@ osm_shapes_to_routes(
   gtfs,
   q,
   ways = FALSE,
-  ways_tags = c("lanes", "psv", "bus", "way", "parking", "name"),
-  sleep_duration = 30
+  ways_tags = c("lanes", "psv", "bus", "way", "parking", "name")
 )
 }
 \arguments{

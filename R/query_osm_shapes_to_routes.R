@@ -40,32 +40,47 @@
 #' @import callr
 #'
 #' @export
-osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "psv", "bus", "way", "parking", "name"), sleep_duration = 30) {
-  total_steps <- 2 + (if (ways) { 1 + (sleep_duration > 0) } else { 0 })
+osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "psv", "bus", "way", "parking", "name")) {
+  total_steps <- 2 + ways
 
-  # 1. Get OSM routes
+  # 1. Fetch OSM data as XML
   pb <- progress::progress_bar$new( # Track progress
-    format = sprintf("1/%d: Fetching OSM routes [:bar] :percent :spin elapsed=:elapsed", total_steps),
+    format = sprintf("1/%d: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed", total_steps),
     clear = FALSE, show_after = 0
   )
   pb$update(0)
-  job <- callr::r_bg(function(q) { # update spinner while blocking method call
-    return(q |> osmdata::osmdata_sf())
-  }, args = list(q))
+
+  osm_file <- tempfile(fileext = ".osm", check = TRUE)
+  job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
+    osmdata::osmdata_xml(q, filename = osm_file, quiet = FALSE)
+  }, args = list(q, osm_file))
+  while (job$is_alive()) {
+    pb$tick(0)
+    Sys.sleep(0.1)
+  }
+  job$get_result() # This will throw any error that occurred in the subprocess (e.g., timeout)
+
+  pb$update(0.5)
+
+  # 2. Convert to SF and Extract routes
+  job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
+    return(osmdata::osmdata_sf(q, osm_file))
+  }, args = list(q, osm_file))
   while (job$is_alive()) {
     pb$tick(0)
     Sys.sleep(0.1)
   }
   osm <- job$get_result()
 
-  pb$update(0.5)
+  pb$update(0.75)
+
   osm_multilines <- osm$osm_multilines
   osm_multilines_redux <- osm_multilines |>
     select(any_of(c("osm_id", "gtfs:shape_id")))
   pb$update(1)
   pb$terminate()
 
-  # 2. Merge with GTFS
+  # 3. Merge with GTFS
   shape_ids <- gtfs$trips |>
     select(shape_id) |>
     distinct()
@@ -84,34 +99,12 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
 
   # If relation disaggregation
   if (ways) {
-    # 3.1. Get OSM relations (to associate relations and ways)
-    if (sleep_duration > 0) {
-      pb_wait <- progress::progress_bar$new(
-        format = sprintf("3/%d: Waiting to avoid server overloading [:bar] :percent :spin elapsed=:elapsed", total_steps),
-        total = sleep_duration * 10, clear = FALSE, show_after = 0
-      )
-      for (i in seq_len(sleep_duration * 10)) {
-        pb_wait$tick()
-        Sys.sleep(0.1)
-      }
-      pb_wait$terminate()
-    }
-
+    # 4. Processing OSM relations (already have the file!)
     pb <- progress::progress_bar$new( # Track progress
-      format = sprintf("%d/%d: Matching OSM routes with ways [:bar] :percent :spin elapsed=:elapsed", 3 + (sleep_duration > 0), total_steps),
+      format = sprintf("3/%d: Matching OSM routes with ways [:bar] :percent :spin elapsed=:elapsed", total_steps),
       clear = FALSE, show_after = 0
     )
     pb$update(0)
-
-    osm_file <- tempfile(fileext = ".osm")
-    job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
-      osmdata::osmdata_xml(q, filename = osm_file)
-    }, args = list(q, osm_file))
-    while (job$is_alive()) {
-      pb$tick(0)
-      Sys.sleep(0.1)
-    }
-    pb$update(0.33)
 
     job <- callr::r_bg(function(osm_file) { # update spinner while blocking method call
       library(xml2)
@@ -140,14 +133,14 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
       pb$tick(0)
       Sys.sleep(0.1)
     }
-    pb$update(0.66)
+    pb$update(0.5)
 
     relations_df <- job$get_result()
     ways_relations <- relations_df |>
       filter(type == "way") |>
       select(ref, relation_osm_id) # ref is way osm_id
 
-    # 3.2. Disaggregate relations in ways
+    # 4.2. Disaggregate relations in ways
     result <- result |>
       sf::st_drop_geometry() |>
       left_join(ways_relations |> rename(way_osm_id = ref, osm_id = relation_osm_id), by = "osm_id") |>
