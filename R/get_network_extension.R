@@ -18,8 +18,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' gtfs = GTFShift::load_feed("gtfs.zip")
-#' route_extension = GTFShift::get_network_extension(gtfs)
+#' gtfs <- GTFShift::load_feed("gtfs.zip")
+#' route_extension <- GTFShift::get_network_extension(gtfs)
 #' }
 #'
 #' @seealso [GTFShift::get_route_frequency_hourly()]
@@ -29,38 +29,37 @@
 #'
 #' @export
 get_network_extension <- function(
-    gtfs,
-    route_identifier = "route_id",
-    direction_wise = TRUE,
-    unified = FALSE,
-    date = GTFShift::calendar_nextBusinessWednesday(),
-    use_osm_routes = NA
+  gtfs,
+  route_identifier = "route_id",
+  direction_wise = TRUE,
+  unified = FALSE,
+  date = GTFShift::calendar_nextBusinessWednesday(),
+  use_osm_routes = NA
 ) {
-
   # 0. Validations
   if (!(route_identifier %in% c("route_id", "route_short_name", "route_long_name"))) {
     stop("route_identifier should be one of: route_id, route_short_name or route_long_name")
   }
 
   # Compute hourly frequencies for each route
-  network = gtfs |> GTFShift::get_route_frequency_hourly(date = date, use_osm_routes = use_osm_routes, overline = FALSE)
+  network <- gtfs |> GTFShift::get_route_frequency_hourly(date = date, use_osm_routes = use_osm_routes, overline = FALSE)
 
   # Get unique shapes
-  shapes_unique = network |>
+  shapes_unique <- network |>
     st_drop_geometry() |>
     select(shape_id) |>
     distinct() |>
-    left_join(network, by = "shape_id", multiple="first")
+    left_join(network, by = "shape_id", multiple = "first")
 
   # Compute daily frequencies per route shape
-  network_redux = network |>
+  network_redux <- network |>
     st_drop_geometry() |>
     group_by(.data[[route_identifier]], direction_id, shape_id) |>
     summarise(frequency_day = sum(frequency)) |>
     ungroup()
 
   # Get shape with max frequencies per route
-  network_redux_max = network_redux |>
+  network_redux_max <- network_redux |>
     # Get max frequency shape per route (and direction, if direction_wise=TRUE)
     group_by(.data[[route_identifier]], shape_id, !!!if (direction_wise) rlang::syms("direction_id")) |>
     summarise(frequency_max = max(frequency_day)) |>
@@ -73,19 +72,21 @@ get_network_extension <- function(
     ungroup()
 
   # Join with the original network to get the shapes and compute its distance
-  network_redux_shapes = network_redux_max |>
+  network_redux_shapes <- network_redux_max |>
     left_join(shapes_unique, by = "shape_id") |>
     st_as_sf() |>
-    st_transform(crs = 3857) |> # For units in meters
-    mutate(length = st_length(geometry))
+    st_transform(crs = 3857) # For units in meters
+
+  geom_col <- st_geometry(network_redux_shapes)
+  network_redux_shapes <- network_redux_shapes |> mutate(length = st_length(geom_col))
 
   # Compute unified network extension
   if (unified) {
-    network_union = network_redux_shapes |>
+    network_union <- network_redux_shapes |>
       st_union() |>
       stplanr::line_cast() |>
       st_as_sf() |>
-      mutate(length = st_length(x))
+      mutate(length = st_length(geom_col))
     return(sum(network_union$length))
   }
 

@@ -34,9 +34,12 @@ get_prioritization_stats <- function(
     weight <- match.arg(weight)
     prioritization_internal <- lane_prioritization |>
         st_as_sf() |>
-        st_transform(crs = 3857) |>
+        st_transform(crs = 3857)
+
+    geom_col <- st_geometry(prioritization_internal)
+    prioritization_internal <- prioritization_internal |>
         mutate(
-            length = units::drop_units(st_length(geom))
+            length = units::drop_units(st_length(geom_col))
         ) |>
         st_drop_geometry()
     stats <- list()
