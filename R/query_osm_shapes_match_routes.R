@@ -280,11 +280,13 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     osm_route_name <- tryCatch(
       {
         osm_route_name |>
-          mutate(roundtrip = if (!"roundtrip" %in% names(osm_route_name)) NA else roundtrip) |>
+          mutate(
+            roundtrip = if (!"roundtrip" %in% names(osm_route_name)) NA else roundtrip,
+            route_dist = st_length(geom_col) |> units::drop_units()
+          ) |>
           rowwise() |>
           mutate(
             # Geographical data
-            route_dist = st_length(geom_col) |> units::drop_units(),
             # Other relevant parameters
             nr_stops = { # Consider the number of stops to be the maximum of stops or platforms, because some routes use them mixed and miss some
               nr_s <- nrow(relations_df |> filter(relation_osm_id == osm_id & grepl("stop", role)))
@@ -343,10 +345,10 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     # > Same for GTFS shapes
     geom_col <- st_geometry(gtfs_route_name)
     gtfs_route_name <- gtfs_route_name |>
+      mutate(route_dist = st_length(geom_col) |> units::drop_units()) |>
       rowwise() |>
       mutate(
         # Geographical data
-        route_dist = st_length(geom_col) |> units::drop_units(),
         trip_id_copy = trip_id,
         first_stop_id = gtfs$stop_times |> filter(trip_id == trip_id_copy) |> arrange(stop_sequence) |> slice(1) |> pull(stop_id),
         last_stop_id = gtfs$stop_times |> filter(trip_id == trip_id_copy) |> arrange(desc(stop_sequence)) |> slice(1) |> pull(stop_id),
