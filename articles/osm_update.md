@@ -54,7 +54,12 @@ matches by the criteria that best suits your context.
 ``` python
 import pandas as pd
 
-df = pd.read_csv("osm_match.csv") # CSV with columns osm_id, shape_id and route_id (optional)
+area = "stcp"
+gtfs_date = "2026-04-16"
+run_date = "20260416"
+base_folder = "./"
+
+df = pd.read_csv(f"{base_folder}/{area}/shapes_match_stcp_gtfs{gtfs_date}_run{run_date}.csv") # CSV with columns osm_id, shape_id and route_id (optional)
 len(df)
 df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 len(df)
@@ -73,6 +78,9 @@ from dotenv import load_dotenv, find_dotenv
 import os
 import pandas as pd
 import logging
+
+# Patch requests default User-Agent to avoid being blocked by OSM (see https://github.com/Zverik/cli-oauth2/issues/7)
+requests.utils.default_user_agent = lambda: "GTFShift/0.8.3 (ushift@tecnico.ulisboa.pt)"
 ```
 
 If there is any dependency missing, just install it with
@@ -189,7 +197,7 @@ Make sure you have the right data before proceeding!
 ``` python
 # Create change set, updating relations with tag gtfs:shape_id
 # The changeset comment can be customized to better describe the change submitted 
-with api.Changeset({"comment": "GTFS shapes and routes association (using GTFShift v0.7.0)", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+with api.change_set({"comment": "GTFS shapes and routes association (using GTFShift v0.8.3)", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
   logger.info(f"Running changeset {changeset_id} for {len(df)} relations")
   logger.info(f"{'route_id':20s}{'shape_id':20s} | {'osm_id':20s} | {'osm_route_id':20s}{'updated?':10s}{'osm_shape_id':20s}{'updated?':10s} | {'operation status':20s}")
   for idx, row in df.iterrows():
@@ -197,7 +205,7 @@ with api.Changeset({"comment": "GTFS shapes and routes association (using GTFShi
     shape_id = str(row["shape_id"])
     osm_id = int(row["osm_id"])
     
-    relation = api.RelationGet(osm_id)
+    relation = api.relation_get(osm_id)
     relation_shape = str(relation["tag"]["gtfs:shape_id"]) if "gtfs:shape_id" in relation["tag"] else "-"
     relation_route = str(relation["tag"]["gtfs:route_id"]) if "gtfs:route_id" in relation["tag"] else "-"
     
@@ -206,7 +214,7 @@ with api.Changeset({"comment": "GTFS shapes and routes association (using GTFShi
       relation["tag"]["gtfs:shape_id"] = str(shape_id) # https://wiki.openstreetmap.org/wiki/Key:gtfs:shape_id
       if route_id:
         relation["tag"]["gtfs:route_id"] = str(route_id) # https://wiki.openstreetmap.org/wiki/Key:gtfs:route_id
-      update = api.RelationUpdate(relation)
+      update = api.relation_update(relation)
       status = "Updated"
     else:
       status = "Skipped"
@@ -219,14 +227,14 @@ with api.Changeset({"comment": "GTFS shapes and routes association (using GTFShi
 If you need to rollback the changes, use the code below.
 
 ``` python
-with api.Changeset({"comment": "GTFS shapes association rollback", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+with api.change_set({"comment": "GTFS shapes association rollback", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
   for idx, row in df.iterrows():
     osm_id = int(row["osm_id"])
-    relation = api.RelationGet(osm_id)
-    relation_prev = api.RelationGet(osm_id, RelationVersion=relation["version"]-1)
+    relation = api.relation_get(osm_id)
+    relation_prev = api.relation_get(osm_id, RelationVersion=relation["version"]-1)
     logger.info(f"{osm_id} {relation['tag']['gtfs:shape_id'] if 'gtfs:shape_id' in relation['tag'] else '-'} Current {relation['version']} Previous {relation_prev['version']}")
     relation_prev["version"] = relation["version"] # We need to set version to last to enable update
-    update = api.RelationUpdate(relation_prev)
+    update = api.relation_update(relation_prev)
 ```
 
 ### Validate changes
@@ -239,7 +247,7 @@ for idx, row in df.iterrows():
     route_id = str(row["route_id"]) if "route_id" in row else None
     osm_id = int(row["osm_id"])
   
-    relation = api.RelationGet(osm_id)
+    relation = api.relation_get(osm_id)
     
     relation_shape = str(relation["tag"]["gtfs:shape_id"]) if "gtfs:shape_id" in relation["tag"] else "-"
     relation_route = str(relation["tag"]["gtfs:route_id"]) if "gtfs:route_id" in relation["tag"] else "-"

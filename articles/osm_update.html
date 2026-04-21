@@ -134,10 +134,15 @@ stored in a CSV file.</p>
 matches by the criteria that best suits your context.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"osm_match.csv"</span>) <span class="co"># CSV with columns osm_id, shape_id and route_id (optional)</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="bu">len</span>(df)</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>df <span class="op">=</span> df[(df[<span class="st">'distance_diff'</span>] <span class="op">&lt;</span> <span class="dv">1000</span>) <span class="op">&amp;</span> (df[<span class="st">'points_diff'</span>] <span class="op">&lt;</span> <span class="dv">500</span>)] <span class="co"># Filter to only update those that meet threshold</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="bu">len</span>(df)</span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>area <span class="op">=</span> <span class="st">"stcp"</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>gtfs_date <span class="op">=</span> <span class="st">"2026-04-16"</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>run_date <span class="op">=</span> <span class="st">"20260416"</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>base_folder <span class="op">=</span> <span class="st">"./"</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="ss">f"</span><span class="sc">{</span>base_folder<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>area<span class="sc">}</span><span class="ss">/shapes_match_stcp_gtfs</span><span class="sc">{</span>gtfs_date<span class="sc">}</span><span class="ss">_run</span><span class="sc">{</span>run_date<span class="sc">}</span><span class="ss">.csv"</span>) <span class="co"># CSV with columns osm_id, shape_id and route_id (optional)</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="bu">len</span>(df)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>df <span class="op">=</span> df[(df[<span class="st">'distance_diff'</span>] <span class="op">&lt;</span> <span class="dv">1000</span>) <span class="op">&amp;</span> (df[<span class="st">'points_diff'</span>] <span class="op">&lt;</span> <span class="dv">500</span>)] <span class="co"># Filter to only update those that meet threshold</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="bu">len</span>(df)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="local-environment-set-up">Local environment set up<a class="anchor" aria-label="anchor" href="#local-environment-set-up"></a>
@@ -150,7 +155,10 @@ matches by the criteria that best suits your context.</p>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv, find_dotenv</span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="im">import</span> logging</span></code></pre></div>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="im">import</span> logging</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Patch requests default User-Agent to avoid being blocked by OSM (see https://github.com/Zverik/cli-oauth2/issues/7)</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>requests.utils.default_user_agent <span class="op">=</span> <span class="kw">lambda</span>: <span class="st">"GTFShift/0.8.3 (ushift@tecnico.ulisboa.pt)"</span></span></code></pre></div>
 <p>If there is any dependency missing, just install it with
 <code><a href="https://rstudio.github.io/reticulate/reference/py_install.html" class="external-link">reticulate::py_install()</a></code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -232,7 +240,7 @@ code. Copy it and set <code>auth_code</code> to its value.</p>
 data! Make sure you have the right data before proceeding!</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Create change set, updating relations with tag gtfs:shape_id</span></span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co"># The changeset comment can be customized to better describe the change submitted </span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="cf">with</span> api.Changeset({<span class="st">"comment"</span>: <span class="st">"GTFS shapes and routes association (using GTFShift v0.7.0)"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="cf">with</span> api.change_set({<span class="st">"comment"</span>: <span class="st">"GTFS shapes and routes association (using GTFShift v0.8.3)"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  logger.info(<span class="ss">f"Running changeset </span><span class="sc">{</span>changeset_id<span class="sc">}</span><span class="ss"> for </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> relations"</span>)</span>
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  logger.info(<span class="ss">f"</span><span class="sc">{</span><span class="st">'route_id'</span><span class="sc">:20s}{</span><span class="st">'shape_id'</span><span class="sc">:20s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'osm_id'</span><span class="sc">:20s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'osm_route_id'</span><span class="sc">:20s}{</span><span class="st">'updated?'</span><span class="sc">:10s}{</span><span class="st">'osm_shape_id'</span><span class="sc">:20s}{</span><span class="st">'updated?'</span><span class="sc">:10s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'operation status'</span><span class="sc">:20s}</span><span class="ss">"</span>)</span>
 <span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="cf">for</span> idx, row <span class="kw">in</span> df.iterrows():</span>
@@ -240,7 +248,7 @@ data! Make sure you have the right data before proceeding!</p>
 <span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>    shape_id <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">"shape_id"</span>])</span>
 <span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>    osm_id <span class="op">=</span> <span class="bu">int</span>(row[<span class="st">"osm_id"</span>])</span>
 <span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>    </span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>    relation <span class="op">=</span> api.RelationGet(osm_id)</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>    relation <span class="op">=</span> api.relation_get(osm_id)</span>
 <span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>    relation_shape <span class="op">=</span> <span class="bu">str</span>(relation[<span class="st">"tag"</span>][<span class="st">"gtfs:shape_id"</span>]) <span class="cf">if</span> <span class="st">"gtfs:shape_id"</span> <span class="kw">in</span> relation[<span class="st">"tag"</span>] <span class="cf">else</span> <span class="st">"-"</span></span>
 <span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>    relation_route <span class="op">=</span> <span class="bu">str</span>(relation[<span class="st">"tag"</span>][<span class="st">"gtfs:route_id"</span>]) <span class="cf">if</span> <span class="st">"gtfs:route_id"</span> <span class="kw">in</span> relation[<span class="st">"tag"</span>] <span class="cf">else</span> <span class="st">"-"</span></span>
 <span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>    </span>
@@ -249,7 +257,7 @@ data! Make sure you have the right data before proceeding!</p>
 <span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>      relation[<span class="st">"tag"</span>][<span class="st">"gtfs:shape_id"</span>] <span class="op">=</span> <span class="bu">str</span>(shape_id) <span class="co"># https://wiki.openstreetmap.org/wiki/Key:gtfs:shape_id</span></span>
 <span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>      <span class="cf">if</span> route_id:</span>
 <span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>        relation[<span class="st">"tag"</span>][<span class="st">"gtfs:route_id"</span>] <span class="op">=</span> <span class="bu">str</span>(route_id) <span class="co"># https://wiki.openstreetmap.org/wiki/Key:gtfs:route_id</span></span>
-<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>      update <span class="op">=</span> api.RelationUpdate(relation)</span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>      update <span class="op">=</span> api.relation_update(relation)</span>
 <span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>      status <span class="op">=</span> <span class="st">"Updated"</span></span>
 <span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>    <span class="cf">else</span>:</span>
 <span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a>      status <span class="op">=</span> <span class="st">"Skipped"</span></span>
@@ -259,14 +267,14 @@ data! Make sure you have the right data before proceeding!</p>
 <h3 id="rollback-avoid-this-please">Rollback (avoid this, please :/)<a class="anchor" aria-label="anchor" href="#rollback-avoid-this-please"></a>
 </h3>
 <p>If you need to rollback the changes, use the code below.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="cf">with</span> api.Changeset({<span class="st">"comment"</span>: <span class="st">"GTFS shapes association rollback"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="cf">with</span> api.change_set({<span class="st">"comment"</span>: <span class="st">"GTFS shapes association rollback"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="cf">for</span> idx, row <span class="kw">in</span> df.iterrows():</span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>    osm_id <span class="op">=</span> <span class="bu">int</span>(row[<span class="st">"osm_id"</span>])</span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>    relation <span class="op">=</span> api.RelationGet(osm_id)</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>    relation_prev <span class="op">=</span> api.RelationGet(osm_id, RelationVersion<span class="op">=</span>relation[<span class="st">"version"</span>]<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>    relation <span class="op">=</span> api.relation_get(osm_id)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>    relation_prev <span class="op">=</span> api.relation_get(osm_id, RelationVersion<span class="op">=</span>relation[<span class="st">"version"</span>]<span class="op">-</span><span class="dv">1</span>)</span>
 <span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>    logger.info(<span class="ss">f"</span><span class="sc">{</span>osm_id<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>relation[<span class="st">'tag'</span>][<span class="st">'gtfs:shape_id'</span>] <span class="cf">if</span> <span class="st">'gtfs:shape_id'</span> <span class="kw">in</span> relation[<span class="st">'tag'</span>] <span class="cf">else</span> <span class="st">'-'</span><span class="sc">}</span><span class="ss"> Current </span><span class="sc">{</span>relation[<span class="st">'version'</span>]<span class="sc">}</span><span class="ss"> Previous </span><span class="sc">{</span>relation_prev[<span class="st">'version'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>    relation_prev[<span class="st">"version"</span>] <span class="op">=</span> relation[<span class="st">"version"</span>] <span class="co"># We need to set version to last to enable update</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>    update <span class="op">=</span> api.RelationUpdate(relation_prev)</span></code></pre></div>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>    update <span class="op">=</span> api.relation_update(relation_prev)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="validate-changes">Validate changes<a class="anchor" aria-label="anchor" href="#validate-changes"></a>
@@ -278,7 +286,7 @@ data! Make sure you have the right data before proceeding!</p>
 <span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>    route_id <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">"route_id"</span>]) <span class="cf">if</span> <span class="st">"route_id"</span> <span class="kw">in</span> row <span class="cf">else</span> <span class="va">None</span></span>
 <span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>    osm_id <span class="op">=</span> <span class="bu">int</span>(row[<span class="st">"osm_id"</span>])</span>
 <span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>  </span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>    relation <span class="op">=</span> api.RelationGet(osm_id)</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>    relation <span class="op">=</span> api.relation_get(osm_id)</span>
 <span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>    </span>
 <span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>    relation_shape <span class="op">=</span> <span class="bu">str</span>(relation[<span class="st">"tag"</span>][<span class="st">"gtfs:shape_id"</span>]) <span class="cf">if</span> <span class="st">"gtfs:shape_id"</span> <span class="kw">in</span> relation[<span class="st">"tag"</span>] <span class="cf">else</span> <span class="st">"-"</span></span>
 <span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>    relation_route <span class="op">=</span> <span class="bu">str</span>(relation[<span class="st">"tag"</span>][<span class="st">"gtfs:route_id"</span>]) <span class="cf">if</span> <span class="st">"gtfs:route_id"</span> <span class="kw">in</span> relation[<span class="st">"tag"</span>] <span class="cf">else</span> <span class="st">"-"</span></span>
