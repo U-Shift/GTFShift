@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   cache = TRUE,
   eval = FALSE, # Don't run code, just display!
   comment = "#>",
-  engine.path = list(python = "~/.virtualenvs/r-reticulate/bin/python3.12")
+  engine.path = list(python = '~/.virtualenvs/r-reticulate/bin/python3.12')
 )
 ```
 
@@ -25,9 +25,20 @@ The association between OSM route relations id and the GTFS shapes_id returned b
 
 Python library [OsmApi](https://osmapi.metaodi.ch/osmapi/OsmApi.html) enables to perform this batch process using OpenStreetMaps API. This article, adapted from an [osmapi example script](https://github.com/metaodi/osmapi/blob/16aeb189c9ff8db607cc118842133b8cd7b60971/examples/oauth2.py), aims to document this procedure.
 
-It can be run either at the development or live version of OSM, requiring credentials to be run on either of them.
+It can be run either at the development or live version of OSM, requiring API credentials to be run on either of them, that should be stored as environment variables.
 
-This script considers credentials to be stored at environment variables (`OSM_USER` and `OSM_PASSWORD`), to avoid hardcoding them in the script. When running it, either replace them manually by your credentials or, better, set them as environment variables, using `usethis::edit_r_environ()` on R, or by exporting them in the terminal.
+> To get credentials for the development version, go to https://master.apis.dev.openstreetmap.org/oauth2/applications.
+> They should be stored as `OSM_OAUTH_CLIENT_ID_DEV` and `OSM_OAUTH_CLIENT_SECRET_DEV`.
+
+> To get credentials for the live version, go to https://www.openstreetmap.org/oauth2/applications.
+> They should be stored as `OSM_OAUTH_CLIENT_ID_PROD` and `OSM_OAUTH_CLIENT_SECRET_PROD`.
+
+> API registration parameters:
+> Redirect uri: `urn:ietf:wg:oauth:2.0:oob`
+> Permissions: `write_api`, `write_notes`, `read_prefs`
+
+The environment variables can be edited using `usethis::edit_r_environ()`, on R.
+
 
 # Match GTFS shapes with OSM routes 
 
@@ -35,8 +46,8 @@ This example assumes that the steps described at [Matching shapes geometry](./os
 
 ```{r}
 write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
-  distance_diff = round(distance_diff),
-  points_diff = round(points_diff)
+  distance_diff=round(distance_diff),
+  points_diff=round(points_diff)
 ), "osm_match.csv", row.names = FALSE)
 ```
 
@@ -44,12 +55,7 @@ Then, it should be loaded into the Python environment, filtering the matches by 
 ```{python}
 import pandas as pd
 
-area = "stcp"
-gtfs_date = "2026-04-16"
-run_date = "20260416"
-base_folder = "../../GTFShift-web/scripts/osm_match" # "./" # "../../GTFShift-web/scripts/osm_match"
-
-df = pd.read_csv(f"{base_folder}/{area}/shapes_match_stcp_gtfs{gtfs_date}_run{run_date}.csv") # CSV with columns osm_id, shape_id and route_id (optional)
+df = pd.read_csv("osm_match.csv") # CSV with columns osm_id, shape_id and route_id (optional)
 len(df)
 df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 len(df)
@@ -73,7 +79,7 @@ import logging
 If there is any dependency missing, just install it with `reticulate::py_install()`.
 ```{r}
 # library(reticulate)
-# py_install("dotenv")
+# py_install("geopy")
 ```
 
 Load environment variables
@@ -83,12 +89,10 @@ load_dotenv(find_dotenv())
 
 Set up logging
 ```{python}
-# If previous logger definition exists, remove it to avoid duplicated logs
-if 'logger' in globals():
-    logger.handlers.clear()
 logger = logging.getLogger('my_logger')
 logger.setLevel(logging.DEBUG)  # Set the base logging level
-log_file_path = f'{base_folder}/{area}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.osm.log'
+# Use a generic log file path; replace {city} and {date} as needed
+log_file_path = '../releases/{version}/shapes_match_{city}_gtfs{date}_run{date}.osm.log'
 file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
@@ -104,12 +108,67 @@ logger.addHandler(console_handler)
 
 # Connect to OSM
 
-Open the API connection
+Either connect to the live OSM version...
 ```{python}
-api_url = "https://api.openstreetmap.org" # Live OSM
-# api_url = "https://api06.dev.openstreetmap.org" # Use this for testing on the development OSM instance, but make sure to change credentials accordingly
+client_id = os.getenv("OSM_OAUTH_CLIENT_ID_PROD") # To edit env vars on RStudio, use usethis::edit_r_environ()
+client_secret = os.getenv("OSM_OAUTH_CLIENT_SECRET_PROD")
+authorization_base_url = "https://www.openstreetmap.org/oauth2/authorize"
+token_url = "https://www.openstreetmap.org/oauth2/token"
+api_url = "https://api.openstreetmap.org"
+```
 
-api = osmapi.OsmApi(api=api_url, username=os.getenv("OSM_USER"), password=os.getenv("OSM_PASSWORD"))
+... or the dev one. It is recommended to try to apply the changes first at the dev version, to avoid corrupting the live OSM data.
+```{python}
+client_id = os.getenv("OSM_OAUTH_CLIENT_ID_DEV") # To edit env vars on RStudio, use usethis::edit_r_environ()
+client_secret = os.getenv("OSM_OAUTH_CLIENT_SECRET_DEV")
+authorization_base_url = "https://master.apis.dev.openstreetmap.org/oauth2/authorize"
+token_url = "https://master.apis.dev.openstreetmap.org/oauth2/token"
+api_url = "https://api06.dev.openstreetmap.org"
+```
+
+If no window is opened, authenticate by clicking on the url that is printed in the console.
+```{python}
+redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
+oauth2client = OAuth2Client(
+    token_endpoint=token_url,
+    authorization_endpoint=authorization_base_url,
+    redirect_uri=redirect_uri,
+    client_id=client_id,
+    client_secret=client_secret,
+    auth_method="client_secret_post",
+    code_challenge_method=None
+)
+
+# Open OSM website to authorize user using the write_api and write_notes scope
+scope = ["write_api", "write_notes", "read_prefs"]
+az_request = oauth2client.authorization_request(scope=scope)
+print(f"Authorize user using this URL: {az_request.uri}")
+webbrowser.open(az_request.uri) # If on studio web, this might not work. If so, just open the link printed in the command before and jump to next line.
+```
+
+After authenticating, you will be presented with an authorization code. Copy it and set `auth_code` to its value.
+```{python}
+auth_code = "" # Replace with your authorization code
+auth_code
+auth = OAuth2AuthorizationCodeAuth(
+    oauth2client,
+    auth_code,
+    redirect_uri=redirect_uri,
+)
+oauth_session = requests.Session()
+oauth_session.auth = auth
+```
+
+Test authentication (should return 200 status code)
+```{python}
+resp = oauth_session.get(f"{api_url}/api/0.6/user/details")
+print(resp.status_code) # 200 is expected
+# print(resp.text) # This can help debugging if something goes wrong
+```
+
+Finally, open the API connection
+```{python}
+api = osmapi.OsmApi(api=api_url, session=oauth_session)
 ```
 
 
