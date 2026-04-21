@@ -6,6 +6,7 @@
 #' @param transfer_distance Integer (Default 300). Upper straight-line distance limit in meters for transfers.
 #' @param transfer_time Integer (Default 120). Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
 #' @param transfer_street_routing Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
+#' @param headers Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS zip file URL.
 #'
 #' @details
 #' In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
@@ -32,7 +33,15 @@
 #' @import tidytransit
 #'
 #' @export
-load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
+load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE, headers=NULL) {
+
+  # If path is a URL and headers are provided, download first
+  if (grepl("^http", path) && !is.null(headers)) {
+    temp_zip <- tempfile(fileext = ".zip")
+    res <- httr::GET(path, httr::add_headers(.headers = headers), httr::write_disk(temp_zip, overwrite = TRUE))
+    httr::stop_for_status(res)
+    path <- temp_zip
+  }
 
   # LOAD GTFS
   gtfs <- tidytransit::read_gtfs(path)
