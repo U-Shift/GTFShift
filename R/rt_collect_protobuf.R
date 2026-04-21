@@ -6,6 +6,7 @@
 #' @param fields_collect Character vector. Fields to extract from each entity in the feed.
 #' @param scrape_interval Integer (Default 60). Interval in seconds between each download. Negative to run only once.
 #' @param log_file String (Optional). Path to a log file to save download logs.
+#' @param headers Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.
 #'
 #' @details
 #' Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
@@ -26,7 +27,7 @@
 rt_collect_protobuf <- function(
     gtfs_rt_url, destination_file,
     fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
-    scrape_interval = 60, log_file = NA
+    scrape_interval = 60, log_file = NA, headers = NULL
 ) {
   # Log script start
   m = sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
@@ -41,7 +42,14 @@ rt_collect_protobuf <- function(
 
     # Load protobuf
     RProtoBuf::readProtoFiles((system.file("extdata", "gtfs-realtime.proto", package = "GTFShift")))
-    f <- file(gtfs_rt_url, "rb")
+    if (grepl("^http", gtfs_rt_url) && !is.null(headers)) {
+      temp_pb <- tempfile(fileext = ".pb")
+      res <- httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers), httr::write_disk(temp_pb, overwrite = TRUE))
+      httr::stop_for_status(res)
+      f <- file(temp_pb, "rb")
+    } else {
+      f <- file(gtfs_rt_url, "rb")
+    }
     feed <- RProtoBuf::read(`transit_realtime.FeedMessage`, f)
     close(f)
 
