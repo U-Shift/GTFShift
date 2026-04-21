@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   cache = TRUE,
   eval = FALSE, # Don't run code, just display!
   comment = "#>",
-  engine.path = list(python = "~/.virtualenvs/r-reticulate/bin/python3.12")
+  engine.path = list(python = '~/.virtualenvs/r-reticulate/bin/python3.12')
 )
 ```
 
@@ -46,8 +46,8 @@ This example assumes that the steps described at [Matching shapes geometry](./os
 
 ```{r}
 write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
-  distance_diff = round(distance_diff),
-  points_diff = round(points_diff)
+  distance_diff=round(distance_diff),
+  points_diff=round(points_diff)
 ), "osm_match.csv", row.names = FALSE)
 ```
 
@@ -97,12 +97,10 @@ load_dotenv(find_dotenv())
 
 Set up logging
 ```{python}
-# If previous logger definition exists, remove it to avoid duplicated logs
-if 'logger' in globals():
-    logger.handlers.clear()
 logger = logging.getLogger('my_logger')
 logger.setLevel(logging.DEBUG)  # Set the base logging level
-log_file_path = f'{base_folder}/{area}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.osm.log'
+# Use a generic log file path; replace {city} and {date} as needed
+log_file_path = '../releases/{version}/shapes_match_{city}_gtfs{date}_run{date}.osm.log'
 file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
@@ -249,6 +247,5 @@ for idx, row in df.iterrows():
     logger.info(f"{route_id:20s}{shape_id:20s} | {osm_id:20d} | {relation_route:20s}{('✅' if relation_route==route_id else '❌'):10s}{relation_shape:20s}{('✅' if relation_shape==shape_id else '❌'):10s}")
 logger.info("Validation finished!")
 ```
-
 
 
