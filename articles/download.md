@@ -74,12 +74,14 @@ feeds |>
 #> 1                            Carris active
 #> 2       Cascais Próxima, E.M., S.A. active
 #> 3                          Fertagus active
-#> 4 Transportes Coletivos do Barreiro active
+#> 4           Metro de Lisboa (Metro) active
+#> 5 Transportes Coletivos do Barreiro active
 #>                                                                       producer_url
 #> 1                            https://gateway.carris.pt/gateway/gtfs/api/v2.11/GTFS
 #> 2 https://drive.google.com/uc?export=download&id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX
 #> 3                             https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip
-#> 4                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
+#> 4                      https://www.metrolisboa.pt/google_transit/googleTransit.zip
+#> 5                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
 
 gtfs = GTFShift::load_feed(feeds$producer_url[2], create_transfers=FALSE)
 summary(gtfs)
@@ -88,11 +90,11 @@ summary(gtfs)
 #> agency       Carris
 #> service      from 2026-01-01 to 2026-06-05
 #> uses         stop_times (no frequencies)
-#> # routes       173
-#> # trips      77519
-#> # stop_ids    2320
-#> # stop_names  1136
-#> # shapes       305
+#> # routes       176
+#> # trips      79044
+#> # stop_ids    2330
+#> # stop_names  1140
+#> # shapes       311
 ```
 
 ### Using GTFShift incorporated database for Portugal
@@ -155,9 +157,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      195
-#> # trips      2489
+#> # routes      187
+#> # trips      1906
 #> # stop_ids    454
 #> # stop_names  454
-#> # shapes      270
+#> # shapes      263
 ```

@@ -35,6 +35,11 @@ osm_shapes_to_routes(
   using
   [`tidyselect::contains()`](https://tidyselect.r-lib.org/reference/starts_with.html).
 
+- sleep_duration:
+
+  Numeric (Default 30). Time to sleep, in seconds, before fetching OSM
+  data to avoid overloading the server.
+
 ## Value
 
 A `sf` `data.frame` with the following columns:
@@ -65,10 +70,10 @@ considering the OSM `gtfs:shape_id` attribute.
 if (FALSE) { # \dontrun{
 gtfs <- GTFShift::load_feed("gtfs.zip")
 
-q = opq("Lisbon")  |>
+q <- opq("Lisbon") |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
-shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs, q)
+shapes_geometry_osm <- GTFShift::osm_shapes_to_routes(gtfs, q)
 } # }
 ```

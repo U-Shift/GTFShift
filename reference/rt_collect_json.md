@@ -14,7 +14,8 @@ rt_collect_json(
     "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp",
     "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
   scrape_interval = 60,
-  log_file = NA
+  log_file = NA,
+  headers = NULL
 )
 ```
 
@@ -51,6 +52,11 @@ rt_collect_json(
 - log_file:
 
   String (Optional). Path to a log file to save download logs.
+
+- headers:
+
+  Named list or character vector (Optional). Custom HTTP headers for
+  credentials when accessing the GTFS-RT feed URL.
 
 ## Details
 

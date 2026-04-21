@@ -84,6 +84,10 @@
 <dt id="arg-ways-tags">ways_tags<a class="anchor" aria-label="anchor" href="#arg-ways-tags"></a></dt>
 <dd><p>character vector (Default <code>c("lanes", "psv", "bus", "way", "parking", "name")</code>). List of OSM way tags to extract when <code>ways</code> parameter is set to true. Match is done using <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">tidyselect::contains()</a></code>.</p></dd>
 
+
+<dt id="arg-sleep-duration">sleep_duration<a class="anchor" aria-label="anchor" href="#arg-sleep-duration"></a></dt>
+<dd><p>Numeric (Default 30). Time to sleep, in seconds, before fetching OSM data to avoid overloading the server.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -106,11 +110,11 @@ OSM <code>gtfs:shape_id</code> attribute.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="load_feed.html">load_feed</a></span><span class="op">(</span><span class="st">"gtfs.zip"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">q</span> <span class="op">=</span> <span class="fu">opq</span><span class="op">(</span><span class="st">"Lisbon"</span><span class="op">)</span>  <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span><span class="va">q</span> <span class="op">&lt;-</span> <span class="fu">opq</span><span class="op">(</span><span class="st">"Lisbon"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">add_osm_feature</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"route"</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bus"</span>, <span class="st">"tram"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">add_osm_feature</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"network"</span>, value <span class="op">=</span> <span class="st">"Carris"</span>, key_exact <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">shapes_geometry_osm</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">osm_shapes_to_routes</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">q</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">shapes_geometry_osm</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">osm_shapes_to_routes</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">q</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

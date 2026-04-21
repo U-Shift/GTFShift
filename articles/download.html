@@ -158,12 +158,14 @@ free at Mobility Database <a href="https://mobilitydatabase.org/account" class="
 <span><span class="co">#&gt; 1                            Carris active</span></span>
 <span><span class="co">#&gt; 2       Cascais Próxima, E.M., S.A. active</span></span>
 <span><span class="co">#&gt; 3                          Fertagus active</span></span>
-<span><span class="co">#&gt; 4 Transportes Coletivos do Barreiro active</span></span>
+<span><span class="co">#&gt; 4           Metro de Lisboa (Metro) active</span></span>
+<span><span class="co">#&gt; 5 Transportes Coletivos do Barreiro active</span></span>
 <span><span class="co">#&gt;                                                                       producer_url</span></span>
 <span><span class="co">#&gt; 1                            https://gateway.carris.pt/gateway/gtfs/api/v2.11/GTFS</span></span>
 <span><span class="co">#&gt; 2 https://drive.google.com/uc?export=download&amp;id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX</span></span>
 <span><span class="co">#&gt; 3                             https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip</span></span>
-<span><span class="co">#&gt; 4                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip</span></span>
+<span><span class="co">#&gt; 4                      https://www.metrolisboa.pt/google_transit/googleTransit.zip</span></span>
+<span><span class="co">#&gt; 5                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip</span></span>
 <span></span>
 <span><span class="va">gtfs</span> <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="../reference/load_feed.html">load_feed</a></span><span class="op">(</span><span class="va">feeds</span><span class="op">$</span><span class="va">producer_url</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, create_transfers<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
@@ -172,11 +174,11 @@ free at Mobility Database <a href="https://mobilitydatabase.org/account" class="
 <span><span class="co">#&gt; agency       Carris</span></span>
 <span><span class="co">#&gt; service      from 2026-01-01 to 2026-06-05</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
-<span><span class="co">#&gt; # routes       173</span></span>
-<span><span class="co">#&gt; # trips      77519</span></span>
-<span><span class="co">#&gt; # stop_ids    2320</span></span>
-<span><span class="co">#&gt; # stop_names  1136</span></span>
-<span><span class="co">#&gt; # shapes       305</span></span></code></pre></div>
+<span><span class="co">#&gt; # routes       176</span></span>
+<span><span class="co">#&gt; # trips      79044</span></span>
+<span><span class="co">#&gt; # stop_ids    2330</span></span>
+<span><span class="co">#&gt; # stop_names  1140</span></span>
+<span><span class="co">#&gt; # shapes       311</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="using-gtfshift-incorporated-database-for-portugal">Using GTFShift incorporated database for Portugal<a class="anchor" aria-label="anchor" href="#using-gtfshift-incorporated-database-for-portugal"></a>
@@ -247,11 +249,11 @@ operator GTFS.</li>
 <span><span class="co">#&gt; agency       CP - Comboios de Portugal</span></span>
 <span><span class="co">#&gt; service      from 2025-12-14 to 2026-12-12</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
-<span><span class="co">#&gt; # routes      195</span></span>
-<span><span class="co">#&gt; # trips      2489</span></span>
+<span><span class="co">#&gt; # routes      187</span></span>
+<span><span class="co">#&gt; # trips      1906</span></span>
 <span><span class="co">#&gt; # stop_ids    454</span></span>
 <span><span class="co">#&gt; # stop_names  454</span></span>
-<span><span class="co">#&gt; # shapes      270</span></span></code></pre></div>
+<span><span class="co">#&gt; # shapes      263</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

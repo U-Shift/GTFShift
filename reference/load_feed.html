@@ -63,7 +63,8 @@
 <span>  create_transfers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  transfer_distance <span class="op">=</span> <span class="fl">300</span>,</span>
 <span>  transfer_time <span class="op">=</span> <span class="fl">120</span>,</span>
-<span>  transfer_street_routing <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  transfer_street_routing <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  headers <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -93,6 +94,10 @@
 
 <dt id="arg-transfer-street-routing">transfer_street_routing<a class="anchor" aria-label="anchor" href="#arg-transfer-street-routing"></a></dt>
 <dd><p>Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).</p></dd>
+
+
+<dt id="arg-headers">headers<a class="anchor" aria-label="anchor" href="#arg-headers"></a></dt>
+<dd><p>Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS zip file URL.</p></dd>
 
 </dl></div>
     <div class="section level2">

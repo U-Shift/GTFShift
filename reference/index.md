@@ -13,6 +13,8 @@
   : Prioritize road network lanes for bus lane implementation
 - [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
   : Extend prioritization with GTFS-RT metrics
+- [`get_prioritization_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritization_stats.md)
+  : Get prioritization stats
 
 ## Filter
 
@@ -27,6 +29,8 @@
 
 - [`get_network_extension()`](https://u-shift.github.io/GTFShift/reference/get_network_extension.md)
   : Get network routes extension
+- [`get_prioritization_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritization_stats.md)
+  : Get prioritization stats
 - [`get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
   : Get aggregated frequency per hour for each bus route
 - [`get_stop_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.md)

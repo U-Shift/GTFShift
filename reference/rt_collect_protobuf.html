@@ -64,7 +64,8 @@
 <span>    <span class="st">"vehicle.position.longitude"</span>, <span class="st">"vehicle.position.speed"</span>, <span class="st">"vehicle.timestamp"</span>,</span>
 <span>    <span class="st">"vehicle.current_status"</span>, <span class="st">"vehicle.current_stop_sequence"</span>, <span class="st">"vehicle.stop_id"</span><span class="op">)</span>,</span>
 <span>  scrape_interval <span class="op">=</span> <span class="fl">60</span>,</span>
-<span>  log_file <span class="op">=</span> <span class="cn">NA</span></span>
+<span>  log_file <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  headers <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -90,6 +91,10 @@
 
 <dt id="arg-log-file">log_file<a class="anchor" aria-label="anchor" href="#arg-log-file"></a></dt>
 <dd><p>String (Optional). Path to a log file to save download logs.</p></dd>
+
+
+<dt id="arg-headers">headers<a class="anchor" aria-label="anchor" href="#arg-headers"></a></dt>
+<dd><p>Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.</p></dd>
 
 </dl></div>
     <div class="section level2">

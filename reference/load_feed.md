@@ -11,7 +11,8 @@ load_feed(
   create_transfers = TRUE,
   transfer_distance = 300,
   transfer_time = 120,
-  transfer_street_routing = FALSE
+  transfer_street_routing = FALSE,
+  headers = NULL
 )
 ```
 
@@ -48,6 +49,11 @@ load_feed(
   Boolean (Default FALSE). If TRUE, transfer times are calculated by
   routing throughout the underlying street network (downloaded
   automatically).
+
+- headers:
+
+  Named list or character vector (Optional). Custom HTTP headers for
+  credentials when accessing the GTFS zip file URL.
 
 ## Value
 
