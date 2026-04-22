@@ -55,12 +55,12 @@ Then, it should be loaded into the Python environment, filtering the matches by 
 ```{python}
 import pandas as pd
 
-area = "stcp"
-gtfs_date = "2026-04-16"
-run_date = "20260416"
-base_folder = "./"
+area = "lisboa"
+gtfs_date = "2026-04-20"
+run_date = "20260421"
+base_folder = "../../GTFShift-web/scripts/osm_match" 
 
-df = pd.read_csv(f"{base_folder}/{area}/shapes_match_stcp_gtfs{gtfs_date}_run{run_date}.csv") # CSV with columns osm_id, shape_id and route_id (optional)
+df = pd.read_csv(f"{base_folder}/{area}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.csv") # CSV with columns osm_id, shape_id and route_id (optional)
 len(df)
 df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 len(df)
@@ -99,8 +99,7 @@ Set up logging
 ```{python}
 logger = logging.getLogger('my_logger')
 logger.setLevel(logging.DEBUG)  # Set the base logging level
-# Use a generic log file path; replace {city} and {date} as needed
-log_file_path = '../releases/{version}/shapes_match_{city}_gtfs{date}_run{date}.osm.log'
+log_file_path = f"{base_folder}/{area}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.osm.log"
 file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
@@ -156,7 +155,7 @@ webbrowser.open(az_request.uri) # If on studio web, this might not work. If so, 
 
 After authenticating, you will be presented with an authorization code. Copy it and set `auth_code` to its value.
 ```{python}
-auth_code = "" # Replace with your authorization code
+auth_code = "n5wuAkZn5OrzIJAkmxSoyxzu1koW-zAAG6yx3FAx3wc" # Replace with your authorization code
 auth_code
 auth = OAuth2AuthorizationCodeAuth(
     oauth2client,
