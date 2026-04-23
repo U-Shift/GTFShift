@@ -20,13 +20,25 @@
 #' @import dplyr
 #'
 #' @export
-osm_bus_lanes <- function(bbox) {
-  road_osm <- opq(bbox) |> # uses osmdata package, to extract only with BB
-    add_osm_feature(key = "highway") |>
-    osmdata_sf() |>
-    osm_poly2line() # makes roundabouts into lines
+osm_bus_lanes <- function(bbox, osm_file = NULL) {
+  if (!is.null(osm_file)) {
+    highways_base <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
+    highways_cols <- osmextract::oe_get_keys(highways_base)
+    cols_to_check <- c(
+      grep("psv:lanes|bus:lanes", highways_cols, value = TRUE),
+      grep("lanes:psv|lanes:bus", highways_cols, value = TRUE),
+      "psv"
+    )
+    road_osm <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE, extra_tags = cols_to_check)
+    names(road_osm) <- gsub("_", ":", names(road_osm))
+  } else {
+    road_osm <- opq(bbox) |> # uses osmdata package, to extract only with BB
+      add_osm_feature(key = "highway") |>
+      osmdata_sf() |>
+      osm_poly2line() # makes roundabouts into lines
+    road_osm <- road_osm$osm_lines
+  }
 
-  road_osm <- road_osm$osm_lines
 
   osm_lanes <- filter_osm_bus_lanes(road_osm)
 
