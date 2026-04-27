@@ -77,11 +77,11 @@ library(sf)
 
 # Read the filtered PBF
 # This returns an sf object where the 'members' information is preserved
-raw_bus_data <- tags_filter(bus_relations_pbf, "r/route=bus")
+# raw_bus_data <- tags_filter(bus_relations_pbf, "r/route=bus")
 
 # Inspect the members
 # This column will contain a list of the types (node/way) and their IDs
-head(raw_bus_data$members)
+# head(raw_bus_data$members)
 
 xml <- show_content(bus_relations_pbf, object_type = c("relation"), output_format = "xml")
 xml
