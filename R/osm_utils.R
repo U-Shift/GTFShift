@@ -21,3 +21,111 @@ filter_osm_bus_lanes <- function(road_osm) {
 
   return(osm_lanes)
 }
+
+
+#' Get OSM relations tagged as bus networks
+#'
+#' @param osm_file character. Path to OSM file.
+#' @param pb progress bar object.
+#' @param pb_update_1 numeric. Value to add to progress bar when progress at 1/3.
+#' @param pb_update_2 numeric. Value to add to progress bar when progress at 2/3.
+#' @param pb_update_3 numeric. Value to add to progress bar when progress at 3/3.
+#'
+#' @return data frame. OSM relations data frame with columns: `osm_id`, `type`, `way_osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `ref`
+#'
+#' @noRd
+get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_update_3) {
+  bus_relations_pbf <- tempfile(fileext = ".osm.pbf")
+
+  job <- callr::r_bg(function(bus_relations_pbf, osm_file) { # update spinner while blocking method call
+    return(rosmium::tags_filter(
+      osm_file,
+      "nwr/route=bus",
+      output = bus_relations_pbf,
+      overwrite = TRUE
+    ))
+  }, args = list(bus_relations_pbf, osm_file))
+  while (job$is_alive()) {
+    pb$tick(0)
+    Sys.sleep(0.1)
+  }
+  job$get_result()
+  pb$update(pb_update_1)
+
+  bus_relations_xml <- rosmium::show_content(
+    bus_relations_pbf,
+    object_type = c("relation"),
+    output_format = "xml",
+    preview = FALSE,
+    spinner = FALSE
+  )
+
+  pb$update(pb_update_2)
+
+  # 1.2. Filter relations using q$features and extract way members
+  doc <- xml2::read_xml(bus_relations_xml)
+  relations <- xml2::xml_find_all(doc, ".//relation")
+
+  # > Extract filter criteria from q$features
+  features_str <- q$features
+  feature_regex <- '\\["([^"]+)"([=~])"([^"]+)"\\]'
+  feature_matches <- regmatches(features_str, gregexpr(feature_regex, features_str))[[1]]
+  parsed_features <- lapply(feature_matches, function(f) {
+    m <- regexec(feature_regex, f)
+    parts <- regmatches(f, m)[[1]]
+    list(key = parts[2], op = parts[3], val = parts[4])
+  })
+
+  pb$update(pb_update_3)
+  rel_n <- 0
+  relations_data <- lapply(relations, function(rel) {
+    rel_n <<- rel_n + 1
+    pb$update(min(round(0.3 + (0.6 * rel_n / length(relations)), digits = 2), 1))
+    tags <- xml2::xml_find_all(rel, ".//tag")
+    tag_keys <- xml2::xml_attr(tags, "k")
+    tag_vals <- xml2::xml_attr(tags, "v")
+    names(tag_vals) <- tag_keys
+
+    # Check if relation matches all features in q
+    matches_all <- all(sapply(parsed_features, function(feat) {
+      val <- tag_vals[feat$key]
+      if (is.na(val)) {
+        return(FALSE)
+      }
+      if (feat$op == "=") {
+        return(val == feat$val)
+      }
+      if (feat$op == "~") {
+        return(grepl(feat$val, val))
+      }
+      return(FALSE)
+    }))
+
+    if (!matches_all) {
+      return(NULL)
+    }
+
+    way_members <- xml2::xml_find_all(rel, ".//member[@type='way']")
+    if (length(way_members) == 0) {
+      return(NULL)
+    }
+
+    data.frame(
+      # <relation>
+      osm_id = xml2::xml_attr(rel, "id"),
+      type = "way",
+      # <member>
+      way_osm_id = xml2::xml_attr(way_members, "ref"),
+      role = xml2::xml_attr(way_members, "role"),
+      # <tag>
+      `gtfs:shape_id` = tag_vals["gtfs:shape_id"],
+      `gtfs:route_id` = tag_vals["gtfs:route_id"],
+      ref = tag_vals["ref"],
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+  })
+  relations_df <- dplyr::bind_rows(relations_data)
+
+  return(relations_df)
+}
