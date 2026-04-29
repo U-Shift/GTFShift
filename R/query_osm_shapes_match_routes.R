@@ -64,7 +64,7 @@
 #' @import stringi
 #'
 #' @export
-osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA) {
+osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA, osm_file = NULL) {
   total_steps <- 4
 
   if (!is.na(log_file)) {
@@ -104,50 +104,75 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   )
   pb$update(0)
 
-  osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
-  job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
-    osmdata::osmdata_xml(q, filename = osm_file, quiet = FALSE)
-  }, args = list(q, osm_file))
-  while (job$is_alive()) {
-    pb$tick(0)
-    Sys.sleep(0.1)
+  if (!is.null(osm_file)) {
+    # 2.1. Get relations
+    relations_df <- get_osm_relations_bus(osm_file, q, pb, 0.1, 0.2, 0.33)
+
+    # 2.2. Get geometries and filter by matched relations
+    bbox <- st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+    osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
+    osm_multilines_redux <- relations_df |>
+      select(osm_id, way_osm_id, ref, name, `gtfs:shape_id`, `gtfs:route_id`) |>
+      # Join with osm_ways to get geometries back
+      left_join(osm_ways |> select(osm_id), by = c("way_osm_id" = "osm_id")) |>
+      st_as_sf() |>
+      # Group by osm_id, gtfs:shape_id, generating multilinestring with geometries
+      dplyr::group_by(osm_id, ref, name, `gtfs:shape_id`, `gtfs:route_id`) |>
+      dplyr::summarise(do_union = FALSE, .groups = "drop") |>
+      sf::st_cast("MULTILINESTRING")
+
+    # 2.3 Get stop locations
+    osm_stoppositions <- osmextract::oe_read(osm_file, layer = "points", boundary = bbox, quiet = TRUE, extra_tags = c("public_transport")) |>
+      dplyr::filter(public_transport == "stop_position" | public_transport == "platform")
+
+
+    # TODO
+  } else {
+    osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
+    job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
+      osmdata::osmdata_xml(q, filename = osm_file, quiet = FALSE)
+    }, args = list(q, osm_file))
+    while (job$is_alive()) {
+      pb$tick(0)
+      Sys.sleep(0.1)
+    }
+    job$get_result() # This will throw any error that occurred in the subprocess (e.g., timeout)
+    pb$update(0.33)
+
+    # 3. Convert to SF and Extract routes/points
+    job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
+      return(osmdata::osmdata_sf(q, osm_file))
+    }, args = list(q, osm_file))
+    while (job$is_alive()) {
+      pb$tick(0)
+      Sys.sleep(0.1)
+    }
+    osm <- job$get_result()
+
+    osm_multilines <- osm$osm_multilines
+    osm_multilines_redux <- osm_multilines |>
+      select(any_of(c("osm_id", "ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id"))) |>
+      distinct(osm_id, .keep_all = TRUE)
+    pb$update(0.66)
+
+    st_agr(osm$osm_points) <- "constant" # https://github.com/r-spatial/sf/issues/406
+    job <- callr::r_bg(function(osm, osm_multilines_redux) { # update spinner while blocking method call
+      return(
+        osm$osm_points |>
+          sf::st_crop(sf::st_bbox(stplanr::geo_buffer(osm_multilines_redux, dist = 100))) |>
+          dplyr::filter(public_transport == "stop_position" | public_transport == "platform") |>
+          dplyr::select_if(~ !all(is.na(.)))
+      )
+    }, args = list(osm, osm_multilines_redux))
+    while (job$is_alive()) {
+      pb$tick(0)
+      Sys.sleep(0.1)
+    }
+    osm_stoppositions <- job$get_result()
+    pb$update(1)
+    pb$terminate()
   }
-  job$get_result() # This will throw any error that occurred in the subprocess (e.g., timeout)
 
-  pb$update(0.33)
-
-  # 3. Convert to SF and Extract routes/points
-  job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
-    return(osmdata::osmdata_sf(q, osm_file))
-  }, args = list(q, osm_file))
-  while (job$is_alive()) {
-    pb$tick(0)
-    Sys.sleep(0.1)
-  }
-  osm <- job$get_result()
-
-  osm_multilines <- osm$osm_multilines
-  osm_multilines_redux <- osm_multilines |>
-    select(any_of(c("osm_id", "ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id"))) |>
-    distinct(osm_id, .keep_all = TRUE)
-  pb$update(0.66)
-
-  st_agr(osm$osm_points) <- "constant" # https://github.com/r-spatial/sf/issues/406
-  job <- callr::r_bg(function(osm, osm_multilines_redux) { # update spinner while blocking method call
-    return(
-      osm$osm_points |>
-        sf::st_crop(sf::st_bbox(stplanr::geo_buffer(osm_multilines_redux, dist = 100))) |>
-        dplyr::filter(public_transport == "stop_position" | public_transport == "platform") |>
-        dplyr::select_if(~ !all(is.na(.)))
-    )
-  }, args = list(osm, osm_multilines_redux))
-  while (job$is_alive()) {
-    pb$tick(0)
-    Sys.sleep(0.1)
-  }
-  osm_stoppositions <- job$get_result()
-  pb$update(1)
-  pb$terminate()
 
   # 4. Processing OSM relations (already have the file!)
   pb <- progress::progress_bar$new(
