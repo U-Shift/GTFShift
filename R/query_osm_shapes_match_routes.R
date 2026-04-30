@@ -66,6 +66,9 @@
 #' @export
 osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA, osm_file = NULL) {
   total_steps <- 4
+  if (!is.null(osm_file)) {
+    total_steps = 3
+  }
 
   if (!is.na(log_file)) {
     cat(
@@ -99,34 +102,58 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
   # 2. Get OSM data as XML
   pb <- progress::progress_bar$new( # Track progress
-    format = sprintf("2/%d: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed", total_steps),
+    format = sprintf(
+      ifelse(
+        is.null(osm_file),
+        "2/%d: Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
+        "2/%d: Getting and parsing OSM file [:bar] :percent :spin elapsed=:elapsed"
+      ),
+      total_steps
+    ),
     clear = FALSE, show_after = 0
   )
   pb$update(0)
 
+  relations_df <- NULL
   if (!is.null(osm_file)) {
     # 2.1. Get relations
-    relations_df <- get_osm_relations_bus(osm_file, q, pb, 0.1, 0.2, 0.33)
+    relations_df <<- get_osm_relations_bus(osm_file, q, pb, 0.12, 0.25, 0.37)
+    pb$update(0.5)
 
     # 2.2. Get geometries and filter by matched relations
     bbox <- st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
     osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
+    pb$update(0.75)
     osm_multilines_redux <- relations_df |>
-      select(osm_id, way_osm_id, ref, name, `gtfs:shape_id`, `gtfs:route_id`) |>
+      filter(type == "way") |>
+      select(relation_osm_id, osm_id, ref, name, `gtfs:shape_id`, `gtfs:route_id`) |>
       # Join with osm_ways to get geometries back
-      left_join(osm_ways |> select(osm_id), by = c("way_osm_id" = "osm_id")) |>
+      left_join(osm_ways |> select(osm_id), by = "osm_id") |>
       st_as_sf() |>
       # Group by osm_id, gtfs:shape_id, generating multilinestring with geometries
-      dplyr::group_by(osm_id, ref, name, `gtfs:shape_id`, `gtfs:route_id`) |>
+      dplyr::group_by(relation_osm_id, ref, name, `gtfs:shape_id`, `gtfs:route_id`) |>
       dplyr::summarise(do_union = FALSE, .groups = "drop") |>
-      sf::st_cast("MULTILINESTRING")
+      sf::st_cast("MULTILINESTRING") |>
+      rename(osm_id = relation_osm_id)
 
     # 2.3 Get stop locations
-    osm_stoppositions <- osmextract::oe_read(osm_file, layer = "points", boundary = bbox, quiet = TRUE, extra_tags = c("public_transport")) |>
-      dplyr::filter(public_transport == "stop_position" | public_transport == "platform")
+    osm_stops <- osmextract::oe_read(osm_file, layer = "points", boundary = bbox, quiet = TRUE, extra_tags = c("public_transport")) |>
+      dplyr::filter(public_transport == "stop_position" | public_transport == "platform") |>
+      select(osm_id)
+    pb$update(0.99)
 
+    osm_stoppositions <- relations_df |>
+      filter(type == "node") |>
+      # Join with osm_stops to get geometries back
+      left_join(osm_stops |> select(osm_id), by = "osm_id") |>
+      st_as_sf()
+    pb$update(1)
+    pb$terminate()
 
-    # TODO
+    m <- sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", length(unique(relations_df$relation_osm_id)), length(unique(osm_stoppositions$osm_id)))
+    message(m)
+    if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
+
   } else {
     osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
     job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
@@ -175,52 +202,54 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
 
 
   # 4. Processing OSM relations (already have the file!)
-  pb <- progress::progress_bar$new(
-    format = sprintf("3/%d: Processing OSM relations [:bar] :percent :spin elapsed=:elapsed", total_steps),
-    clear = FALSE, show_after = 0
-  )
-  pb$update(0)
+  if (is.null(osm_file)) {
+    pb <- progress::progress_bar$new(
+      format = sprintf("3/%d: Processing OSM relations [:bar] :percent :spin elapsed=:elapsed", total_steps),
+      clear = FALSE, show_after = 0
+    )
+    pb$update(0)
 
-  job <- callr::r_bg(function(osm_file) { # update spinner while blocking method call
-    library(xml2)
-    library(dplyr)
+    job <- callr::r_bg(function(osm_file) { # update spinner while blocking method call
+      library(xml2)
+      library(dplyr)
 
-    doc <- read_xml(osm_file)
-    relations <- xml_find_all(doc, ".//relation")
-    relations_df <- lapply(relations, function(relation) { # blocking
-      relation_id <- xml_attr(relation, "id")
-      members <- xml_find_all(relation, "member")
+      doc <- read_xml(osm_file)
+      relations <- xml_find_all(doc, ".//relation")
+      relations_df <- lapply(relations, function(relation) { # blocking
+        relation_id <- xml_attr(relation, "id")
+        members <- xml_find_all(relation, "member")
 
-      members_df <- lapply(members, function(member) {
-        c(
-          type = xml_attr(member, "type"),
-          ref = xml_attr(member, "ref"),
-          role = xml_attr(member, "role")
-        )
+        members_df <- lapply(members, function(member) {
+          c(
+            type = xml_attr(member, "type"),
+            osm_id = xml_attr(member, "ref"),
+            role = xml_attr(member, "role")
+          )
+        })
+        df <- data.frame(do.call(rbind, members_df))
+        df$relation_osm_id <- relation_id
+        return(df)
       })
-      df <- data.frame(do.call(rbind, members_df))
-      df$relation_osm_id <- relation_id
-      return(df)
-    })
-    return(bind_rows(relations_df))
-  }, args = list(osm_file))
-  while (job$is_alive()) {
-    pb$tick(0)
-    Sys.sleep(0.1)
-  }
-  relations_df <- job$get_result()
+      return(bind_rows(relations_df))
+    }, args = list(osm_file))
+    while (job$is_alive()) {
+      pb$tick(0)
+      Sys.sleep(0.1)
+    }
+    relations_df <- job$get_result()
 
-  pb$update(1)
-  pb$terminate()
-  m <- sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", nrow(osm_multilines_redux), nrow(osm_stoppositions))
-  message(m)
-  if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
+    pb$update(1)
+    pb$terminate()
+    m <- sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", nrow(osm_multilines_redux), nrow(osm_stoppositions))
+    message(m)
+    if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
+  }
 
   # 5. For each gtfs route, match shapes with OSM routes
   routes_names <- unique(gtfs$routes |> pull(!!gtfs_match)) # !! to use variable value and not its literal name
 
   pb <- progress::progress_bar$new( # Track progress
-    format = sprintf("4/%d: Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed", total_steps),
+    format = sprintf("%d/%d: Matching GTFS shapes with OSM routes [:bar] :percent :spin elapsed=:elapsed", total_steps, total_steps),
     clear = FALSE, show_after = 0
   )
 
@@ -320,16 +349,16 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
             },
             first_stop_osm_id = relations_df |>
               # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
-              filter(relation_osm_id == osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
+              filter(relation_osm_id == !!osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
               # Use sorting to give priority to entry/exit, when they exist
               arrange(
                 match(role, c("stop_entry_only", "platform_entry_only", "stop", "platform")),
                 role
               ) |>
               slice(1) |>
-              pull(ref),
+              pull(osm_id),
             last_stop_osm_id = relations_df |>
-              filter(relation_osm_id == osm_id & role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
+              filter(relation_osm_id == !!osm_id & role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
               mutate(role_group = case_when(
                 # When roundtrip (circular), keep normal order
                 roundtrip == "yes" ~ 1,
@@ -348,7 +377,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
                 )
               ) |>
               slice(1) |>
-              pull(ref),
+              pull(osm_id),
             initial = osm_stoppositions |> filter(osm_id == first_stop_osm_id) |> slice(1) |> pull(geometry) |> first(default = NA),
             final = osm_stoppositions |> filter(osm_id == last_stop_osm_id) |> slice(1) |> pull(geometry) |> first(default = NA)
           ) |>

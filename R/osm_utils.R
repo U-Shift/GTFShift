@@ -23,7 +23,7 @@ filter_osm_bus_lanes <- function(road_osm) {
 }
 
 
-#' Get OSM relations tagged as bus networks
+#' Get OSM relations and elements (ways and nodes) tagged as bus networks
 #'
 #' @param osm_file character. Path to OSM file.
 #' @param pb progress bar object.
@@ -31,7 +31,7 @@ filter_osm_bus_lanes <- function(road_osm) {
 #' @param pb_update_2 numeric. Value to add to progress bar when progress at 2/3.
 #' @param pb_update_3 numeric. Value to add to progress bar when progress at 3/3.
 #'
-#' @return data frame. OSM relations data frame with columns: `osm_id`, `type`, `way_osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `ref`
+#' @return data frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
 #'
 #' @noRd
 get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_update_3) {
@@ -105,22 +105,24 @@ get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_
       return(NULL)
     }
 
-    way_members <- xml2::xml_find_all(rel, ".//member[@type='way']")
-    if (length(way_members) == 0) {
+    members <- xml2::xml_find_all(rel, ".//member[@type='way' or @type='node']")
+    if (length(members) == 0) {
       return(NULL)
     }
 
     data.frame(
       # <relation>
-      osm_id = xml2::xml_attr(rel, "id"),
-      type = "way",
+      relation_osm_id = xml2::xml_attr(rel, "id"),
       # <member>
-      way_osm_id = xml2::xml_attr(way_members, "ref"),
-      role = xml2::xml_attr(way_members, "role"),
+      type = xml2::xml_attr(members, "type"),
+      osm_id = xml2::xml_attr(members, "ref"),
+      role = xml2::xml_attr(members, "role"),
       # <tag>
       `gtfs:shape_id` = tag_vals["gtfs:shape_id"],
       `gtfs:route_id` = tag_vals["gtfs:route_id"],
+      name = tag_vals["name"],
       ref = tag_vals["ref"],
+      roundtrip = tag_vals["roundtrip"],
       stringsAsFactors = FALSE,
       check.names = FALSE
     )

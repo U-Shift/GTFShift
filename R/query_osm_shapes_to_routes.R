@@ -64,16 +64,18 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
 
   if (!is.null(osm_file)) {
     # 1.1. Get relations
-    relations_df <- get_osm_relations_bus(osm_file, pb, 0.1, 0.2, 0.3)
+    relations_df <- get_osm_relations_bus(osm_file, q, pb, 0.1, 0.2, 0.3) |>
+      filter(type == "way") |>
+      rename(way_osm_id = osm_id, osm_id = relation_osm_id)
 
     # 1.3. Get geometries and filter by matched relations
     bbox <- st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
     osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
     pb$update(0.95)
     osm_multilines_redux <- relations_df |>
-      select(osm_id, way_osm_id, `gtfs:shape_id`) |>
+      select(relation_osm_id, osm_id, `gtfs:shape_id`) |>
       # Join with osm_ways to get geometries back
-      left_join(osm_ways |> select(osm_id), by = c("way_osm_id" = "osm_id")) |>
+      left_join(osm_ways |> select(osm_id), by = "osm_id") |>
       st_as_sf()
 
     if (!ways) {
