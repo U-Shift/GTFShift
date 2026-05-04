@@ -6,6 +6,7 @@
 #' @param q osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
 #' @param keep_osm_attributes Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.
+#' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, returning a data.frame with the road segments where transit routes
@@ -39,7 +40,13 @@
 #' \dontrun{
 #' gtfs <- GTFShift::load_feed("gtfs.zip")
 #' q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+#'
+#' # To use OSM API:
 #' lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q)
+#'
+#' # To use a local OSM file:
+#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+#' lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q, osm_file = osm_file)
 #' }
 #'
 #' @import dplyr
@@ -50,10 +57,11 @@ prioritize_lanes <- function(
   gtfs,
   q,
   date = GTFShift::calendar_nextBusinessWednesday(),
-  keep_osm_attributes = FALSE
+  keep_osm_attributes = FALSE,
+  osm_file = NULL
 ) {
   # Get way frequency hourly
-  way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE)
+  way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE, osm_file)
 
   # Get bus lanes
   bus_lanes <- filter_osm_bus_lanes(way_frequency |> distinct(way_osm_id, .keep_all = TRUE))

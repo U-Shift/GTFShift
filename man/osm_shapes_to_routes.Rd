@@ -8,7 +8,8 @@ osm_shapes_to_routes(
   gtfs,
   q,
   ways = FALSE,
-  ways_tags = c("lanes", "psv", "bus", "way", "parking", "name")
+  ways_tags = c("lanes", "psv", "bus", "way", "parking", "name"),
+  osm_file = NULL
 )
 }
 \arguments{
@@ -20,7 +21,7 @@ osm_shapes_to_routes(
 
 \item{ways_tags}{character vector (Default \code{c("lanes", "psv", "bus", "way", "parking", "name")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.}
 
-\item{sleep_duration}{Numeric (Default 30). Time to sleep, in seconds, before fetching OSM data to avoid overloading the server.}
+\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.}
 }
 \value{
 A \code{sf} \code{data.frame} with the following columns:
@@ -50,7 +51,11 @@ q <- opq("Lisbon") |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
+# To use OSM API:
 shapes_geometry_osm <- GTFShift::osm_shapes_to_routes(gtfs, q)
-}
 
+# To use a local OSM file:
+osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+shapes_geometry_osm <- GTFShift::osm_shapes_to_routes(gtfs, q, osm_file = osm_file)
+}
 }

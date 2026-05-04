@@ -4,10 +4,12 @@
 \alias{osm_bus_lanes}
 \title{Export designated bus lanes from OpenStreetMaps}
 \usage{
-osm_bus_lanes(bbox)
+osm_bus_lanes(bbox, osm_file = NULL)
 }
 \arguments{
 \item{bbox}{bbox. Area from which to export bus lanes.}
+
+\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.}
 }
 \value{
 osm_lines in sf format
@@ -20,8 +22,14 @@ Exports roads tagged as designated bus lanes on OpenStreetMaps for given area.
 }
 \examples{
 \dontrun{
-BBOX = sf::st_bbox(city_limit)
+BBOX <- sf::st_bbox(city_limit)
+
+# To use OSM API:
 bus_lanes <- GTFShift::osm_bus_lanes(BBOX)
+
+# To use a local OSM file:
+osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+bus_lanes <- GTFShift::osm_bus_lanes(BBOX, osm_file = osm_file)
 }
 
 }

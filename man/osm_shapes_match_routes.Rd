@@ -11,7 +11,8 @@ osm_shapes_match_routes(
   gtfs_match = "route_short_name",
   osm_match = "ref",
   gtfs_osm_match_exact = TRUE,
-  log_file = NA
+  log_file = NA,
+  osm_file = NULL
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ osm_shapes_match_routes(
 \item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
 
 \item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
+
+\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
@@ -76,7 +79,12 @@ q <- opq("Lisbon") |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
+# To use OSM API:
 shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q)
+
+# To use a local OSM file:
+osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q, osm_file = osm_file)
 }
 
 }
