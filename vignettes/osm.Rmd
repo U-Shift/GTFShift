@@ -37,6 +37,44 @@ library(dplyr)
 OpenStreetMaps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
 GTFShift includes some methods that allow to access its information directly.
 
+## Using OSM API vs. local OSM extract
+
+By default, GTFShift methods use OSM API to access OpenStreetMaps data ([osmdata::osmdata_sf](https://docs.ropensci.org/osmdata/reference/osmdata_sf.html)). 
+However, the API rate is limited, making it hard to download large datasets. 
+In these cases, it is recommended to use a local OSM extract file.
+For this purpose, most of the methods support the optional parameter `osm_file`. Check each method documentation
+to confirm.
+
+```{r, eval=FALSE}
+# Example of using local OSM extract
+
+# Download OSM extract
+# (use day tag on filename to get the latest file, as oe_download caches files and GeoFrabrick is updated daily)
+osm_file <- oe_download(
+  "https://download.geofabrik.de/europe/portugal-latest.osm.pbf",
+  file_basename = sprintf("%s_%s.osm.pbf", "PT", format(Sys.Date(), "%Y%m%d"))
+)
+
+# Get GTFS from library GTFS database for Portugal
+data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_id <- "lisboa"
+gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FALSE)
+
+# Build OSM query
+library(osmdata)
+q <- opq("Lisbon") |>
+  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+
+# Call method with osm_file parameter
+shapes_ways_osm <- GTFShift::osm_shapes_to_routes(gtfs, q, ways = TRUE, osm_file = osm_file)
+```
+
+
+
+Refer to [osmextract::oe_download](https://docs.ropensci.org/osmextract/reference/oe_download.html) for a detailed
+download documentation.
+
 
 # Download bus lanes 
 
