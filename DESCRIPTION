@@ -38,6 +38,8 @@ Suggests:
     rmarkdown,
     mapview,
     xml2,
-    RProtoBuf
+    RProtoBuf,
+    osmextract,
+    rosmium
 VignetteBuilder: knitr
 Config/Needs/website: rmarkdown
