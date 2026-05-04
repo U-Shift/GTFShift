@@ -8,7 +8,8 @@ get_way_frequency_hourly(
   gtfs,
   q,
   date = GTFShift::calendar_nextBusinessWednesday(),
-  keep_osm_attributes = FALSE
+  keep_osm_attributes = FALSE,
+  osm_file = NULL
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ get_way_frequency_hourly(
 \item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
 
 \item{keep_osm_attributes}{Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.}
+
+\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.}
 }
 \value{
 An \code{sf} \code{data.frame} object with the following columns:
@@ -43,9 +46,15 @@ For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
 \dontrun{
-gtfs = GTFShift::load_feed("gtfs.zip")
-q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
-frequency_analysis = GTFShift::get_way_frequency_hourly(gtfs, q)
+gtfs <- GTFShift::load_feed("gtfs.zip")
+q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+
+# To use OSM API:
+frequency_analysis <- GTFShift::get_way_frequency_hourly(gtfs, q)
+
+# To use a local OSM file:
+osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+frequency_analysis <- GTFShift::get_way_frequency_hourly(gtfs, q, osm_file = osm_file)
 }
 
 }

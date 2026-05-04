@@ -4,7 +4,7 @@
 #' @param q osmdata::opq. Overpass query for transit network.
 #' @param ways boolean (Default False). If true, relation is disaggregated in ways.
 #' @param ways_tags character vector (Default \code{c("lanes", "psv", "bus", "way", "parking", "name")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.
-#' @param sleep_duration Numeric (Default 30). Time to sleep, in seconds, before fetching OSM data to avoid overloading the server.
+#' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations, considering the
@@ -30,9 +30,13 @@
 #'   add_osm_feature(key = "route", value = c("bus", "tram")) |>
 #'   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 #'
+#' # To use OSM API:
 #' shapes_geometry_osm <- GTFShift::osm_shapes_to_routes(gtfs, q)
-#' }
 #'
+#' # To use a local OSM file:
+#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+#' shapes_geometry_osm <- GTFShift::osm_shapes_to_routes(gtfs, q, osm_file = osm_file)
+#' }
 #' @import osmdata
 #' @import sf
 #' @import dplyr

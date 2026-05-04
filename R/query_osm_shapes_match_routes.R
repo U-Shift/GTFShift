@@ -7,6 +7,7 @@
 #' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
 #' @param gtfs_osm_match_exact Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).
 #' @param log_file String (Optional). If provided, will log warnings to this file, in addition to the console.
+#' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
@@ -51,7 +52,12 @@
 #'   add_osm_feature(key = "route", value = c("bus", "tram")) |>
 #'   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 #'
+#' # To use OSM API:
 #' shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q)
+#'
+#' # To use a local OSM file:
+#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+#' shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q, osm_file = osm_file)
 #' }
 #'
 #' @import osmdata
@@ -67,7 +73,7 @@
 osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA, osm_file = NULL) {
   total_steps <- 4
   if (!is.null(osm_file)) {
-    total_steps = 3
+    total_steps <- 3
   }
 
   if (!is.na(log_file)) {
@@ -153,7 +159,6 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     m <- sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", length(unique(relations_df$relation_osm_id)), length(unique(osm_stoppositions$osm_id)))
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
-
   } else {
     osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
     job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
