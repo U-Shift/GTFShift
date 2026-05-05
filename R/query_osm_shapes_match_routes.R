@@ -123,7 +123,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   relations_df <- NULL
   if (!is.null(osm_file)) {
     # 2.1. Get relations
-    relations_df <<- get_osm_relations_bus(osm_file, q, pb, 0.12, 0.25, 0.37)
+    relations_df <- get_osm_relations_bus(osm_file, q, pb, 0.12, 0.25, 0.37, 0.49)
     pb$update(0.5)
 
     # 2.2. Get geometries and filter by matched relations
@@ -353,17 +353,19 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
               max(nr_s, nr_p)
             },
             first_stop_osm_id = relations_df |>
+              select(relation_osm_id, stop_osm_id = osm_id, role) |>
               # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
-              filter(relation_osm_id == !!osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
+              filter(relation_osm_id == osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
               # Use sorting to give priority to entry/exit, when they exist
               arrange(
                 match(role, c("stop_entry_only", "platform_entry_only", "stop", "platform")),
                 role
               ) |>
               slice(1) |>
-              pull(osm_id),
+              pull(stop_osm_id),
             last_stop_osm_id = relations_df |>
-              filter(relation_osm_id == !!osm_id & role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
+              select(relation_osm_id, stop_osm_id = osm_id, role) |>
+              filter(relation_osm_id == osm_id & role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
               mutate(role_group = case_when(
                 # When roundtrip (circular), keep normal order
                 roundtrip == "yes" ~ 1,
@@ -382,7 +384,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
                 )
               ) |>
               slice(1) |>
-              pull(osm_id),
+              pull(stop_osm_id),
             initial = osm_stoppositions |> filter(osm_id == first_stop_osm_id) |> slice(1) |> pull(geometry) |> first(default = NA),
             final = osm_stoppositions |> filter(osm_id == last_stop_osm_id) |> slice(1) |> pull(geometry) |> first(default = NA)
           ) |>
