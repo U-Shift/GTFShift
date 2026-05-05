@@ -81,7 +81,7 @@ get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_
   rel_n <- 0
   relations_data <- lapply(relations, function(rel) {
     rel_n <<- rel_n + 1
-    pb$update(min(round(pb_update_3 + (pb_update_4 * rel_n / length(relations)), digits = 2), 1))
+    pb$update(min(round(pb_update_3 + ((pb_update_4 - pb_update_3) * rel_n / length(relations)), digits = 2), 1))
     tags <- xml2::xml_find_all(rel, ".//tag")
     tag_keys <- xml2::xml_attr(tags, "k")
     tag_vals <- xml2::xml_attr(tags, "v")

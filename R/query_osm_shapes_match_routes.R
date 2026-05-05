@@ -514,6 +514,12 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       gtfs_route_name_result <- gtfs_route_name_result_unique
     }
 
+    # Memory optimization: drop heavy columns before returning to the main process
+    # Geometries and auxiliary points will be re-joined later
+    gtfs_route_name_result <- gtfs_route_name_result |>
+      sf::st_drop_geometry() |>
+      dplyr::select(-any_of(c("initial_osm", "final_osm", "initial_gtfs", "final_gtfs", "osm_name", "osm_ref")))
+
     return(list(
       res = gtfs_route_name_result,
       warn_missing = warn_routes_missing,
@@ -537,11 +543,17 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   }
 
   # 6. Unpack results
-  result <- lapply(results_list, `[[`, "res")
   warning_routes_missing <- do.call(c, lapply(results_list, `[[`, "warn_missing"))
   warning_osm_repeated <- do.call(c, lapply(results_list, `[[`, "warn_repeated"))
   warning_osm_unsorted_stops <- do.call(c, lapply(results_list, `[[`, "warn_unsorted"))
   warning_osm_stops_missing <- do.call(c, lapply(results_list, `[[`, "warn_stops_missing"))
+
+  message("> Unpacking results\n")
+  result <- lapply(results_list, `[[`, "res")
+  rm(results_list)
+  gc()
+
+  message("> Combining results\n")
   if (length(result[lengths(result) > 1]) == 1) {
     result_success <- result[[which(lengths(result) > 1)]]
   } else {
@@ -550,9 +562,31 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   pb$update(1)
   pb$terminate()
 
+  # 7. Re-attach OSM metadata and geometries (dropped in workers to save RAM)
+  if (nrow(result_success) > 0) {
+    message("> Re-attaching OSM metadata and geometries\n")
+    result_success <- result_success |>
+      dplyr::left_join(
+        osm_multilines_redux |>
+          sf::st_drop_geometry() |>
+          dplyr::select(osm_id, osm_name = name, osm_ref = ref) |>
+          dplyr::distinct(osm_id, .keep_all = TRUE),
+        by = "osm_id"
+      ) |>
+      dplyr::left_join(
+        osm_multilines_redux |> dplyr::select(osm_id, geometry),
+        by = "osm_id"
+      ) |>
+      sf::st_as_sf()
+  }
+
+  rm(result)
+  gc()
+
   # 5. Give user feedback on processing
 
   # > Get route metadata
+  message("> Getting route metadata\n")
   route_shapes <- gtfs$routes |>
     left_join(gtfs$trips, by = "route_id") |>
     left_join(gtfs$shapes, by = "shape_id", relationship = "many-to-many") |>
