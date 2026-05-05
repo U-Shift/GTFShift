@@ -68,7 +68,7 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
 
   if (!is.null(osm_file)) {
     # 1.1. Get relations
-    relations_df <- get_osm_relations_bus(osm_file, q, pb, 0.1, 0.2, 0.3) |>
+    relations_df <- get_osm_relations_bus(osm_file, q, pb, 0.1, 0.2, 0.3, 0.94) |>
       filter(type == "way") |>
       rename(way_osm_id = osm_id, osm_id = relation_osm_id)
 
