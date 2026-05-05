@@ -39,6 +39,9 @@ It can be run either at the development or live version of OSM, requiring API cr
 
 The environment variables can be edited using `usethis::edit_r_environ()`, on R.
 
+# GTFShift OSM contributions
+
+GTFShift development team regularly uses this script to contribute to OSM, updating GTFS shapes and routes data for different cities. Refer to [the changesets page](www.openstreetmap.org/user/Gonçalo Matos/history) for a complete list on the changes applied and to the [GitHub releases](https://github.com/U-Shift/GTFShift/releases) for the  detailed logs and geometries. 
 
 # Match GTFS shapes with OSM routes 
 
@@ -56,11 +59,11 @@ Then, it should be loaded into the Python environment, filtering the matches by 
 import pandas as pd
 
 area = "lisboa"
-gtfs_date = "2026-04-20"
-run_date = "20260421"
-base_folder = "../../GTFShift-web/scripts/osm_match" 
+gtfs_date = "2026-05-05"
+run_date = "20260505"
+base_folder = "osm_match" 
 
-df = pd.read_csv(f"{base_folder}/{area}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.csv") # CSV with columns osm_id, shape_id and route_id (optional)
+df = pd.read_csv(f"{base_folder}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.csv") # CSV with columns osm_id, shape_id and route_id (optional)
 len(df)
 df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 len(df)
@@ -79,6 +82,8 @@ from dotenv import load_dotenv, find_dotenv
 import os
 import pandas as pd
 import logging
+
+assert osmapi.__version__ >= "5.0.0", "Please update osmapi to version 5.0.0 or higher to ensure compatibility"
 
 # Patch requests default User-Agent to avoid being blocked by OSM (see https://github.com/Zverik/cli-oauth2/issues/7)
 requests.utils.default_user_agent = lambda: "GTFShift/0.8.3 (ushift@tecnico.ulisboa.pt)"
@@ -99,7 +104,7 @@ Set up logging
 ```{python}
 logger = logging.getLogger('my_logger')
 logger.setLevel(logging.DEBUG)  # Set the base logging level
-log_file_path = f"{base_folder}/{area}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.osm.log"
+log_file_path = f"{base_folder}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.osm.log"
 file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
@@ -155,7 +160,7 @@ webbrowser.open(az_request.uri) # If on studio web, this might not work. If so, 
 
 After authenticating, you will be presented with an authorization code. Copy it and set `auth_code` to its value.
 ```{python}
-auth_code = "n5wuAkZn5OrzIJAkmxSoyxzu1koW-zAAG6yx3FAx3wc" # Replace with your authorization code
+auth_code = "" # Replace with your authorization code
 auth_code
 auth = OAuth2AuthorizationCodeAuth(
     oauth2client,
