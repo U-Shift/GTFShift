@@ -27,14 +27,15 @@ filter_osm_bus_lanes <- function(road_osm) {
 #'
 #' @param osm_file character. Path to OSM file.
 #' @param pb progress bar object.
-#' @param pb_update_1 numeric. Value to add to progress bar when progress at 1/3.
-#' @param pb_update_2 numeric. Value to add to progress bar when progress at 2/3.
-#' @param pb_update_3 numeric. Value to add to progress bar when progress at 3/3.
+#' @param pb_update_1 numeric. Value to add to progress bar when progress at 1/4.
+#' @param pb_update_2 numeric. Value to add to progress bar when progress at 2/4.
+#' @param pb_update_3 numeric. Value to add to progress bar when progress at 3/4.
+#' @param pb_update_4 numeric. Value to add to progress bar when progress at 4/4.
 #'
 #' @return data frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
 #'
 #' @noRd
-get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_update_3) {
+get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_update_3, pb_update_4) {
   bus_relations_pbf <- tempfile(fileext = ".osm.pbf")
 
   job <- callr::r_bg(function(bus_relations_pbf, osm_file) { # update spinner while blocking method call
@@ -80,7 +81,7 @@ get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_
   rel_n <- 0
   relations_data <- lapply(relations, function(rel) {
     rel_n <<- rel_n + 1
-    pb$update(min(round(0.3 + (0.6 * rel_n / length(relations)), digits = 2), 1))
+    pb$update(min(round(pb_update_3 + (pb_update_4 * rel_n / length(relations)), digits = 2), 1))
     tags <- xml2::xml_find_all(rel, ".//tag")
     tag_keys <- xml2::xml_attr(tags, "k")
     tag_vals <- xml2::xml_attr(tags, "v")
