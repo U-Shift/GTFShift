@@ -12,7 +12,8 @@ osm_shapes_match_routes(
   osm_match = "ref",
   gtfs_osm_match_exact = TRUE,
   log_file = NA,
-  osm_file = NULL
+  osm_file = NULL,
+  num_cores = 1
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ osm_shapes_match_routes(
 \item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
 
 \item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.}
+
+\item{num_cores}{Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
