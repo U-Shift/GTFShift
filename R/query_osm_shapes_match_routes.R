@@ -580,9 +580,6 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       sf::st_as_sf()
   }
 
-  rm(result)
-  gc()
-
   # 5. Give user feedback on processing
 
   # > Get route metadata
