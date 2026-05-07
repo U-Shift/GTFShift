@@ -152,6 +152,10 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
       select(osm_id)
     pb$update(0.99)
 
+    # Remove type==node that has osm_id not in osm_stops
+    relations_df <- relations_df |>
+      filter(!(type == "node" & !(osm_id %in% osm_stops$osm_id)))
+
     osm_stoppositions <- relations_df |>
       filter(type == "node") |>
       # Join with osm_stops to get geometries back
