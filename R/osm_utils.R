@@ -35,7 +35,7 @@ filter_osm_bus_lanes <- function(road_osm) {
 #' @return data frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
 #'
 #' @noRd
-get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_update_3, pb_update_4) {
+get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1 = 0.25, pb_update_2 = 0.5, pb_update_3 = 0.75, pb_update_4 = 1) {
   bus_relations_pbf <- tempfile(fileext = ".osm.pbf")
 
   job <- callr::r_bg(function(bus_relations_pbf, osm_file) { # update spinner while blocking method call
@@ -107,7 +107,8 @@ get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1, pb_update_2, pb_
     }
 
     members <- xml2::xml_find_all(rel, ".//member[@type='way' or @type='node']")
-    if (length(members) == 0) {
+    members_type <- xml2::xml_attr(members, "type")
+    if (length(members) == 0 | !any(members_type == "way") | !any(members_type == "node")) {
       return(NULL)
     }
 

@@ -374,6 +374,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
               max(nr_s, nr_p)
             },
             first_stop_osm_id = relations_df |>
+              dplyr::filter(type == "node") |>
               dplyr::select(relation_osm_id, stop_osm_id = osm_id, role) |>
               # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
               dplyr::filter(relation_osm_id == osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
@@ -385,6 +386,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
               dplyr::slice(1) |>
               dplyr::pull(stop_osm_id),
             last_stop_osm_id = relations_df |>
+              dplyr::filter(type == "node") |>
               dplyr::select(relation_osm_id, stop_osm_id = osm_id, role) |>
               dplyr::filter(relation_osm_id == osm_id & role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
               dplyr::mutate(role_group = dplyr::case_when(
@@ -461,7 +463,6 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
           abs(osm_route_name$nr_stops - gtfs_route_name$nr_stops[i])
       }
     )
-
 
     # > Match OSM network and GTFS shapes considering the match with min aggregated distance (init + fin)
     closeness <- abs(init + fin + length_diff + stops_diff)
