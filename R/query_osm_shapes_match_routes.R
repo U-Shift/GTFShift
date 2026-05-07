@@ -129,7 +129,9 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     pb$update(0.5)
 
     # 2.2. Get geometries and filter by matched relations
-    bbox <- st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+    # Consider 500 meters outside of shapes to avoid loosing stops on the edge
+    bbox <- st_bbox(tidytransit::shapes_as_sf(gtfs$shapes) |> st_transform(3857) |> st_buffer(500))
+
     osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
     pb$update(0.75)
     osm_multilines_redux <- relations_df |>
@@ -266,6 +268,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
   warning_osm_stops_missing <- list()
 
   match_route_worker <- function(route_name) {
+    # message("route_name = " %>% paste(route_name))
     # Warning records for this specific route
     warn_routes_missing <- list()
     warn_osm_repeated <- list()
