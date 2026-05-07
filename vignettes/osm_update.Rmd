@@ -102,7 +102,12 @@ load_dotenv(find_dotenv())
 
 Set up logging
 ```{python}
+# Remove previous log handlers if they exist, to avoid duplicate logs when running multiple times
 logger = logging.getLogger('my_logger')
+if logger.hasHandlers():
+    for handler in logger.handlers[:]:
+        handler.close()
+        logger.removeHandler(handler)
 logger.setLevel(logging.DEBUG)  # Set the base logging level
 log_file_path = f"{base_folder}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.osm.log"
 file_handler = logging.FileHandler(log_file_path)
@@ -191,7 +196,7 @@ Attention! The script below will open a changeset and update OSM data! Make sure
 ```{python}
 # Create change set, updating relations with tag gtfs:shape_id
 # The changeset comment can be customized to better describe the change submitted 
-with api.change_set({"comment": "GTFS shapes and routes association (using GTFShift v0.8.3)", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+with api.changeset({"comment": "GTFS shapes and routes association (using GTFShift v0.8.3)", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
   logger.info(f"Running changeset {changeset_id} for {len(df)} relations")
   logger.info(f"{'route_id':20s}{'shape_id':20s} | {'osm_id':20s} | {'osm_route_id':20s}{'updated?':10s}{'osm_shape_id':20s}{'updated?':10s} | {'operation status':20s}")
   for idx, row in df.iterrows():
@@ -222,7 +227,7 @@ with api.change_set({"comment": "GTFS shapes and routes association (using GTFSh
 If you need to rollback the changes, use the code below.
 
 ```{python}
-with api.change_set({"comment": "GTFS shapes association rollback", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+with api.changeset({"comment": "GTFS shapes association rollback", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
   for idx, row in df.iterrows():
     osm_id = int(row["osm_id"])
     relation = api.relation_get(osm_id)
