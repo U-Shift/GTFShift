@@ -64,7 +64,7 @@ get_way_frequency_hourly <- function(
   # PROCESS GTFS, generating table calculating the frequencies per route
   trips <- gtfs_date$trips
   stops <- gtfs_date$stops
-  ways <- GTFShift::osm_shapes_to_routes(gtfs, q, TRUE, osm_file)
+  ways <- GTFShift::osm_shapes_to_routes(gtfs, q, TRUE, osm_file = osm_file)
 
   routes <- gtfs_date$routes
   stop_times <- gtfs_date$stop_times
