@@ -77,9 +77,9 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
     osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
     pb$update(0.95)
     osm_multilines_redux <- relations_df |>
-      select(relation_osm_id, osm_id, `gtfs:shape_id`) |>
+      select(osm_id, way_osm_id, `gtfs:shape_id`) |>
       # Join with osm_ways to get geometries back
-      left_join(osm_ways |> select(osm_id), by = "osm_id") |>
+      left_join(osm_ways |> select(osm_id), by = c("way_osm_id" = "osm_id")) |>
       st_as_sf()
 
     if (!ways) {

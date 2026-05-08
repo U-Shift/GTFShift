@@ -61,7 +61,7 @@ prioritize_lanes <- function(
   osm_file = NULL
 ) {
   # Get way frequency hourly
-  way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE, osm_file)
+  way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE, osm_file = osm_file)
 
   # Get bus lanes
   bus_lanes <- filter_osm_bus_lanes(way_frequency |> distinct(way_osm_id, .keep_all = TRUE))
