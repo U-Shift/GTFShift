@@ -13,10 +13,10 @@ filter_osm_bus_lanes <- function(road_osm) {
 
   osm_lanes <- road_osm |> filter(
     # Based on https://wiki.openstreetmap.org/wiki/Bus_lanes
-    psv == "designated" |
-      highway == "busway" |
-      (length(cols_to_check_access) & if_any(all_of(cols_to_check_access), ~ grepl("designated", .x))) |
-      (length(cols_to_check_count) & if_any(all_of(cols_to_check_count), ~ is.numeric(.x) & .x >= 1))
+    if_any(any_of("psv"), ~ .x == "designated") |
+      if_any(any_of("highway"), ~ .x == "busway") |
+      if_any(any_of(cols_to_check_access), ~ grepl("designated", .x)) |
+      if_any(any_of(cols_to_check_count), ~ is.numeric(.x) & .x >= 1)
   )
 
   return(osm_lanes)
