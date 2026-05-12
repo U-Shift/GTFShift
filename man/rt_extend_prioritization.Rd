@@ -29,6 +29,8 @@ This function extends lane segment indicators for prioritization with metrics pr
 \details{
 Extends the \code{lane_prioritization} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
 
+If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status == "IN_TRANSIT_TO"} are considered.
+
 Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 }
 \examples{
