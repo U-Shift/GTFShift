@@ -9,6 +9,7 @@
 #' @param log_file String (Optional). If provided, will log warnings to this file, in addition to the console.
 #' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.
 #' @param num_cores Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).
+#' @param osm_stop_order_relaxed Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
@@ -72,7 +73,15 @@
 #' @import parallel
 #'
 #' @export
-osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE, log_file = NA, osm_file = NULL, num_cores = 1) {
+osm_shapes_match_routes <- function(
+  gtfs, q,
+  geometry = TRUE,
+  gtfs_match = "route_short_name", osm_match = "ref", gtfs_osm_match_exact = TRUE,
+  log_file = NA,
+  osm_file = NULL,
+  num_cores = 1,
+  osm_stop_order_relaxed = FALSE
+) {
   total_steps <- 4
   if (!is.null(osm_file)) {
     total_steps <- 3
@@ -329,7 +338,7 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
         }
       }
     }
-    if (osm_route_error) {
+    if (osm_route_error && !osm_stop_order_relaxed) {
       return(list(
         res = data.frame(route_name = route_name),
         warn_missing = warn_routes_missing,
@@ -705,10 +714,17 @@ osm_shapes_match_routes <- function(gtfs, q, geometry = TRUE, gtfs_match = "rout
     if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
   if (length(warning_osm_unsorted_stops) > 0) {
-    w <- sprintf("%d error(s) were OSM routes that had entry/exit stops not respecting the right order (routes ignored):\n(This might indicate OSM data integrity problems)\n\n> %s", length(warning_osm_unsorted_stops), paste(
-      warning_osm_unsorted_stops,
-      collapse = "\n> "
-    ))
+    w <- sprintf(
+      ifelse(osm_stop_order_relaxed,
+        "%d error(s) were OSM routes that had entry/exit stops not respecting the right order (routes were still matched, but this might indicate OSM data integrity problems)\n\n> %s",
+        "%d error(s) were OSM routes that had entry/exit stops not respecting the right order (routes ignored):\n(This might indicate OSM data integrity problems)\n\n> %s"
+      ),
+      length(warning_osm_unsorted_stops),
+      paste(
+        warning_osm_unsorted_stops,
+        collapse = "\n> "
+      )
+    )
     warning(w)
     if (!is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
