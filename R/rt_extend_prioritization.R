@@ -15,12 +15,12 @@
 #'
 #'
 #' @returns The \code{lane_prioritization} \code{sf} \code{data.frame}, extended with the following columns:
-#' \itemize{
-#'  \item \code{speed_avg}, the average speed of the vehicles on the way.
-#'  \item \code{speed_median}, the median speed of the vehicles on the way.
-#'  \item \code{speed_p25}, the 25th percentile speed of the vehicles on the way.
-#'  \item \code{speed_p75}, the 75th percentile speed of the vehicles on the way.
-#'  \item \code{speed_count}, the number of speed observations on the way.
+#' \describe{
+#'   \item{speed_avg}{The average speed of the vehicles on the way.}
+#'   \item{speed_median}{The median speed of the vehicles on the way.}
+#'   \item{speed_p25}{The 25th percentile speed of the vehicles on the way.}
+#'   \item{speed_p75}{The 75th percentile speed of the vehicles on the way.}
+#'   \item{speed_count}{The number of speed observations on the way.}
 #' }
 #'
 #' @examples

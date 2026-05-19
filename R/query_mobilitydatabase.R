@@ -18,10 +18,10 @@
 #' It can be obtained for free at Mobility Database website.\cr\cr
 #' For more details on the parameters, refer to \url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
 #' Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:
-#' \itemize{
-#'  \item \code{provider} The name of the GTFS provider.
-#'  \item \code{status} Tells if the feed is active, inactive or deprecated.
-#'  \item \code{producer_url} The GTFS feed URL. Can be used to download.
+#' \describe{
+#'   \item{provider}{The name of the GTFS provider.}
+#'   \item{status}{Tells if the feed is active, inactive or deprecated.}
+#'   \item{producer_url}{The GTFS feed URL. Can be used to download.}
 #' }
 #'
 #' @returns data.frame with query results

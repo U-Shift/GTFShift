@@ -40,18 +40,18 @@ osm_shapes_match_routes(
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
-\itemize{
- \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
- \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
- \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
- \item \code{distance_diff}, the difference, in meters, between GTFS shape and OSM route lengths.
- \item \code{points_diff}, the sum of the difference, in meters, between GTFS shape and OSM route start and end points.
- \item \code{stops_diff}, the difference between GTFS and OSM routes number of stops.
- \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
- \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
- \item \code{osm_ref}, the \code{ref} attribute from OSM route relation.
- \item \code{osm_name}, the \code{name} attribute from OSM route relation.
- \item \code{geometry}, the geometrical data for the OSM route relation.
+\describe{
+  \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
+  \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
+  \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
+  \item{distance_diff}{The difference, in meters, between GTFS shape and OSM route lengths.}
+  \item{points_diff}{The sum of the difference, in meters, between GTFS shape and OSM route start and end points.}
+  \item{stops_diff}{The difference between GTFS and OSM routes number of stops.}
+  \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
+  \item{route_long_name}{The \code{route_long_name} attribute from \code{routes.txt} file.}
+  \item{osm_ref}{The \code{ref} attribute from OSM route relation.}
+  \item{osm_name}{The \code{name} attribute from OSM route relation.}
+  \item{geometry}{The geometrical data for the OSM route relation.}
 }
 }
 \description{
