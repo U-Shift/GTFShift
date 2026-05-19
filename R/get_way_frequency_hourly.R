@@ -15,14 +15,14 @@
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
 #' @returns An \code{sf} \code{data.frame} object with the following columns:
-#' \itemize{
-#'  \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way.
-#'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
-#'  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
-#'  \item \code{routes}, the list of route_ids that use the way.
-#'  \item \code{shapes}, the list of shape_ids that use the way.
-#'  \item \code{geometry}, the route shape.
-#'  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
+#' \describe{
+#'   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
+#'   \item{hour}{The hour for which the frequency applies (24 hour format).}
+#'   \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+#'   \item{routes}{The list of route_ids that use the way.}
+#'   \item{shapes}{The list of shape_ids that use the way.}
+#'   \item{geometry}{The route shape.}
+#'   \item{(if \code{keep_osm_attributes = TRUE})}{All OSM way attributes.}
 #' }
 #'
 #' @examples

@@ -25,21 +25,21 @@ prioritize_lanes(
 }
 \value{
 An \code{sf} \code{data.frame} object with the following columns:
-\itemize{
- \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way.
- \item \code{hour}, the hour for which the frequency applies (24 hour format).
- \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
- \item \code{is_bus_lane}, whether the way has a bus lane.
- \item \code{n_lanes_parking}, the number of parking lanes.
- \item \code{n_lanes_circulation}, the number of circulation lanes.
- \item \code{n_lanes}, the total number of lanes.
- \item \code{n_directions}, the number of travel directions.
- \item \code{n_lanes_circulation_direction}, the number of circulation lanes per direction.
- \item \code{n_lanes_direction}, the number of total lanes per direction.
- \item \code{routes}, the list of route_id that use the way.
- \item \code{shapes}, the list of shape_id that use the way.
- \item \code{geometry}, the route shape.
- \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
+\describe{
+  \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
+  \item{hour}{The hour for which the frequency applies (24 hour format).}
+  \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+  \item{is_bus_lane}{Whether the way has a bus lane.}
+  \item{n_lanes_parking}{The number of parking lanes.}
+  \item{n_lanes_circulation}{The number of circulation lanes.}
+  \item{n_lanes}{The total number of lanes.}
+  \item{n_directions}{The number of travel directions.}
+  \item{n_lanes_circulation_direction}{The number of circulation lanes per direction.}
+  \item{n_lanes_direction}{The number of total lanes per direction.}
+  \item{routes}{The list of route_id that use the way.}
+  \item{shapes}{The list of shape_id that use the way.}
+  \item{geometry}{The route shape.}
+  \item{(if \code{keep_osm_attributes = TRUE})}{All OSM way attributes.}
 }
 }
 \description{

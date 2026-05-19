@@ -25,12 +25,12 @@ osm_shapes_to_routes(
 }
 \value{
 A \code{sf} \code{data.frame} with the following columns:
-\itemize{
- \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
- \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
- \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way (if \code{ways} parameter is set to true).
- \item \code{*}, any column that matches \code{ways_tags} parameter.
- \item \code{geometry}, the geometrical data for the OSM route relation.
+\describe{
+  \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
+  \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
+  \item{way_osm_id}{The \code{osm_id} attribute from OSM way (if \code{ways} parameter is set to true).}
+  \item{*}{Any column that matches \code{ways_tags} parameter.}
+  \item{geometry}{The geometrical data for the OSM route relation.}
 }
 
 Shapes that do not have a match on OSM are ignored.
