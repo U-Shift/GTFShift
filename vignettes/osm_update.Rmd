@@ -41,7 +41,7 @@ The environment variables can be edited using `usethis::edit_r_environ()`, on R.
 
 # GTFShift OSM contributions
 
-GTFShift development team regularly uses this script to contribute to OSM, updating GTFS shapes and routes data for different cities. Refer to [the changesets page](www.openstreetmap.org/user/Gonçalo Matos/history) for a complete list on the changes applied and to the [GitHub releases](https://github.com/U-Shift/GTFShift/releases) for the  detailed logs and geometries. 
+GTFShift development team regularly uses this script to contribute to OSM, updating GTFS shapes and routes data for different cities. Refer to [the changesets page](https://openstreetmap.org/user/Gonçalo Matos/history){target="_blank"} for a complete list on the changes applied and to the [GitHub releases](https://github.com/U-Shift/GTFShift/releases){target="_blank"} for the  detailed logs and geometries. 
 
 # Match GTFS shapes with OSM routes 
 
