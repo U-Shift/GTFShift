@@ -2,7 +2,7 @@
 #
 #'
 #' @param bbox bbox. Area from which to export bus lanes.
-#' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.
+#' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
 #'
 #' @details
 #' Exports roads tagged as designated bus lanes on OpenStreetMaps for given area.

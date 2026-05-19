@@ -33,7 +33,6 @@ Imports:
   stringi,
   parallel
 URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
-RoxygenNote: 7.3.3
 Suggests: 
     knitr,
     rmarkdown,
@@ -44,3 +43,4 @@ Suggests:
     rosmium
 VignetteBuilder: knitr
 Config/Needs/website: rmarkdown
+Config/roxygen2/version: 8.0.0
