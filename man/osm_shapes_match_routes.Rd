@@ -62,8 +62,19 @@ For each route, matches its trips' shapes with OSM route relations.
 
 The calculation is performed considering, for each GTFS route, the subset of OSM routes that match
 the route identifier (based on \code{gtfs_match} and \code{osm_match}). Then, for each shape,
-the geometrical match is performed considering the OSM route that minimizes the distance between
-start and end points, total length and number of stops.
+the geometrical match is performed considering the OSM route \eqn{j} that minimizes the closeness
+metric \eqn{C(i, j)} for GTFS shape \eqn{i}:
+
+\deqn{C(i, j) = d(\text{init}_{GTFS, i}, \text{init}_{OSM, j}) + d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j}) + |L_{GTFS, i} - L_{OSM, j}| + \frac{L_{GTFS, i}}{N_{stops, i}} \cdot |N_{stops, i} - N_{stops, j}|}{C(i, j) = d(init_GTFS,i, init_OSM,j) + d(fin_GTFS,i, fin_OSM,j) + |L_GTFS,i - L_OSM,j| + (L_GTFS,i / N_stops,i) * |N_stops,i - N_stops,j|}
+
+where:
+\itemize{
+  \item \eqn{d(\text{init}_{GTFS, i}, \text{init}_{OSM, j})}{d(init_GTFS,i, init_OSM,j)} is the distance between the starting points/stops of the GTFS shape \eqn{i} and the OSM route \eqn{j}.
+  \item \eqn{d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j})}{d(fin_GTFS,i, fin_OSM,j)} is the distance between the ending points/stops of the GTFS shape \eqn{i} and the OSM route \eqn{j}.
+  \item \eqn{L_{GTFS, i}}{L_GTFS,i} and \eqn{L_{OSM, j}}{L_OSM,j} are the total lengths of the GTFS shape \eqn{i} and the OSM route \eqn{j}, respectively.
+  \item \eqn{N_{stops, i}}{N_stops,i} and \eqn{N_{stops, j}}{N_stops,j} are the number of stops on the GTFS shape \eqn{i} and the OSM route \eqn{j}, respectively. The term \eqn{\frac{L_{GTFS, i}}{N_{stops, i}}}{(L_GTFS,i / N_stops,i)} represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.
+}
+
 
 Be aware that the result might ignore some GTFS routes, in the following cases:
 \itemize{

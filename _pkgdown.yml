@@ -2,6 +2,7 @@ url: https://u-shift.github.io/GTFShift/
 template:
   bootstrap: 5
   light-switch: true
+  math-rendering: mathjax
   bslib:
     primary: "#15AF97FF"
 
