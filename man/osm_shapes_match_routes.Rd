@@ -13,7 +13,8 @@ osm_shapes_match_routes(
   gtfs_osm_match_exact = TRUE,
   log_file = NA,
   osm_file = NULL,
-  num_cores = 1
+  num_cores = 1,
+  osm_stop_order_relaxed = FALSE
 )
 }
 \arguments{
@@ -31,9 +32,11 @@ osm_shapes_match_routes(
 
 \item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
 
-\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details.}
+\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
 
 \item{num_cores}{Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).}
+
+\item{osm_stop_order_relaxed}{Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:

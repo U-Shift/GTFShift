@@ -53,8 +53,8 @@ Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
 }
 \examples{
 \dontrun{
-gtfs = GTFShift::load_feed("gtfs.zip")
-frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
+gtfs <- GTFShift::load_feed("gtfs.zip")
+frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 }
 
 }
