@@ -51,6 +51,7 @@ reference:
   - title: Utils
     contents:
     - calendar_nextBusinessWednesday
+    - multiline_to_sorted_linestring
 articles:
   - title: Articles
     navbar: ~

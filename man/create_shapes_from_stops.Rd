@@ -10,7 +10,7 @@ create_shapes_from_stops(gtfs)
 \item{gtfs}{tidygtfs. GTFS feed.}
 }
 \value{
-The gtfs feed with the shapes attribute defined and the trips updated with the matching shape_id.
+A \code{data.table} representing a GTFS shapes table.
 }
 \description{
 Build shapes from GTFS stops data
@@ -23,7 +23,7 @@ This can be useful for some applications that do not require high precision in t
 \examples{
 \dontrun{
 gtfs <- GTFShift::load_feed("gtfs.zip")
-gtfs <- GTFShift::create_shapes_from_stops(gtfs)
+gtfs$shapes <- GTFShift::create_shapes_from_stops(gtfs)
 }
 
 }
