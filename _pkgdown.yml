@@ -65,3 +65,4 @@ articles:
     - osm
     - rt
     - osm_update
+    - gtfs_from_osm
