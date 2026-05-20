@@ -4,10 +4,13 @@
 \alias{multiline_to_sorted_linestring}
 \title{Convert a MULTILINESTRING to a sorted LINESTRING}
 \usage{
-multiline_to_sorted_linestring(multilinestring)
+multiline_to_sorted_linestring(multilinestring, start_point = NULL)
 }
 \arguments{
 \item{multilinestring}{sf object with MULTILINESTRING geometry}
+
+\item{start_point}{(Optional) sf point geometry. If provided, the sorting of the linestrings
+will start from this point.}
 }
 \value{
 A \code{sf} object with LINESTRING geometry.
@@ -22,6 +25,6 @@ by sorting the linestrings and combining them in the correct order.
 The sorting criteria is based on the geometric distance between the endpoint of the current linestring
 and the endpoints of the remaining linestrings. The linestring with the minimum distance
 to the endpoint of the current linestring is selected as the next linestring.
-The algorithm starts from the first linestring in the MULTILINESTRING object and continues
-until all linestrings are sorted.
+The algorithm starts either from the \code{start_point} (if provided) or from the first linestring
+in the MULTILINESTRING object and continues until all linestrings are sorted.
 }

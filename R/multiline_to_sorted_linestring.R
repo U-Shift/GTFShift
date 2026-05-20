@@ -1,6 +1,8 @@
 #' Convert a MULTILINESTRING to a sorted LINESTRING
 #'
 #' @param multilinestring sf object with MULTILINESTRING geometry
+#' @param start_point (Optional) sf point geometry. If provided, the sorting of the linestrings
+#'   will start from this point.
 #'
 #' @details
 #' The function takes a MULTILINESTRING object and converts it to a LINESTRING object
@@ -9,8 +11,8 @@
 #' The sorting criteria is based on the geometric distance between the endpoint of the current linestring
 #' and the endpoints of the remaining linestrings. The linestring with the minimum distance
 #' to the endpoint of the current linestring is selected as the next linestring.
-#' The algorithm starts from the first linestring in the MULTILINESTRING object and continues
-#' until all linestrings are sorted.
+#' The algorithm starts either from the \code{start_point} (if provided) or from the first linestring
+#' in the MULTILINESTRING object and continues until all linestrings are sorted.
 #'
 #' @returns A \code{sf} object with LINESTRING geometry.
 #'
@@ -19,7 +21,7 @@
 #' @import lwgeom
 #'
 #' @export
-multiline_to_sorted_linestring <- function(multilinestring) {
+multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) {
     # browser()
 
     # 1. Extract all individual LINESTRING components
@@ -40,7 +42,13 @@ multiline_to_sorted_linestring <- function(multilinestring) {
     # Find the best path (simplified approach)
     # (This part may need adjustment based on your data)
     ordered_lines <- list()
-    current_line <- linestrings[1, ] # Start with the first line
+    # If start_point is provided, find the line that is closest to the start_point
+    if (!is.null(start_point)) {
+        nearest_idx <- st_nearest_feature(start_point, linestrings)
+        current_line <- linestrings[nearest_idx, ]
+    } else {
+        current_line <- linestrings[1, ] # Start with the first line
+    }
     ordered_lines[[1]] <- current_line$geometry
     remaining_lines <- linestrings[-1, ]
 
