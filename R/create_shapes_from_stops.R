@@ -1,4 +1,4 @@
-#' Build shapes from GTFS data
+#' Build shapes from GTFS stops data
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #'
@@ -12,13 +12,13 @@
 #' @examples
 #' \dontrun{
 #' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' gtfs <- GTFShift::build_shapes(gtfs)
+#' gtfs <- GTFShift::create_shapes_from_stops(gtfs)
 #' }
 #'
 #' @import dplyr
 #'
 #' @export
-build_shapes = function(gtfs) {
+create_shapes_from_stops <- function(gtfs) {
   if ("shapes" %in% names(gtfs)) {
     warning("The GTFS feed already has shapes defined! Overriding it...")
   }
@@ -35,28 +35,28 @@ build_shapes = function(gtfs) {
     ungroup()
 
   # Get unique stop_sequence_str
-  shapes_trips_geom = shapes_trips |>
+  shapes_trips_geom <- shapes_trips |>
     select(stop_sequence_str, stop_id, stop_sequence, stop_lon, stop_lat) |>
     distinct()
 
   # Gnerate shape_id
-  shapes = shapes_trips |>
+  shapes <- shapes_trips |>
     group_by(stop_sequence_str) |>
     reframe(
-      trip_id=list(trip_id)
+      trip_id = list(trip_id)
     ) |>
     mutate(
-      shape_id = paste0('shape-', 1:n())
+      shape_id = paste0("shape-", 1:n())
     )
 
   # Asssociate trips to shape_id
   gtfs$trips <-
     gtfs$trips |>
     select(-shape_id) |>
-    left_join(shapes |> tidyr::unnest(cols = 'trip_id'), join_by(trip_id))
+    left_join(shapes |> tidyr::unnest(cols = "trip_id"), join_by(trip_id))
 
   # Gather shape_id and shape geometry (from shapes_trips_geom)
-  gtfs$shapes = shapes |>
+  gtfs$shapes <- shapes |>
     select(-trip_id) |>
     left_join(shapes_trips_geom, by = "stop_sequence_str") |>
     select(-stop_sequence_str, -stop_id) |>
