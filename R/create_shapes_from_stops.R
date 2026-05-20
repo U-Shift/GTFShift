@@ -7,12 +7,12 @@
 #' The resulting shapes are a simplified version of the original ones, as they do not take into account the actual path followed by the vehicles, but only the stop sequence.
 #' This can be useful for some applications that do not require high precision in the shapes, and can be used as a fallback when the original feed does not include shapes.txt file.
 #'
-#' @returns The gtfs feed with the shapes attribute defined and the trips updated with the matching shape_id.
+#' @returns A \code{data.table} representing a GTFS shapes table.
 #'
 #' @examples
 #' \dontrun{
 #' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' gtfs <- GTFShift::create_shapes_from_stops(gtfs)
+#' gtfs$shapes <- GTFShift::create_shapes_from_stops(gtfs)
 #' }
 #'
 #' @import dplyr
@@ -56,7 +56,7 @@ create_shapes_from_stops <- function(gtfs) {
     left_join(shapes |> tidyr::unnest(cols = "trip_id"), join_by(trip_id))
 
   # Gather shape_id and shape geometry (from shapes_trips_geom)
-  gtfs$shapes <- shapes |>
+  return(shapes |>
     select(-trip_id) |>
     left_join(shapes_trips_geom, by = "stop_sequence_str") |>
     select(-stop_sequence_str, -stop_id) |>
@@ -64,7 +64,5 @@ create_shapes_from_stops <- function(gtfs) {
       shape_pt_lat = stop_lat,
       shape_pt_lon = stop_lon,
       shape_pt_sequence = stop_sequence
-    )
-
-  return(gtfs)
+    ))
 }
