@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="6. Get OSM data">
 </head>
@@ -272,26 +272,26 @@ cities around the world at <a href="https://github.com/U-Shift/GTFShift/blob/mai
 <span><span class="co">#&gt; &gt; Of those, 14 shapes (100.00% of 14 matched) have a distance difference below 1000 meters, a points difference below 500 meters</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">shapes_match_routes</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    route_id           shape_id            osm_id          distance_diff   </span></span>
-<span><span class="co">#&gt;  Length:14          Length:14          Length:14          Min.   :  5.22  </span></span>
-<span><span class="co">#&gt;  Class :character   Class :character   Class :character   1st Qu.: 20.05  </span></span>
-<span><span class="co">#&gt;  Mode  :character   Mode  :character   Mode  :character   Median : 31.36  </span></span>
-<span><span class="co">#&gt;                                                           Mean   : 49.86  </span></span>
-<span><span class="co">#&gt;                                                           3rd Qu.: 43.68  </span></span>
-<span><span class="co">#&gt;                                                           Max.   :278.50  </span></span>
-<span><span class="co">#&gt;   points_diff       stops_diff     route_short_name   route_long_name   </span></span>
-<span><span class="co">#&gt;  Min.   : 7.851   Min.   :0.0000   Length:14          Length:14         </span></span>
-<span><span class="co">#&gt;  1st Qu.:12.197   1st Qu.:0.0000   Class :character   Class :character  </span></span>
-<span><span class="co">#&gt;  Median :22.718   Median :0.0000   Mode  :character   Mode  :character  </span></span>
-<span><span class="co">#&gt;  Mean   :25.424   Mean   :0.4286                                        </span></span>
-<span><span class="co">#&gt;  3rd Qu.:37.073   3rd Qu.:0.7500                                        </span></span>
-<span><span class="co">#&gt;  Max.   :49.869   Max.   :3.0000                                        </span></span>
-<span><span class="co">#&gt;    osm_name           osm_ref                       geom   </span></span>
-<span><span class="co">#&gt;  Length:14          Length:14          MULTILINESTRING:14  </span></span>
-<span><span class="co">#&gt;  Class :character   Class :character   epsg:4326      : 0  </span></span>
-<span><span class="co">#&gt;  Mode  :character   Mode  :character   +proj=long...  : 0  </span></span>
-<span><span class="co">#&gt;                                                            </span></span>
-<span><span class="co">#&gt;                                                            </span></span>
+<span><span class="co">#&gt;       route_id       shape_id        osm_id   distance_diff     points_diff    </span></span>
+<span><span class="co">#&gt;  Length   :14   Length   :14   Length   :14   Min.   :  5.22   Min.   : 7.851  </span></span>
+<span><span class="co">#&gt;  N.unique : 8   N.unique :14   N.unique :14   1st Qu.: 20.05   1st Qu.:12.197  </span></span>
+<span><span class="co">#&gt;  N.blank  : 0   N.blank  : 0   N.blank  : 0   Median : 31.36   Median :22.718  </span></span>
+<span><span class="co">#&gt;  Min.nchar: 4   Min.nchar:12   Min.nchar: 7   Mean   : 49.86   Mean   :25.424  </span></span>
+<span><span class="co">#&gt;  Max.nchar: 5   Max.nchar:14   Max.nchar: 8   3rd Qu.: 43.68   3rd Qu.:37.073  </span></span>
+<span><span class="co">#&gt;                                               Max.   :278.50   Max.   :49.869  </span></span>
+<span><span class="co">#&gt;    stops_diff      route_short_name  route_long_name      osm_name </span></span>
+<span><span class="co">#&gt;  Min.   :0.0000   Length   :14      Length   :14     Length   :14  </span></span>
+<span><span class="co">#&gt;  1st Qu.:0.0000   N.unique : 4      N.unique : 8     N.unique :14  </span></span>
+<span><span class="co">#&gt;  Median :0.0000   N.blank  : 0      N.blank  : 0     N.blank  : 0  </span></span>
+<span><span class="co">#&gt;  Mean   :0.4286   Min.nchar: 3      Min.nchar:17     Min.nchar:26  </span></span>
+<span><span class="co">#&gt;  3rd Qu.:0.7500   Max.nchar: 3      Max.nchar:41     Max.nchar:82  </span></span>
+<span><span class="co">#&gt;  Max.   :3.0000                                                    </span></span>
+<span><span class="co">#&gt;       osm_ref                geom   </span></span>
+<span><span class="co">#&gt;  Length   :14   MULTILINESTRING:14  </span></span>
+<span><span class="co">#&gt;  N.unique : 4   epsg:4326      : 0  </span></span>
+<span><span class="co">#&gt;  N.blank  : 0   +proj=long...  : 0  </span></span>
+<span><span class="co">#&gt;  Min.nchar: 3                       </span></span>
+<span><span class="co">#&gt;  Max.nchar: 3                       </span></span>
 <span><span class="co">#&gt; </span></span>
 <span></span>
 <span><span class="co"># Visualize results</span></span>

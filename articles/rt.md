@@ -1,6 +1,7 @@
 # 7. GTFS Real Time
 
 ``` r
+
 library(GTFShift)
 library(dplyr)
 library(mapview)
@@ -27,6 +28,7 @@ data at regular intervals (default is every 60 seconds) until manually
 stopped (CTRL+C).
 
 ``` r
+
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "lisboa"
@@ -45,6 +47,7 @@ takes a lane prioritization data frame and a GTFS-RT collection (as an
 Refer to the method documentation for the full details.
 
 ``` r
+
 # Prioritization based on static GTFS data and infrastructure characteristics
 gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
 osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
@@ -79,6 +82,7 @@ speed, and speed percentiles, providing a more comprehensive view of
 lane performance based on real-time data.
 
 ``` r
+
 lane_prioritization_0800 = lane_prioritization_extended |> filter(hour==8)
 
 mapview::mapview(
@@ -89,6 +93,7 @@ mapview::mapview(
 ```
 
 ``` r
+
 
 p50_frequency = quantile(lane_prioritization_0800$frequency, 0.5, na.rm=TRUE)
 p50_speed = quantile(lane_prioritization_0800$speed_avg, 0.5, na.rm=TRUE)

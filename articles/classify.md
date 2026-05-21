@@ -1,6 +1,7 @@
 # 5. Classify transit data
 
 ``` r
+
 library(GTFShift)
 library(tidytransit)
 library(mapview)
@@ -24,6 +25,7 @@ their applicability with simple examples.
 > for more details.
 
 ``` r
+
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "barreiro"
@@ -59,6 +61,7 @@ all may serve a particular destination”. Applications of this method to
 other scenarios should consider this aspect.
 
 ``` r
+
 # Get route frequency analysis
 frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
 
@@ -102,6 +105,7 @@ table(frequency_los$frequency_los)
 ```
 
 ``` r
+
 mapview::mapview(
   frequency_los |> filter(hour == 8),
   zcol = "frequency_los",

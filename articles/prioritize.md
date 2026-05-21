@@ -1,6 +1,7 @@
 # Prioritize bus lane implementation
 
 ``` r
+
 library(GTFShift)
 library(tidytransit)
 library(mapview)
@@ -64,6 +65,7 @@ and lane characteristics). With a single call, it returns a data.frame
 with the relevant metrics for each road segment with transit service.
 
 ``` r
+
 # Get GTFS from library GTFS database for Portugal
 data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id <- "lisboa"
@@ -77,13 +79,14 @@ lanes <- prioritize_lanes(gtfs, osm_q)
 ```
 
 ``` r
+
 summary(lanes)
-#>   way_osm_id             hour         frequency      is_bus_lane    
-#>  Length:132056      Min.   : 0.00   Min.   : 1.000   Mode :logical  
-#>  Class :character   1st Qu.: 8.00   1st Qu.: 3.000   FALSE:120040   
-#>  Mode  :character   Median :13.00   Median : 6.000   TRUE :12016    
-#>                     Mean   :12.56   Mean   : 9.673                  
-#>                     3rd Qu.:18.00   3rd Qu.:13.000                  
+#>      way_osm_id          hour         frequency      is_bus_lane    
+#>  Length   :132056   Min.   : 0.00   Min.   : 1.000   Mode :logical  
+#>  N.unique :  6744   1st Qu.: 8.00   1st Qu.: 3.000   FALSE:120040   
+#>  N.blank  :     0   Median :13.00   Median : 6.000   TRUE :12016    
+#>  Min.nchar:     7   Mean   :12.56   Mean   : 9.673                  
+#>  Max.nchar:    10   3rd Qu.:18.00   3rd Qu.:13.000                  
 #>                     Max.   :23.00   Max.   :99.000                  
 #>  n_lanes_parking   n_lanes_circulation    n_lanes       n_directions  
 #>  Min.   :0.00000   Min.   :1.00        Min.   :1.000   Min.   :1.000  
@@ -92,12 +95,12 @@ summary(lanes)
 #>  Mean   :0.01438   Mean   :2.15        Mean   :2.165   Mean   :1.364  
 #>  3rd Qu.:0.00000   3rd Qu.:3.00        3rd Qu.:3.000   3rd Qu.:2.000  
 #>  Max.   :2.00000   Max.   :7.00        Max.   :7.000   Max.   :2.000  
-#>  n_lanes_circulation_direction n_lanes_direction    routes         
-#>  Min.   :1.000                 Min.   :1.000     Length:132056     
-#>  1st Qu.:1.000                 1st Qu.:1.000     Class :character  
-#>  Median :1.000                 Median :1.000     Mode  :character  
-#>  Mean   :1.703                 Mean   :1.713                       
-#>  3rd Qu.:2.000                 3rd Qu.:2.000                       
+#>  n_lanes_circulation_direction n_lanes_direction       routes      
+#>  Min.   :1.000                 Min.   :1.000     Length   :132056  
+#>  1st Qu.:1.000                 1st Qu.:1.000     N.unique :  3093  
+#>  Median :1.000                 Median :1.000     N.blank  :     0  
+#>  Mean   :1.703                 Mean   :1.713     Min.nchar:     4  
+#>  3rd Qu.:2.000                 3rd Qu.:2.000     Max.nchar:    95  
 #>  Max.   :6.000                 Max.   :6.000                       
 #>             geom       
 #>  LINESTRING   :132056  
@@ -117,6 +120,7 @@ experiencing significant delays due to traffic congestion, which may
 benefit from bus lane implementation.
 
 ``` r
+
 rt_collection <- read.csv("rt_collect_file.csv") |>
   sf::st_as_sf(coords = c("vehicle.position.longitude", "vehicle.position.latitude"), crs = 4326)
 
@@ -139,6 +143,7 @@ can be used to obtain statistics about lane prioritization, weighted by
 length and/or frequency.
 
 ``` r
+
 # For network analysis, frequency weight is more appropriate,
 # to give more importance to the segments with more service
 lanes_0800 <- lanes |> filter(hour == 8)
@@ -208,32 +213,33 @@ implementation if they have more than 1 lane per direction and a
 frequency above the median number of buses per hour registered at 8:00.
 
 ``` r
+
 lanes_0800 <- lanes |> filter(hour == 8)
 summary(lanes_0800)
-#>   way_osm_id             hour     frequency     is_bus_lane    
-#>  Length:6665        Min.   :8   Min.   : 1.00   Mode :logical  
-#>  Class :character   1st Qu.:8   1st Qu.: 5.00   FALSE:6114     
-#>  Mode  :character   Median :8   Median :10.00   TRUE :551      
-#>                     Mean   :8   Mean   :13.32                  
-#>                     3rd Qu.:8   3rd Qu.:18.00                  
-#>                     Max.   :8   Max.   :99.00                  
-#>                                                                
-#>  n_lanes_parking   n_lanes_circulation    n_lanes       n_directions  
-#>  Min.   :0.00000   Min.   :1.000       Min.   :1.000   Min.   :1.000  
-#>  1st Qu.:0.00000   1st Qu.:1.000       1st Qu.:1.000   1st Qu.:1.000  
-#>  Median :0.00000   Median :2.000       Median :2.000   Median :1.000  
-#>  Mean   :0.01425   Mean   :2.122       Mean   :2.136   Mean   :1.365  
-#>  3rd Qu.:0.00000   3rd Qu.:3.000       3rd Qu.:3.000   3rd Qu.:2.000  
-#>  Max.   :2.00000   Max.   :7.000       Max.   :7.000   Max.   :2.000  
-#>                                                                       
-#>  n_lanes_circulation_direction n_lanes_direction    routes         
-#>  Min.   :1.000                 Min.   :1.000     Length:6665       
-#>  1st Qu.:1.000                 1st Qu.:1.000     Class :character  
-#>  Median :1.000                 Median :1.000     Mode  :character  
-#>  Mean   :1.679                 Mean   :1.689                       
-#>  3rd Qu.:2.000                 3rd Qu.:2.000                       
-#>  Max.   :6.000                 Max.   :6.000                       
-#>                                                                    
+#>      way_osm_id        hour     frequency     is_bus_lane     n_lanes_parking  
+#>  Length   :6665   Min.   :8   Min.   : 1.00   Mode :logical   Min.   :0.00000  
+#>  N.unique :6665   1st Qu.:8   1st Qu.: 5.00   FALSE:6114      1st Qu.:0.00000  
+#>  N.blank  :   0   Median :8   Median :10.00   TRUE :551       Median :0.00000  
+#>  Min.nchar:   7   Mean   :8   Mean   :13.32                   Mean   :0.01425  
+#>  Max.nchar:  10   3rd Qu.:8   3rd Qu.:18.00                   3rd Qu.:0.00000  
+#>                   Max.   :8   Max.   :99.00                   Max.   :2.00000  
+#>                                                                                
+#>  n_lanes_circulation    n_lanes       n_directions  
+#>  Min.   :1.000       Min.   :1.000   Min.   :1.000  
+#>  1st Qu.:1.000       1st Qu.:1.000   1st Qu.:1.000  
+#>  Median :2.000       Median :2.000   Median :1.000  
+#>  Mean   :2.122       Mean   :2.136   Mean   :1.365  
+#>  3rd Qu.:3.000       3rd Qu.:3.000   3rd Qu.:2.000  
+#>  Max.   :7.000       Max.   :7.000   Max.   :2.000  
+#>                                                     
+#>  n_lanes_circulation_direction n_lanes_direction       routes    
+#>  Min.   :1.000                 Min.   :1.000     Length   :6665  
+#>  1st Qu.:1.000                 1st Qu.:1.000     N.unique : 955  
+#>  Median :1.000                 Median :1.000     N.blank  :   0  
+#>  Mean   :1.679                 Mean   :1.689     Min.nchar:   5  
+#>  3rd Qu.:2.000                 3rd Qu.:2.000     Max.nchar:  77  
+#>  Max.   :6.000                 Max.   :6.000                     
+#>                                                                  
 #>    speed_avg         speed_median      speed_p25        speed_p75       
 #>  Min.   : 0.01694   Min.   : 0.000   Min.   : 0.000   Min.   : 0.01694  
 #>  1st Qu.: 8.53002   1st Qu.: 7.994   1st Qu.: 6.138   1st Qu.:10.19889  
@@ -241,21 +247,22 @@ summary(lanes_0800)
 #>  Mean   :10.24983   Mean   : 9.589   Mean   : 7.377   Mean   :12.39146  
 #>  3rd Qu.:11.48475   3rd Qu.:10.886   3rd Qu.: 8.469   3rd Qu.:13.90043  
 #>  Max.   :64.79895   Max.   :44.118   Max.   :41.508   Max.   :77.74918  
-#>  NA's   :128        NA's   :128      NA's   :128      NA's   :128       
-#>   speed_count     route_names                   geom     
-#>  Min.   :   1.0   Length:6665        LINESTRING   :6665  
-#>  1st Qu.:  42.0   Class :character   epsg:4326    :   0  
-#>  Median : 101.0   Mode  :character   +proj=long...:   0  
-#>  Mean   : 176.5                                          
-#>  3rd Qu.: 217.0                                          
-#>  Max.   :5541.0                                          
-#>  NA's   :128
+#>  NAs    :128        NAs    :128      NAs    :128      NAs    :128       
+#>   speed_count        route_names              geom     
+#>  Min.   :   1.0   Length   :6665   LINESTRING   :6665  
+#>  1st Qu.:  42.0   N.unique : 916   epsg:4326    :   0  
+#>  Median : 101.0   N.blank  :   0   +proj=long...:   0  
+#>  Mean   : 176.5   Min.nchar:   3                       
+#>  3rd Qu.: 217.0   Max.nchar:  51                       
+#>  Max.   :5541.0                                        
+#>  NAs    :128
 
 p50_frequency <- quantile(lanes_0800$frequency, 0.5, na.rm = TRUE)
 p50_speed <- quantile(lanes_0800$speed_avg, 0.5, na.rm = TRUE)
 ```
 
 ``` r
+
 mapview::mapview(
   lanes_0800 |> filter(is_bus_lane & (frequency < p50_frequency | (is.na(n_lanes) | n_lanes_direction <= 1) | speed_avg <= p50_speed)),
   layer.name = sprintf("Bus lane with -%d bus/h OR -2 lane/dir OR %.2f km/h or - avg. speed", p50_frequency, p50_speed),

@@ -62,7 +62,7 @@ A tidygtfs object.
 ## Details
 
 Aggregates multiple feeds using
-[`gtfstools::merge_gtfs()`](https://ipeagit.github.io/gtfstools/reference/merge_gtfs.html).
+[`gtfstools::merge_gtfs()`](https://rdrr.io/pkg/gtfstools/man/merge_gtfs.html).
 When generating transfers, those already existing in each GTFS file are
 kept, extended with new ones computed based on the stops network of the
 final aggregated version.
@@ -79,7 +79,7 @@ For a detailed example, see the
 
 ## See also
 
-[`gtfstools::merge_gtfs()`](https://ipeagit.github.io/gtfstools/reference/merge_gtfs.html)
+[`gtfstools::merge_gtfs()`](https://rdrr.io/pkg/gtfstools/man/merge_gtfs.html)
 
 [`gtfsrouter::gtfs_transfer_table()`](https://rdrr.io/pkg/gtfsrouter/man/gtfs_transfer_table.html)
 

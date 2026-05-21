@@ -1,6 +1,7 @@
 # 6. Get OSM data
 
 ``` r
+
 library(GTFShift)
 library(tidytransit)
 library(dplyr)
@@ -20,6 +21,7 @@ their spatial distribution is important to study operation dynamics.
 for a given area.
 
 ``` r
+
 aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
 lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
 
@@ -27,6 +29,7 @@ bus_lanes = GTFShift::osm_bus_lanes(lisboa) |> select(osm_id)
 ```
 
 ``` r
+
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
 
@@ -41,6 +44,7 @@ methods to use them in the GTFS analysis.
 > urban bus network.
 
 ``` r
+
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 gtfs_id = "lisboa"
@@ -64,6 +68,7 @@ allow to query OSM for the routes matching the feed trips, given,
 respectively, their shape or trip id.
 
 ``` r
+
 # Subset feed for some routes only, for demonstration purposes
 gtfs_794 = GTFShift::filter_by_route_name(gtfs, list("794"))
 
@@ -72,6 +77,7 @@ shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q)
 ```
 
 ``` r
+
 shapes_geometry_osm
 #> Simple feature collection with 2 features and 2 fields
 #> Geometry type: MULTILINESTRING
@@ -84,6 +90,7 @@ shapes_geometry_osm
 ```
 
 ``` r
+
 # Get original shapes, for comparison
 shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
 ```
@@ -91,12 +98,14 @@ shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
 #### GTFS shapes
 
 ``` r
+
 mapview::mapview(shapes_sf, zcol = "shape_id", legend = TRUE, layer.name="GTFS shapes")
 ```
 
 #### OSM routes
 
 ``` r
+
 mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.name="OSM routes")
 ```
 
@@ -108,11 +117,13 @@ enables the retrieval of the OSM routes disaggregated by the individual
 ways that compose them.
 
 ``` r
+
 # Match shapes geometry disaggregated by ways
 shapes_ways_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q, ways=TRUE)
 ```
 
 ``` r
+
 shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
 #> Simple feature collection with 324 features and 4 fields
 #> Geometry type: LINESTRING
@@ -134,6 +145,7 @@ shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
 ```
 
 ``` r
+
 mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.name="OSM ways")
 ```
 
@@ -163,6 +175,7 @@ end points, total length, and number of stops.
 > [dev/test_osm_shapes_match_routes_local.R](https://github.com/U-Shift/GTFShift/blob/main/dev/test_osm_shapes_match_routes_local.R).
 
 ``` r
+
 # Subset feed for some routes only, for demonstration purposes
 gtfs_subset = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65B"))
 
@@ -175,27 +188,28 @@ shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
 ```
 
 ``` r
+
 summary(shapes_match_routes)
-#>    route_id           shape_id            osm_id          distance_diff   
-#>  Length:14          Length:14          Length:14          Min.   :  5.22  
-#>  Class :character   Class :character   Class :character   1st Qu.: 20.05  
-#>  Mode  :character   Mode  :character   Mode  :character   Median : 31.36  
-#>                                                           Mean   : 49.86  
-#>                                                           3rd Qu.: 43.68  
-#>                                                           Max.   :278.50  
-#>   points_diff       stops_diff     route_short_name   route_long_name   
-#>  Min.   : 7.851   Min.   :0.0000   Length:14          Length:14         
-#>  1st Qu.:12.197   1st Qu.:0.0000   Class :character   Class :character  
-#>  Median :22.718   Median :0.0000   Mode  :character   Mode  :character  
-#>  Mean   :25.424   Mean   :0.4286                                        
-#>  3rd Qu.:37.073   3rd Qu.:0.7500                                        
-#>  Max.   :49.869   Max.   :3.0000                                        
-#>    osm_name           osm_ref                       geom   
-#>  Length:14          Length:14          MULTILINESTRING:14  
-#>  Class :character   Class :character   epsg:4326      : 0  
-#>  Mode  :character   Mode  :character   +proj=long...  : 0  
-#>                                                            
-#>                                                            
+#>       route_id       shape_id        osm_id   distance_diff     points_diff    
+#>  Length   :14   Length   :14   Length   :14   Min.   :  5.22   Min.   : 7.851  
+#>  N.unique : 8   N.unique :14   N.unique :14   1st Qu.: 20.05   1st Qu.:12.197  
+#>  N.blank  : 0   N.blank  : 0   N.blank  : 0   Median : 31.36   Median :22.718  
+#>  Min.nchar: 4   Min.nchar:12   Min.nchar: 7   Mean   : 49.86   Mean   :25.424  
+#>  Max.nchar: 5   Max.nchar:14   Max.nchar: 8   3rd Qu.: 43.68   3rd Qu.:37.073  
+#>                                               Max.   :278.50   Max.   :49.869  
+#>    stops_diff      route_short_name  route_long_name      osm_name 
+#>  Min.   :0.0000   Length   :14      Length   :14     Length   :14  
+#>  1st Qu.:0.0000   N.unique : 4      N.unique : 8     N.unique :14  
+#>  Median :0.0000   N.blank  : 0      N.blank  : 0     N.blank  : 0  
+#>  Mean   :0.4286   Min.nchar: 3      Min.nchar:17     Min.nchar:26  
+#>  3rd Qu.:0.7500   Max.nchar: 3      Max.nchar:41     Max.nchar:82  
+#>  Max.   :3.0000                                                    
+#>       osm_ref                geom   
+#>  Length   :14   MULTILINESTRING:14  
+#>  N.unique : 4   epsg:4326      : 0  
+#>  N.blank  : 0   +proj=long...  : 0  
+#>  Min.nchar: 3                       
+#>  Max.nchar: 3                       
 #> 
 
 # Visualize results
@@ -209,6 +223,7 @@ shapes_match_routes$map_name = paste(
 ```
 
 ``` r
+
 mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name="route_short_name | shape_id | osm_id")
 ```
 
@@ -245,6 +260,7 @@ the road network exported from OpenStreetMaps, using Python
 #### Original network
 
 ``` r
+
 library(osmdata)
 
 road_osm = opq("Arroios, Lisboa, Portugal") |>
@@ -257,12 +273,14 @@ road_osm = road_osm$osm_lines
 ```
 
 ``` r
+
 mapview::mapview(road_osm)
 ```
 
 #### Simplified network
 
 ``` r
+
 centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
 #> Using Python: /usr/bin/python3.12
 #> Creating virtual environment '~/.virtualenvs/r-reticulate' ...
@@ -274,5 +292,6 @@ centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
 ```
 
 ``` r
+
 mapview::mapview(centerlines)
 ```

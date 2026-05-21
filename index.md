@@ -31,6 +31,7 @@ You can install the development version of **GTFShift** from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("U-Shift/GTFShift")
 ```
@@ -38,6 +39,7 @@ remotes::install_github("U-Shift/GTFShift")
 ## Load the package
 
 ``` r
+
 library(GTFShift)
 ```
 

@@ -1,6 +1,7 @@
 # 1. Getting transit data
 
 ``` r
+
 library(GTFShift)
 library(tidytransit)
 ```
@@ -32,6 +33,7 @@ the feed for any integrity errors and fixing them automatically, as well
 as the option to store it locally.
 
 ``` r
+
 # Using tidytransit
 gtfs = tidytransit::load_feed("https://operator.com/gtfs.zip")
 
@@ -57,6 +59,7 @@ To use it, an access token must be provided. It can be obtained for free
 at Mobility Database [website](https://mobilitydatabase.org/account).
 
 ``` r
+
 aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE) |> sf::st_bbox()
 
 # usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work
@@ -70,18 +73,20 @@ feeds |>
   dplyr::filter(status == "active") |>
   dplyr::select(provider, status, producer_url) |>
   head()
-#>                            provider status
-#> 1                            Carris active
-#> 2       Cascais Próxima, E.M., S.A. active
-#> 3                          Fertagus active
-#> 4           Metro de Lisboa (Metro) active
-#> 5 Transportes Coletivos do Barreiro active
+#>                                      provider status
+#> 1                                      Carris active
+#> 2                 Cascais Próxima, E.M., S.A. active
+#> 3                                    Fertagus active
+#> 4                     Metro de Lisboa (Metro) active
+#> 5 Metro Transportes do Sul, Metro Sul do Tejo active
+#> 6           Transportes Coletivos do Barreiro active
 #>                                                                       producer_url
 #> 1                            https://gateway.carris.pt/gateway/gtfs/api/v2.11/GTFS
 #> 2 https://drive.google.com/uc?export=download&id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX
 #> 3                             https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip
 #> 4                      https://www.metrolisboa.pt/google_transit/googleTransit.zip
-#> 5                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
+#> 5                                              https://mts.pt/imt/MTS-20240129.zip
+#> 6                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
 
 gtfs = GTFShift::load_feed(feeds$producer_url[2], create_transfers=FALSE)
 summary(gtfs)
@@ -90,11 +95,11 @@ summary(gtfs)
 #> agency       Carris
 #> service      from 2026-01-01 to 2026-06-05
 #> uses         stop_times (no frequencies)
-#> # routes       176
-#> # trips      79044
-#> # stop_ids    2330
-#> # stop_names  1140
-#> # shapes       311
+#> # routes       174
+#> # trips      77928
+#> # stop_ids    2331
+#> # stop_names  1138
+#> # shapes       306
 ```
 
 ### Using GTFShift incorporated database for Portugal
@@ -112,6 +117,7 @@ for Portuguese operators. It is a CSV file, available at
 - `GTFSDocs`, the URL to the page that documents the operator GTFS.
 
 ``` r
+
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 head(data)
 #>         ID LastUpdate ReferenceDate
@@ -157,9 +163,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      187
-#> # trips      1906
+#> # routes      181
+#> # trips      1736
 #> # stop_ids    454
 #> # stop_names  454
-#> # shapes      263
+#> # shapes      253
 ```

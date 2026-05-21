@@ -42,6 +42,7 @@ have been followed, up to the definition of the variable
 file.
 
 ``` r
+
 write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
   distance_diff=round(distance_diff),
   points_diff=round(points_diff)
@@ -87,6 +88,7 @@ If there is any dependency missing, just install it with
 [`reticulate::py_install()`](https://rstudio.github.io/reticulate/reference/py_install.html).
 
 ``` r
+
 # library(reticulate)
 # py_install("geopy")
 ```
