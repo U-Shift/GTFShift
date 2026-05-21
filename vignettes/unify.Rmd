@@ -38,12 +38,30 @@ Public transit analysis takes advantage of the standardized GTFS format. However
 
 > This article uses GTFS feeds from the library GTFS database for Portugal as an example. Refer to the [vignette("download")](./download) for more details.
 
-```{r}
+
+
+```{r eval=FALSE}
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
 
 gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
   feed = GTFShift::load_feed(data$URL[data$ID == ID], create_transfers=FALSE)
+  summary(feed)
+  return(feed)
+})
+```
+
+```{r echo=FALSE}
+# FIx for https://github.com/U-Shift/GTFShift/issues/81
+# Get GTFS from library GTFS database for Portugal
+data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+
+gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
+  feed = GTFShift::load_feed(data$URL[data$ID == ID], create_transfers=FALSE)
+   # If feed has columns start_pickup_drop_off_window and end_pickup_drop_off_window, remove them (they are not supported by gtfsrouter)
+  if ("start_pickup_drop_off_window" %in% names(feed$stop_times)) {
+    feed$stop_times <- feed$stop_times |> select(-start_pickup_drop_off_window, -end_pickup_drop_off_window)
+  }
   summary(feed)
   return(feed)
 })
