@@ -25,7 +25,7 @@
 #' \dontrun{
 #' gtfs1 <- GTFShift::load_feed("gtfs1.zip")
 #' gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-#' unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers=TRUE)
+#' unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers = TRUE)
 #' }
 #'
 #' @seealso \code{gtfstools::merge_gtfs()}
@@ -35,14 +35,13 @@
 #' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
-unify <- function(..., prefix = FALSE, store_path=NA, create_transfers=FALSE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE) {
-
-  gtfss = list(...)
+unify <- function(..., prefix = FALSE, store_path = NA, create_transfers = FALSE, transfer_distance = 300, transfer_time = 120, transfer_street_routing = FALSE) {
+  gtfss <- list(...)
 
   # Merge them
   message(sprintf("1. Starting merge process..."))
-  prefix_arg = FALSE
-  if (prefix) prefix_arg = unlist( lapply( gtfss, function(feed) feed$agency$agency_id ) )
+  prefix_arg <- FALSE
+  if (prefix) prefix_arg <- unlist(lapply(gtfss, function(feed) paste(feed$agency$agency_id, collapse = "_")))
   gtfs <- gtfstools::merge_gtfs(
     gtfss,
     prefix = prefix_arg
@@ -59,8 +58,10 @@ unify <- function(..., prefix = FALSE, store_path=NA, create_transfers=FALSE, tr
     gtfs_temp <- file.path(temp_dir, "gtfs.zip")
     tidytransit::write_gtfs(gtfs, gtfs_temp)
 
-    suppressMessages(suppressWarnings({gtfs_transfers <- gtfsrouter::extract_gtfs(gtfs_temp)})) # Suppress warning that has no transfers, as they will be generated next
-    gtfs_transfers <- gtfsrouter::gtfs_transfer_table(gtfs_transfers, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
+    suppressMessages(suppressWarnings({
+      gtfs_transfers <- gtfsrouter::extract_gtfs(gtfs_temp)
+    })) # Suppress warning that has no transfers, as they will be generated next
+    gtfs_transfers <- gtfsrouter::gtfs_transfer_table(gtfs_transfers, d_limit = transfer_distance, min_transfer_time = transfer_time, network_times = transfer_street_routing)
     gtfs$transfers <- gtfs_transfers$transfers
     gtfs <- tidytransit::as_tidygtfs(gtfs)
   }
