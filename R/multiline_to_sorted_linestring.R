@@ -78,6 +78,12 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
             next_end <- lwgeom::st_endpoint(next_line$geometry)
         }
 
+        # Check if distance between current and next exceeds their aggregated length and if so, discard...
+        if (st_distance(current_line, next_line) > (st_length(current_line) + st_length(next_line))) {
+            remaining_lines <- remaining_lines[-nearest_idx, ]
+            next
+        }
+
         # Check if we need to reverse the next line to connect properly
         if(next_start == next_end) {
             # message("> Circular shape...")
