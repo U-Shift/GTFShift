@@ -62,14 +62,26 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
         last_point <- lwgeom::st_endpoint(current_line$geometry)
 
         # Find the closest line segment to continue the route
-        nearest_idx <- st_nearest_feature(last_point, remaining_lines$start)
+        nearest_idx_start <- st_nearest_feature(last_point, remaining_lines$start)
+        nearest_idx_end <- st_nearest_feature(last_point, remaining_lines$end)
+        nearest_idx = min(nearest_idx_start, nearest_idx_end)
         next_line <- remaining_lines[nearest_idx, ]
-
-        # Check if we need to reverse the next line to connect properly
         next_start <- lwgeom::st_startpoint(next_line$geometry)
         next_end <- lwgeom::st_endpoint(next_line$geometry)
 
-        if (st_distance(last_point, next_start) > st_distance(last_point, next_end)) {
+
+        # If they have same geometry, consider other nearest 
+        if (next_line$geometry == current_line$geometry) {
+            nearest_idx = max(nearest_idx_start, nearest_idx_end)
+            next_line <- remaining_lines[nearest_idx, ]
+            next_start <- lwgeom::st_startpoint(next_line$geometry)
+            next_end <- lwgeom::st_endpoint(next_line$geometry)
+        }
+
+        # Check if we need to reverse the next line to connect properly
+        if(next_start == next_end) {
+            # message("> Circular shape...")
+        } else if (st_distance(last_point, next_start) > st_distance(last_point, next_end)) {
             next_line$geometry <- st_reverse(next_line$geometry)
         }
 
