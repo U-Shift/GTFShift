@@ -48,6 +48,10 @@ create_shapes_from_sf <- function(sf_shapes, gtfs) {
         left_join(gtfs$stops |> select(stop_id, stop_name, stop_lat, stop_lon), by = "stop_id") |>
         st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326) |>
         rename(stop_point = geometry)
+    
+    multilinestring <- (sf_shapes |> filter(shape_id=="1-VA-TERM"))$geom
+    start_point <- (sf_shapes_linestrings |> filter(shape_id=="1-VA-TERM"))$stop_point
+    # 10-FT-COINA
 
     # Convert MULTILINESTRING to LINESTRING
     current_geom_col <- attr(sf_shapes, "sf_column")
@@ -65,6 +69,11 @@ create_shapes_from_sf <- function(sf_shapes, gtfs) {
             start_point = stop_point
         )) |>
         ungroup()
+
+    #mapview::mapview(sf_shapes_linestrings |> select(-stop_point), zcol="shape_id")
+    #sf_shapes_linestrings_debug = sf_shapes_linestrings|>filter(shape_id=="1-VA-TERM")
+    #mapview::mapview((sf_shapes_linestrings_debug )$geom)+
+    #    mapview::mapview((sf_shapes_linestrings_debug)$stop_point) 
 
     # Convert LINESTRING to GTFS shapes.txt data.frame
     shapes_gtfstools <- gtfstools::convert_sf_to_shapes(
