@@ -62,7 +62,7 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
         last_point <- lwgeom::st_endpoint(current_line$geometry)
 
         # Find the closest line segment to continue the route
-        nearest_idx <- st_nearest_feature(last_point, remaining_lines)
+        nearest_idx <- st_nearest_feature(last_point, remaining_lines$start)
         next_line <- remaining_lines[nearest_idx, ]
 
         # Check if we need to reverse the next line to connect properly
