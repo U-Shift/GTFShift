@@ -46,6 +46,12 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
     if (!is.null(start_point)) {
         nearest_idx <- st_nearest_feature(start_point, linestrings)
         current_line <- linestrings[nearest_idx, ]
+        current_start <- lwgeom::st_startpoint(current_line$geometry)
+        current_end <- lwgeom::st_endpoint(current_line$geometry)
+        # If start_point is closest to line end point than start point, invert geometry
+        if (st_distance(start_point, current_start) > st_distance(start_point, current_end)) {
+            current_line$geometry = st_reverse(current_line$geometry)
+        }
     } else {
         current_line <- linestrings[1, ] # Start with the first line
     }
