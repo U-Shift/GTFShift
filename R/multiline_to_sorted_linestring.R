@@ -48,6 +48,7 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
         current_line <- linestrings[nearest_idx, ]
         current_start <- lwgeom::st_startpoint(current_line$geometry)
         current_end <- lwgeom::st_endpoint(current_line$geometry)
+        # mapview(start_point, col.regions = "yellow") + mapview(current_line) + mapview(current_start, col.regions="pink") + mapview(current_end, col.regions="gray")
         # If start_point is closest to line end point than start point, invert geometry
         if (st_distance(start_point, current_start) > st_distance(start_point, current_end)) {
             current_line$geometry = st_reverse(current_line$geometry)
@@ -58,9 +59,14 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
     ordered_lines[[1]] <- current_line$geometry
     remaining_lines <- linestrings[-1, ]
 
-    while (nrow(remaining_lines) > 0) {
-        last_point <- lwgeom::st_endpoint(current_line$geometry)
+    # mapview(linestrings, layer.name="linestrings") + mapview(ordered_lines[[1]], color = "red") + mapview(start_point, col.regions = "yellow")
 
+    while (nrow(remaining_lines) > 0) { 
+        # && length(ordered_lines)<=12 # 7
+        #  && length(ordered_lines)<=31 # 10
+        last_point <- lwgeom::st_endpoint(current_line$geometry)
+        # mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, color="blue")
+        # mapview(remaining_lines)
         # Find the closest line segment to continue the route
         nearest_idx_start <- st_nearest_feature(last_point, remaining_lines$start)
         nearest_idx_end <- st_nearest_feature(last_point, remaining_lines$end)
@@ -69,9 +75,12 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
         next_start <- lwgeom::st_startpoint(next_line$geometry)
         next_end <- lwgeom::st_endpoint(next_line$geometry)
 
+        # mapview(start_point, col.regions="gray") + mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, col.regions="orange") + mapview(next_line, color="green")
+        # mapview(remaining_lines$geom) + mapview(remaining_lines$start, col.regions="pink") + mapview(remaining_lines$end, col.regions="black")
 
         # If they have same geometry, consider other nearest 
         if (next_line$geometry == current_line$geometry) {
+            message("> Next has same geometry as current, considering other match...")
             nearest_idx = max(nearest_idx_start, nearest_idx_end)
             next_line <- remaining_lines[nearest_idx, ]
             next_start <- lwgeom::st_startpoint(next_line$geometry)
@@ -80,14 +89,17 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
 
         # Check if distance between current and next exceeds their aggregated length and if so, discard...
         if (st_distance(current_line, next_line) > (st_length(current_line) + st_length(next_line))) {
+            message("> Next is farther than current + next length, discarding it...")
             remaining_lines <- remaining_lines[-nearest_idx, ]
             next
         }
 
         # Check if we need to reverse the next line to connect properly
+        # mapview(current_line, color="red") + mapview(last_point, color="blue") + mapview(next_line, color="green") + mapview(next_start, col.regions="pink") + mapview(next_end, col.regions="black")
         if(next_start == next_end) {
-            # message("> Circular shape...")
+            message("> Circular shape...")
         } else if (st_distance(last_point, next_start) > st_distance(last_point, next_end)) {
+            message("> Inverting next line...")
             next_line$geometry <- st_reverse(next_line$geometry)
         }
 
@@ -99,6 +111,21 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
     # 4. Extract ALL coordinates in order
     all_coords <- do.call(rbind, lapply(ordered_lines, st_coordinates))[, 1:2]
 
+    # Convert list of linestrings to dataframe of linestrings, preserving list order
+    combined_sfc <- do.call(c, ordered_lines)
+    line_df <- st_sf(geometry = combined_sfc) |> mutate(order = row_number())
+    # mapview(start_point, col.regions="gray") + mapview(line_df, zcol = "order")
+    # View(line_df|>st_drop_geometry())
+
+    # Convert matrix to data.frame with x and y columns
+    all_cords_df <- as.data.frame(all_coords) |>
+        st_as_sf(coords = c("X", "Y"), crs = st_crs(multilinestring)) |>
+        mutate(order = row_number())
+
+    # mapview(all_cords_df, zcol = "order")
+
     # 5. Create new LINESTRING from the combined coordinates
+    result <- st_sfc(st_linestring(all_coords), crs = st_crs(multilinestring))
+    # mapview(result)
     return(st_sfc(st_linestring(all_coords), crs = st_crs(multilinestring)))
 }
