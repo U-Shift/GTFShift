@@ -81,6 +81,7 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
 
         # mapview(start_point, col.regions="gray") + mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, col.regions="orange") + mapview(next_line, color="green")
         # mapview(remaining_lines$geom) + mapview(remaining_lines$start, col.regions="pink") + mapview(remaining_lines$end, col.regions="black")
+        # mapview(remaining_lines[nearest_idx_start, ], color="green") + mapview(remaining_lines[nearest_idx_start, ]$start, col.regions="green") +mapview(remaining_lines[nearest_idx_end, ], color="purple") + mapview(remaining_lines[nearest_idx_end, ]$end, col.regions="purple") + mapview(last_point)
 
         # If they have same geometry, consider other nearest 
         if (next_line$geometry == current_line$geometry) {
