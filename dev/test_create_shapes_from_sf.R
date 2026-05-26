@@ -4,18 +4,22 @@ library(dplyr)
 library(GTFShift)
 library(mapview)
 
-gtfs <- load_feed("../GTFShift-web/scripts/osm_gtfs/aml_barreiro_cascais_lisboa/run_20260521_165353/gtfs_barreiro.zip")
+shape_id_debug = "sjr4"
+
+gtfs <- load_feed("../GTFShift-web/scripts/osm_gtfs/aml_barreiro_cascais_lisboa/run_20260526_102424/gtfs_cascais.zip")
 sf_shapes_original <- tidytransit::shapes_as_sf(gtfs$shapes)
 summary(gtfs)
-# mapview(sf_shapes_original |> filter(shape_id=="1-VA-TERM"))
+# mapview(sf_shapes_original |> filter(shape_id==shape_id_debug))
 
-sf_shapes <- sf::st_read("../GTFShift-web/scripts/osm_match/barreiro/gtfs_20260518/run_20260518_123051/shapes_match_barreiro_gtfs20260518_run20260518.gpkg")
+sf_shapes <- sf::st_read("../GTFShift-web/scripts/osm_match/cascais/gtfs_20260507/run_20260507_113820/shapes_match_cascais_gtfs20260507_run20260507.gpkg")
 summary(sf_shapes)
-mapview(sf_shapes |> filter(shape_id=="1-VA-TERM"))
+mapview(sf_shapes |> filter(shape_id==shape_id_debug))
+
+sf_shapes |> distinct(shape_id, .keep_all=TRUE) |> filter(shape_id==shape_id_debug)
 
 
 
-gtfs_osm <- load_feed("../GTFShift-web/scripts/osm_gtfs/aml_barreiro_cascais_lisboa/run_20260521_165353/gtfs_barreiro_osm.zip")
+gtfs_osm <- load_feed("../GTFShift-web/scripts/osm_gtfs/aml_barreiro_cascais_lisboa/run_20260526_102424/gtfs_cascais_osm.zip")
 summary(gtfs_osm)
 sf_shapes_osm <- tidytransit::shapes_as_sf(gtfs_osm$shapes)
 

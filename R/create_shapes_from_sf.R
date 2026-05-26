@@ -49,9 +49,10 @@ create_shapes_from_sf <- function(sf_shapes, gtfs) {
         st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326) |>
         rename(stop_point = geometry)
     
-    multilinestring <- (sf_shapes |> filter(shape_id=="1-VA-TERM"))$geom
-    start_point <- (sf_shapes_linestrings |> filter(shape_id=="1-VA-TERM"))$stop_point
-    # 10-FT-COINA
+    # shape_id_debug from dev/test_create_shapes_from_sf.R
+    multilinestring <- (sf_shapes |> filter(shape_id==shape_id_debug))[1, ]$geom
+    start_point <- (sf_shapes_linestrings |> filter(shape_id==shape_id_debug))[1, ]$stop_point
+    
 
     # Convert MULTILINESTRING to LINESTRING
     current_geom_col <- attr(sf_shapes, "sf_column")
