@@ -14,7 +14,8 @@ osm_shapes_match_routes(
   log_file = NA,
   osm_file = NULL,
   num_cores = 1,
-  osm_stop_order_relaxed = FALSE
+  osm_stop_order_relaxed = FALSE,
+  osm_route_type = "bus"
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ osm_shapes_match_routes(
 \item{num_cores}{Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).}
 
 \item{osm_stop_order_relaxed}{Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.}
+
+\item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:

@@ -50,7 +50,7 @@ For a detailed example, see the \code{vignette("unify")}.
 \dontrun{
 gtfs1 <- GTFShift::load_feed("gtfs1.zip")
 gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers=TRUE)
+unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers = TRUE)
 }
 
 }
