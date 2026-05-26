@@ -64,7 +64,11 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
         # Find the closest line segment to continue the route
         nearest_idx_start <- st_nearest_feature(last_point, remaining_lines$start)
         nearest_idx_end <- st_nearest_feature(last_point, remaining_lines$end)
-        nearest_idx = min(nearest_idx_start, nearest_idx_end)
+        if (st_distance(last_point, remaining_lines[nearest_idx_start, ]$start) < st_distance(last_point, remaining_lines[nearest_idx_end, ]$end)) {
+            nearest_idx = nearest_idx_start    
+        } else {
+            nearest_idx = nearest_idx_end
+        }
         next_line <- remaining_lines[nearest_idx, ]
         next_start <- lwgeom::st_startpoint(next_line$geometry)
         next_end <- lwgeom::st_endpoint(next_line$geometry)
@@ -72,7 +76,11 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
 
         # If they have same geometry, consider other nearest 
         if (next_line$geometry == current_line$geometry) {
-            nearest_idx = max(nearest_idx_start, nearest_idx_end)
+            if (nearest_idx == nearest_idx_start) {
+                nearest_idx = nearest_idx_end
+            } else {
+                nearest_idx = nearest_idx_start
+            }
             next_line <- remaining_lines[nearest_idx, ]
             next_start <- lwgeom::st_startpoint(next_line$geometry)
             next_end <- lwgeom::st_endpoint(next_line$geometry)
