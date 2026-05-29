@@ -58,6 +58,7 @@ create_shapes_from_sf <- function(sf_shapes, gtfs) {
                 distinct(shape_id, .keep_all = TRUE),
             by = "shape_id"
         ) |>
+        filter(!st_is_empty(stop_point)) |> # Only consider sf_shapes that have a GTFS match
         # sample_n(10) |> # For debug only
         rowwise() |>
         mutate(!!current_geom_col := multiline_to_sorted_linestring(
