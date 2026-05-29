@@ -1,8 +1,8 @@
 ---
-title: "Extra. Generate GTFS with OSM geometries"
+title: "Generate GTFS with OSM geometries"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Extra. Generate GTFS with OSM geometries}
+  %\VignetteIndexEntry{Generate GTFS with OSM geometries}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
