@@ -75,6 +75,19 @@ shapes_ways_osm <- GTFShift::osm_shapes_to_routes(gtfs, q, ways = TRUE, osm_file
 Refer to [osmextract::oe_download](https://docs.ropensci.org/osmextract/reference/oe_download.html) for a detailed
 download documentation.
 
+## OSM API instances
+
+Another alternative to avoid OSM API usage rate limits is to use an alternative instance. There are several documented at [OSM Wiki](https://wiki.openstreetmap.org/wiki/Overpass_API#Public_Overpass_API_instances). Below is an example of how to change the instance to Private.coffee Overpass Instance.
+
+```{r, eval=FALSE}
+library(osmdata)
+
+get_overpass_url() # You will see the default API instance
+set_overpass_url("https://overpass.private.coffee/api/interpreter") # Changin the instance to Private.coffee
+get_overpass_url() # You should see the new instance now
+
+# Now you can call any method on osmdata and the new API instance will be used 
+```
 
 # Download bus lanes 
 
