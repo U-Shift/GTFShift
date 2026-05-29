@@ -73,12 +73,14 @@ feeds = GTFShift::query_mobilitydatabase(
   bbox = aml
 )
 
-feeds |>
+feeds_active <- feeds |>
   dplyr::filter(status == "active") |>
-  dplyr::select(provider, status, producer_url) |>
+  dplyr::select(provider, status, producer_url) 
+
+feeds_active |>
   head()
 
-gtfs = GTFShift::load_feed(feeds$producer_url[2], create_transfers=FALSE)
+gtfs = GTFShift::load_feed(feeds_active$producer_url[2], create_transfers=FALSE)
 summary(gtfs)
 ```
 
