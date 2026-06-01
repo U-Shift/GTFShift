@@ -2,7 +2,7 @@
 #'
 #' @param path String. The location of the GTFS zip file. Either local or URL.
 #' @param store_path String (Optional). If provided, GTFS feed zip is stored at location. The file is overwritten if it already exists.
-#' @param create_transfers Boolean (Default TRUE). When true, generates \code{transfers.txt}, aggregating close stops.
+#' @param create_transfers Boolean (Default FALSE). When true, generates \code{transfers.txt}, aggregating close stops.
 #' @param transfer_distance Integer (Default 300). Upper straight-line distance limit in meters for transfers.
 #' @param transfer_time Integer (Default 120). Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.
 #' @param transfer_street_routing Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).
@@ -12,7 +12,7 @@
 #' In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
 #' \itemize{
 #'  \item \code{stop_times.txt} with empty \code{arrival_time} or \code{departure_time}, filtering rows that do not comply.
-#'  \item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFShift::build_shapes()}.
+#'  \item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFShift::create_shapes_from_stops()}.
 #' }
 #' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops
 #' network of the final aggregated version. This computation is executed with \code{gtfsrouter::gtfs_transfer_table()}, with
@@ -21,7 +21,7 @@
 #'
 #' @returns A tidygtfs object.
 #'
-#' @seealso \code{GTFShift::build_shapes()}
+#' @seealso \code{GTFShift::create_shapes_from_stops()}
 #' @seealso \code{tidytransit::read_gtfs()}
 #' @seealso \code{gtfsrouter::gtfs_transfer_table()}
 #'
@@ -33,8 +33,7 @@
 #' @import tidytransit
 #'
 #' @export
-load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_distance=300, transfer_time=120, transfer_street_routing=FALSE, headers=NULL) {
-
+load_feed <- function(path, store_path = NA, create_transfers = FALSE, transfer_distance = 300, transfer_time = 120, transfer_street_routing = FALSE, headers = NULL) {
   # If path is a URL and headers are provided, download first
   if (grepl("^http", path) && !is.null(headers)) {
     temp_zip <- tempfile(fileext = ".zip")
@@ -53,17 +52,17 @@ load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_dista
   gtfs$stop_times <- gtfs$stop_times[!is.na(gtfs$stop_times$arrival_time), ]
   stopsNAfter <- length(gtfs$stop_times$trip_id)
   if (stopsNPrev != stopsNAfter) {
-    warning(sprintf("> FIXED GTFS, there were %d stop times without arrival time!", stopsNPrev-stopsNAfter))
+    warning(sprintf("> FIXED GTFS, there were %d stop times without arrival time!", stopsNPrev - stopsNAfter))
   }
 
   ## If trips does not have shape_id column, create empty one
   if (!("shape_id" %in% names(gtfs$trips))) {
-    gtfs$trips$shape_id = NA
+    gtfs$trips$shape_id <- NA
   }
 
   ## If no shapes.txt, create them
   if (!("shapes" %in% names(gtfs))) {
-    gtfs = build_shapes(gtfs)
+    gtfs <- create_shapes_from_stops(gtfs)
     warning(sprintf("> CREATED shapes.txt, the file was missing!"))
   }
 
@@ -75,8 +74,10 @@ load_feed <- function(path, store_path=NA, create_transfers=TRUE, transfer_dista
     gtfs_temp <- file.path(temp_dir, "gtfs.zip")
     tidytransit::write_gtfs(gtfs, gtfs_temp)
 
-    suppressMessages(suppressWarnings({gtfs_transfers <- gtfsrouter::extract_gtfs(gtfs_temp)})) # Suppress warning that has no transfers, as they will be generated next
-    gtfs_transfers <- gtfsrouter::gtfs_transfer_table(gtfs_transfers, d_limit=transfer_distance, min_transfer_time=transfer_time, network_times=transfer_street_routing)
+    suppressMessages(suppressWarnings({
+      gtfs_transfers <- gtfsrouter::extract_gtfs(gtfs_temp)
+    })) # Suppress warning that has no transfers, as they will be generated next
+    gtfs_transfers <- gtfsrouter::gtfs_transfer_table(gtfs_transfers, d_limit = transfer_distance, min_transfer_time = transfer_time, network_times = transfer_street_routing)
     gtfs$transfers <- gtfs_transfers$transfers
 
     gtfs <- tidytransit::as_tidygtfs(gtfs)

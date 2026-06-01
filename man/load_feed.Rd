@@ -7,7 +7,7 @@
 load_feed(
   path,
   store_path = NA,
-  create_transfers = TRUE,
+  create_transfers = FALSE,
   transfer_distance = 300,
   transfer_time = 120,
   transfer_street_routing = FALSE,
@@ -19,7 +19,7 @@ load_feed(
 
 \item{store_path}{String (Optional). If provided, GTFS feed zip is stored at location. The file is overwritten if it already exists.}
 
-\item{create_transfers}{Boolean (Default TRUE). When true, generates \code{transfers.txt}, aggregating close stops.}
+\item{create_transfers}{Boolean (Default FALSE). When true, generates \code{transfers.txt}, aggregating close stops.}
 
 \item{transfer_distance}{Integer (Default 300). Upper straight-line distance limit in meters for transfers.}
 
@@ -39,7 +39,7 @@ Read GTFS feed, fixing integrity errors
 In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
 \itemize{
  \item \code{stop_times.txt} with empty \code{arrival_time} or \code{departure_time}, filtering rows that do not comply.
- \item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFShift::build_shapes()}.
+ \item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFShift::create_shapes_from_stops()}.
 }
 When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops
 network of the final aggregated version. This computation is executed with \code{gtfsrouter::gtfs_transfer_table()}, with
@@ -53,7 +53,7 @@ gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
 
 }
 \seealso{
-\code{GTFShift::build_shapes()}
+\code{GTFShift::create_shapes_from_stops()}
 
 \code{tidytransit::read_gtfs()}
 

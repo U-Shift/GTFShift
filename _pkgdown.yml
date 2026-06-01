@@ -2,6 +2,7 @@ url: https://u-shift.github.io/GTFShift/
 template:
   bootstrap: 5
   light-switch: true
+  math-rendering: mathjax
   bslib:
     primary: "#15AF97FF"
 
@@ -50,6 +51,7 @@ reference:
   - title: Utils
     contents:
     - calendar_nextBusinessWednesday
+    - multiline_to_sorted_linestring
 articles:
   - title: Articles
     navbar: ~
@@ -63,3 +65,4 @@ articles:
     - osm
     - rt
     - osm_update
+    - gtfs_from_osm

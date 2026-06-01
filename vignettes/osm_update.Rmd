@@ -39,6 +39,9 @@ It can be run either at the development or live version of OSM, requiring API cr
 
 The environment variables can be edited using `usethis::edit_r_environ()`, on R.
 
+# GTFShift OSM contributions
+
+GTFShift development team regularly uses this script to contribute to OSM, updating GTFS shapes and routes data for different cities. Refer to [the changesets page](https://openstreetmap.org/user/Gonçalo Matos/history){target="_blank"} for a complete list on the changes applied and to the [GitHub releases](https://github.com/U-Shift/GTFShift/releases){target="_blank"} for the  detailed logs and geometries. 
 
 # Match GTFS shapes with OSM routes 
 
@@ -55,12 +58,12 @@ Then, it should be loaded into the Python environment, filtering the matches by 
 ```{python}
 import pandas as pd
 
-area = "stcp"
-gtfs_date = "2026-04-16"
-run_date = "20260416"
-base_folder = "./"
+area = "lisboa"
+gtfs_date = "2026-05-05"
+run_date = "20260505"
+base_folder = "osm_match" 
 
-df = pd.read_csv(f"{base_folder}/{area}/shapes_match_stcp_gtfs{gtfs_date}_run{run_date}.csv") # CSV with columns osm_id, shape_id and route_id (optional)
+df = pd.read_csv(f"{base_folder}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.csv") # CSV with columns osm_id, shape_id and route_id (optional)
 len(df)
 df = df[(df['distance_diff'] < 1000) & (df['points_diff'] < 500)] # Filter to only update those that meet threshold
 len(df)
@@ -80,6 +83,8 @@ import os
 import pandas as pd
 import logging
 
+assert osmapi.__version__ >= "5.0.0", "Please update osmapi to version 5.0.0 or higher to ensure compatibility"
+
 # Patch requests default User-Agent to avoid being blocked by OSM (see https://github.com/Zverik/cli-oauth2/issues/7)
 requests.utils.default_user_agent = lambda: "GTFShift/0.8.3 (ushift@tecnico.ulisboa.pt)"
 ```
@@ -97,10 +102,14 @@ load_dotenv(find_dotenv())
 
 Set up logging
 ```{python}
+# Remove previous log handlers if they exist, to avoid duplicate logs when running multiple times
 logger = logging.getLogger('my_logger')
+if logger.hasHandlers():
+    for handler in logger.handlers[:]:
+        handler.close()
+        logger.removeHandler(handler)
 logger.setLevel(logging.DEBUG)  # Set the base logging level
-# Use a generic log file path; replace {city} and {date} as needed
-log_file_path = '../releases/{version}/shapes_match_{city}_gtfs{date}_run{date}.osm.log'
+log_file_path = f"{base_folder}/shapes_match_{area}_gtfs{gtfs_date}_run{run_date}.osm.log"
 file_handler = logging.FileHandler(log_file_path)
 file_handler.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
@@ -187,7 +196,7 @@ Attention! The script below will open a changeset and update OSM data! Make sure
 ```{python}
 # Create change set, updating relations with tag gtfs:shape_id
 # The changeset comment can be customized to better describe the change submitted 
-with api.change_set({"comment": "GTFS shapes and routes association (using GTFShift v0.8.3)", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+with api.changeset({"comment": "GTFS shapes and routes association (using GTFShift v0.8.3)", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
   logger.info(f"Running changeset {changeset_id} for {len(df)} relations")
   logger.info(f"{'route_id':20s}{'shape_id':20s} | {'osm_id':20s} | {'osm_route_id':20s}{'updated?':10s}{'osm_shape_id':20s}{'updated?':10s} | {'operation status':20s}")
   for idx, row in df.iterrows():
@@ -218,7 +227,7 @@ with api.change_set({"comment": "GTFS shapes and routes association (using GTFSh
 If you need to rollback the changes, use the code below.
 
 ```{python}
-with api.change_set({"comment": "GTFS shapes association rollback", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
+with api.changeset({"comment": "GTFS shapes association rollback", "review_requested": "no", "locale": "pt", "source": "local knowledge"}) as changeset_id:
   for idx, row in df.iterrows():
     osm_id = int(row["osm_id"])
     relation = api.relation_get(osm_id)

@@ -11,7 +11,11 @@ osm_shapes_match_routes(
   gtfs_match = "route_short_name",
   osm_match = "ref",
   gtfs_osm_match_exact = TRUE,
-  log_file = NA
+  log_file = NA,
+  osm_file = NULL,
+  num_cores = 1,
+  osm_stop_order_relaxed = FALSE,
+  osm_route_type = "bus"
 )
 }
 \arguments{
@@ -28,21 +32,29 @@ osm_shapes_match_routes(
 \item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
 
 \item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
+
+\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
+
+\item{num_cores}{Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).}
+
+\item{osm_stop_order_relaxed}{Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.}
+
+\item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
-\itemize{
- \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
- \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
- \item \code{osm_id}, the \code{osm_id} attribute from OSM route relation.
- \item \code{distance_diff}, the difference, in meters, between GTFS shape and OSM route lengths.
- \item \code{points_diff}, the sum of the difference, in meters, between GTFS shape and OSM route start and end points.
- \item \code{stops_diff}, the difference between GTFS and OSM routes number of stops.
- \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
- \item \code{route_long_name}, the \code{route_long_name} attribute from \code{routes.txt} file.
- \item \code{osm_ref}, the \code{ref} attribute from OSM route relation.
- \item \code{osm_name}, the \code{name} attribute from OSM route relation.
- \item \code{geometry}, the geometrical data for the OSM route relation.
+\describe{
+  \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
+  \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
+  \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
+  \item{distance_diff}{The difference, in meters, between GTFS shape and OSM route lengths.}
+  \item{points_diff}{The sum of the difference, in meters, between GTFS shape and OSM route start and end points.}
+  \item{stops_diff}{The difference between GTFS and OSM routes number of stops.}
+  \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
+  \item{route_long_name}{The \code{route_long_name} attribute from \code{routes.txt} file.}
+  \item{osm_ref}{The \code{ref} attribute from OSM route relation.}
+  \item{osm_name}{The \code{name} attribute from OSM route relation.}
+  \item{geometry}{The geometrical data for the OSM route relation.}
 }
 }
 \description{
@@ -53,8 +65,19 @@ For each route, matches its trips' shapes with OSM route relations.
 
 The calculation is performed considering, for each GTFS route, the subset of OSM routes that match
 the route identifier (based on \code{gtfs_match} and \code{osm_match}). Then, for each shape,
-the geometrical match is performed considering the OSM route that minimizes the distance between
-start and end points, total length and number of stops.
+the geometrical match is performed considering the OSM route \eqn{j} that minimizes the closeness
+metric \eqn{C(i, j)} for GTFS shape \eqn{i}:
+
+\deqn{C(i, j) = d(\text{init}_{GTFS, i}, \text{init}_{OSM, j}) + d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j}) + |L_{GTFS, i} - L_{OSM, j}| + \frac{L_{GTFS, i}}{N_{stops, i}} \cdot |N_{stops, i} - N_{stops, j}|}{C(i, j) = d(init_GTFS,i, init_OSM,j) + d(fin_GTFS,i, fin_OSM,j) + |L_GTFS,i - L_OSM,j| + (L_GTFS,i / N_stops,i) * |N_stops,i - N_stops,j|}
+
+where:
+\itemize{
+  \item \eqn{d(\text{init}_{GTFS, i}, \text{init}_{OSM, j})}{d(init_GTFS,i, init_OSM,j)} is the distance between the starting points/stops of the GTFS shape \eqn{i} and the OSM route \eqn{j}.
+  \item \eqn{d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j})}{d(fin_GTFS,i, fin_OSM,j)} is the distance between the ending points/stops of the GTFS shape \eqn{i} and the OSM route \eqn{j}.
+  \item \eqn{L_{GTFS, i}}{L_GTFS,i} and \eqn{L_{OSM, j}}{L_OSM,j} are the total lengths of the GTFS shape \eqn{i} and the OSM route \eqn{j}, respectively.
+  \item \eqn{N_{stops, i}}{N_stops,i} and \eqn{N_{stops, j}}{N_stops,j} are the number of stops on the GTFS shape \eqn{i} and the OSM route \eqn{j}, respectively. The term \eqn{\frac{L_{GTFS, i}}{N_{stops, i}}}{(L_GTFS,i / N_stops,i)} represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.
+}
+
 
 Be aware that the result might ignore some GTFS routes, in the following cases:
 \itemize{
@@ -76,7 +99,12 @@ q <- opq("Lisbon") |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
+# To use OSM API:
 shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q)
+
+# To use a local OSM file:
+osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q, osm_file = osm_file)
 }
 
 }

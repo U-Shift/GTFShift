@@ -6,6 +6,7 @@
 #' @param q osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
 #' @param keep_osm_attributes Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.
+#' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, finding for each route the corresponding OSM ways using \code{GTFShift::osm_shapes_to_routes()}
@@ -14,21 +15,27 @@
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
 #' @returns An \code{sf} \code{data.frame} object with the following columns:
-#' \itemize{
-#'  \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way.
-#'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
-#'  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
-#'  \item \code{routes}, the list of route_ids that use the way.
-#'  \item \code{shapes}, the list of shape_ids that use the way.
-#'  \item \code{geometry}, the route shape.
-#'  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
+#' \describe{
+#'   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
+#'   \item{hour}{The hour for which the frequency applies (24 hour format).}
+#'   \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+#'   \item{routes}{The list of route_ids that use the way.}
+#'   \item{shapes}{The list of shape_ids that use the way.}
+#'   \item{geometry}{The route shape.}
+#'   \item{(if \code{keep_osm_attributes = TRUE})}{All OSM way attributes.}
 #' }
 #'
 #' @examples
 #' \dontrun{
-#' gtfs = GTFShift::load_feed("gtfs.zip")
-#' q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
-#' frequency_analysis = GTFShift::get_way_frequency_hourly(gtfs, q)
+#' gtfs <- GTFShift::load_feed("gtfs.zip")
+#' q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+#'
+#' # To use OSM API:
+#' frequency_analysis <- GTFShift::get_way_frequency_hourly(gtfs, q)
+#'
+#' # To use a local OSM file:
+#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+#' frequency_analysis <- GTFShift::get_way_frequency_hourly(gtfs, q, osm_file = osm_file)
 #' }
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
@@ -41,27 +48,28 @@
 #' @import lubridate
 #'
 #' @export
-get_way_frequency_hourly = function(
-    gtfs,
-    q,
-    date = GTFShift::calendar_nextBusinessWednesday(),
-    keep_osm_attributes = FALSE
+get_way_frequency_hourly <- function(
+  gtfs,
+  q,
+  date = GTFShift::calendar_nextBusinessWednesday(),
+  keep_osm_attributes = FALSE,
+  osm_file = NULL
 ) {
   message(sprintf("Analysing GTFS for %s...", date))
 
   ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
-  gtfs_date = tidytransit::filter_feed_by_date(gtfs, extract_date = date)
+  gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = date)
 
   # PROCESS GTFS, generating table calculating the frequencies per route
-  trips = gtfs_date$trips
-  stops = gtfs_date$stops
-  ways = GTFShift::osm_shapes_to_routes(gtfs, q, TRUE)
+  trips <- gtfs_date$trips
+  stops <- gtfs_date$stops
+  ways <- GTFShift::osm_shapes_to_routes(gtfs, q, TRUE, osm_file = osm_file)
 
-  routes = gtfs_date$routes
-  stop_times = gtfs_date$stop_times
+  routes <- gtfs_date$routes
+  stop_times <- gtfs_date$stop_times
 
-  stop_times = stop_times |>
+  stop_times <- stop_times |>
     left_join(trips) |>
     left_join(routes) |>
     select(any_of(c(
@@ -77,36 +85,36 @@ get_way_frequency_hourly = function(
       "stop_sequence"
     )))
 
-  stop_times = stop_times |>
+  stop_times <- stop_times |>
     arrange(stop_sequence) |>
     group_by(trip_id) |>
     slice(1) |> # Only departures from origin (first stop)
     ungroup() |>
     mutate(hour = lubridate::hour(departure_time))
 
-  freq_data = stop_times |>
+  freq_data <- stop_times |>
     group_by(across(any_of(c("route_id", "route_short_name", "direction_id", "hour")))) |>
     summarize(frequency = n()) |>
     ungroup()
 
-  routes_freq =
+  routes_freq <-
     freq_data |>
     left_join(trips |>
-                select(any_of(c("route_id", "direction_id", "shape_id"))) |>
-                distinct(), relationship="many-to-many") |>
+      select(any_of(c("route_id", "direction_id", "shape_id"))) |>
+      distinct(), relationship = "many-to-many") |>
     as.data.frame()
 
   # Join with ways
-  ways_unique_geometry = ways |>
+  ways_unique_geometry <- ways |>
     distinct(way_osm_id, .keep_all = TRUE)
 
   if (!keep_osm_attributes) {
-    ways_unique_geometry = ways_unique_geometry |>
+    ways_unique_geometry <- ways_unique_geometry |>
       select(way_osm_id, geometry)
   }
 
-  ways_freq = routes_freq |>
-    inner_join(ways |> sf::st_drop_geometry() |> select(shape_id, way_osm_id), by="shape_id", relationship = "many-to-many") |>
+  ways_freq <- routes_freq |>
+    inner_join(ways |> sf::st_drop_geometry() |> select(shape_id, way_osm_id), by = "shape_id", relationship = "many-to-many") |>
     group_by(way_osm_id, hour) |>
     summarize(
       frequency = sum(frequency),
@@ -114,7 +122,7 @@ get_way_frequency_hourly = function(
       shapes = list(unique(shape_id))
     ) |>
     ungroup() |>
-    inner_join(ways_unique_geometry, by="way_osm_id") |>
+    inner_join(ways_unique_geometry, by = "way_osm_id") |>
     st_as_sf()
 
   return(ways_freq)

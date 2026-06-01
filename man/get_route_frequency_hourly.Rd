@@ -22,14 +22,14 @@ get_route_frequency_hourly(
 }
 \value{
 An \code{sf} \code{data.frame} object with the following columns (the first three are only present if \code{overline=FALSE}):
-\itemize{
- \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
- \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
- \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
- \item \code{direction_id}, the \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).
- \item \code{hour}, the hour for which the frequency applies (24 hour format).
- \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
- \item \code{geometry}, the route shape.
+\describe{
+  \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
+  \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
+  \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
+  \item{direction_id}{The \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).}
+  \item{hour}{The hour for which the frequency applies (24 hour format).}
+  \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+  \item{geometry}{The route shape.}
 }
 }
 \description{
@@ -53,8 +53,8 @@ Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
 }
 \examples{
 \dontrun{
-gtfs = GTFShift::load_feed("gtfs.zip")
-frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
+gtfs <- GTFShift::load_feed("gtfs.zip")
+frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 }
 
 }

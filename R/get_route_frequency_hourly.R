@@ -24,20 +24,20 @@
 #' Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
 #'
 #' @returns An \code{sf} \code{data.frame} object with the following columns (the first three are only present if \code{overline=FALSE}):
-#' \itemize{
-#'  \item \code{route_id}, the \code{route_id} attribute from \code{routes.txt} file.
-#'  \item \code{route_short_name}, the \code{route_short_name} attribute from \code{routes.txt} file.
-#'  \item \code{shape_id}, the \code{shape_id} attribute from \code{shapes.txt} file.
-#'  \item \code{direction_id}, the \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).
-#'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
-#'  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
-#'  \item \code{geometry}, the route shape.
+#' \describe{
+#'   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
+#'   \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
+#'   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
+#'   \item{direction_id}{The \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).}
+#'   \item{hour}{The hour for which the frequency applies (24 hour format).}
+#'   \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+#'   \item{geometry}{The route shape.}
 #' }
 #'
 #' @examples
 #' \dontrun{
-#' gtfs = GTFShift::load_feed("gtfs.zip")
-#' frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
+#' gtfs <- GTFShift::load_feed("gtfs.zip")
+#' frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 #' }
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
@@ -52,31 +52,31 @@
 #' @import stplanr
 #'
 #' @export
-get_route_frequency_hourly = function(
-    gtfs,
-    date = GTFShift::calendar_nextBusinessWednesday(),
-    use_osm_routes=NA,
-    overline = FALSE
+get_route_frequency_hourly <- function(
+  gtfs,
+  date = GTFShift::calendar_nextBusinessWednesday(),
+  use_osm_routes = NA,
+  overline = FALSE
 ) {
   message(sprintf("Analysing GTFS for %s...", date))
 
   ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
-  gtfs_date = tidytransit::filter_feed_by_date(gtfs, extract_date = date)
+  gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = date)
 
   # PROCESS GTFS, generating table calculating the frequencies per route
-  trips = gtfs_date$trip
-  stops = gtfs_date$stops
+  trips <- gtfs_date$trip
+  stops <- gtfs_date$stops
   if (any(!is.na(use_osm_routes))) {
-    shapes = GTFShift::osm_shapes_to_routes(gtfs, use_osm_routes)
+    shapes <- GTFShift::osm_shapes_to_routes(gtfs, use_osm_routes)
   } else {
-    shapes = tidytransit::shapes_as_sf(gtfs_date$shapes)
+    shapes <- tidytransit::shapes_as_sf(gtfs_date$shapes)
   }
 
-  routes = gtfs_date$routes
-  stop_times = gtfs_date$stop_times
+  routes <- gtfs_date$routes
+  stop_times <- gtfs_date$stop_times
 
-  stop_times = stop_times |>
+  stop_times <- stop_times |>
     left_join(trips) |>
     left_join(routes) |>
     select(any_of(c(
@@ -92,40 +92,36 @@ get_route_frequency_hourly = function(
       "stop_sequence"
     )))
 
-  stop_times = stop_times |>
+  stop_times <- stop_times |>
     arrange(stop_sequence) |>
     group_by(trip_id) |>
     slice(1) |> # Only departures from origin (first stop)
     ungroup() |>
     mutate(hour = lubridate::hour(departure_time))
 
-  freq_data = stop_times |>
-    group_by(across(any_of(c("route_id", "route_short_name", "direction_id", "hour")))) |>
+  freq_data <- stop_times |>
+    group_by(across(any_of(c("route_id", "shape_id", "route_short_name", "direction_id", "hour")))) |>
     summarize(frequency = n()) |>
     ungroup()
 
-  routes_freq =
+  routes_freq <-
     freq_data |>
-    left_join(trips |>
-                select(any_of(c("route_id", "direction_id", "shape_id"))) |>
-                distinct(), relationship="many-to-many") |>
-    as.data.frame() |>
     inner_join(shapes) |>
     st_as_sf()
 
   # Overline?
   if (overline) {
-    routes_freq_all = data.frame()
+    routes_freq_all <- data.frame()
     for (h in unique(routes_freq$hour)) { # hours of the day
-      routes_freq_h = routes_freq |>
+      routes_freq_h <- routes_freq |>
         filter(hour == h) |>
         stplanr::overline2(attrib = "frequency") |>
         arrange(frequency) |>
         mutate(hour = h)
 
-      routes_freq_all = rbind(routes_freq_all, routes_freq_h)
+      routes_freq_all <- rbind(routes_freq_all, routes_freq_h)
     }
-    return (routes_freq_all)
+    return(routes_freq_all)
   }
 
   return(routes_freq)

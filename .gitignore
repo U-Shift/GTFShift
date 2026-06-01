@@ -11,3 +11,5 @@ docs
 
 releases/
 vignettes/*_cache/*
+
+scratch/*
