@@ -22,10 +22,12 @@ knitr::opts_chunk$set(
 # Introduction
 
 The match between GTFS shapes and OSM routes geometries using either `GTFShift::osm_shapes_match_routes()` or 
-`GTFShift:: osm_shapes_to_routes()` enables the retrieval of harmonized geometries for the GTFS network. However, 
+`GTFShift::osm_shapes_to_routes()` enables the retrieval of harmonized geometries for the GTFS network. However, 
 OSM geometries are often MULTILINESTRING objects. In contrast, GTFS shapes.txt file requires a sequence of points to define each shape.
 
 `GTFShift::create_shapes_from_sf()` can be used to convert the MULTILINESTRING objects to sorted LINESTRING objects.
+
+> 
 
 # Example
 
