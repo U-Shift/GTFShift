@@ -69,7 +69,7 @@ For a detailed example, see the
 
 ``` r
 if (FALSE) { # \dontrun{
-gtfs = GTFShift::load_feed("gtfs.zip")
-route_extension = GTFShift::get_network_extension(gtfs)
+gtfs <- GTFShift::load_feed("gtfs.zip")
+route_extension <- GTFShift::get_network_extension(gtfs)
 } # }
 ```

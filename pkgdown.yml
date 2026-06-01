@@ -6,13 +6,14 @@ articles:
   classify: classify.html
   download: download.html
   filter: filter.html
+  gtfs_from_osm: gtfs_from_osm.html
   articles/GTFShift: GTFShift.html
   osm_update: osm_update.html
   osm: osm.html
   prioritize: prioritize.html
   rt: rt.html
   unify: unify.html
-last_built: 2026-05-21T12:56Z
+last_built: 2026-06-01T08:22Z
 urls:
   reference: https://u-shift.github.io/GTFShift/reference
   article: https://u-shift.github.io/GTFShift/articles

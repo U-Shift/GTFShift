@@ -74,29 +74,21 @@ frequency_los
 #> Dimension:     XY
 #> Bounding box:  xmin: -9.084467 ymin: 38.57161 xmax: -9.01185 ymax: 38.67369
 #> Geodetic CRS:  WGS 84
-#> First 10 features:
-#>          route_id route_short_name direction_id hour frequency    shape_id
-#> 1  10_10-COINA-FT               10            0    6         1 10-COINA-FT
-#> 2  10_10-COINA-FT               10            0    7         2 10-COINA-FT
-#> 3  10_10-COINA-FT               10            0    8         1 10-COINA-FT
-#> 4  10_10-COINA-FT               10            0    9         2 10-COINA-FT
-#> 5  10_10-COINA-FT               10            0   10         1 10-COINA-FT
-#> 6  10_10-COINA-FT               10            0   11         2 10-COINA-FT
-#> 7  10_10-COINA-FT               10            0   12         1 10-COINA-FT
-#> 8  10_10-COINA-FT               10            0   13         2 10-COINA-FT
-#> 9  10_10-COINA-FT               10            0   14         1 10-COINA-FT
-#> 10 10_10-COINA-FT               10            0   15         2 10-COINA-FT
-#>                          geometry frequency_los
-#> 1  LINESTRING (-9.051876 38.58...             E
-#> 2  LINESTRING (-9.051876 38.58...             D
-#> 3  LINESTRING (-9.051876 38.58...             E
-#> 4  LINESTRING (-9.051876 38.58...             D
-#> 5  LINESTRING (-9.051876 38.58...             E
-#> 6  LINESTRING (-9.051876 38.58...             D
-#> 7  LINESTRING (-9.051876 38.58...             E
-#> 8  LINESTRING (-9.051876 38.58...             D
-#> 9  LINESTRING (-9.051876 38.58...             E
-#> 10 LINESTRING (-9.051876 38.58...             D
+#> # A tibble: 432 × 8
+#>    route_id       shape_id    route_short_name direction_id  hour frequency
+#>  * <chr>          <chr>       <chr>                   <int> <int>     <int>
+#>  1 10_10-COINA-FT 10-COINA-FT 10                          0     6         1
+#>  2 10_10-COINA-FT 10-COINA-FT 10                          0     7         2
+#>  3 10_10-COINA-FT 10-COINA-FT 10                          0     8         1
+#>  4 10_10-COINA-FT 10-COINA-FT 10                          0     9         2
+#>  5 10_10-COINA-FT 10-COINA-FT 10                          0    10         1
+#>  6 10_10-COINA-FT 10-COINA-FT 10                          0    11         2
+#>  7 10_10-COINA-FT 10-COINA-FT 10                          0    12         1
+#>  8 10_10-COINA-FT 10-COINA-FT 10                          0    13         2
+#>  9 10_10-COINA-FT 10-COINA-FT 10                          0    14         1
+#> 10 10_10-COINA-FT 10-COINA-FT 10                          0    15         2
+#> # ℹ 422 more rows
+#> # ℹ 2 more variables: geometry <LINESTRING [°]>, frequency_los <chr>
 
 table(frequency_los$frequency_los)
 #> 

@@ -19,3 +19,5 @@
   Time](https://u-shift.github.io/GTFShift/articles/rt.md):
 - [Extra. Update OSM
   data](https://u-shift.github.io/GTFShift/articles/osm_update.md):
+- [Generate GTFS with OSM
+  geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.md):

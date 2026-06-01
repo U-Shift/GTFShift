@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" sizes="any" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
-<script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -28,7 +34,7 @@
 
     <a class="navbar-brand me-2" href="index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +57,7 @@
     <li><a class="dropdown-item" href="articles/osm.html">6. Get OSM data</a></li>
     <li><a class="dropdown-item" href="articles/rt.html">7. GTFS Real Time</a></li>
     <li><a class="dropdown-item" href="articles/osm_update.html">Extra. Update OSM data</a></li>
+    <li><a class="dropdown-item" href="articles/gtfs_from_osm.html">Generate GTFS with OSM geometries</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Dashboard</a></li>
@@ -82,19 +89,7 @@
 </div>
 <!-- badges: start -->
 
-<p><strong>GTFShift</strong> emerged from the necessity to understand how to get an overview of where bus lanes should be prioritized for a given territory, using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM) data.</p>
-<p>It provides a comprehensive bundle of methods that cover several dimensions of this problem, namely:</p>
-<ul>
-<li>Frequency of buses (and trams) per hour and direction, at a peak hour;</li>
-<li>Number of lanes in the same direction;</li>
-<li>Existing traffic conditions;</li>
-<li>Existing bus lanes in the area (from a network continuity perspective).</li>
-</ul>
-<p>Together, these can be used to identify road segments where bus lanes should be implemented, enabling for a transparent and data-driven decision-making process, suitable to different contexts and criteria.</p>
-<p><img src="reference/figures/prioritization.png"></p>
-<blockquote>
-<p>Example of bus lane prioritization analysis for Lisbon city, considering road segments with a minimum frequency of 10 buses/hour, average commercial speed below 9.7 km/h and more than 1 lane per direction.</p>
-</blockquote>
+<p><strong>GTFShift</strong> encompasses a complete bundle of methods to harmonize GTFS and OSM data, enabling the integration and exploration of different layers of transit data, starting with the planned operations (GTFS), but also the infrastructure topology (OSM) and real-time information (GTFS-RT).</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -115,11 +110,42 @@
 <p>For more details on the package and how to get started, please visit the <a href="https://u-shift.github.io/GTFShift/articles/GTFShift.html">Get started</a> page.</p>
 </div>
 <div class="section level2">
-<h2 id="dashboard">Dashboard<a class="anchor" aria-label="anchor" href="#dashboard"></a>
+<h2 id="main-use-cases">Main use cases<a class="anchor" aria-label="anchor" href="#main-use-cases"></a>
 </h2>
+<div class="section level3">
+<h3 id="harmonize-gtfs-geometries-with-osm-data">Harmonize GTFS geometries with OSM data<a class="anchor" aria-label="anchor" href="#harmonize-gtfs-geometries-with-osm-data"></a>
+</h3>
+<p>The lack of standardization on GTFS shape geometries hampers aggregated analysis of different feeds and the association of planned service information with other urban dimensions such as the infrastructure topology.</p>
+<p>To solve this problem, <strong>GTFShift</strong> provides a bundle of methods to harmonize GTFS shapes with OSM road network geometries. Refer to <a href="articles/osm.html#get-osm-data-for-bus-routes">Get OSM data for bus routes</a> and <a href="articles/gtfs_from_osm.html">Generate GTFS with OSM geometries</a> for more details.</p>
+<p><img src="reference/figures/geometry_harmonization_barreiro.png"></p>
+<blockquote>
+<p>Example of GTFS original shapes (salmon) and harmonized GTFS shapes with OSM data (blue) for TCB, Barreiro, Portugal</p>
+</blockquote>
+</div>
+<div class="section level3">
+<h3 id="bus-lane-prioritization">Bus Lane Prioritization<a class="anchor" aria-label="anchor" href="#bus-lane-prioritization"></a>
+</h3>
+<p><strong>GTFShift</strong> emerged from the necessity to understand how to get an overview of where bus lanes should be prioritized for a given territory, using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM) data.</p>
+<p>It provides a comprehensive bundle of methods that cover several dimensions of this problem, namely:</p>
+<ul>
+<li>Frequency of buses (and trams) per hour and direction, at a peak hour;</li>
+<li>Number of lanes in the same direction;</li>
+<li>Existing traffic conditions;</li>
+<li>Existing bus lanes in the area (from a network continuity perspective).</li>
+</ul>
+<p>Together, these can be used to identify road segments where bus lanes should be implemented, enabling for a transparent and data-driven decision-making process, suitable to different contexts and criteria.</p>
+<p><img src="reference/figures/prioritization.png"></p>
+<blockquote>
+<p>Example of bus lane prioritization analysis for Lisbon city, considering road segments with a minimum frequency of 10 buses/hour, average commercial speed below 9.7 km/h and more than 1 lane per direction.</p>
+</blockquote>
+<div class="section level4">
+<h4 id="dashboard">Dashboard<a class="anchor" aria-label="anchor" href="#dashboard"></a>
+</h4>
 <p><strong>GTFShift</strong> provides an interactive dashboard that allows users to explore and visualize results for real case studies, aiming to illustrate its potential and capabilities to a non-technical audience, while disseminating the outputs of these real world scenarios.</p>
 <p>Visit it at <a href="https://ushift.pt/apps/gtfshift" class="external-link">ushift.pt/apps/gtfshift</a>.</p>
 <p><a href="https://ushift.pt/apps/gtfshift" class="external-link"><img src="reference/figures/web.png"></a></p>
+</div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="related-packages">Related packages<a class="anchor" aria-label="anchor" href="#related-packages"></a>

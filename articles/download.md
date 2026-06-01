@@ -69,9 +69,11 @@ feeds = GTFShift::query_mobilitydatabase(
   bbox = aml
 )
 
-feeds |>
+feeds_active <- feeds |>
   dplyr::filter(status == "active") |>
-  dplyr::select(provider, status, producer_url) |>
+  dplyr::select(provider, status, producer_url) 
+
+feeds_active |>
   head()
 #>                                      provider status
 #> 1                                      Carris active
@@ -79,27 +81,27 @@ feeds |>
 #> 3                                    Fertagus active
 #> 4                     Metro de Lisboa (Metro) active
 #> 5 Metro Transportes do Sul, Metro Sul do Tejo active
-#> 6           Transportes Coletivos do Barreiro active
+#> 6          Transportes Colectivos do Barreiro active
 #>                                                                       producer_url
 #> 1                            https://gateway.carris.pt/gateway/gtfs/api/v2.11/GTFS
 #> 2 https://drive.google.com/uc?export=download&id=13ucYiAJRtu-gXsLa02qKJrGOgDjbnUWX
 #> 3                             https://www.fertagus.pt/GTFSTMLzip/Fertagus_GTFS.zip
 #> 4                      https://www.metrolisboa.pt/google_transit/googleTransit.zip
 #> 5                                              https://mts.pt/imt/MTS-20240129.zip
-#> 6                https://www.tcbarreiro.pt/front/files/sample_gtfs/GTFS-TCB_24.zip
+#> 6                                      https://backend.tcbarreiro.pt/download-gtfs
 
-gtfs = GTFShift::load_feed(feeds$producer_url[2], create_transfers=FALSE)
+gtfs = GTFShift::load_feed(feeds_active$producer_url[2], create_transfers=FALSE)
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
-#> agency       Carris
-#> service      from 2026-01-01 to 2026-06-05
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops
+#> agency       Cascais Próxima
+#> service      from 2024-08-01 to 2026-12-31
 #> uses         stop_times (no frequencies)
-#> # routes       174
-#> # trips      77928
-#> # stop_ids    2331
-#> # stop_names  1138
-#> # shapes       306
+#> # routes       94
+#> # trips      3791
+#> # stop_ids   1076
+#> # stop_names  597
+#> # shapes      139
 ```
 
 ### Using GTFShift incorporated database for Portugal
@@ -163,9 +165,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      181
-#> # trips      1736
+#> # routes      185
+#> # trips      2237
 #> # stop_ids    454
 #> # stop_names  454
-#> # shapes      253
+#> # shapes      257
 ```

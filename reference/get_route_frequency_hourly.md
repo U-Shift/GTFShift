@@ -43,22 +43,35 @@ get_route_frequency_hourly(
 An `sf` `data.frame` object with the following columns (the first three
 are only present if `overline=FALSE`):
 
-- `route_id`, the `route_id` attribute from `routes.txt` file.
+- route_id:
 
-- `route_short_name`, the `route_short_name` attribute from `routes.txt`
-  file.
+  The `route_id` attribute from `routes.txt` file.
 
-- `shape_id`, the `shape_id` attribute from `shapes.txt` file.
+- route_short_name:
 
-- `direction_id`, the `direction_id` attribute from `trips.txt` file (if
-  attribute present in GTFS feed).
+  The `route_short_name` attribute from `routes.txt` file.
 
-- `hour`, the hour for which the frequency applies (24 hour format).
+- shape_id:
 
-- `frequency`, the number of services for the route that depart from the
-  first stop for the corresponding 60 minutes period.
+  The `shape_id` attribute from `shapes.txt` file.
 
-- `geometry`, the route shape.
+- direction_id:
+
+  The `direction_id` attribute from `trips.txt` file (if attribute
+  present in GTFS feed).
+
+- hour:
+
+  The hour for which the frequency applies (24 hour format).
+
+- frequency:
+
+  The number of services for the route that depart from the first stop
+  for the corresponding 60 minutes period.
+
+- geometry:
+
+  The route shape.
 
 ## Details
 
@@ -103,7 +116,7 @@ Adapted from <https://github.com/Bondify/GTFS_in_R/>.
 
 ``` r
 if (FALSE) { # \dontrun{
-gtfs = GTFShift::load_feed("gtfs.zip")
-frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
+gtfs <- GTFShift::load_feed("gtfs.zip")
+frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 } # }
 ```

@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -25,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +54,7 @@
     <li><a class="dropdown-item" href="../articles/osm.html">6. Get OSM data</a></li>
     <li><a class="dropdown-item" href="../articles/rt.html">7. GTFS Real Time</a></li>
     <li><a class="dropdown-item" href="../articles/osm_update.html">Extra. Update OSM data</a></li>
+    <li><a class="dropdown-item" href="../articles/gtfs_from_osm.html">Generate GTFS with OSM geometries</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Dashboard</a></li>
@@ -119,6 +126,15 @@ should be stored as <code>OSM_OAUTH_CLIENT_ID_PROD</code> and
 <code>usethis::edit_r_environ()</code>, on R.</p>
 </div>
 <div class="section level2">
+<h2 id="gtfshift-osm-contributions">GTFShift OSM contributions<a class="anchor" aria-label="anchor" href="#gtfshift-osm-contributions"></a>
+</h2>
+<p>GTFShift development team regularly uses this script to contribute to
+OSM, updating GTFS shapes and routes data for different cities. Refer to
+<a href="https://openstreetmap.org/user/Gon%C3%A7alo%20Matos/history" target="_blank" class="external-link">the changesets page</a> for a complete list on the
+changes applied and to the <a href="https://github.com/U-Shift/GTFShift/releases" target="_blank" class="external-link">GitHub releases</a> for the detailed logs and
+geometries.</p>
+</div>
+<div class="section level2">
 <h2 id="match-gtfs-shapes-with-osm-routes">Match GTFS shapes with OSM routes<a class="anchor" aria-label="anchor" href="#match-gtfs-shapes-with-osm-routes"></a>
 </h2>
 <p>This example assumes that the steps described at <a href="./osm.html#matching-shapes-geometry">Matching shapes geometry</a>
@@ -134,12 +150,12 @@ stored in a CSV file.</p>
 matches by the criteria that best suits your context.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>area <span class="op">=</span> <span class="st">"stcp"</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>gtfs_date <span class="op">=</span> <span class="st">"2026-04-16"</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>run_date <span class="op">=</span> <span class="st">"20260416"</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>base_folder <span class="op">=</span> <span class="st">"./"</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>area <span class="op">=</span> <span class="st">"lisboa"</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>gtfs_date <span class="op">=</span> <span class="st">"2026-05-05"</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>run_date <span class="op">=</span> <span class="st">"20260505"</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>base_folder <span class="op">=</span> <span class="st">"osm_match"</span> </span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="ss">f"</span><span class="sc">{</span>base_folder<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>area<span class="sc">}</span><span class="ss">/shapes_match_stcp_gtfs</span><span class="sc">{</span>gtfs_date<span class="sc">}</span><span class="ss">_run</span><span class="sc">{</span>run_date<span class="sc">}</span><span class="ss">.csv"</span>) <span class="co"># CSV with columns osm_id, shape_id and route_id (optional)</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="ss">f"</span><span class="sc">{</span>base_folder<span class="sc">}</span><span class="ss">/shapes_match_</span><span class="sc">{</span>area<span class="sc">}</span><span class="ss">_gtfs</span><span class="sc">{</span>gtfs_date<span class="sc">}</span><span class="ss">_run</span><span class="sc">{</span>run_date<span class="sc">}</span><span class="ss">.csv"</span>) <span class="co"># CSV with columns osm_id, shape_id and route_id (optional)</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="bu">len</span>(df)</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>df <span class="op">=</span> df[(df[<span class="st">'distance_diff'</span>] <span class="op">&lt;</span> <span class="dv">1000</span>) <span class="op">&amp;</span> (df[<span class="st">'points_diff'</span>] <span class="op">&lt;</span> <span class="dv">500</span>)] <span class="co"># Filter to only update those that meet threshold</span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="bu">len</span>(df)</span></code></pre></div>
@@ -157,8 +173,10 @@ matches by the criteria that best suits your context.</p>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="im">import</span> logging</span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Patch requests default User-Agent to avoid being blocked by OSM (see https://github.com/Zverik/cli-oauth2/issues/7)</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>requests.utils.default_user_agent <span class="op">=</span> <span class="kw">lambda</span>: <span class="st">"GTFShift/0.8.3 (ushift@tecnico.ulisboa.pt)"</span></span></code></pre></div>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="cf">assert</span> osmapi.__version__ <span class="op">&gt;=</span> <span class="st">"5.0.0"</span>, <span class="st">"Please update osmapi to version 5.0.0 or higher to ensure compatibility"</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># Patch requests default User-Agent to avoid being blocked by OSM (see https://github.com/Zverik/cli-oauth2/issues/7)</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>requests.utils.default_user_agent <span class="op">=</span> <span class="kw">lambda</span>: <span class="st">"GTFShift/0.8.3 (ushift@tecnico.ulisboa.pt)"</span></span></code></pre></div>
 <p>If there is any dependency missing, just install it with
 <code><a href="https://rstudio.github.io/reticulate/reference/py_install.html" class="external-link">reticulate::py_install()</a></code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -167,19 +185,23 @@ matches by the criteria that best suits your context.</p>
 <p>Load environment variables</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>load_dotenv(find_dotenv())</span></code></pre></div>
 <p>Set up logging</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>logger <span class="op">=</span> logging.getLogger(<span class="st">'my_logger'</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>logger.setLevel(logging.DEBUG)  <span class="co"># Set the base logging level</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># Use a generic log file path; replace {city} and {date} as needed</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>log_file_path <span class="op">=</span> <span class="st">'../releases/</span><span class="sc">{version}</span><span class="st">/shapes_match_</span><span class="sc">{city}</span><span class="st">_gtfs</span><span class="sc">{date}</span><span class="st">_run</span><span class="sc">{date}</span><span class="st">.osm.log'</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>file_handler <span class="op">=</span> logging.FileHandler(log_file_path)</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>file_handler.setLevel(logging.DEBUG)</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>console_handler <span class="op">=</span> logging.StreamHandler()</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>console_handler.setLevel(logging.INFO)</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>formatter <span class="op">=</span> logging.Formatter(<span class="st">'</span><span class="sc">%(asctime)s</span><span class="st"> - </span><span class="sc">%(levelname)s</span><span class="st"> - </span><span class="sc">%(message)s</span><span class="st">'</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>file_handler.setFormatter(formatter)</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>console_handler.setFormatter(formatter)</span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>logger.addHandler(file_handler)</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>logger.addHandler(console_handler)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Remove previous log handlers if they exist, to avoid duplicate logs when running multiple times</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>logger <span class="op">=</span> logging.getLogger(<span class="st">'my_logger'</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="cf">if</span> logger.hasHandlers():</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="cf">for</span> handler <span class="kw">in</span> logger.handlers[:]:</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>        handler.close()</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>        logger.removeHandler(handler)</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>logger.setLevel(logging.DEBUG)  <span class="co"># Set the base logging level</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>log_file_path <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>base_folder<span class="sc">}</span><span class="ss">/shapes_match_</span><span class="sc">{</span>area<span class="sc">}</span><span class="ss">_gtfs</span><span class="sc">{</span>gtfs_date<span class="sc">}</span><span class="ss">_run</span><span class="sc">{</span>run_date<span class="sc">}</span><span class="ss">.osm.log"</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>file_handler <span class="op">=</span> logging.FileHandler(log_file_path)</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>file_handler.setLevel(logging.DEBUG)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>console_handler <span class="op">=</span> logging.StreamHandler()</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>console_handler.setLevel(logging.INFO)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>formatter <span class="op">=</span> logging.Formatter(<span class="st">'</span><span class="sc">%(asctime)s</span><span class="st"> - </span><span class="sc">%(levelname)s</span><span class="st"> - </span><span class="sc">%(message)s</span><span class="st">'</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>file_handler.setFormatter(formatter)</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>console_handler.setFormatter(formatter)</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>logger.addHandler(file_handler)</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>logger.addHandler(console_handler)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="connect-to-osm">Connect to OSM<a class="anchor" aria-label="anchor" href="#connect-to-osm"></a>
@@ -240,7 +262,7 @@ code. Copy it and set <code>auth_code</code> to its value.</p>
 data! Make sure you have the right data before proceeding!</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Create change set, updating relations with tag gtfs:shape_id</span></span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co"># The changeset comment can be customized to better describe the change submitted </span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="cf">with</span> api.change_set({<span class="st">"comment"</span>: <span class="st">"GTFS shapes and routes association (using GTFShift v0.8.3)"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="cf">with</span> api.changeset({<span class="st">"comment"</span>: <span class="st">"GTFS shapes and routes association (using GTFShift v0.8.3)"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  logger.info(<span class="ss">f"Running changeset </span><span class="sc">{</span>changeset_id<span class="sc">}</span><span class="ss"> for </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> relations"</span>)</span>
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  logger.info(<span class="ss">f"</span><span class="sc">{</span><span class="st">'route_id'</span><span class="sc">:20s}{</span><span class="st">'shape_id'</span><span class="sc">:20s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'osm_id'</span><span class="sc">:20s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'osm_route_id'</span><span class="sc">:20s}{</span><span class="st">'updated?'</span><span class="sc">:10s}{</span><span class="st">'osm_shape_id'</span><span class="sc">:20s}{</span><span class="st">'updated?'</span><span class="sc">:10s}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'operation status'</span><span class="sc">:20s}</span><span class="ss">"</span>)</span>
 <span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="cf">for</span> idx, row <span class="kw">in</span> df.iterrows():</span>
@@ -267,7 +289,7 @@ data! Make sure you have the right data before proceeding!</p>
 <h3 id="rollback-avoid-this-please">Rollback (avoid this, please :/)<a class="anchor" aria-label="anchor" href="#rollback-avoid-this-please"></a>
 </h3>
 <p>If you need to rollback the changes, use the code below.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="cf">with</span> api.change_set({<span class="st">"comment"</span>: <span class="st">"GTFS shapes association rollback"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="cf">with</span> api.changeset({<span class="st">"comment"</span>: <span class="st">"GTFS shapes association rollback"</span>, <span class="st">"review_requested"</span>: <span class="st">"no"</span>, <span class="st">"locale"</span>: <span class="st">"pt"</span>, <span class="st">"source"</span>: <span class="st">"local knowledge"</span>}) <span class="im">as</span> changeset_id:</span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="cf">for</span> idx, row <span class="kw">in</span> df.iterrows():</span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>    osm_id <span class="op">=</span> <span class="bu">int</span>(row[<span class="st">"osm_id"</span>])</span>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>    relation <span class="op">=</span> api.relation_get(osm_id)</span>

@@ -51,8 +51,10 @@
   Merge multiple GTFS into a single aggregated file
 - [`create_calendar()`](https://u-shift.github.io/GTFShift/reference/create_calendar.md)
   : Create calendar.txt from calendar_dates.txt
-- [`build_shapes()`](https://u-shift.github.io/GTFShift/reference/build_shapes.md)
-  : Build shapes from GTFS data
+- [`create_shapes_from_sf()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_sf.md)
+  : Build shapes from simple feature object
+- [`create_shapes_from_stops()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_stops.md)
+  : Build shapes from GTFS stops data
 
 ## OpenStreetMaps
 
@@ -64,8 +66,6 @@
   : Get OSM routes that match shapes, based on geometrical match
 - [`osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
   : Get OSM routes geometry considering gtfs:shape_id match
-- [`osm_trips_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_trips_to_routes.md)
-  : Get OSM routes geometry considering gtfs:trip_id match
 
 ## Realtime
 
@@ -81,3 +81,5 @@
 
 - [`calendar_nextBusinessWednesday()`](https://u-shift.github.io/GTFShift/reference/calendar_nextBusinessWednesday.md)
   : Get next business Wednesday
+- [`multiline_to_sorted_linestring()`](https://u-shift.github.io/GTFShift/reference/multiline_to_sorted_linestring.md)
+  : Convert a MULTILINESTRING to a sorted LINESTRING

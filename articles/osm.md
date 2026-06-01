@@ -13,6 +13,64 @@ OpenStreetMaps (OSM) is an important data source for transit analysis,
 due to its rich, open, and detailed geographic data. GTFShift includes
 some methods that allow to access its information directly.
 
+### Using OSM API vs. local OSM extract
+
+By default, GTFShift methods use OSM API to access OpenStreetMaps data
+([osmdata::osmdata_sf](https://docs.ropensci.org/osmdata/reference/osmdata_sf.html)).
+However, the API rate is limited, making it hard to download large
+datasets. In these cases, it is recommended to use a local OSM extract
+file. For this purpose, most of the methods support the optional
+parameter `osm_file`. Check each method documentation to confirm.
+
+``` r
+
+# Example of using local OSM extract
+
+# Download OSM extract
+# (use day tag on filename to get the latest file, as oe_download caches files and GeoFrabrick is updated daily)
+osm_file <- oe_download(
+  "https://download.geofabrik.de/europe/portugal-latest.osm.pbf",
+  file_basename = sprintf("%s_%s.osm.pbf", "PT", format(Sys.Date(), "%Y%m%d"))
+)
+
+# Get GTFS from library GTFS database for Portugal
+data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_id <- "lisboa"
+gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FALSE)
+
+# Build OSM query
+library(osmdata)
+q <- opq("Lisbon") |>
+  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+
+# Call method with osm_file parameter
+shapes_ways_osm <- GTFShift::osm_shapes_to_routes(gtfs, q, ways = TRUE, osm_file = osm_file)
+```
+
+Refer to
+[osmextract::oe_download](https://docs.ropensci.org/osmextract/reference/oe_download.html)
+for a detailed download documentation.
+
+### OSM API instances
+
+Another alternative to avoid OSM API usage rate limits is to use an
+alternative instance. There are several documented at [OSM
+Wiki](https://wiki.openstreetmap.org/wiki/Overpass_API#Public_Overpass_API_instances).
+Below is an example of how to change the instance to Private.coffee
+Overpass Instance.
+
+``` r
+
+library(osmdata)
+
+get_overpass_url() # You will see the default API instance
+set_overpass_url("https://overpass.private.coffee/api/interpreter") # Changin the instance to Private.coffee
+get_overpass_url() # You should see the new instance now
+
+# Now you can call any method on osmdata and the new API instance will be used 
+```
+
 ## Download bus lanes
 
 Dedicated bus lanes can improve bus transit operation. Understanding
@@ -22,10 +80,12 @@ for a given area.
 
 ``` r
 
-aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
-lisboa = aml |> dplyr::filter(Concelho == "Lisboa") |> sf::st_bbox()
+aml <- sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
+lisboa <- aml |>
+  dplyr::filter(Concelho == "Lisboa") |>
+  sf::st_bbox()
 
-bus_lanes = GTFShift::osm_bus_lanes(lisboa) |> select(osm_id)
+bus_lanes <- GTFShift::osm_bus_lanes(lisboa) |> select(osm_id)
 ```
 
 ``` r
@@ -46,13 +106,13 @@ methods to use them in the GTFS analysis.
 ``` r
 
 # Get GTFS from library GTFS database for Portugal
-data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_id = "lisboa"
-gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
+data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_id <- "lisboa"
+gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FALSE)
 
 # Build OSM query
 library(osmdata)
-q = opq("Lisbon")  |>
+q <- opq("Lisbon") |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 ```
@@ -62,18 +122,16 @@ q = opq("Lisbon")  |>
 GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*`
 keys.
 [`GTFShift::osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
-and
-[`GTFShift::osm_trips_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_trips_to_routes.md)
-allow to query OSM for the routes matching the feed trips, given,
-respectively, their shape or trip id.
+allows to query OSM for the routes matching the feed trips, given their
+shape id.
 
 ``` r
 
 # Subset feed for some routes only, for demonstration purposes
-gtfs_794 = GTFShift::filter_by_route_name(gtfs, list("794"))
+gtfs_794 <- GTFShift::filter_by_route_name(gtfs, list("794"))
 
 # Match shapes geometry
-shapes_geometry_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q)
+shapes_geometry_osm <- GTFShift::osm_shapes_to_routes(gtfs_794, q)
 ```
 
 ``` r
@@ -92,21 +150,21 @@ shapes_geometry_osm
 ``` r
 
 # Get original shapes, for comparison
-shapes_sf = tidytransit::shapes_as_sf(gtfs_794$shapes)
+shapes_sf <- tidytransit::shapes_as_sf(gtfs_794$shapes)
 ```
 
 #### GTFS shapes
 
 ``` r
 
-mapview::mapview(shapes_sf, zcol = "shape_id", legend = TRUE, layer.name="GTFS shapes")
+mapview::mapview(shapes_sf, zcol = "shape_id", legend = TRUE, layer.name = "GTFS shapes")
 ```
 
 #### OSM routes
 
 ``` r
 
-mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.name="OSM routes")
+mapview::mapview(shapes_geometry_osm, zcol = "shape_id", legend = TRUE, layer.name = "OSM routes")
 ```
 
 ### Ways (matching GTFS id)
@@ -119,7 +177,7 @@ ways that compose them.
 ``` r
 
 # Match shapes geometry disaggregated by ways
-shapes_ways_osm = GTFShift::osm_shapes_to_routes(gtfs_794, q, ways=TRUE)
+shapes_ways_osm <- GTFShift::osm_shapes_to_routes(gtfs_794, q, ways = TRUE)
 ```
 
 ``` r
@@ -146,7 +204,7 @@ shapes_ways_osm |> select(shape_id, osm_id, way_osm_id, lanes)
 
 ``` r
 
-mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.name="OSM ways")
+mapview::mapview(shapes_ways_osm, zcol = "way_osm_id", legend = FALSE, layer.name = "OSM ways")
 ```
 
 ### Routes (matching shapes geometry)
@@ -177,10 +235,10 @@ end points, total length, and number of stops.
 ``` r
 
 # Subset feed for some routes only, for demonstration purposes
-gtfs_subset = GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65B"))
+gtfs_subset <- GTFShift::filter_by_route_name(gtfs, list("736", "750", "15E", "65B"))
 
 # Match shapes geometry
-shapes_match_routes = GTFShift::osm_shapes_match_routes(gtfs_subset, q)
+shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs_subset, q)
 #> > Found 14 GTFS shapes and 231 stops
 #> > Found 300 OSM route relations and 4911 bus stops/platforms
 #> > Associated 14 shapes (100.00% of 14 total) of 8 routes (100.00% of 8 total) with OSM routes, with a mean distance of 25.42 meters for points, 49.86 meters for route length and a mean difference of 0.43 stops
@@ -213,18 +271,18 @@ summary(shapes_match_routes)
 #> 
 
 # Visualize results
-shapes_match_routes$map_name = paste(
+shapes_match_routes$map_name <- paste(
   shapes_match_routes$route_short_name,
   " | ",
-  shapes_match_routes$shape_id, 
-  " | ", 
+  shapes_match_routes$shape_id,
+  " | ",
   shapes_match_routes$osm_id
 )
 ```
 
 ``` r
 
-mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name="route_short_name | shape_id | osm_id")
+mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.name = "route_short_name | shape_id | osm_id")
 ```
 
 #### Updating OSM routes with shape_id
@@ -232,7 +290,7 @@ mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.na
 The association between OSM route relations id and the GTFS shapes_id
 returned by
 [`GTFShift::osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)
-can be used to update OpenStreetMaps data. Refer to [Extra. Update OSM
+can be used to update OpenStreetMaps data. Refer to [Update OSM
 data](https://u-shift.github.io/GTFShift/articles/osm_update.md) for
 more details.
 
@@ -263,13 +321,13 @@ the road network exported from OpenStreetMaps, using Python
 
 library(osmdata)
 
-road_osm = opq("Arroios, Lisboa, Portugal") |>
-    add_osm_feature(key = "highway", value = c("motorway", "trunk", "primary", "secondary", "tertiary", "residential", "unclassified", "living_street")) |>
-    add_osm_feature(key = "area", value = "!yes") |>
-    osmdata_sf() |>
-    osm_poly2line()
+road_osm <- opq("Arroios, Lisboa, Portugal") |>
+  add_osm_feature(key = "highway", value = c("motorway", "trunk", "primary", "secondary", "tertiary", "residential", "unclassified", "living_street")) |>
+  add_osm_feature(key = "area", value = "!yes") |>
+  osmdata_sf() |>
+  osm_poly2line()
 
-road_osm = road_osm$osm_lines
+road_osm <- road_osm$osm_lines
 ```
 
 ``` r
@@ -281,7 +339,7 @@ mapview::mapview(road_osm)
 
 ``` r
 
-centerlines = GTFShift::osm_centerlines(place="Arroios, Lisboa, Portugal")
+centerlines <- GTFShift::osm_centerlines(place = "Arroios, Lisboa, Portugal")
 #> Using Python: /usr/bin/python3.12
 #> Creating virtual environment '~/.virtualenvs/r-reticulate' ...
 #> Done!

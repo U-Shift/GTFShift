@@ -27,14 +27,22 @@ get_stop_frequency_hourly(
 
 An `sf` `data.frame` object with the following columns:
 
-- `stop_id`, the `stop_id` attribute from `stops.txt` file.
+- stop_id:
 
-- `hour`, the hour for which the frequency applies (24 hour format).
+  The `stop_id` attribute from `stops.txt` file.
 
-- `frequency`, the number of services provided at the stop for the
-  corresponding 60 minutes period.
+- hour:
 
-- `geometry`, the stop coordinates.
+  The hour for which the frequency applies (24 hour format).
+
+- frequency:
+
+  The number of services provided at the stop for the corresponding 60
+  minutes period.
+
+- geometry:
+
+  The stop coordinates.
 
 ## Details
 

@@ -110,3 +110,13 @@ contributions.
 **GTFShift** includes methods to facilitate the process of contributing
 to OSM, specifically for updating bus lane information based on the
 analysis results.
+
+#### [Generate GTFS with OSM geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.md)
+
+The lack of standardization on GTFS shape geometries hampers aggregated
+analysis of different feeds and the association of planned service
+information with other urban dimensions such as the infrastructure
+topology.
+
+**GTFShift** provides methods to generate a GTFS file with OSM
+geometries.

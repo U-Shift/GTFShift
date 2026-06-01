@@ -6,6 +6,7 @@
 <url><loc>https://u-shift.github.io/GTFShift/articles/classify.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/download.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/filter.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/index.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/osm.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/osm_update.html</loc></url>
@@ -14,10 +15,11 @@
 <url><loc>https://u-shift.github.io/GTFShift/articles/unify.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/authors.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/index.html</loc></url>
-<url><loc>https://u-shift.github.io/GTFShift/reference/build_shapes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/calendar_nextBusinessWednesday.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/classify_frequency_los.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/create_calendar.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/create_shapes_from_sf.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/create_shapes_from_stops.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/filter_by_agency.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/filter_by_modes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/filter_by_route_name.html</loc></url>
@@ -28,12 +30,12 @@
 <url><loc>https://u-shift.github.io/GTFShift/reference/get_way_frequency_hourly.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/index.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/load_feed.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/multiline_to_sorted_linestring.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/network_overline.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_bus_lanes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_centerlines.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.html</loc></url>
-<url><loc>https://u-shift.github.io/GTFShift/reference/osm_trips_to_routes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/prioritize_lanes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/rt_collect_json.html</loc></url>

@@ -10,7 +10,8 @@ prioritize_lanes(
   gtfs,
   q,
   date = GTFShift::calendar_nextBusinessWednesday(),
-  keep_osm_attributes = FALSE
+  keep_osm_attributes = FALSE,
+  osm_file = NULL
 )
 ```
 
@@ -37,39 +38,74 @@ prioritize_lanes(
   Boolean (Default FALSE). Whether to keep all OSM way attributes in the
   output `sf` object.
 
+- osm_file:
+
+  character (Optional). Location of OSM extract file with `osm.pbf`
+  format. Refer to
+  [`osmextract::oe_download()`](https://docs.ropensci.org/osmextract/reference/oe_download.html)
+  for more details. If not provided OSM Overpass API is called through
+  [`osmdata::osmdata_sf()`](https://docs.ropensci.org/osmdata/reference/osmdata_sf.html).
+
 ## Value
 
 An `sf` `data.frame` object with the following columns:
 
-- `way_osm_id`, the `osm_id` attribute from OSM way.
+- way_osm_id:
 
-- `hour`, the hour for which the frequency applies (24 hour format).
+  The `osm_id` attribute from OSM way.
 
-- `frequency`, the number of services for the route that depart from the
-  first stop for the corresponding 60 minutes period.
+- hour:
 
-- `is_bus_lane`, whether the way has a bus lane.
+  The hour for which the frequency applies (24 hour format).
 
-- `n_lanes_parking`, the number of parking lanes.
+- frequency:
 
-- `n_lanes_circulation`, the number of circulation lanes.
+  The number of services for the route that depart from the first stop
+  for the corresponding 60 minutes period.
 
-- `n_lanes`, the total number of lanes.
+- is_bus_lane:
 
-- `n_directions`, the number of travel directions.
+  Whether the way has a bus lane.
 
-- `n_lanes_circulation_direction`, the number of circulation lanes per
-  direction.
+- n_lanes_parking:
 
-- `n_lanes_direction`, the number of total lanes per direction.
+  The number of parking lanes.
 
-- `routes`, the list of route_id that use the way.
+- n_lanes_circulation:
 
-- `shapes`, the list of shape_id that use the way.
+  The number of circulation lanes.
 
-- `geometry`, the route shape.
+- n_lanes:
 
-- (if `keep_osm_attributes = TRUE`) all OSM way attributes.
+  The total number of lanes.
+
+- n_directions:
+
+  The number of travel directions.
+
+- n_lanes_circulation_direction:
+
+  The number of circulation lanes per direction.
+
+- n_lanes_direction:
+
+  The number of total lanes per direction.
+
+- routes:
+
+  The list of route_id that use the way.
+
+- shapes:
+
+  The list of shape_id that use the way.
+
+- geometry:
+
+  The route shape.
+
+- (if `keep_osm_attributes = TRUE`):
+
+  All OSM way attributes.
 
 ## Details
 
@@ -97,6 +133,12 @@ an OSM match are ignored.
 if (FALSE) { # \dontrun{
 gtfs <- GTFShift::load_feed("gtfs.zip")
 q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+
+# To use OSM API:
 lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q)
+
+# To use a local OSM file:
+osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q, osm_file = osm_file)
 } # }
 ```

@@ -82,11 +82,17 @@ For more details on the parameters, refer to
 Some useful columns of the returned data.frame (refer to the API
 documentation for a full list) are:
 
-- `provider` The name of the GTFS provider.
+- provider:
 
-- `status` Tells if the feed is active, inactive or deprecated.
+  The name of the GTFS provider.
 
-- `producer_url` The GTFS feed URL. Can be used to download.
+- status:
+
+  Tells if the feed is active, inactive or deprecated.
+
+- producer_url:
+
+  The GTFS feed URL. Can be used to download.
 
 ## Examples
 

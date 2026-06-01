@@ -8,7 +8,7 @@ Read GTFS feed, fixing integrity errors
 load_feed(
   path,
   store_path = NA,
-  create_transfers = TRUE,
+  create_transfers = FALSE,
   transfer_distance = 300,
   transfer_time = 120,
   transfer_street_routing = FALSE,
@@ -29,7 +29,7 @@ load_feed(
 
 - create_transfers:
 
-  Boolean (Default TRUE). When true, generates `transfers.txt`,
+  Boolean (Default FALSE). When true, generates `transfers.txt`,
   aggregating close stops.
 
 - transfer_distance:
@@ -69,7 +69,7 @@ the following validations:
   filtering rows that do not comply.
 
 - Feeds with missing `shapes.txt` file, generating it using
-  [`GTFShift::build_shapes()`](https://u-shift.github.io/GTFShift/reference/build_shapes.md).
+  [`GTFShift::create_shapes_from_stops()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_stops.md).
 
 When generating transfers, those already existing in each GTFS file are
 kept, extended with new ones computed based on the stops network of the
@@ -82,7 +82,7 @@ applied the library default values.
 
 ## See also
 
-[`GTFShift::build_shapes()`](https://u-shift.github.io/GTFShift/reference/build_shapes.md)
+[`GTFShift::create_shapes_from_stops()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_stops.md)
 
 [`tidytransit::read_gtfs()`](https://r-transit.github.io/tidytransit/reference/read_gtfs.html)
 

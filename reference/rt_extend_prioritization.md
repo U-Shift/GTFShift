@@ -30,21 +30,34 @@ rt_extend_prioritization(lane_prioritization, rt_collection, lane_buffer = 15)
 The `lane_prioritization` `sf` `data.frame`, extended with the following
 columns:
 
-- `speed_avg`, the average speed of the vehicles on the way.
+- speed_avg:
 
-- `speed_median`, the median speed of the vehicles on the way.
+  The average speed of the vehicles on the way.
 
-- `speed_p25`, the 25th percentile speed of the vehicles on the way.
+- speed_median:
 
-- `speed_p75`, the 75th percentile speed of the vehicles on the way.
+  The median speed of the vehicles on the way.
 
-- `speed_count`, the number of speed observations on the way.
+- speed_p25:
+
+  The 25th percentile speed of the vehicles on the way.
+
+- speed_p75:
+
+  The 75th percentile speed of the vehicles on the way.
+
+- speed_count:
+
+  The number of speed observations on the way.
 
 ## Details
 
 Extends the `lane_prioritization` data with speed metrics calculated
 from the GTFS-RT data points that fall within a buffer around each lane
 segment.
+
+If the `current_status` column is present in the `rt_collection` data,
+only points with `current_status == "IN_TRANSIT_TO"` are considered.
 
 Refer to
 [`GTFShift::rt_collect_json()`](https://u-shift.github.io/GTFShift/reference/rt_collect_json.md)
