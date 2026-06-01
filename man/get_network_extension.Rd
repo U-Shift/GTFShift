@@ -39,8 +39,8 @@ For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
 \dontrun{
-gtfs = GTFShift::load_feed("gtfs.zip")
-route_extension = GTFShift::get_network_extension(gtfs)
+gtfs <- GTFShift::load_feed("gtfs.zip")
+route_extension <- GTFShift::get_network_extension(gtfs)
 }
 
 }

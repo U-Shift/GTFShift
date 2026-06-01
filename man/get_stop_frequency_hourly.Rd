@@ -16,11 +16,11 @@ get_stop_frequency_hourly(
 }
 \value{
 An \code{sf} \code{data.frame} object with the following columns:
-\itemize{
- \item \code{stop_id}, the \code{stop_id} attribute from \code{stops.txt} file.
- \item \code{hour}, the hour for which the frequency applies (24 hour format).
- \item \code{frequency}, the number of services provided at the stop for the corresponding 60 minutes period.
- \item \code{geometry}, the stop coordinates.
+\describe{
+  \item{stop_id}{The \code{stop_id} attribute from \code{stops.txt} file.}
+  \item{hour}{The hour for which the frequency applies (24 hour format).}
+  \item{frequency}{The number of services provided at the stop for the corresponding 60 minutes period.}
+  \item{geometry}{The stop coordinates.}
 }
 }
 \description{

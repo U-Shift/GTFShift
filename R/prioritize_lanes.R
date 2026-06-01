@@ -6,6 +6,7 @@
 #' @param q osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
 #' @param keep_osm_attributes Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.
+#' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, returning a data.frame with the road segments where transit routes
@@ -18,28 +19,34 @@
 #' OSM relation mapping is well defined for the transit routes. Routes that do not have an OSM match are ignored.
 #'
 #' @returns An \code{sf} \code{data.frame} object with the following columns:
-#' \itemize{
-#'  \item \code{way_osm_id}, the \code{osm_id} attribute from OSM way.
-#'  \item \code{hour}, the hour for which the frequency applies (24 hour format).
-#'  \item \code{frequency}, the number of services for the route that depart from the first stop for the corresponding 60 minutes period.
-#'  \item \code{is_bus_lane}, whether the way has a bus lane.
-#'  \item \code{n_lanes_parking}, the number of parking lanes.
-#'  \item \code{n_lanes_circulation}, the number of circulation lanes.
-#'  \item \code{n_lanes}, the total number of lanes.
-#'  \item \code{n_directions}, the number of travel directions.
-#'  \item \code{n_lanes_circulation_direction}, the number of circulation lanes per direction.
-#'  \item \code{n_lanes_direction}, the number of total lanes per direction.
-#'  \item \code{routes}, the list of route_id that use the way.
-#'  \item \code{shapes}, the list of shape_id that use the way.
-#'  \item \code{geometry}, the route shape.
-#'  \item (if \code{keep_osm_attributes = TRUE}) all OSM way attributes.
+#' \describe{
+#'   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
+#'   \item{hour}{The hour for which the frequency applies (24 hour format).}
+#'   \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+#'   \item{is_bus_lane}{Whether the way has a bus lane.}
+#'   \item{n_lanes_parking}{The number of parking lanes.}
+#'   \item{n_lanes_circulation}{The number of circulation lanes.}
+#'   \item{n_lanes}{The total number of lanes.}
+#'   \item{n_directions}{The number of travel directions.}
+#'   \item{n_lanes_circulation_direction}{The number of circulation lanes per direction.}
+#'   \item{n_lanes_direction}{The number of total lanes per direction.}
+#'   \item{routes}{The list of route_id that use the way.}
+#'   \item{shapes}{The list of shape_id that use the way.}
+#'   \item{geometry}{The route shape.}
+#'   \item{(if \code{keep_osm_attributes = TRUE})}{All OSM way attributes.}
 #' }
 #'
 #' @examples
 #' \dontrun{
 #' gtfs <- GTFShift::load_feed("gtfs.zip")
 #' q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+#'
+#' # To use OSM API:
 #' lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q)
+#'
+#' # To use a local OSM file:
+#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
+#' lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q, osm_file = osm_file)
 #' }
 #'
 #' @import dplyr
@@ -50,10 +57,11 @@ prioritize_lanes <- function(
   gtfs,
   q,
   date = GTFShift::calendar_nextBusinessWednesday(),
-  keep_osm_attributes = FALSE
+  keep_osm_attributes = FALSE,
+  osm_file = NULL
 ) {
   # Get way frequency hourly
-  way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE)
+  way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE, osm_file = osm_file)
 
   # Get bus lanes
   bus_lanes <- filter_osm_bus_lanes(way_frequency |> distinct(way_osm_id, .keep_all = TRUE))

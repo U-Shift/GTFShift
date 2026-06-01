@@ -15,12 +15,12 @@ rt_extend_prioritization(lane_prioritization, rt_collection, lane_buffer = 15)
 }
 \value{
 The \code{lane_prioritization} \code{sf} \code{data.frame}, extended with the following columns:
-\itemize{
- \item \code{speed_avg}, the average speed of the vehicles on the way.
- \item \code{speed_median}, the median speed of the vehicles on the way.
- \item \code{speed_p25}, the 25th percentile speed of the vehicles on the way.
- \item \code{speed_p75}, the 75th percentile speed of the vehicles on the way.
- \item \code{speed_count}, the number of speed observations on the way.
+\describe{
+  \item{speed_avg}{The average speed of the vehicles on the way.}
+  \item{speed_median}{The median speed of the vehicles on the way.}
+  \item{speed_p25}{The 25th percentile speed of the vehicles on the way.}
+  \item{speed_p75}{The 75th percentile speed of the vehicles on the way.}
+  \item{speed_count}{The number of speed observations on the way.}
 }
 }
 \description{
@@ -28,6 +28,8 @@ This function extends lane segment indicators for prioritization with metrics pr
 }
 \details{
 Extends the \code{lane_prioritization} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
+
+If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status == "IN_TRANSIT_TO"} are considered.
 
 Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 }
