@@ -27,8 +27,6 @@ OSM geometries are often MULTILINESTRING objects. In contrast, GTFS shapes.txt f
 
 `GTFShift::create_shapes_from_sf()` can be used to convert the MULTILINESTRING objects to sorted LINESTRING objects.
 
-> 
-
 # Example
 
 ```{r eval=FALSE}
