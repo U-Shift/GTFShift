@@ -1,4 +1,4 @@
-# Extra. Update OSM data
+# Update OSM data
 
 ## Introduction
 

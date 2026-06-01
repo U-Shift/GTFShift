@@ -17,7 +17,7 @@
 - [6. Get OSM data](https://u-shift.github.io/GTFShift/articles/osm.md):
 - [7. GTFS Real
   Time](https://u-shift.github.io/GTFShift/articles/rt.md):
-- [Extra. Update OSM
+- [Update OSM
   data](https://u-shift.github.io/GTFShift/articles/osm_update.md):
 - [Generate GTFS with OSM
   geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.md):
