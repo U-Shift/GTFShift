@@ -10,6 +10,7 @@
 #' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
 #' @param num_cores Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).
 #' @param osm_stop_order_relaxed Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.
+#' @param osm_route_type character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
@@ -91,7 +92,8 @@ osm_shapes_match_routes <- function(
   log_file = NA,
   osm_file = NULL,
   num_cores = 1,
-  osm_stop_order_relaxed = FALSE
+  osm_stop_order_relaxed = FALSE,
+  osm_route_type = "bus"
 ) {
   total_steps <- 4
   if (!is.null(osm_file)) {
@@ -145,7 +147,7 @@ osm_shapes_match_routes <- function(
   relations_df <- NULL
   if (!is.null(osm_file)) {
     # 2.1. Get relations
-    relations_df <- get_osm_relations_bus(osm_file, q, pb, 0.12, 0.25, 0.37, 0.49)
+    relations_df <- get_osm_relations(osm_file, q, pb, osm_route_type, 0.12, 0.25, 0.37, 0.49)
     pb$update(0.5)
 
     # 2.2. Get geometries and filter by matched relations
@@ -620,12 +622,13 @@ osm_shapes_match_routes <- function(
       .groups = "drop_last"
     ) |>
     ungroup()
-  result_success <- result_success |> left_join(route_shapes |> select(
-    -any_of(names(result_success)), shape_id # Avoid duplicate columns
-  ), by = "shape_id")
+
 
   # > Output success message
   if (nrow(result_success) > 0) {
+    result_success <- result_success |> left_join(route_shapes |> select(
+      -any_of(names(result_success)), shape_id # Avoid duplicate columns
+    ), by = "shape_id")
     m <- sprintf(
       "> Associated %d shapes (%.2f%% of %d total) of %d routes (%.2f%% of %d total) with OSM routes, corresponding to %d trips (%.2f%% of %d total), with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops\n",
       # shapes
@@ -752,7 +755,7 @@ osm_shapes_match_routes <- function(
     m <- "> No shapes were matched with OSM routes!\n"
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
-    return(if (geometry) st_sf(data.frame()) else data.frame())
+    return(if (geometry) st_sf(st_sfc()) else data.frame())
   }
 
   result_success <- result_success |> select(

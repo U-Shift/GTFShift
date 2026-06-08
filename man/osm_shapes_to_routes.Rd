@@ -9,7 +9,8 @@ osm_shapes_to_routes(
   q,
   ways = FALSE,
   ways_tags = c("lanes", "psv", "bus", "way", "parking", "name"),
-  osm_file = NULL
+  osm_file = NULL,
+  osm_route_type = "bus"
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ osm_shapes_to_routes(
 \item{ways_tags}{character vector (Default \code{c("lanes", "psv", "bus", "way", "parking", "name")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.}
 
 \item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
+
+\item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
 }
 \value{
 A \code{sf} \code{data.frame} with the following columns:

@@ -35,17 +35,17 @@ filter_osm_bus_lanes <- function(road_osm) {
 #' @return data frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
 #'
 #' @noRd
-get_osm_relations_bus <- function(osm_file, q, pb, pb_update_1 = 0.25, pb_update_2 = 0.5, pb_update_3 = 0.75, pb_update_4 = 1) {
+get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update_1 = 0.25, pb_update_2 = 0.5, pb_update_3 = 0.75, pb_update_4 = 1) {
   bus_relations_pbf <- tempfile(fileext = ".osm.pbf")
 
-  job <- callr::r_bg(function(bus_relations_pbf, osm_file) { # update spinner while blocking method call
+  job <- callr::r_bg(function(bus_relations_pbf, osm_file, osm_route_type) { # update spinner while blocking method call
     return(rosmium::tags_filter(
       osm_file,
-      "nwr/route=bus",
+      sprintf("nwr/route=%s", osm_route_type),
       output = bus_relations_pbf,
       overwrite = TRUE
     ))
-  }, args = list(bus_relations_pbf, osm_file))
+  }, args = list(bus_relations_pbf, osm_file, osm_route_type))
   while (job$is_alive()) {
     pb$tick(0)
     Sys.sleep(0.1)
