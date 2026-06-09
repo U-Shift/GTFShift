@@ -44,5 +44,9 @@ filter_by_agency <- function(gtfs, id=NA, name=NA) {
   # Filter feed by trip id
   gtfs_filtered = tidytransit::filter_feed_by_trips(gtfs, trip_ids = trips$trip_id)
 
+  # Filter agency table
+  routes_agencies <- unique(gtfs_filtered$routes$agency_id)
+  gtfs_filtered$agency = gtfs_filtered$agency |> filter(agency_id %in% routes_agencies)
+
   return(gtfs_filtered)
 }

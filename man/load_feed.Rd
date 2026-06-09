@@ -7,7 +7,7 @@
 load_feed(
   path,
   store_path = NA,
-  create_transfers = TRUE,
+  create_transfers = FALSE,
   transfer_distance = 300,
   transfer_time = 120,
   transfer_street_routing = FALSE,
@@ -19,7 +19,7 @@ load_feed(
 
 \item{store_path}{String (Optional). If provided, GTFS feed zip is stored at location. The file is overwritten if it already exists.}
 
-\item{create_transfers}{Boolean (Default TRUE). When true, generates \code{transfers.txt}, aggregating close stops.}
+\item{create_transfers}{Boolean (Default FALSE). When true, generates \code{transfers.txt}, aggregating close stops.}
 
 \item{transfer_distance}{Integer (Default 300). Upper straight-line distance limit in meters for transfers.}
 

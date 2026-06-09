@@ -12,7 +12,7 @@ navbar:
 
   components:
     dashboard:
-      text: "Dashboard"
+      text: "Bus lane prioritization dashboard"
       href: "https://ushift.pt/apps/gtfshift"
       target: "_blank"
 

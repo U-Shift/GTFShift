@@ -5,6 +5,7 @@
 #' @param ways boolean (Default False). If true, relation is disaggregated in ways.
 #' @param ways_tags character vector (Default \code{c("lanes", "psv", "bus", "way", "parking", "name")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.
 #' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
+#' @param osm_route_type character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations, considering the
@@ -44,7 +45,12 @@
 #' @import callr
 #'
 #' @export
-osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "psv", "bus", "way", "parking", "name"), osm_file = NULL) {
+osm_shapes_to_routes <- function(
+  gtfs, q,
+  ways = FALSE, ways_tags = c("lanes", "psv", "bus", "way", "parking", "name"),
+  osm_file = NULL,
+  osm_route_type = "bus"
+) {
   total_steps <- 2 + ways
   if (!is.null(osm_file)) {
     total_steps <- total_steps - 1
@@ -68,7 +74,7 @@ osm_shapes_to_routes <- function(gtfs, q, ways = FALSE, ways_tags = c("lanes", "
 
   if (!is.null(osm_file)) {
     # 1.1. Get relations
-    relations_df <- get_osm_relations_bus(osm_file, q, pb, 0.1, 0.2, 0.3, 0.94) |>
+    relations_df <- get_osm_relations(osm_file, q, pb, osm_route_type, 0.1, 0.2, 0.3, 0.94) |>
       filter(type == "way") |>
       rename(way_osm_id = osm_id, osm_id = relation_osm_id)
 
