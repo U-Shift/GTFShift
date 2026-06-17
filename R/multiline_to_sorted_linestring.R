@@ -89,9 +89,9 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
     ordered_lines[[1]] <- current_line$geometry
     remaining_lines <- linestrings[-1, ]
 
-    # mapview(linestrings, layer.name="OSM original geometry", homebutton=FALSE, color="#440154") + mapview(ordered_lines[[1]], color = "red", homebutton=FALSE) + mapview(start_point, col.regions = "gray", homebutton=FALSE)
+    # mapview(linestrings, layer.name="OSM original geometry", homebutton=FALSE, color="#b3a7b8") + mapview(ordered_lines[[1]], color = "red", homebutton=FALSE) + mapview(start_point, col.regions = "gray", homebutton=FALSE)
 
-    while (nrow(remaining_lines) > 0 && length(ordered_lines)<=63) { 
+    while (nrow(remaining_lines) > 0 && length(ordered_lines)<=65) { 
         # && length(ordered_lines)<=12 # 7
         #  && length(ordered_lines)<=31 # 10
         last_point <- lwgeom::st_endpoint(current_line$geometry)
@@ -111,14 +111,19 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
 
         # mapview(start_point, col.regions="gray") + mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, col.regions="orange") + mapview(next_line, color="green")
         mapview(start_point, col.regions="gray", layer.name="Start Point", homebutton=FALSE) + 
-            mapview(linestrings, layer.name="OSM original geometry", homebutton=FALSE, color="#440154") + 
+            mapview(linestrings, layer.name="OSM original geometry", homebutton=FALSE, color="#b3a7b8") + 
             mapview(ordered_lines, color="yellow", layer.name = "OSM matched geometry", homebutton=FALSE) +
             mapview(current_line, color="red", layer.name="Current segment", homebutton=FALSE) + 
-            # mapview(current_line, color="yellow", layer.name="OSM matched geometry", homebutton=FALSE) + 
             mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE) + 
-            mapview(next_line, color="green", layer.name="Next segment")
+            mapview(next_line, color="green", layer.name="Next segment", homebutton=FALSE)
         # mapview(remaining_lines$geom) + mapview(remaining_lines$start, col.regions="pink") + mapview(remaining_lines$end, col.regions="black")
         # mapview(remaining_lines[nearest_idx_start, ], color="green") + mapview(remaining_lines[nearest_idx_start, ]$start, col.regions="green") +mapview(remaining_lines[nearest_idx_end, ], color="purple") + mapview(remaining_lines[nearest_idx_end, ]$end, col.regions="purple") + mapview(last_point)
+        mapview(linestrings, layer.name="OSM original geometry", homebutton=FALSE, color="#b3a7b8") + 
+            mapview(ordered_lines, color="yellow", layer.name = "OSM matched geometry", homebutton=FALSE) +
+            mapview(current_line, color="yellow", layer.name="OSM matched geometry", homebutton=FALSE)  + 
+            mapview(start_point, col.regions="gray", layer.name="Start Point", homebutton=FALSE) + 
+            mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE)
+
 
         # If they have same geometry, consider other nearest
         if (next_line$geometry == current_line$geometry) {
