@@ -176,7 +176,8 @@ osm_shapes_match_routes <- function(
 
     # Remove type==node that has osm_id not in osm_stops
     relations_df <- relations_df |>
-      filter(!(type == "node" & !(osm_id %in% osm_stops$osm_id)))
+      filter(!(type == "node" & !(osm_id %in% osm_stops$osm_id))) |>
+      filter(relation_osm_id %in% osm_multilines_redux$osm_id)
 
     osm_stoppositions <- relations_df |>
       filter(type == "node") |>
@@ -293,6 +294,15 @@ osm_shapes_match_routes <- function(
   warning_osm_unsorted_stops <- list()
   warning_osm_stops_missing <- list()
 
+  stop_counts <- relations_df |>
+    dplyr::filter(grepl("stop|platform", role)) |>
+    dplyr::group_by(relation_osm_id) |>
+    dplyr::summarise(
+      nr_s = sum(grepl("stop", role)),
+      nr_p = sum(grepl("platform", role)),
+      nr_stops = max(nr_s, nr_p)
+    )
+
   match_route_worker <- function(route_name) {
     # message("route_name = " %>% paste(route_name))
     # Warning records for this specific route
@@ -318,6 +328,10 @@ osm_shapes_match_routes <- function(
           )
         )
     }
+    # Filter to remove empty geometries
+    osm_route_name_geom_col <- sf::st_geometry(osm_route_name)
+    osm_route_name <- osm_route_name |>
+      dplyr::filter(!sf::st_is_empty(osm_route_name_geom_col))
 
     # >> Validate OSM data
     if (nrow(osm_route_name) == 0) { # Validate that there is an OSM match for GTFS route
@@ -382,7 +396,8 @@ osm_shapes_match_routes <- function(
 
     # 2. Match based on initial and final points
     # > Compute osm final and initial points
-    geom_col <- sf::st_geometry(osm_route_name)
+    geom_col <- sf::st_geometry(osm_route_name |> st_transform(3857)) # To get length in meters)
+    
     osm_route_name <- tryCatch(
       {
         osm_route_name |>
@@ -391,14 +406,10 @@ osm_shapes_match_routes <- function(
             route_dist = sf::st_length(geom_col) |> units::drop_units()
           ) |>
           dplyr::rowwise() |>
+          dplyr::left_join(stop_counts, by = c("osm_id" = "relation_osm_id")) |>
           dplyr::mutate(
             # Geographical data
-            # Other relevant parameters
-            nr_stops = { # Consider the number of stops to be the maximum of stops or platforms, because some routes use them mixed and miss some
-              nr_s <- nrow(relations_df |> dplyr::filter(relation_osm_id == osm_id & grepl("stop", role)))
-              nr_p <- nrow(relations_df |> dplyr::filter(relation_osm_id == osm_id & grepl("platform", role)))
-              max(nr_s, nr_p)
-            },
+            # Other relevant parameters,
             first_stop_osm_id = relations_df |>
               dplyr::filter(type == "node") |>
               dplyr::select(relation_osm_id, stop_osm_id = osm_id, role) |>
@@ -457,7 +468,7 @@ osm_shapes_match_routes <- function(
     }
 
     # > Same for GTFS shapes
-    geom_col <- sf::st_geometry(gtfs_route_name)
+    geom_col <- sf::st_geometry(gtfs_route_name |> st_transform(3857)) # To get length in meters
     gtfs_route_name <- gtfs_route_name |>
       dplyr::mutate(route_dist = sf::st_length(geom_col) |> units::drop_units()) |>
       dplyr::rowwise() |>
@@ -478,8 +489,8 @@ osm_shapes_match_routes <- function(
 
     # 3. Match gtfs shapes and osm routes, by choosing the one that share the closest start and end points
     # >  Compute distances between init and final points for both
-    init <- units::drop_units(sf::st_distance(osm_route_name$initial, gtfs_route_name$initial))
-    fin <- units::drop_units(sf::st_distance(osm_route_name$final, gtfs_route_name$final))
+    init <- units::drop_units(sf::st_distance(osm_route_name$initial |> st_transform(3857), gtfs_route_name$initial |> st_transform(3857)))
+    fin <- units::drop_units(sf::st_distance(osm_route_name$final |> st_transform(3857), gtfs_route_name$final |> st_transform(3857)))
     length_diff <- sapply(gtfs_route_name$route_dist, function(y) abs(osm_route_name$route_dist - y))
     # Proxy for number of stops distance: average distance between stops on GTFS, times the difference between osm and gtfs stops
     stops_diff <- sapply(
@@ -510,7 +521,7 @@ osm_shapes_match_routes <- function(
       dplyr::rowwise() |>
       dplyr::mutate(
         distance_diff = abs(route_dist_gtfs - route_dist_osm),
-        points_diff = as.numeric(units::drop_units(sf::st_distance(initial_osm, initial_gtfs)) + units::drop_units(sf::st_distance(final_osm, final_gtfs))),
+        points_diff = as.numeric(units::drop_units(sf::st_distance(initial_osm |> st_transform(3857), initial_gtfs |> st_transform(3857)))) + units::drop_units(sf::st_distance(final_osm |> st_transform(3857), final_gtfs |> st_transform(3857))),
         stops_diff = abs(nr_stops_gtfs - nr_stops_osm)
       ) |> # absolute difference
       dplyr::ungroup() |>
