@@ -40,7 +40,7 @@ regions <- rbind( # Barreiro
     gtfs_day = gsub("-", "", Sys.Date()),
     query = I(list(list(
       list(key = "route", value = c("bus"), key_exact = TRUE),
-      list(key = "network", value = "Transportes Coletivos do Barreiro", key_exact = TRUE)
+      list(key = "network", value = c("TCB", "Transportes Coletivos do Barreiro", "Transportes Colectivos do Barreiro"), key_exact = TRUE)
     ))),
     geofabrik_region = "europe/portugal"
   )
