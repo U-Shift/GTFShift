@@ -28,7 +28,8 @@ regions <- rbind( # AML
     query = I(list(list(
       list(key = "route", value = c("bus"), key_exact = TRUE),
       list(key = "network", value = "Carris Metropolitana", key_exact = TRUE)
-    )))
+    ))),
+    geofabrik_region = "europe/portugal"
   )
 )
 regions <- rbind( # Barreiro
@@ -332,6 +333,7 @@ for (i in 1:nrow(regions)) {
   assign(sprintf("q_%s_gtfs%s", region$name, region$gtfs_day), q)
 
   osm_file <- NULL
+  options(timeout = 1000)
   if (!is.null(region$geofabrik_region)) {
     osm_file <- osmextract::oe_download(
       sprintf("https://download.geofabrik.de/%s-latest.osm.pbf", region$geofabrik_region),
