@@ -62,8 +62,10 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
     linestrings <- linestrings |>
         mutate(
             start = lwgeom::st_startpoint(geometry),
-            end = lwgeom::st_endpoint(geometry)
-        )
+            end = lwgeom::st_endpoint(geometry), 
+            order = row_number()
+        ) 
+    mapview(linestrings, zcol = "order")
 
     # 3. Reorder the linestrings by finding the best sequence
 
@@ -76,7 +78,7 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
         current_line <- linestrings[nearest_idx, ]
         current_start <- lwgeom::st_startpoint(current_line$geometry)
         current_end <- lwgeom::st_endpoint(current_line$geometry)
-        # mapview(start_point, col.regions = "yellow") + mapview(current_line) + mapview(current_start, col.regions="pink") + mapview(current_end, col.regions="gray")
+        # mapview(start_point, col.regions = "gray") + mapview(current_line) + mapview(current_start, col.regions="pink") + mapview(current_end, col.regions="gray")
         # If start_point is closest to line end point than start point, invert geometry
         if (st_distance(start_point, current_start) > st_distance(start_point, current_end)) {
             current_line$geometry <- st_reverse(current_line$geometry)
@@ -87,9 +89,9 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
     ordered_lines[[1]] <- current_line$geometry
     remaining_lines <- linestrings[-1, ]
 
-    # mapview(linestrings, layer.name="linestrings") + mapview(ordered_lines[[1]], color = "red") + mapview(start_point, col.regions = "yellow")
+    # mapview(linestrings, layer.name="OSM original route relation", homebutton=FALSE, color="#440154") + mapview(ordered_lines[[1]], color = "red", homebutton=FALSE) + mapview(start_point, col.regions = "gray", homebutton=FALSE)
 
-    while (nrow(remaining_lines) > 0) { 
+    while (nrow(remaining_lines) > 0 && length(ordered_lines)<=65) { 
         # && length(ordered_lines)<=12 # 7
         #  && length(ordered_lines)<=31 # 10
         last_point <- lwgeom::st_endpoint(current_line$geometry)
@@ -108,8 +110,20 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
         next_end <- lwgeom::st_endpoint(next_line$geometry)
 
         # mapview(start_point, col.regions="gray") + mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, col.regions="orange") + mapview(next_line, color="green")
+        mapview(start_point, col.regions="gray", layer.name="Start Point", homebutton=FALSE) + 
+            mapview(linestrings, layer.name="OSM original route relation", homebutton=FALSE, color="#440154") + 
+            mapview(ordered_lines, color="yellow", layer.name = "OSM matched geometry", homebutton=FALSE) +
+            mapview(current_line, color="red", layer.name="Current segment", homebutton=FALSE) + 
+            mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE) + 
+            mapview(next_line, color="green", layer.name="Next segment", homebutton=FALSE)
         # mapview(remaining_lines$geom) + mapview(remaining_lines$start, col.regions="pink") + mapview(remaining_lines$end, col.regions="black")
         # mapview(remaining_lines[nearest_idx_start, ], color="green") + mapview(remaining_lines[nearest_idx_start, ]$start, col.regions="green") +mapview(remaining_lines[nearest_idx_end, ], color="purple") + mapview(remaining_lines[nearest_idx_end, ]$end, col.regions="purple") + mapview(last_point)
+        mapview(linestrings, layer.name="OSM original route relation", homebutton=FALSE, color="#440154") + 
+            mapview(ordered_lines, color="#E7BF00", layer.name = "OSM matched geometry", homebutton=FALSE) +
+            mapview(current_line, color="#E7BF00", layer.name="OSM matched geometry", homebutton=FALSE)  + 
+            mapview(start_point, col.regions="gray", layer.name="Start Point", homebutton=FALSE) + 
+            mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE)
+
 
         # If they have same geometry, consider other nearest
         if (next_line$geometry == current_line$geometry) {
