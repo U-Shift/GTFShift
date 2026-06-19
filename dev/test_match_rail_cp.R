@@ -95,8 +95,8 @@ osm_match_result_unique_routes <- osm_match_result |>
   distinct()
 osm_match_result_unique_routes
 
-mapview(osm_match_result_unique_routes, zcol="osm_name")
-mapview(osm_match_result_unique_routes, zcol="route_short_name")
+mapview(osm_match_result_unique_routes, zcol="osm_name", layer.name="GTFS/OSM match result")
+mapview(osm_match_result_unique_routes, zcol="route_short_name", layer.name="GTFS/OSM match result")
 
 
 length(unique(routes_lisbon$route_id))
