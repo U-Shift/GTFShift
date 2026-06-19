@@ -23,7 +23,7 @@ filter_osm_bus_lanes <- function(road_osm) {
 }
 
 
-#' Get OSM relations and elements (ways and nodes) tagged as bus networks
+#' Get OSM relations and elements (ways and nodes) tagged as part of route relations
 #'
 #' @param osm_file character. Path to OSM file.
 #' @param pb progress bar object.
@@ -36,16 +36,16 @@ filter_osm_bus_lanes <- function(road_osm) {
 #'
 #' @noRd
 get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update_1 = 0.25, pb_update_2 = 0.5, pb_update_3 = 0.75, pb_update_4 = 1) {
-  bus_relations_pbf <- tempfile(fileext = ".osm.pbf")
+  relations_pbf <- tempfile(fileext = ".osm.pbf")
 
-  job <- callr::r_bg(function(bus_relations_pbf, osm_file, osm_route_type) { # update spinner while blocking method call
+  job <- callr::r_bg(function(relations_pbf, osm_file, osm_route_type) { # update spinner while blocking method call
     return(rosmium::tags_filter(
       osm_file,
       sprintf("nwr/route=%s", osm_route_type),
-      output = bus_relations_pbf,
+      output = relations_pbf,
       overwrite = TRUE
     ))
-  }, args = list(bus_relations_pbf, osm_file, osm_route_type))
+  }, args = list(relations_pbf, osm_file, osm_route_type))
   while (job$is_alive()) {
     pb$tick(0)
     Sys.sleep(0.1)
@@ -53,8 +53,8 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
   job$get_result()
   pb$update(pb_update_1)
 
-  bus_relations_xml <- rosmium::show_content(
-    bus_relations_pbf,
+  relations_xml <- rosmium::show_content(
+    relations_pbf,
     object_type = c("relation"),
     output_format = "xml",
     preview = FALSE,
@@ -64,7 +64,7 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
   pb$update(pb_update_2)
 
   # 1.2. Filter relations using q$features and extract way members
-  doc <- xml2::read_xml(bus_relations_xml)
+  doc <- xml2::read_xml(relations_xml)
   relations <- xml2::xml_find_all(doc, ".//relation")
 
   # > Extract filter criteria from q$features
