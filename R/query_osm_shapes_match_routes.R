@@ -161,6 +161,7 @@ osm_shapes_match_routes <- function(
       select(relation_osm_id, osm_id, ref, name, `gtfs:shape_id`, `gtfs:route_id`) |>
       # Join with osm_ways to get geometries back
       left_join(osm_ways |> select(osm_id), by = "osm_id") |>
+      filter(!st_is_empty(geometry)) |> # Ignore empty geometries (for instance, platforms on railways)
       st_as_sf() |>
       # Group by osm_id, gtfs:shape_id, generating multilinestring with geometries
       dplyr::group_by(relation_osm_id, ref, name, `gtfs:shape_id`, `gtfs:route_id`) |>
