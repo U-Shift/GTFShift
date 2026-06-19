@@ -415,6 +415,12 @@ osm_shapes_match_routes <- function(
               dplyr::select(relation_osm_id, stop_osm_id = osm_id, role) |>
               # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
               dplyr::filter(relation_osm_id == osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
+              # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
+              dplyr::filter(
+                (nr_s > 3 * nr_p & role %in% c("stop_entry_only", "stop")) |
+                (nr_p > 3 * nr_s & role %in% c("platform_entry_only", "platform")) |
+                (nr_s <= 3 * nr_p & nr_p <= 3 * nr_s)
+              ) |>
               # Use sorting to give priority to entry/exit, when they exist
               dplyr::arrange(
                 match(role, c("stop_entry_only", "platform_entry_only", "stop", "platform")),
@@ -426,6 +432,12 @@ osm_shapes_match_routes <- function(
               dplyr::filter(type == "node") |>
               dplyr::select(relation_osm_id, stop_osm_id = osm_id, role) |>
               dplyr::filter(relation_osm_id == osm_id & role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
+              # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
+              dplyr::filter(
+                (nr_s > 3 * nr_p & role %in% c("stop_exit_only", "stop")) |
+                (nr_p > 3 * nr_s & role %in% c("platform_exit_only", "platform")) |
+                (nr_s <= 3 * nr_p & nr_p <= 3 * nr_s)
+              ) |>
               dplyr::mutate(role_group = dplyr::case_when(
                 # When roundtrip (circular), keep normal order
                 roundtrip == "yes" ~ 1,
