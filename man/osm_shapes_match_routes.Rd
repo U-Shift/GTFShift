@@ -63,20 +63,42 @@ Get OSM routes that match shapes, based on geometrical match
 \details{
 For each route, matches its trips' shapes with OSM route relations.
 
-The calculation is performed considering, for each GTFS route, the subset of OSM routes that match
-the route identifier (based on \code{gtfs_match} and \code{osm_match}). Then, for each shape,
-the geometrical match is performed considering the OSM route \eqn{j} that minimizes the closeness
-metric \eqn{C(i, j)} for GTFS shape \eqn{i}:
+The matching algorithm is formulated as follows:
+Let \eqn{R} be a GTFS route identifier.
 
+\bold{1. Filtering and Base Data Selection:}
+Let \eqn{\mathcal{O}_R = \{O_1, \dots, O_m\}} be the set of candidate OSM route relations matching the identifier \eqn{R}
+(based on \code{gtfs_match} and \code{osm_match}).
+If \eqn{\mathcal{O}_R} is empty, route \eqn{R} is skipped.
+Unless \code{osm_stop_order_relaxed = TRUE}, any relation in \eqn{\mathcal{O}_R} with entry/exit stops not in the correct order is discarded.
+We also retrieve the set of GTFS shapes associated with route \eqn{R}, denoted as \eqn{\mathcal{S}_R = \{S_1, \dots, S_n\}}.
+
+\bold{2. Feature Extraction:}
+For each GTFS shape \eqn{S_i \in \mathcal{S}_R}:
+\itemize{
+  \item Extract the start and end coordinates of its trips' first and last stops: \eqn{\text{init}_{GTFS, i}} and \eqn{\text{fin}_{GTFS, i}}.
+  \item Compute the shape's total length \eqn{L_{GTFS, i}} and the number of stop times \eqn{N_{stops, i}}.
+}
+For each candidate OSM route relation \eqn{O_j \in \mathcal{O}_R}:
+\itemize{
+  \item Extract the coordinates of the first and last stops/platforms: \eqn{\text{init}_{OSM, j}} and \eqn{\text{fin}_{OSM, j}}.
+  \item Compute the relation's geometry length \eqn{L_{OSM, j}} and the number of stop/platform nodes \eqn{N_{stops, j}}.
+}
+
+\bold{3. Closeness Metric Evaluation:}
+For each GTFS shape \eqn{S_i}, we calculate the closeness metric \eqn{C(i, j)} for all candidate OSM routes \eqn{O_j \in \mathcal{O}_R}:
 \deqn{C(i, j) = d(\text{init}_{GTFS, i}, \text{init}_{OSM, j}) + d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j}) + |L_{GTFS, i} - L_{OSM, j}| + \frac{L_{GTFS, i}}{N_{stops, i}} \cdot |N_{stops, i} - N_{stops, j}|}{C(i, j) = d(init_GTFS,i, init_OSM,j) + d(fin_GTFS,i, fin_OSM,j) + |L_GTFS,i - L_OSM,j| + (L_GTFS,i / N_stops,i) * |N_stops,i - N_stops,j|}
 
 where:
 \itemize{
-  \item \eqn{d(\text{init}_{GTFS, i}, \text{init}_{OSM, j})}{d(init_GTFS,i, init_OSM,j)} is the distance between the starting points/stops of the GTFS shape \eqn{i} and the OSM route \eqn{j}.
-  \item \eqn{d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j})}{d(fin_GTFS,i, fin_OSM,j)} is the distance between the ending points/stops of the GTFS shape \eqn{i} and the OSM route \eqn{j}.
-  \item \eqn{L_{GTFS, i}}{L_GTFS,i} and \eqn{L_{OSM, j}}{L_OSM,j} are the total lengths of the GTFS shape \eqn{i} and the OSM route \eqn{j}, respectively.
-  \item \eqn{N_{stops, i}}{N_stops,i} and \eqn{N_{stops, j}}{N_stops,j} are the number of stops on the GTFS shape \eqn{i} and the OSM route \eqn{j}, respectively. The term \eqn{\frac{L_{GTFS, i}}{N_{stops, i}}}{(L_GTFS,i / N_stops,i)} represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.
+  \item \eqn{d(\cdot)} is the Euclidean distance.
+  \item The term \eqn{\frac{L_{GTFS, i}}{N_{stops, i}}}{(L_GTFS,i / N_stops,i)} represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.
 }
+Shape \eqn{S_i} is associated with the OSM route \eqn{O_{j^*}} that minimizes the closeness metric:
+\deqn{j^* = \operatorname{argmin}_{j} C(i, j)}{j* = argmin_j C(i, j)}
+
+\bold{4. Conflict Resolution:}
+If multiple GTFS shapes are associated with the same OSM route \eqn{O_j}, only the shape \eqn{S_i} that minimizes the closeness metric is retained. The other conflicting shapes are ignored and a warning is triggered.
 
 
 Be aware that the result might ignore some GTFS routes, in the following cases:
