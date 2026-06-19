@@ -441,18 +441,18 @@ osm_shapes_match_routes <- function(
               dplyr::mutate(role_group = dplyr::case_when(
                 # When roundtrip (circular), keep normal order
                 roundtrip == "yes" ~ 1,
-                # Otherwise, consider first stop_exit_only or last stop (if no exit_only)
+                # Otherwise, consider last stop_exit_only or stop (if no exit_only)
                 role == "stop_exit_only" ~ 1, role == "platform_exit_only" ~ 2, role == "stop" ~ 4, role == "platform" ~ 4, TRUE ~ 5
               )) |>
               dplyr::arrange(
-                role_group,
-                dplyr::case_when(
+                role_group, # First criteria, to prioritize entry/exit when they exist
+                dplyr::case_when( # Within each role, sort by order on OSM relation, considering roundtrip and role type
                   roundtrip == "yes" ~ dplyr::row_number(), # When roundtrip (circular), keep normal order
-                  role == "stop_exit_only" ~ dplyr::row_number(), # keep natural order
-                  role == "platform_exit_only" ~ dplyr::row_number(), # keep natural order
+                  role == "stop_exit_only" ~ dplyr::desc(dplyr::row_number()), # reverse order
+                  role == "platform_exit_only" ~ dplyr::desc(dplyr::row_number()), # reverse order
                   role == "stop" ~ dplyr::desc(dplyr::row_number()), # reverse order
                   role == "platform" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  TRUE ~ dplyr::row_number() # fallback order for others
+                  TRUE ~ dplyr::desc(dplyr::row_number()) # fallback order for others
                 )
               ) |>
               dplyr::slice(1) |>
