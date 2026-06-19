@@ -640,7 +640,7 @@ osm_shapes_match_routes <- function(
   message("> Getting route metadata\n")
   route_shapes <- gtfs$routes |>
     left_join(gtfs$trips, by = "route_id") |>
-    group_by(across(any_of(c("route_id", "route_short_name", "trip_headsign", "trip_short_name", "direction_id", "shape_id")))) |>
+    group_by(across(any_of(c("route_id", "route_short_name", "direction_id", "shape_id")))) |>
     summarise(
       n_trips = n(),
       .groups = "drop_last"
@@ -785,7 +785,7 @@ osm_shapes_match_routes <- function(
   result_success <- result_success |> select(
     any_of(c(
       "route_id", "route_short_name", "route_long_name",
-      "shape_id", "trip_headsign", "trip_short_name", "direction_id",
+      "shape_id", "direction_id",
       "osm_id", "osm_name", "osm_ref",
       "distance_diff", "points_diff", "stops_diff",
       "geometry"
