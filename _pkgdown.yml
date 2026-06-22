@@ -22,7 +22,7 @@ reference:
     contents:
     - load_feed
     - query_mobilitydatabase
-  - title: Prioritize
+  - title: Prioritize for bus lane implementation
     contents:
     - starts_with("prioritize_")
     - rt_extend_prioritization

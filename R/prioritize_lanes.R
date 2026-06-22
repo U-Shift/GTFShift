@@ -26,10 +26,8 @@
 #'   \item{is_bus_lane}{Whether the way has a bus lane.}
 #'   \item{n_lanes_parking}{The number of parking lanes.}
 #'   \item{n_lanes_circulation}{The number of circulation lanes.}
-#'   \item{n_lanes}{The total number of lanes.}
 #'   \item{n_directions}{The number of travel directions.}
 #'   \item{n_lanes_circulation_direction}{The number of circulation lanes per direction.}
-#'   \item{n_lanes_direction}{The number of total lanes per direction.}
 #'   \item{routes}{The list of route_id that use the way.}
 #'   \item{shapes}{The list of shape_id that use the way.}
 #'   \item{geometry}{The route shape.}
@@ -121,18 +119,12 @@ prioritize_lanes <- function(
         n_lanes_circulation / n_directions < 1 ~ 1,
         !is.na(n_lanes_circulation) & !is.na(n_directions) ~ n_lanes_circulation / n_directions,
         TRUE ~ NA_real_
-      ),
-      n_lanes = n_lanes_circulation + n_lanes_parking,
-      n_lanes_direction = case_when(
-        n_lanes / n_directions < 1 ~ 1,
-        !is.na(n_lanes) & !is.na(n_directions) ~ n_lanes / n_directions,
-        TRUE ~ NA_real_
       )
     )
 
   if (!keep_osm_attributes) {
     lanes <- lanes |>
-      select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_parking, n_lanes_circulation, n_lanes, n_directions, n_lanes_circulation_direction, n_lanes_direction, routes, shapes, geometry)
+      select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_parking, n_lanes_circulation, n_directions, n_lanes_circulation_direction, routes, shapes, geometry)
   }
 
   return(lanes)
