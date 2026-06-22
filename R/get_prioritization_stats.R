@@ -12,9 +12,9 @@
 #'   \item{speed_avg}{Average speed of the prioritized network, in km/h.}
 #'   \item{speed_min}{Minimum speed of the prioritized network, in km/h.}
 #'   \item{speed_max}{Maximum speed of the prioritized network, in km/h.}
-#'   \item{n_lanes_avg}{Average number of lanes in the prioritized network.}
-#'   \item{n_lanes_min}{Minimum number of lanes in the prioritized network.}
-#'   \item{n_lanes_max}{Maximum number of lanes in the prioritized network.}
+#'   \item{n_lanes_circulation_avg}{Average number of lanes in the prioritized network.}
+#'   \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritized network.}
+#'   \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritized network.}
 #' }
 #'
 #' @examples
@@ -59,9 +59,13 @@ get_prioritization_stats <- function(
     }
 
     # Compute number of lanes, weighted by chosen weight
-    stats$n_lanes_avg <- weighted.mean(prioritization_internal$n_lanes, prioritization_internal[[weight]], na.rm = TRUE)
-    stats$n_lanes_min <- min(prioritization_internal$n_lanes, na.rm = TRUE)
-    stats$n_lanes_max <- max(prioritization_internal$n_lanes, na.rm = TRUE)
+    stats$n_lanes_circulation_avg <- weighted.mean(prioritization_internal$n_lanes_circulation, prioritization_internal[[weight]], na.rm = TRUE)
+    stats$n_lanes_circulation_min <- min(prioritization_internal$n_lanes_circulation, na.rm = TRUE)
+    stats$n_lanes_circulation_max <- max(prioritization_internal$n_lanes_circulation, na.rm = TRUE)
+
+    stats$n_lanes_parking_avg <- weighted.mean(prioritization_internal$n_lanes_parking, prioritization_internal[[weight]], na.rm = TRUE)
+    stats$n_lanes_parking_min <- min(prioritization_internal$n_lanes_parking, na.rm = TRUE)
+    stats$n_lanes_parking_max <- max(prioritization_internal$n_lanes_parking, na.rm = TRUE)
 
     return(stats)
 }
