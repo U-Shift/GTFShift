@@ -82,8 +82,8 @@ where:
 Be aware that the result might ignore some GTFS routes, in the following cases:
 \itemize{
  \item If there is no OSM route relation that matches the GTFS route identifier;
- \item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order;
- \item If, for the same route, distinct shapes are associated to the same OSM route.
+ \item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order (unless \code{osm_stop_order_relaxed} is set to TRUE);
+ \item If, for the same route, distinct shapes are associated to the same OSM route. In that case, only the shape that minimizes the closeness metric is retained.
 }
 If any of these errors occurs, warnings will be thrown at end of the method execution, and those GTFS route will be ignored in the results.
 
