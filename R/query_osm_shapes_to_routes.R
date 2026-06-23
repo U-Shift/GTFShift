@@ -28,7 +28,7 @@
 #' gtfs <- GTFShift::load_feed("gtfs.zip")
 #'
 #' q <- opq("Lisbon") |>
-#'   add_osm_feature(key = "route", value = c("bus", "tram")) |>
+#'   add_osm_feature(key = "route", value = c("bus")) |>
 #'   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 #'
 #' # To use OSM API:
