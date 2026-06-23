@@ -22,9 +22,9 @@ List with statistics about lane prioritization, with the following attributes:
   \item{speed_avg}{Average speed of the prioritized network, in km/h.}
   \item{speed_min}{Minimum speed of the prioritized network, in km/h.}
   \item{speed_max}{Maximum speed of the prioritized network, in km/h.}
-  \item{n_lanes_avg}{Average number of lanes in the prioritized network.}
-  \item{n_lanes_min}{Minimum number of lanes in the prioritized network.}
-  \item{n_lanes_max}{Maximum number of lanes in the prioritized network.}
+  \item{n_lanes_circulation_avg}{Average number of lanes in the prioritized network.}
+  \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritized network.}
+  \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritized network.}
 }
 }
 \description{
