@@ -63,7 +63,7 @@
 #' gtfs <- GTFShift::load_feed("gtfs.zip")
 #'
 #' q <- opq("Lisbon") |>
-#'   add_osm_feature(key = "route", value = c("bus", "tram")) |>
+#'   add_osm_feature(key = "route", value = c("bus")) |>
 #'   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 #'
 #' # To use OSM API:
@@ -188,7 +188,7 @@ osm_shapes_match_routes <- function(
     pb$update(1)
     pb$terminate()
 
-    m <- sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", length(unique(relations_df$relation_osm_id)), length(unique(osm_stoppositions$osm_id)))
+    m <- sprintf("> Found %d OSM route relations and %d stops/platforms\n", length(unique(relations_df$relation_osm_id)), length(unique(osm_stoppositions$osm_id)))
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
   } else {
@@ -277,7 +277,7 @@ osm_shapes_match_routes <- function(
 
     pb$update(1)
     pb$terminate()
-    m <- sprintf("> Found %d OSM route relations and %d bus stops/platforms\n", nrow(osm_multilines_redux), nrow(osm_stoppositions))
+    m <- sprintf("> Found %d OSM route relations and %d stops/platforms\n", nrow(osm_multilines_redux), nrow(osm_stoppositions))
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
   }
