@@ -4,14 +4,24 @@
 \alias{rt_extend_prioritization}
 \title{Extend prioritization with GTFS-RT metrics}
 \usage{
-rt_extend_prioritization(lane_prioritization, rt_collection, lane_buffer = 15)
+rt_extend_prioritization(
+  lane_prioritization,
+  rt_collection,
+  rt_current_status = c("IN_TRANSIT_TO"),
+  lane_buffer = 15,
+  metric_crs = 3857
+)
 }
 \arguments{
 \item{lane_prioritization}{sf data.frame. Result of \code{GTFShift::prioritize_lanes()}}
 
 \item{rt_collection}{sf data.frame. GTFS-RT data collection. Must include \code{speed} column.}
 
+\item{rt_current_status}{Character vector (Default \code{c("IN_TRANSIT_TO")}). If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status} in this vector are considered.}
+
 \item{lane_buffer}{numeric (Default 15). Buffer distance (in meters) to create around lane segments to capture nearby GTFS-RT points.}
+
+\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to apply lane buffer distances in meters.}
 }
 \value{
 The \code{lane_prioritization} \code{sf} \code{data.frame}, extended with the following columns:
@@ -28,8 +38,6 @@ This function extends lane segment indicators for prioritization with metrics pr
 }
 \details{
 Extends the \code{lane_prioritization} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
-
-If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status == "IN_TRANSIT_TO"} are considered.
 
 Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 }
