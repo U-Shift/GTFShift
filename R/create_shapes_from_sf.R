@@ -1,7 +1,8 @@
 #' Build shapes from simple feature object
 #'
-#' @param sf_shapes sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING)
+#' @param sf_shapes sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING).
 #' @param gtfs tidygtfs. GTFS feed.
+#' @param metric_crs numeric (Default 3857). EPSG code for a metric CRS used when computing distances (passed to \code{multiline_to_sorted_linestring}).
 #'
 #' @details
 #' This function builds the shapes.txt file from a simple feature object.
@@ -32,7 +33,7 @@
 #' @seealso \code{GTFShift::multiline_to_sorted_linestring}
 #'
 #' @export
-create_shapes_from_sf <- function(sf_shapes, gtfs) {
+create_shapes_from_sf <- function(sf_shapes, gtfs, metric_crs = 3857) {
     # Initial validations
     if (!"shape_id" %in% names(sf_shapes)) {
         stop("The sf_shapes object must contain a \"shape_id\" column.")
@@ -63,7 +64,8 @@ create_shapes_from_sf <- function(sf_shapes, gtfs) {
         rowwise() |>
         mutate(!!current_geom_col := multiline_to_sorted_linestring(
             multilinestring = .data[[current_geom_col]],
-            start_point = stop_point
+            start_point = stop_point,
+            metric_crs = metric_crs
         )) |>
         ungroup()
 
