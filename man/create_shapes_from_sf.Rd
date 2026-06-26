@@ -4,12 +4,14 @@
 \alias{create_shapes_from_sf}
 \title{Build shapes from simple feature object}
 \usage{
-create_shapes_from_sf(sf_shapes, gtfs)
+create_shapes_from_sf(sf_shapes, gtfs, metric_crs = 3857)
 }
 \arguments{
-\item{sf_shapes}{sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING)}
+\item{sf_shapes}{sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING).}
 
 \item{gtfs}{tidygtfs. GTFS feed.}
+
+\item{metric_crs}{numeric (Default 3857). EPSG code for a metric CRS used when computing distances (passed to \code{multiline_to_sorted_linestring}).}
 }
 \value{
 A \code{data.table} representing a GTFS shapes table.
