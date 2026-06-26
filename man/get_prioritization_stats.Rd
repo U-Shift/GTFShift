@@ -6,13 +6,16 @@
 \usage{
 get_prioritization_stats(
   lane_prioritization,
-  weight = c("length", "frequency")
+  weight = c("length", "frequency"),
+  metric_crs = 3857
 )
 }
 \arguments{
 \item{lane_prioritization}{sf data.frame. Lane prioritization.}
 
 \item{weight}{Character. Weight to use for weighted mean. Accepted values: "length", "frequency".}
+
+\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute lengths in meters.}
 }
 \value{
 List with statistics about lane prioritization, with the following attributes:

@@ -15,7 +15,8 @@ osm_shapes_match_routes(
   osm_file = NULL,
   num_cores = 1,
   osm_stop_order_relaxed = FALSE,
-  osm_route_type = "bus"
+  osm_route_type = "bus",
+  metric_crs = 3857
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ osm_shapes_match_routes(
 \item{osm_stop_order_relaxed}{Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.}
 
 \item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
+
+\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute shapes and routes lengths and stop-to-stop distances.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
