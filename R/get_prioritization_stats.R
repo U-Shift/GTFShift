@@ -4,6 +4,7 @@
 #'
 #' @param lane_prioritization sf data.frame. Lane prioritization.
 #' @param weight Character. Weight to use for weighted mean. Accepted values: "length", "frequency".
+#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute lengths in meters.
 #'
 #' @returns List with statistics about lane prioritization, with the following attributes:
 #' \describe{
@@ -29,12 +30,18 @@
 #' @export
 get_prioritization_stats <- function(
   lane_prioritization,
-  weight = c("length", "frequency")
+  weight = c("length", "frequency"),
+  metric_crs = 3857
 ) {
     weight <- match.arg(weight)
+    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+    if (is.na(metric_crs)) {
+        stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+    }
+
     prioritization_internal <- lane_prioritization |>
         st_as_sf() |>
-        st_transform(crs = 3857)
+        st_transform(crs = metric_crs)
 
     geom_col <- st_geometry(prioritization_internal)
     prioritization_internal <- prioritization_internal |>

@@ -3,6 +3,7 @@
 #' @param multilinestring sf object with MULTILINESTRING geometry
 #' @param start_point (Optional) sf point geometry. If provided, the sorting of the linestrings
 #'   will start from this point.
+#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.
 #'
 #' @details
 #' The function takes a MULTILINESTRING object and converts it to a LINESTRING object
@@ -49,13 +50,24 @@
 #' @import lwgeom
 #'
 #' @export
-multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) {
+multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL, metric_crs = 3857) {
+    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+    if (is.na(metric_crs)) {
+        stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+    }
+    original_crs <- st_crs(multilinestring)
+
     # browser()
 
     # 1. Extract all individual LINESTRING components
     linestrings <- st_cast(multilinestring, "LINESTRING") |>
         st_as_sf() |>
-        st_set_geometry("geometry")
+        st_set_geometry("geometry") |>
+        st_transform(metric_crs)
+
+    if (!is.null(start_point)) {
+        start_point <- st_transform(start_point, metric_crs)
+    }
 
     # 2. Find the correct order by connecting endpoints
     #    - Get all start and end points
@@ -136,5 +148,9 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL) 
     all_coords <- do.call(rbind, lapply(ordered_lines, st_coordinates))[, 1:2]
 
     # 5. Create new LINESTRING from the combined coordinates
-    return(st_sfc(st_linestring(all_coords), crs = st_crs(multilinestring)))
+    result <- st_sfc(st_linestring(all_coords), crs = st_crs(linestrings))
+    if (!is.na(original_crs)) {
+        result <- st_transform(result, original_crs)
+    }
+    return(result)
 }
