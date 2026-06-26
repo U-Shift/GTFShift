@@ -6,6 +6,7 @@
 #' @param target_network_split Integer (Default 100). If not NA, network is split in segments of defined meters.
 #' @param fun Method (Default \code{base::sum}). Function to summarise the attributes by.
 #' @param join_dist Integer (Default 10). Meters to consider when joining routes and network segments.
+#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute segment lengths and join distances in meters.
 #'
 #' @details
 #' This method allows for the lines aggregation. Given a target network, it identifies (using \code{stplanr::rnet_join()})
@@ -43,10 +44,17 @@ network_overline <- function(
     attr,
     target_network_split=100,
     fun=sum,
-    join_dist=10
+    join_dist=10,
+    metric_crs = 3857
 ) {
+  original_crs <- st_crs(target_network)
+  metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+  if (is.na(metric_crs)) {
+    stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+  }
+
   # 1. Prepare network
-  network_line = stplanr::line_cast(st_transform(target_network, crs=3857))
+  network_line = stplanr::line_cast(st_transform(target_network, crs = metric_crs))
   if (!is.na(target_network_split)) {
     network_segmented = stplanr::line_segment(
       network_line,
@@ -58,7 +66,7 @@ network_overline <- function(
   }
 
   df = lines |>
-    st_transform(crs=3857) |>
+    st_transform(crs = metric_crs) |>
     mutate(df_id=row_number())
 
   # 2. Overlap df and network segments
@@ -68,7 +76,8 @@ network_overline <- function(
       select(segment),
     length_y = FALSE,
     key_column = "df_id",
-    dist = join_dist
+    dist = join_dist,
+    crs = st_crs(metric_crs)
   ) |> st_drop_geometry()
 
   df_network_attr = df_network_match |>
@@ -87,7 +96,8 @@ network_overline <- function(
   result = network_segmented |>
     filter(segment %in% df_network_segment$segment) |>
     left_join(df_network_segment, by="segment") |>
-    select(-segment)
+    select(-segment) |>
+    st_transform(crs = original_crs)
 
   return(result)
 }

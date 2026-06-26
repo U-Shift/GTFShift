@@ -69,7 +69,7 @@ create_shapes_from_sf <- function(sf_shapes, gtfs) {
 
     # Convert LINESTRING to GTFS shapes.txt data.frame
     shapes_gtfstools <- gtfstools::convert_sf_to_shapes(
-        sf_shapes_linestrings |> st_transform(4326),
+        sf_shapes_linestrings |> st_transform(4326), # Use WGS 84 as default CRS for GTFS shapes
         calculate_distance = FALSE
     )
 

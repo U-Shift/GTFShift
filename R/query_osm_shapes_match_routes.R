@@ -11,6 +11,7 @@
 #' @param num_cores Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).
 #' @param osm_stop_order_relaxed Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.
 #' @param osm_route_type character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').
+#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute shapes and routes lengths and stop-to-stop distances.
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
@@ -93,7 +94,8 @@ osm_shapes_match_routes <- function(
   osm_file = NULL,
   num_cores = 1,
   osm_stop_order_relaxed = FALSE,
-  osm_route_type = "bus"
+  osm_route_type = "bus",
+  metric_crs = 3857
 ) {
   total_steps <- 4
   if (!is.null(osm_file)) {
@@ -113,6 +115,10 @@ osm_shapes_match_routes <- function(
   }
   if (!(osm_match %in% c("ref", "name", "gtfs:route_id"))) {
     stop("osm_match should be one of: ref, name, gtfs:route_id")
+  }
+  metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+  if (is.na(metric_crs)) {
+    stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
   }
 
   # 1. Get geometry for shapes and stops
@@ -152,7 +158,7 @@ osm_shapes_match_routes <- function(
 
     # 2.2. Get geometries and filter by matched relations
     # Consider 500 meters outside of shapes to avoid loosing stops on the edge
-    bbox <- st_bbox(tidytransit::shapes_as_sf(gtfs$shapes) |> st_transform(3857) |> st_buffer(500))
+    bbox <- st_bbox(tidytransit::shapes_as_sf(gtfs$shapes) |> st_transform(metric_crs) |> st_buffer(500))
 
     osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
     pb$update(0.75)
@@ -397,7 +403,7 @@ osm_shapes_match_routes <- function(
 
     # 2. Match based on initial and final points
     # > Compute osm final and initial points
-    geom_col <- sf::st_geometry(osm_route_name |> st_transform(3857)) # To get length in meters)
+    geom_col <- sf::st_geometry(osm_route_name |> st_transform(metric_crs)) # To get route length in a projected CRS
     
     osm_route_name <- tryCatch(
       {
@@ -481,7 +487,7 @@ osm_shapes_match_routes <- function(
     }
 
     # > Same for GTFS shapes
-    geom_col <- sf::st_geometry(gtfs_route_name |> st_transform(3857)) # To get length in meters
+    geom_col <- sf::st_geometry(gtfs_route_name |> st_transform(metric_crs)) # To get route length in a projected CRS
     gtfs_route_name <- gtfs_route_name |>
       dplyr::mutate(route_dist = sf::st_length(geom_col) |> units::drop_units()) |>
       dplyr::rowwise() |>
@@ -502,8 +508,8 @@ osm_shapes_match_routes <- function(
 
     # 3. Match gtfs shapes and osm routes, by choosing the one that share the closest start and end points
     # >  Compute distances between init and final points for both
-    init <- units::drop_units(sf::st_distance(osm_route_name$initial |> st_transform(3857), gtfs_route_name$initial |> st_transform(3857)))
-    fin <- units::drop_units(sf::st_distance(osm_route_name$final |> st_transform(3857), gtfs_route_name$final |> st_transform(3857)))
+    init <- units::drop_units(sf::st_distance(osm_route_name$initial |> st_transform(metric_crs), gtfs_route_name$initial |> st_transform(metric_crs)))
+    fin <- units::drop_units(sf::st_distance(osm_route_name$final |> st_transform(metric_crs), gtfs_route_name$final |> st_transform(metric_crs)))
     length_diff <- sapply(gtfs_route_name$route_dist, function(y) abs(osm_route_name$route_dist - y))
     # Proxy for number of stops distance: average distance between stops on GTFS, times the difference between osm and gtfs stops
     stops_diff <- sapply(
@@ -534,7 +540,7 @@ osm_shapes_match_routes <- function(
       dplyr::rowwise() |>
       dplyr::mutate(
         distance_diff = abs(route_dist_gtfs - route_dist_osm),
-        points_diff = as.numeric(units::drop_units(sf::st_distance(initial_osm |> st_transform(3857), initial_gtfs |> st_transform(3857)))) + units::drop_units(sf::st_distance(final_osm |> st_transform(3857), final_gtfs |> st_transform(3857))),
+        points_diff = as.numeric(units::drop_units(sf::st_distance(initial_osm |> st_transform(metric_crs), initial_gtfs |> st_transform(metric_crs)))) + units::drop_units(sf::st_distance(final_osm |> st_transform(metric_crs), final_gtfs |> st_transform(metric_crs))),
         stops_diff = abs(nr_stops_gtfs - nr_stops_osm)
       ) |> # absolute difference
       dplyr::ungroup() |>
