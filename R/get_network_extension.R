@@ -38,6 +38,7 @@ get_network_extension <- function(
   use_osm_routes = NA,
   metric_crs = 3857
 ) {
+  metric_crs_is_default <- missing(metric_crs)
   # 0. Validations
   if (!(route_identifier %in% c("route_id", "route_short_name", "route_long_name"))) {
     stop("route_identifier should be one of: route_id, route_short_name or route_long_name")
@@ -45,6 +46,12 @@ get_network_extension <- function(
   metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
   if (is.na(metric_crs)) {
     stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+  }
+  if (metric_crs_is_default) {
+    warning(
+      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+      call. = FALSE
+    )
   }
 
   # Compute hourly frequencies for each route
