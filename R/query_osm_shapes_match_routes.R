@@ -97,6 +97,7 @@ osm_shapes_match_routes <- function(
   osm_route_type = "bus",
   metric_crs = 3857
 ) {
+  metric_crs_is_default <- missing(metric_crs)
   total_steps <- 4
   if (!is.null(osm_file)) {
     total_steps <- 3
@@ -119,6 +120,12 @@ osm_shapes_match_routes <- function(
   metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
   if (is.na(metric_crs)) {
     stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+  }
+  if (metric_crs_is_default) {
+    warning(
+      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+      call. = FALSE
+    )
   }
 
   # 1. Get geometry for shapes and stops

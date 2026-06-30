@@ -48,6 +48,7 @@ rt_extend_prioritization <- function(
   lane_buffer = 15, # in meters
   metric_crs = 3857
 ) {
+  metric_crs_is_default <- missing(metric_crs)
   # 1. Validate inputs
   required_cols <- c("way_osm_id")
   missing_cols <- setdiff(required_cols, colnames(lane_prioritization))
@@ -63,6 +64,12 @@ rt_extend_prioritization <- function(
   metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
   if (is.na(metric_crs)) {
     stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+  }
+  if (metric_crs_is_default) {
+    warning(
+      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+      call. = FALSE
+    )
   }
   rt_collection_crs <- sf::st_crs(rt_collection)
 

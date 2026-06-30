@@ -34,6 +34,13 @@
 #'
 #' @export
 create_shapes_from_sf <- function(sf_shapes, gtfs, metric_crs = 3857) {
+    if (missing(metric_crs)) {
+        warning(
+            "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+            call. = FALSE
+        )
+    }
+
     # Initial validations
     if (!"shape_id" %in% names(sf_shapes)) {
         stop("The sf_shapes object must contain a \"shape_id\" column.")
