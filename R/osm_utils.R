@@ -16,7 +16,7 @@ filter_osm_bus_lanes <- function(road_osm) {
     if_any(any_of("psv"), ~ .x == "designated") |
       if_any(any_of("highway"), ~ .x == "busway") |
       if_any(any_of(cols_to_check_access), ~ grepl("designated", .x)) |
-      if_any(any_of(cols_to_check_count), ~ is.numeric(.x) & .x >= 1)
+      if_any(any_of(cols_to_check_count), ~ {v <- suppressWarnings(as.numeric(sub(";.*$", "", .x))); !is.na(v) & v >= 1})
   )
 
   return(osm_lanes)
