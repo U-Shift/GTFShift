@@ -86,11 +86,12 @@ prioritize_lanes <- function(
         if_any(matches("^parking(:lane)?:both"), ~ !is.na(.) & . != "no") ~ 2L,
         # Otherwise, count left and right sides separately based on specific tags (parking:lane:left/right or parking:left/right)
         TRUE ~ (
-          as.integer(
-            if_any(matches("^parking(:lane)?:left"), ~ !is.na(.) & . != "no")
-          ) +
             as.integer(
-              if_any(matches("^parking(:lane)?:right"), ~ !is.na(.) & . != "no")
+              # grepl "no" to account for parking:left:restriction=no_stopping
+              if_any(matches("^parking(:lane)?:left"),  ~ !is.na(.) & !grepl("\\bno\\b", ., ignore.case = TRUE))
+            ) +
+            as.integer(
+              if_any(matches("^parking(:lane)?:right"), ~ !is.na(.) & !grepl("\\bno\\b", ., ignore.case = TRUE))
             )
         )
       ),
@@ -99,9 +100,9 @@ prioritize_lanes <- function(
         parse_lanes(lanes),
         # Directional count (sum existing ones; returns NA if all are missing)
         na_if(
-          coalesce(parse_lanes(`lanes:forward`), 0) +
-            coalesce(parse_lanes(`lanes:backward`), 0) +
-            coalesce(parse_lanes(`lanes:both_ways`), 0),
+            rowSums(across(matches("^lanes(:[^:]+)*:forward$"), ~ coalesce(parse_lanes(.), 0)), na.rm = TRUE) +
+            rowSums(across(matches("^lanes(:[^:]+)*:backward$"), ~ coalesce(parse_lanes(.), 0)), na.rm = TRUE) +
+            rowSums(across(matches("^lanes(:[^:]+)*:both_ways$"), ~ coalesce(parse_lanes(.), 0)), na.rm = TRUE),
           0
         ),
         # If oneway=="yes", then 1
@@ -111,8 +112,10 @@ prioritize_lanes <- function(
       ),
       n_directions = case_when(
         n_lanes_circulation == 1 ~ 1, # When only one lane, assume one direction
-        oneway %in% c("yes", "1", "-1", "true") ~ 1,
-        oneway %in% c("no", "0", "false") ~ 2,
+        # any oneway:* tag indicating "no"
+        if_any(matches("oneway"), ~ tolower(.x) %in% c("no", "0", "false")) ~ 2,
+        # any oneway:* tag indicating "yes"
+        if_any(matches("oneway"), ~ tolower(.x) %in% c("yes", "1", "-1", "true")) ~ 1,
         TRUE ~ 2
       ),
       n_lanes_circulation_direction = case_when(
