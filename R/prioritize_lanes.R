@@ -88,10 +88,10 @@ prioritize_lanes <- function(
         TRUE ~ (
             as.integer(
               # grepl "no" to account for parking:left:restriction=no_stopping
-              if_any(matches("^parking(:lane)?:left"),  ~ !is.na(.) & !grepl("\\bno\\b", ., ignore.case = TRUE))
+              if_any(matches("^parking(:lane)?:left"),  ~ !is.na(.) & !grepl("\\bno\\b|\\bno_", ., ignore.case = TRUE))
             ) +
             as.integer(
-              if_any(matches("^parking(:lane)?:right"), ~ !is.na(.) & !grepl("\\bno\\b", ., ignore.case = TRUE))
+              if_any(matches("^parking(:lane)?:right"), ~ !is.na(.) & !grepl("\\bno\\b|\\bno_", ., ignore.case = TRUE))
             )
         )
       ),
