@@ -13,6 +13,10 @@ rt_commercial_speed <- function(
   if (!inherits(trips_geometries, "sf")) {
     stop("trips_geometries must be an sf object")
   }
+  # > if rl_collection geometry has MULTILINESTRING, throw error
+  if (any(sf::st_geometry_type(rt_collection) != "LINESTRING")) {
+    stop("rt_collection geometry must be LINESTRING. Use GTFShift::multiline_to_sorted_linestring() to convert MULTILINESTRING to LINESTRING.")
+  }
 
   # > rt_collection must have trip_id and timestamp columns
   required_cols <- c("trip_id", "timestamp")
@@ -28,6 +32,7 @@ rt_commercial_speed <- function(
     purrr::map_dfr(function(trip_df) {
       trip_df <- trip_df |> arrange(timestamp) |> st_transform(crs = metric_crs)
       trip_geometry <- trips_geometries |> filter(trip_id == trip_df$trip_id[[1]]) |> st_transform(crs = metric_crs)
+      # mapview(trip_geometry)
       
       # Find the closest point on the shape for each update
       trip_df_geometry <- st_geometry(trip_df)
@@ -37,12 +42,15 @@ rt_commercial_speed <- function(
       n <- length(closest_points)
       matched_on_shape <- pts_all[seq(2, length(pts_all), by = 2)]
       trip_df <- trip_df |> dplyr::mutate(closest_on_shape = matched_on_shape)
+      # mapview(trip_df, zcol = "timestamp", layer.name = "GTFS-RT updates") +  mapview(trip_geometry, color = "blue", lwd = 3, layer.name = "Trip geometry") + mapview(closest_points, color = "green", layer.name = "Closest points") + mapview(matched_on_shape, color = "red", layer.name = "Closest points on shape")
 
       # Sample trip_geometry with segments of 10 meters
       line_len_m <- as.numeric(st_length(trip_geometry))
       trip_geometry_sampled <- st_line_sample(trip_geometry, density = 1/geometry_sample_meters)
       trip_geometry_sampled_points <- st_cast(trip_geometry_sampled, "POINT")
       cumdist_m <- seq(0, line_len_m, length.out = length(trip_geometry_sampled_points))
+      # trip_geometry_sampled_points_df <- st_sf(data.frame(cumdist_m = cumdist_m), geometry = trip_geometry_sampled_points)
+      # mapview(trip_geometry_sampled_points_df, zcol="cumdist_m", layer.name = "Sampled points along trip geometry")
       
       # Get closest sampled point on shape for each update and compute distance along shape
       idx <- st_nearest_feature(trip_df$closest_on_shape, trip_geometry_sampled_points)
@@ -56,6 +64,7 @@ rt_commercial_speed <- function(
         speed_kmh = round(speed_kmh, 2),
         distance_along_geometry = round(distance_along_geometry, 2)
       )
+      # mapview(trip_df, zcol = "distance_along_geometry", layer.name = "Distance along geometry") + mapview(trip_df, zcol = "speed_kmh", layer.name = "Speed (km/h)") +  mapview(trip_geometry, color = "blue", lwd = 3, layer.name = "Trip geometry")
       # |> filter(
       #  !is.na(speed_kmh) &
       #  speed_kmh>=0 # Remove negative speeds
