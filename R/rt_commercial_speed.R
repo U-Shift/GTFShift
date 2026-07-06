@@ -13,9 +13,9 @@ rt_commercial_speed <- function(
   if (!inherits(trips_geometries, "sf")) {
     stop("trips_geometries must be an sf object")
   }
-  # > if rl_collection geometry has MULTILINESTRING, throw error
-  if (any(sf::st_geometry_type(rt_collection) != "LINESTRING")) {
-    stop("rt_collection geometry must be LINESTRING. Use GTFShift::multiline_to_sorted_linestring() to convert MULTILINESTRING to LINESTRING.")
+  # > if trips_geometries geometry has MULTILINESTRING, throw error
+  if (any(sf::st_geometry_type(trips_geometries) != "LINESTRING")) {
+    stop("trips_geometries geometry must be LINESTRING. Use GTFShift::multiline_to_sorted_linestring() to convert MULTILINESTRING to LINESTRING.")
   }
 
   # > rt_collection must have trip_id and timestamp columns
