@@ -4,13 +4,19 @@
 \alias{multiline_to_sorted_linestring}
 \title{Convert a MULTILINESTRING to a sorted LINESTRING}
 \usage{
-multiline_to_sorted_linestring(multilinestring, start_point = NULL)
+multiline_to_sorted_linestring(
+  multilinestring,
+  start_point = NULL,
+  metric_crs = 3857
+)
 }
 \arguments{
 \item{multilinestring}{sf object with MULTILINESTRING geometry}
 
 \item{start_point}{(Optional) sf point geometry. If provided, the sorting of the linestrings
 will start from this point.}
+
+\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.}
 }
 \value{
 A \code{sf} object with LINESTRING geometry.

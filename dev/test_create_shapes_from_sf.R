@@ -29,3 +29,11 @@ shapes_gtfstools
 shapes_gtfstools_sf <- tidytransit::shapes_as_sf(shapes_gtfstools)
 shapes_gtfstools_sf
 mapview(shapes_gtfstools_sf, zcol="shape_id")
+
+bbox <- sf::st_bbox(sf_shapes_original <- tidytransit::shapes_as_sf(gtfs$shapes))
+mapview::mapview(bbox)
+library(osmdata)
+q <- opq(bbox = bbox) |>
+  add_osm_feature(key = "route", value = "bus", key_exact = TRUE) |>
+  add_osm_feature(key = "operator", value = c("TCB", "Transportes Colectivos do Barreiro"), key_exact = TRUE)
+  

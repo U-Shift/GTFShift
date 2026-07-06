@@ -1,7 +1,8 @@
 #' Build shapes from simple feature object
 #'
-#' @param sf_shapes sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING)
+#' @param sf_shapes sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING).
 #' @param gtfs tidygtfs. GTFS feed.
+#' @param metric_crs numeric (Default 3857). EPSG code for a metric CRS used when computing distances (passed to \code{multiline_to_sorted_linestring}).
 #'
 #' @details
 #' This function builds the shapes.txt file from a simple feature object.
@@ -32,7 +33,14 @@
 #' @seealso \code{GTFShift::multiline_to_sorted_linestring}
 #'
 #' @export
-create_shapes_from_sf <- function(sf_shapes, gtfs) {
+create_shapes_from_sf <- function(sf_shapes, gtfs, metric_crs = 3857) {
+    if (missing(metric_crs)) {
+        warning(
+            "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+            call. = FALSE
+        )
+    }
+
     # Initial validations
     if (!"shape_id" %in% names(sf_shapes)) {
         stop("The sf_shapes object must contain a \"shape_id\" column.")
@@ -68,9 +76,11 @@ create_shapes_from_sf <- function(sf_shapes, gtfs) {
         rowwise() |>
         mutate(!!current_geom_col := multiline_to_sorted_linestring(
             multilinestring = .data[[current_geom_col]],
-            start_point = stop_point
+            start_point = stop_point,
+            metric_crs = metric_crs
         )) |>
-        ungroup()
+        ungroup() |>
+        select(shape_id)
 
     #mapview::mapview(sf_shapes_linestrings |> select(-stop_point), zcol="shape_id")
     #sf_shapes_linestrings_debug = sf_shapes_linestrings|>filter(shape_id=="1-VA-TERM")
@@ -79,8 +89,7 @@ create_shapes_from_sf <- function(sf_shapes, gtfs) {
 
     # Convert LINESTRING to GTFS shapes.txt data.frame
     shapes_gtfstools <- gtfstools::convert_sf_to_shapes(
-        sf_shapes_linestrings |> st_transform(4326),
-        calculate_distance = FALSE
+        sf_shapes_linestrings |> st_transform(4326) # Use WGS 84 as default CRS for GTFS shapes
     )
 
     return(shapes_gtfstools)
