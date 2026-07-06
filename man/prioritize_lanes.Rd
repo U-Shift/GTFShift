@@ -32,10 +32,8 @@ An \code{sf} \code{data.frame} object with the following columns:
   \item{is_bus_lane}{Whether the way has a bus lane.}
   \item{n_lanes_parking}{The number of parking lanes.}
   \item{n_lanes_circulation}{The number of circulation lanes.}
-  \item{n_lanes}{The total number of lanes.}
   \item{n_directions}{The number of travel directions.}
   \item{n_lanes_circulation_direction}{The number of circulation lanes per direction.}
-  \item{n_lanes_direction}{The number of total lanes per direction.}
   \item{routes}{The list of route_id that use the way.}
   \item{shapes}{The list of shape_id that use the way.}
   \item{geometry}{The route shape.}

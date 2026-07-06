@@ -15,7 +15,8 @@ osm_shapes_match_routes(
   osm_file = NULL,
   num_cores = 1,
   osm_stop_order_relaxed = FALSE,
-  osm_route_type = "bus"
+  osm_route_type = "bus",
+  metric_crs = 3857
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ osm_shapes_match_routes(
 \item{osm_stop_order_relaxed}{Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.}
 
 \item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
+
+\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute shapes and routes lengths and stop-to-stop distances.}
 }
 \value{
 A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
@@ -104,8 +107,8 @@ If multiple GTFS shapes are associated with the same OSM route \eqn{O_j}, only t
 Be aware that the result might ignore some GTFS routes, in the following cases:
 \itemize{
  \item If there is no OSM route relation that matches the GTFS route identifier;
- \item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order;
- \item If, for the same route, distinct shapes are associated to the same OSM route.
+ \item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order (unless \code{osm_stop_order_relaxed} is set to TRUE);
+ \item If, for the same route, distinct shapes are associated to the same OSM route. In that case, only the shape that minimizes the closeness metric is retained.
 }
 If any of these errors occurs, warnings will be thrown at end of the method execution, and those GTFS route will be ignored in the results.
 
@@ -118,7 +121,7 @@ Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the 
 gtfs <- GTFShift::load_feed("gtfs.zip")
 
 q <- opq("Lisbon") |>
-  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "route", value = c("bus")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
 # To use OSM API:

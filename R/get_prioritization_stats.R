@@ -4,6 +4,7 @@
 #'
 #' @param lane_prioritization sf data.frame. Lane prioritization.
 #' @param weight Character. Weight to use for weighted mean. Accepted values: "length", "frequency".
+#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute lengths in meters.
 #'
 #' @returns List with statistics about lane prioritization, with the following attributes:
 #' \describe{
@@ -12,9 +13,9 @@
 #'   \item{speed_avg}{Average speed of the prioritized network, in km/h.}
 #'   \item{speed_min}{Minimum speed of the prioritized network, in km/h.}
 #'   \item{speed_max}{Maximum speed of the prioritized network, in km/h.}
-#'   \item{n_lanes_avg}{Average number of lanes in the prioritized network.}
-#'   \item{n_lanes_min}{Minimum number of lanes in the prioritized network.}
-#'   \item{n_lanes_max}{Maximum number of lanes in the prioritized network.}
+#'   \item{n_lanes_circulation_avg}{Average number of lanes in the prioritized network.}
+#'   \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritized network.}
+#'   \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritized network.}
 #' }
 #'
 #' @examples
@@ -29,12 +30,25 @@
 #' @export
 get_prioritization_stats <- function(
   lane_prioritization,
-  weight = c("length", "frequency")
+  weight = c("length", "frequency"),
+  metric_crs = 3857
 ) {
+    metric_crs_is_default <- missing(metric_crs)
     weight <- match.arg(weight)
+    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+    if (is.na(metric_crs)) {
+        stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+    }
+    if (metric_crs_is_default) {
+        warning(
+            "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+            call. = FALSE
+        )
+    }
+
     prioritization_internal <- lane_prioritization |>
         st_as_sf() |>
-        st_transform(crs = 3857)
+        st_transform(crs = metric_crs)
 
     geom_col <- st_geometry(prioritization_internal)
     prioritization_internal <- prioritization_internal |>
@@ -59,9 +73,13 @@ get_prioritization_stats <- function(
     }
 
     # Compute number of lanes, weighted by chosen weight
-    stats$n_lanes_avg <- weighted.mean(prioritization_internal$n_lanes, prioritization_internal[[weight]], na.rm = TRUE)
-    stats$n_lanes_min <- min(prioritization_internal$n_lanes, na.rm = TRUE)
-    stats$n_lanes_max <- max(prioritization_internal$n_lanes, na.rm = TRUE)
+    stats$n_lanes_circulation_avg <- weighted.mean(prioritization_internal$n_lanes_circulation, prioritization_internal[[weight]], na.rm = TRUE)
+    stats$n_lanes_circulation_min <- min(prioritization_internal$n_lanes_circulation, na.rm = TRUE)
+    stats$n_lanes_circulation_max <- max(prioritization_internal$n_lanes_circulation, na.rm = TRUE)
+
+    stats$n_lanes_parking_avg <- weighted.mean(prioritization_internal$n_lanes_parking, prioritization_internal[[weight]], na.rm = TRUE)
+    stats$n_lanes_parking_min <- min(prioritization_internal$n_lanes_parking, na.rm = TRUE)
+    stats$n_lanes_parking_max <- max(prioritization_internal$n_lanes_parking, na.rm = TRUE)
 
     return(stats)
 }
