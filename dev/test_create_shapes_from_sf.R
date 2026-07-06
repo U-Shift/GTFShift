@@ -4,14 +4,38 @@ library(dplyr)
 library(GTFShift)
 library(mapview)
 
-gtfs <- load_feed("../GTFShift-web/scripts/osm_gtfs/aml_barreiro_cascais_lisboa/run_20260521_165353/gtfs_barreiro.zip")
-sf_shapes_original <- tidytransit::shapes_as_sf(gtfs$shapes)
-summary(gtfs)
-# mapview(sf_shapes_original |> filter(shape_id=="1-VA-TERM"))
+METRIC_CRS = 3763 # ETRS89 / Portugal TM06
 
-sf_shapes <- sf::st_read("../GTFShift-web/scripts/osm_match/barreiro/gtfs_20260518/run_20260518_123051/shapes_match_barreiro_gtfs20260518_run20260518.gpkg")
+
+GTFS_FEED_URL = "../GTFShift-web/scripts/osm_gtfs/aml_barreiro_cascais_lisboa/run_20260521_165353/gtfs_barreiro.zip"
+OSM_SHAPES = "../GTFShift-web/scripts/osm_match/barreiro/gtfs_20260518/run_20260518_123051/shapes_match_barreiro_gtfs20260518_run20260518.gpkg"
+SHAPE_ID = "1-VA-TERM"
+
+GTFS_FEED_URL = "https://github.com/U-Shift/busclar/releases/download/0.9/gtfs_carris_metropolitana.zip"
+OSM_SHAPES = "https://github.com/U-Shift/busclar/releases/download/0.9/shapes_match_carris_metropolitana_gtfs20260527_run20260626.gpkg"
+SHAPE_ID = "3526_1_1"
+
+gtfs <- load_feed(GTFS_FEED_URL)
+sf_shapes_original <- tidytransit::shapes_as_sf(gtfs$shapes)
+
+gtfs$trips$shape_id <- gsub("^\\[[^]]*\\]\\s*", "", gtfs$trips$shape_id)
+trip_id <- gtfs$trips |> filter(shape_id == SHAPE_ID) |> slice(1) |> pull(trip_id)
+gtfs_trip <- tidytransit::filter_feed_by_trips(gtfs, trip_ids = trip_id)
+summary(gtfs)
+
+sf_shapes_original$shape_id <- gsub("^\\[[^]]*\\]\\s*", "", sf_shapes_original$shape_id)
+# mapview(sf_shapes_original |> filter(shape_id==SHAPE_ID))
+
+sf_shapes <- sf::st_read(OSM_SHAPES)
 summary(sf_shapes)
-mapview(sf_shapes |> filter(shape_id=="1-VA-TERM"))
+mapview(sf_shapes |> filter(shape_id==SHAPE_ID))
+
+
+# To debug GTFShift::multiline_to_sorted_linestring()
+multilinestring = (sf_shapes |> filter(shape_id==SHAPE_ID)) |> pull(geom)
+start_point = gtfs_trip$stop_times |> arrange(stop_sequence) |> slice(1) |> left_join(gtfs_trip$trips, by="trip_id") |> left_join(gtfs_trip$stops, by="stop_id") |> st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326) |> pull(geometry)
+mapview(multilinestring) + mapview(start_point)
+metric_crs = METRIC_CRS
 
 
 
