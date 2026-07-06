@@ -19,7 +19,7 @@ will start from this point.}
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.}
 }
 \value{
-A \code{sf} object with LINESTRING geometry.
+A \code{sfc} object with LINESTRING geometry.
 }
 \description{
 Convert a MULTILINESTRING to a sorted LINESTRING
@@ -52,7 +52,7 @@ The algorithm searches the remaining components \eqn{\mathcal{R}^{(k)}} for the 
 \deqn{L_{\text{end}} = \operatorname{argmin}_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, E(L))}{L_end = argmin_{L \in \mathcal{R}^{(k)}} d(E^(k), E(L))}
 Let \eqn{d_{\text{start}} = d(E^{(k)}, S(L_{\text{start}}))} and \eqn{d_{\text{end}} = d(E^{(k)}, E(L_{\text{end}}))}.
 The candidate segment \eqn{L^*} is:
-\deqn{L^* = \begin{cases} L_{\text{start}} & \text{if } d_{\text{start}} < d_{\text{end}} \\ L_{\text{end}} & \text{otherwise} \end{cases}}{L* = L_start if d_start < d_end, else L_end}
+\deqn{L^* = \begin{cases} L_{\text{start}} & \text{if } d_{\text{start}} \leq d_{\text{end}} \\ L_{\text{end}} & \text{otherwise} \end{cases}}{L* = L_start if d_start <= d_end, else L_end}
 
 \bold{3. Verification & Assembly:}
 If the distance between the current segment and the candidate exceeds their combined length:
