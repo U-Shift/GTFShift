@@ -38,6 +38,11 @@ rt_commercial_speed <- function(
     sf::st_transform(crs = metric_crs) |>
     group_split(trip_id) |>
     purrr::map_dfr(function(trip_df) {
+      # If trip has less than 2 updates, ignore it
+      if (nrow(trip_df) < 2) {
+        warning(paste("Trip", trip_df[[rt_collection_trips_geometries_match_col]][[1]], "has less than 2 updates. Ignoring it."))
+        return(NULL)
+      }
       trip_df <- trip_df |> arrange(timestamp) |> st_transform(crs = metric_crs)
       trip_geometry <- trips_geometries |> 
         filter(!!sym(rt_collection_trips_geometries_match_col) == trip_df[[rt_collection_trips_geometries_match_col]][[1]]) |> 
