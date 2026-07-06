@@ -33,8 +33,8 @@
 #' \deqn{L_{\text{end}} = \operatorname{argmin}_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, E(L))}{L_end = argmin_{L \in \mathcal{R}^{(k)}} d(E^(k), E(L))}
 #' Let \eqn{d_{\text{start}} = d(E^{(k)}, S(L_{\text{start}}))} and \eqn{d_{\text{end}} = d(E^{(k)}, E(L_{\text{end}}))}.
 #' The candidate segment \eqn{L^*} is:
-#' \deqn{L^* = \begin{cases} L_{\text{start}} & \text{if } d_{\text{start}} < d_{\text{end}} \\ L_{\text{end}} & \text{otherwise} \end{cases}}{L* = L_start if d_start < d_end, else L_end}
-#'
+#' \deqn{L^* = \begin{cases} L_{\text{start}} & \text{if } d_{\text{start}} \leq d_{\text{end}} \\ L_{\text{end}} & \text{otherwise} \end{cases}}{L* = L_start if d_start <= d_end, else L_end}
+#' 
 #' \bold{3. Verification & Assembly:}
 #' If the distance between the current segment and the candidate exceeds their combined length:
 #' \deqn{d(L^{(k)}, L^*) > \text{len}(L^{(k)}) + \text{len}(L^*)}{d(L^(k), L*) > len(L^(k)) + len(L*)}
@@ -43,7 +43,7 @@
 #'
 #' The process repeats until no segments remain, and the components are merged into a single \code{LINESTRING}.
 #'
-#' @returns A \code{sf} object with LINESTRING geometry.
+#' @returns A \code{sfc} object with LINESTRING geometry.
 #'
 #' @import dplyr
 #' @import sf
@@ -119,7 +119,7 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL, 
         # Find the closest line segment to continue the route
         nearest_idx_start <- st_nearest_feature(last_point, remaining_lines$start)
         nearest_idx_end <- st_nearest_feature(last_point, remaining_lines$end)
-        if (st_distance(last_point, remaining_lines[nearest_idx_start, ]$start) < st_distance(last_point, remaining_lines[nearest_idx_end, ]$end)) {
+        if (st_distance(last_point, remaining_lines[nearest_idx_start, ]$start) <= st_distance(last_point, remaining_lines[nearest_idx_end, ]$end)) {
             nearest_idx <- nearest_idx_start
         } else {
             nearest_idx <- nearest_idx_end
