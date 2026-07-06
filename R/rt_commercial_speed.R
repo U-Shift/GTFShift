@@ -1,7 +1,8 @@
 #' @export
 rt_commercial_speed <- function(
   rt_collection, # sf data.frame with GTFS-RT updates for multiple trips 
-  trips_geometries, # sf data.frame with trip_id and geometry (LINESTRING) for each trip
+  trips_geometries, # sf data.frame with trips geometry (LINESTRING) 
+  rt_collection_trips_geometries_match_col = "trip_id", # column name in rt_collection and trips_geometries to match trips
   geometry_sample_meters = 10, # sample trip geometry every X meters to compute distance along shape
   metric_crs = 3857
 ) {
@@ -17,6 +18,13 @@ rt_commercial_speed <- function(
   if (any(sf::st_geometry_type(trips_geometries) != "LINESTRING")) {
     stop("trips_geometries geometry must be LINESTRING. Use GTFShift::multiline_to_sorted_linestring() to convert MULTILINESTRING to LINESTRING.")
   }
+  # > rt_collection_trips_geometries_match_col must be one of the columns in rt_collection and trips_geometries
+  if (!rt_collection_trips_geometries_match_col %in% colnames(rt_collection)) {
+    stop(paste("rt_collection_trips_geometries_match_col must be one of the columns in rt_collection. Available columns:", paste(colnames(rt_collection), collapse = ", ")))
+  }
+  if (!rt_collection_trips_geometries_match_col %in% colnames(trips_geometries)) {
+    stop(paste("rt_collection_trips_geometries_match_col must be one of the columns in trips_geometries. Available columns:", paste(colnames(trips_geometries), collapse = ", ")))
+  }
 
   # > rt_collection must have trip_id and timestamp columns
   required_cols <- c("trip_id", "timestamp")
@@ -31,7 +39,9 @@ rt_commercial_speed <- function(
     group_split(trip_id) |>
     purrr::map_dfr(function(trip_df) {
       trip_df <- trip_df |> arrange(timestamp) |> st_transform(crs = metric_crs)
-      trip_geometry <- trips_geometries |> filter(trip_id == trip_df$trip_id[[1]]) |> st_transform(crs = metric_crs)
+      trip_geometry <- trips_geometries |> 
+        filter(!!sym(rt_collection_trips_geometries_match_col) == trip_df[[rt_collection_trips_geometries_match_col]][[1]]) |> 
+        st_transform(crs = metric_crs)
       # mapview(trip_geometry)
       
       # Find the closest point on the shape for each update
