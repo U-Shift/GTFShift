@@ -4,7 +4,12 @@
 \alias{create_shapes_from_sf}
 \title{Build shapes from simple feature object}
 \usage{
-create_shapes_from_sf(sf_shapes, gtfs, metric_crs = 3857)
+create_shapes_from_sf(
+  sf_shapes,
+  gtfs,
+  metric_crs = 3857,
+  shape_dist_traveled = FALSE
+)
 }
 \arguments{
 \item{sf_shapes}{sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING).}
@@ -12,19 +17,31 @@ create_shapes_from_sf(sf_shapes, gtfs, metric_crs = 3857)
 \item{gtfs}{tidygtfs. GTFS feed.}
 
 \item{metric_crs}{numeric (Default 3857). EPSG code for a metric CRS used when computing distances (passed to \code{multiline_to_sorted_linestring}).}
+
+\item{shape_dist_traveled}{Boolean (Default FALSE). If TRUE, computes
+\code{shape_dist_traveled} for each generated shape.}
 }
 \value{
-A \code{data.table} representing a GTFS shapes table.
+A \code{data.table} representing a GTFS shapes table. Includes
+\code{shape_dist_traveled} if \code{shape_dist_traveled = TRUE}.
 }
 \description{
 Build shapes from simple feature object
 }
 \details{
 This function builds the shapes.txt file from a simple feature object.
+
 It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
 \code{multiline_to_sorted_linestring}, with the first stop of each trip as the starting point.
 Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
 \code{gtfstools::convert_sf_to_shapes}.
+
+Coordinates are 4326 (WGS 84) by default, following GTFS specifications.
+
+Optionally, when \code{shape_dist_traveled = TRUE}, it estimates cumulative
+distance along each shape for all generated points and appends this as
+\code{shape_dist_traveled}. This metric is computed in the units of 
+\code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
 }
 \examples{
 \dontrun{
@@ -40,7 +57,9 @@ gtfs$shapes <- GTFShift::create_shapes_from_sf(shapes_sf, gtfs)
 
 }
 \seealso{
-\code{gtfstools::convert_sf_to_shapes}
+\code{gtfstools::convert_sf_to_shapes()}
 
-\code{GTFShift::multiline_to_sorted_linestring}
+\code{GTFShift::multiline_to_sorted_linestring()}
+
+\code{GTFShift::project_points_along_geometry()}
 }
