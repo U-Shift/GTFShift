@@ -16,12 +16,13 @@ OSM_SHAPES = "https://github.com/U-Shift/busclar/releases/download/0.9/shapes_ma
 SHAPE_ID = "3526_1_1"
 
 gtfs <- load_feed(GTFS_FEED_URL)
+summary(gtfs)
 sf_shapes_original <- tidytransit::shapes_as_sf(gtfs$shapes)
 
 gtfs$trips$shape_id <- gsub("^\\[[^]]*\\]\\s*", "", gtfs$trips$shape_id)
 trip_id <- gtfs$trips |> filter(shape_id == SHAPE_ID) |> slice(1) |> pull(trip_id)
 gtfs_trip <- tidytransit::filter_feed_by_trips(gtfs, trip_ids = trip_id)
-summary(gtfs)
+summary(gtfs_trip)
 
 sf_shapes_original$shape_id <- gsub("^\\[[^]]*\\]\\s*", "", sf_shapes_original$shape_id)
 # mapview(sf_shapes_original |> filter(shape_id==SHAPE_ID))
@@ -37,6 +38,24 @@ start_point = gtfs_trip$stop_times |> arrange(stop_sequence) |> slice(1) |> left
 mapview(multilinestring) + mapview(start_point)
 metric_crs = METRIC_CRS
 
+# To debug GTFShift:create_shapes_from_sf()
+gtfs_osm_shapes <- create_shapes_from_sf(
+  sf_shapes = sf_shapes |> filter(shape_id==SHAPE_ID),
+  gtfs = gtfs_trip,
+  metric_crs = METRIC_CRS,
+  shape_dist_traveled = TRUE
+)
+mapview(gtfs_osm_shapes |> filter(shape_id==SHAPE_ID) |> st_as_sf(coords = c("shape_pt_lon", "shape_pt_lat"), crs = 4326), zcol="shape_dist_traveled")
+gtfs_osm_shapes_sf <- tidytransit::shapes_as_sf(gtfs_osm_shapes)
+mapview(gtfs_osm_shapes_sf, zcol="shape_id")
+gtfs_osm_shapes <- create_shapes_from_sf(
+  sf_shapes = sf_shapes |> filter(shape_id %in% c("15-CASQ-TERM", "1-VA-TERM")),
+  gtfs = gtfs,
+  metric_crs = METRIC_CRS,
+  shape_dist_traveled = TRUE
+)
+gtfs_osm_shapes
+View(gtfs_osm_shapes)
 
 
 gtfs_osm <- load_feed("../GTFShift-web/scripts/osm_gtfs/aml_barreiro_cascais_lisboa/run_20260521_165353/gtfs_barreiro_osm.zip")

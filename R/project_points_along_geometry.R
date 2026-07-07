@@ -87,11 +87,6 @@ project_points_along_geometry <- function(
     stop("geometry and points must have a valid CRS to use metric_crs")
   }
 
-  # Ensure both inputs are in the same CRS before projecting to metric_crs.
-  if (sf::st_crs(points_sfc) != sf::st_crs(geometry_sfc)) {
-    points_sfc <- sf::st_transform(points_sfc, sf::st_crs(geometry_sfc))
-  }
-
   geometry_crs_original <- sf::st_crs(geometry_sfc)
   geometry_metric <- sf::st_transform(geometry_sfc, metric_crs)
   points_metric <- sf::st_transform(points_sfc, metric_crs)
