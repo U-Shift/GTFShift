@@ -1,4 +1,5 @@
 #' @export
+#' # TODO! Validate this against before and after View(df)!!
 rt_commercial_speed <- function(
   rt_collection, # sf data.frame with GTFS-RT updates for multiple trips 
   trips_geometries, # sf data.frame with trips geometry (LINESTRING) 
@@ -49,28 +50,16 @@ rt_commercial_speed <- function(
         st_transform(crs = metric_crs)
       # mapview(trip_geometry)
       
-      # Find the closest point on the shape for each update
-      trip_df_geometry <- st_geometry(trip_df)
-      trip_geometry_geometry <- st_geometry(trip_geometry)
-      closest_points <- st_nearest_points(trip_df_geometry, trip_geometry_geometry)
-      pts_all <- st_cast(closest_points, "POINT")
-      n <- length(closest_points)
-      matched_on_shape <- pts_all[seq(2, length(pts_all), by = 2)]
-      trip_df <- trip_df |> dplyr::mutate(closest_on_shape = matched_on_shape)
-      # mapview(trip_df, zcol = "timestamp", layer.name = "GTFS-RT updates") +  mapview(trip_geometry, color = "blue", lwd = 3, layer.name = "Trip geometry") + mapview(closest_points, color = "green", layer.name = "Closest points") + mapview(matched_on_shape, color = "red", layer.name = "Closest points on shape")
-
-      # Sample trip_geometry with segments of 10 meters
-      line_len_m <- as.numeric(st_length(trip_geometry))
-      trip_geometry_sampled <- st_line_sample(trip_geometry, density = 1/geometry_sample_meters)
-      trip_geometry_sampled_points <- st_cast(trip_geometry_sampled, "POINT")
-      cumdist_m <- seq(0, line_len_m, length.out = length(trip_geometry_sampled_points))
-      # trip_geometry_sampled_points_df <- st_sf(data.frame(cumdist_m = cumdist_m), geometry = trip_geometry_sampled_points)
-      # mapview(trip_geometry_sampled_points_df, zcol="cumdist_m", layer.name = "Sampled points along trip geometry")
-      
-      # Get closest sampled point on shape for each update and compute distance along shape
-      idx <- st_nearest_feature(trip_df$closest_on_shape, trip_geometry_sampled_points)
-      dist_along_m <- cumdist_m[idx]
-      trip_df$distance_along_geometry <- dist_along_m # TODO! Isolate in separate method
+      projected_after <- project_points_along_geometry(
+        geometry = trip_geometry,
+        points = trip_df,
+        geometry_sample_meters = geometry_sample_meters
+      )
+      trip_df <- trip_df |>
+        dplyr::mutate(
+          closest_on_shape = projected$closest_on_geometry,
+          distance_along_geometry = projected$distance_along_geometry
+        )
       trip_df <- trip_df |> mutate(
         time_since_prev_sec = timestamp - lag(timestamp),
         distance_since_prev_meters = distance_along_geometry - lag(distance_along_geometry),
