@@ -1,5 +1,58 @@
+#' Estimate commercial speed from GTFS-RT trip updates
+#'
+#' Projects each real-time vehicle position to its corresponding trip geometry,
+#' computes cumulative distance along the shape, and derives segment speed
+#' between consecutive updates.
+#'
+#' @param rt_collection sf data.frame with GTFS-RT updates for multiple trips.
+#'   Must include at least \code{trip_id} and \code{timestamp} columns.
+#' @param trips_geometries sf data.frame with trip geometries. Geometry must be
+#'   LINESTRING.
+#' @param rt_collection_trips_geometries_match_col Character (Default
+#'   \code{"trip_id"}). Column name present in both \code{rt_collection} and
+#'   \code{trips_geometries} used to match updates to trip geometry.
+#' @param geometry_sample_meters Numeric (Default 10). Sampling step used when
+#'   projecting points along trip geometry and estimating cumulative distance.
+#' @param metric_crs Integer or character (Default 3857). Projected CRS used to
+#'   compute distances and speeds.
+#'
+#' @details
+#' For each trip (grouped by \code{trip_id}), updates are ordered by
+#' \code{timestamp}. Point-to-line projection and cumulative distance are
+#' computed with \code{GTFShift::project_points_along_geometry()}. Speed is then estimated
+#' between consecutive updates as:
+#' \deqn{speed_{km/h} = \frac{\Delta distance\ (m)}{1000} \div \frac{\Delta time\ (s)}{3600}}
+#'
+#' Trips with fewer than 2 updates are ignored with a warning.
+#' 
+#' Method \code{GTFShift::multiline_to_sorted_linestring()} can be used to convert MULTILINESTRING 
+#' geometries to LINESTRING if needed.
+#'
+#' @returns An \code{sf} object based on \code{rt_collection}, with added columns:
+#' \describe{
+#'   \item{closest_on_shape}{Projected point on trip geometry.}
+#'   \item{distance_along_geometry}{Cumulative distance along trip geometry (meters).}
+#'   \item{time_since_prev_sec}{Elapsed time since previous update (seconds).}
+#'   \item{distance_since_prev_meters}{Distance increment since previous update (meters).}
+#'   \item{speed_kmh}{Estimated speed between consecutive updates (km/h).}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' rt_collection <- read.csv("rt_collection.csv") # sf object with GTFS-RT updates (trip_id, timestamp, geometry)
+#' trips_geometries <- sf::st_read("osm_geometries.gpkg") # sf object with LINESTRING geometry per trip
+#' speeds <- GTFShift::rt_commercial_speed(rt_collection, trips_geometries)
+#' }
+#'
+#' @seealso \code{GTFShift::project_points_along_geometry()}
+#' @seealso \code{GTFShift::multiline_to_sorted_linestring()}
+#'
+#' @import sf
+#' @import dplyr
+#' @import purrr
+#' @import rlang
+#'
 #' @export
-#' # TODO! Validate this against before and after View(df)!!
 rt_commercial_speed <- function(
   rt_collection, # sf data.frame with GTFS-RT updates for multiple trips 
   trips_geometries, # sf data.frame with trips geometry (LINESTRING) 
@@ -50,10 +103,11 @@ rt_commercial_speed <- function(
         st_transform(crs = metric_crs)
       # mapview(trip_geometry)
       
-      projected_after <- project_points_along_geometry(
+      projected_after_2 <- project_points_along_geometry(
         geometry = trip_geometry,
         points = trip_df,
-        geometry_sample_meters = geometry_sample_meters
+        geometry_sample_meters = geometry_sample_meters,
+        metric_crs = metric_crs
       )
       trip_df <- trip_df |>
         dplyr::mutate(
