@@ -51,6 +51,7 @@ osm_shapes_trip$geom = osm_shapes_trip_linestring
 
 rt_collection = read.csv(GTFS_RT_SAMPLE) |> sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
 trip_df = rt_collection
+points = trip_df
 # trips_geometries = gtfs_shapes_sf |> filter(shape_id == trip_shape_id) |> mutate(trip_id = TRIP_ID_UPDATES) 
 trips_geometries = osm_shapes_trip |> filter(shape_id == trip_shape_id) |> mutate(trip_id = TRIP_ID_UPDATES) 
 geometry_sample_meters = 10
