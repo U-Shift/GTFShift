@@ -33,7 +33,9 @@ compute distances and speeds.}
 An \code{sf} object based on \code{rt_collection}, with added columns:
 \describe{
   \item{closest_on_shape}{Projected point on trip geometry.}
+  \item{distance_to_closest_on_geometry}{Distance from each update point to its projected location on the shape (meters).}
   \item{distance_along_geometry}{Cumulative distance along trip geometry (meters).}
+  \item{distance_along_geometry_reversed}{Cumulative distance from shape end to projected location (meters).}
   \item{time_since_prev_sec}{Elapsed time since previous update (seconds).}
   \item{distance_since_prev_meters}{Distance increment since previous update (meters).}
   \item{speed_kmh}{Estimated speed between consecutive updates (km/h).}
@@ -48,7 +50,17 @@ between consecutive updates.
 For each trip (grouped by \code{trip_id}), updates are ordered by
 \code{timestamp}. Point-to-line projection and cumulative distance are
 computed with \code{GTFShift::project_points_along_geometry()}. Speed is then estimated
-between consecutive updates as:
+between consecutive updates.
+
+Distance between consecutive updates is computed as the minimum between two
+alternatives, both using absolute differences:
+\enumerate{
+  \item Normal direction: difference in \code{distance_along_geometry}.
+  \item Reversed direction: difference using \code{distance_along_geometry_reversed}
+  to better handle circular shapes.
+}
+
+The selected distance increment is used to compute speed as:
 \deqn{speed_{km/h} = \frac{\Delta distance\ (m)}{1000} \div \frac{\Delta time\ (s)}{3600}}
 
 Trips with fewer than 2 updates are ignored with a warning.

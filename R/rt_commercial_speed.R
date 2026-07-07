@@ -20,7 +20,17 @@
 #' For each trip (grouped by \code{trip_id}), updates are ordered by
 #' \code{timestamp}. Point-to-line projection and cumulative distance are
 #' computed with \code{GTFShift::project_points_along_geometry()}. Speed is then estimated
-#' between consecutive updates as:
+#' between consecutive updates.
+#'
+#' Distance between consecutive updates is computed as the minimum between two
+#' alternatives, both using absolute differences:
+#' \enumerate{
+#'   \item Normal direction: difference in \code{distance_along_geometry}.
+#'   \item Reversed direction: difference using \code{distance_along_geometry_reversed}
+#'   to better handle circular shapes.
+#' }
+#'
+#' The selected distance increment is used to compute speed as:
 #' \deqn{speed_{km/h} = \frac{\Delta distance\ (m)}{1000} \div \frac{\Delta time\ (s)}{3600}}
 #'
 #' Trips with fewer than 2 updates are ignored with a warning.
@@ -31,7 +41,9 @@
 #' @returns An \code{sf} object based on \code{rt_collection}, with added columns:
 #' \describe{
 #'   \item{closest_on_shape}{Projected point on trip geometry.}
+#'   \item{distance_to_closest_on_geometry}{Distance from each update point to its projected location on the shape (meters).}
 #'   \item{distance_along_geometry}{Cumulative distance along trip geometry (meters).}
+#'   \item{distance_along_geometry_reversed}{Cumulative distance from shape end to projected location (meters).}
 #'   \item{time_since_prev_sec}{Elapsed time since previous update (seconds).}
 #'   \item{distance_since_prev_meters}{Distance increment since previous update (meters).}
 #'   \item{speed_kmh}{Estimated speed between consecutive updates (km/h).}
@@ -103,7 +115,7 @@ rt_commercial_speed <- function(
         st_transform(crs = metric_crs)
       # mapview(trip_geometry)
       
-      projected_after_2 <- project_points_along_geometry(
+      projected <- project_points_along_geometry(
         geometry = trip_geometry,
         points = trip_df,
         geometry_sample_meters = geometry_sample_meters,
@@ -112,16 +124,24 @@ rt_commercial_speed <- function(
       trip_df <- trip_df |>
         dplyr::mutate(
           closest_on_shape = projected$closest_on_geometry,
-          distance_along_geometry = projected$distance_along_geometry
+          distance_along_geometry = projected$distance_along_geometry,
+          distance_along_geometry_reversed = projected$distance_along_geometry_reversed,
+          distance_to_closest_on_geometry = projected$distance_to_closest_on_geometry
         )
       trip_df <- trip_df |> mutate(
         time_since_prev_sec = timestamp - lag(timestamp),
-        distance_since_prev_meters = distance_along_geometry - lag(distance_along_geometry),
+        # When computing distances
+        # 1. Use absolute value to avoid negative distances
+        # 2. Consider both normal and reversed distances (to work with circular shapes) and take the minimum
+        distance_since_prev_meters_normal = abs(distance_along_geometry - lag(distance_along_geometry)), 
+        distance_since_prev_meters_reversed = abs(distance_along_geometry - lag(distance_along_geometry_reversed)),
+        distance_since_prev_meters = pmin(distance_since_prev_meters_normal, distance_since_prev_meters_reversed, na.rm = TRUE),
+        # Compute speed in km/h
         speed_kmh = (distance_since_prev_meters / 1000) / (time_since_prev_sec / 3600),
         distance_since_prev_meters = round(distance_since_prev_meters, 2),
         speed_kmh = round(speed_kmh, 2),
         distance_along_geometry = round(distance_along_geometry, 2)
-      )
+      ) |> select(-distance_since_prev_meters_normal, -distance_since_prev_meters_reversed)
       # mapview(trip_df, zcol = "distance_along_geometry", layer.name = "Distance along geometry") + mapview(trip_df, zcol = "speed_kmh", layer.name = "Speed (km/h)") +  mapview(trip_geometry, color = "blue", lwd = 3, layer.name = "Trip geometry")
       # |> filter(
       #  !is.na(speed_kmh) &

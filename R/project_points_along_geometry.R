@@ -21,13 +21,15 @@
 #' Distances are always computed in \code{metric_crs} units. The returned
 #' projected points are transformed back to the original \code{geometry} CRS.
 #'
-#' @returns A data.frame with one row per input point and two columns:
+#' @returns A data.frame with one row per input point and four columns:
 #' \describe{
 #'   \item{closest_on_geometry}{An \code{sfc_POINT} column with the projected location on the line.}
+#'   \item{distance_to_closest_on_geometry}{Numeric distance from each input point to its projected location on the line.}
 #'   \item{distance_along_geometry}{Numeric cumulative distance from the line start to the projected location.}
+#'   \item{distance_along_geometry_reversed}{Numeric cumulative distance from the line end to the projected location.}
 #' }
 #'
-#' If \code{points} is empty, returns a list with empty outputs.
+#' If \code{points} is empty, returns an empty data.frame with the same columns.
 #'
 #' @examples
 #' \dontrun{
@@ -72,9 +74,11 @@ project_points_along_geometry <- function(
     stop("geometry must contain exactly one feature")
   }
   if (length(points_sfc) == 0) {
-    return(list(
+    return(data.frame(
       closest_on_geometry = points_sfc,
-      distance_along_geometry = numeric(0)
+      distance_to_closest_on_geometry = numeric(0),
+      distance_along_geometry = numeric(0),
+      distance_along_geometry_reversed = numeric(0)
     ))
   }
 
@@ -92,6 +96,7 @@ project_points_along_geometry <- function(
   points_metric <- sf::st_transform(points_sfc, metric_crs)
 
   closest_points <- sf::st_nearest_points(points_metric, geometry_metric)
+  closest_points_length <- sf::st_length(closest_points)
   pts_all <- sf::st_cast(closest_points, "POINT")
   closest_on_geometry_metric <- pts_all[seq(2, length(pts_all), by = 2)]
   closest_on_geometry <- sf::st_transform(closest_on_geometry_metric, geometry_crs_original)
@@ -101,12 +106,16 @@ project_points_along_geometry <- function(
   geometry_sampled <- sf::st_line_sample(geometry_metric, density = 1 / geometry_sample_meters)
   geometry_sampled_points <- sf::st_cast(geometry_sampled, "POINT")
   cumdist_m <- seq(0, line_len_m, length.out = length(geometry_sampled_points))
+  cumdist_m_reversed <- rev(cumdist_m)
 
   idx <- sf::st_nearest_feature(closest_on_geometry_metric, geometry_sampled_points)
   distance_along_geometry <- cumdist_m[idx]
+  distance_along_geometry_reversed <- cumdist_m_reversed[idx]
 
   data.frame(
     closest_on_geometry = closest_on_geometry,
-    distance_along_geometry = distance_along_geometry
+    distance_to_closest_on_geometry = as.numeric(closest_points_length),
+    distance_along_geometry = distance_along_geometry,
+    distance_along_geometry_reversed = distance_along_geometry_reversed
   )
 }
