@@ -1,8 +1,10 @@
 #' Convert a MULTILINESTRING to a sorted LINESTRING
 #'
 #' @param multilinestring sf object with MULTILINESTRING geometry
-#' @param start_point (Optional) sf point geometry. If provided, the sorting of the linestrings
-#'   will start from this point.
+#' @param points (Optional) collection of sorted point geometries used to guide ordering.
+#'   If provided, the first point defines the initial segment and the second
+#'   point (when available) is used for its orientation. Remaining points are
+#'   used as iterative tie-break guidance.
 #' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.
 #'
 #' @details
@@ -13,35 +15,40 @@
 #' Let \eqn{\mathcal{L} = \{L_1, \dots, L_n\}} be the set of individual LINESTRING components.
 #' Each component \eqn{L_i} is characterized by its start point \eqn{S(L_i)} and end point \eqn{E(L_i)}.
 #'
-#' \bold{1. Initialization:}
-#' Let \eqn{L^{(1)}} be the first segment in the sorted sequence.
+#' \bold{1. Initialization}
 #'
-#' If a \code{start_point} \eqn{P_{\text{start}}} is provided:
-#' \deqn{L^{(1)} = \operatorname{argmin}_{L \in \mathcal{L}} d(P_{\text{start}}, L)}{L^(1) = argmin_{L \in \mathcal{L}} d(P_start, L)}
-#' where \eqn{d(\cdot)} is the Euclidean distance. If \eqn{d(P_{\text{start}}, S(L^{(1)})) > d(P_{\text{start}}, E(L^{(1)}))},
-#' the component's geometry is reversed so that it starts near \eqn{P_{\text{start}}}.
+#' If guiding points are provided, let \eqn{\mathrm{start\_point}=P_1} be the first point and
+#' \eqn{P_2} the second point (if available). The initial segment is chosen as
+#' \deqn{L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}} d(\mathrm{start\_point}, L).}
+#' where \eqn{d(\cdot)} is the Euclidean distance. If \eqn{P_2} exists, \eqn{L^{(1)}} is oriented so that its end is closer to
+#' \eqn{P_2}; otherwise it is oriented so that its start is closer to \eqn{P_1}.
+#' If no points are provided, \eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
 #'
-#' If no \code{start_point} is provided:
-#' \deqn{L^{(1)} = L_1}{L^(1) = L_1}
+#' \bold{2. Iterative Step}
 #'
-#' The set of remaining segments is initialized as \eqn{\mathcal{R}^{(1)} = \mathcal{L} \setminus \{L^{(1)}\}}.
+#' At iteration \eqn{k}, with current endpoint \eqn{e^{(k)} = E(L^{(k)})}, define
+#' for each remaining segment \eqn{L \in \mathcal{R}^{(k)}}:
+#' \deqn{d_s(L) = d\!\left(e^{(k)}, S(L)\right), \qquad d_e(L) = d\!\left(e^{(k)}, E(L)\right).}
+#' Segments with geometry equal to \eqn{L^{(k)}} are excluded. Candidate segments
+#' minimize endpoint proximity:
+#' \deqn{\mathcal{C}^{(k)} = \left\{L \in \mathcal{R}^{(k)} : \min\big(d_s(L), d_e(L)\big) = m^{(k)}\right\},
+#' \quad m^{(k)} = \min_{J \in \mathcal{R}^{(k)}} \min\big(d_s(J), d_e(J)\big).}
+#' Ties are broken as follows:
+#' \deqn{\text{(i) if next unvisited point } Q \text{ exists, choose closest candidate, minimizing } d(Q,L) \text{ over } L \in \mathcal{C}^{(k)};}
+#' \deqn{\text{(ii) if still tied, choose candidate closest to the current endpoint } e^{(k)}, \text{ minimizing } d\!\left(e^{(k)}, S(L)\right) \text{ over } L \in \mathcal{C}^{(k)}.}
 #'
-#' \bold{2. Iterative Step:}
-#' For each step \eqn{k \ge 1}, let \eqn{L^{(k)}} be the current segment and \eqn{E^{(k)} = E(L^{(k)})} its endpoint.
-#' The algorithm searches the remaining components \eqn{\mathcal{R}^{(k)}} for the closest segment:
-#' \deqn{L_{\text{start}} = \operatorname{argmin}_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, S(L))}{L_start = argmin_{L \in \mathcal{R}^{(k)}} d(E^(k), S(L))}
-#' \deqn{L_{\text{end}} = \operatorname{argmin}_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, E(L))}{L_end = argmin_{L \in \mathcal{R}^{(k)}} d(E^(k), E(L))}
-#' Let \eqn{d_{\text{start}} = d(E^{(k)}, S(L_{\text{start}}))} and \eqn{d_{\text{end}} = d(E^{(k)}, E(L_{\text{end}}))}.
-#' The candidate segment \eqn{L^*} is:
-#' \deqn{L^* = \begin{cases} L_{\text{start}} & \text{if } d_{\text{start}} \leq d_{\text{end}} \\ L_{\text{end}} & \text{otherwise} \end{cases}}{L* = L_start if d_start <= d_end, else L_end}
-#' 
-#' \bold{3. Verification & Assembly:}
-#' If the distance between the current segment and the candidate exceeds their combined length:
-#' \deqn{d(L^{(k)}, L^*) > \text{len}(L^{(k)}) + \text{len}(L^*)}{d(L^(k), L*) > len(L^(k)) + len(L*)}
-#' then \eqn{L^*} is discarded, \eqn{\mathcal{R}^{(k+1)} = \mathcal{R}^{(k)} \setminus \{L^*\}} and we find the next candidate.
-#' Otherwise, \eqn{L^{(k+1)} = L^*} (reversed if \eqn{L^* = L_{\text{end}}}) and \eqn{\mathcal{R}^{(k+1)} = \mathcal{R}^{(k)} \setminus \{L^*\}}.
+#' \bold{3. Verification and Assembly}
 #'
-#' The process repeats until no segments remain, and the components are merged into a single \code{LINESTRING}.
+#' Let \eqn{L^*} be the selected candidate. If
+#' \deqn{d\!\left(L^{(k)}, L^*\right) > \operatorname{len}\!\left(L^{(k)}\right) + \operatorname{len}(L^*),}
+#' then \eqn{L^*} is removed from the remaining set and the loop restarts.
+#' Otherwise, \eqn{L^*} is oriented to connect from \eqn{e^{(k)}} and
+#' appended to the ordered sequence. When points are provided, consecutive
+#' unvisited points \eqn{Q} are marked visited when
+#' \deqn{d\!\left(L^{(k+1)}, Q\right) \leq \min_{J \in \mathcal{R}^{(k+1)}} d(J, Q).}
+#'
+#' The ordered segments are concatenated into a single \code{LINESTRING} and
+#' transformed back to the original CRS of \code{multilinestring}.
 #'
 #' @returns A \code{sfc} object with LINESTRING geometry.
 #'
@@ -50,7 +57,11 @@
 #' @import lwgeom
 #'
 #' @export
-multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL, metric_crs = 3857) {
+multiline_to_sorted_linestring <- function(
+    multilinestring, 
+    points = NULL,
+    metric_crs = 3857
+) {
     metric_crs_is_default <- missing(metric_crs)
     metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
     if (is.na(metric_crs)) {
@@ -70,96 +81,133 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL, 
     linestrings <- st_cast(multilinestring, "LINESTRING") |>
         st_as_sf() |>
         st_set_geometry("geometry") |>
-        st_transform(metric_crs)
-
-    if (!is.null(start_point)) {
-        start_point <- st_transform(start_point, metric_crs)
-    }
-
-    # 2. Find the correct order by connecting endpoints
-    #    - Get all start and end points
-    linestrings <- linestrings |>
+        st_transform(metric_crs) |>
         mutate(
             start = lwgeom::st_startpoint(geometry),
-            end = lwgeom::st_endpoint(geometry), 
-            order = row_number()
-        ) 
-    mapview(linestrings, zcol = "order")
+            end = lwgeom::st_endpoint(geometry)
+        )
 
-    # 3. Reorder the linestrings by finding the best sequence
+    # 2. Reorder the linestrings by finding the best sequence
 
-    # Find the best path (simplified approach)
-    # (This part may need adjustment based on your data)
-    ordered_lines <- list()
-    # If start_point is provided, find the line that is closest to the start_point
+    # Prepare points data if provided
+    points_df <- NULL
+    start_point <- NULL
+    second_point <- NULL
+    if (!is.null(points) & length(points) > 0) {
+        points_df <- st_as_sf(data.frame(
+            geometry = points,
+            visited = FALSE
+        )) |>
+            mutate(order = row_number()) |>
+            st_transform(metric_crs)
+        start_point <- points_df |> slice(1) |> pull(geometry)
+        if (length(points) > 1) {
+            second_point <- points_df |> slice(2) |> pull(geometry)
+        }
+        # Mark the first point as visited
+        points_df$visited[1] <- TRUE
+    }
+
+    # If start_point is defined, find the line that is closest to the start_point
+    # otherwise, assume the linestrings default order to get the first line
     if (!is.null(start_point)) {
         nearest_idx <- st_nearest_feature(start_point, linestrings)
         current_line <- linestrings[nearest_idx, ]
         current_start <- lwgeom::st_startpoint(current_line$geometry)
         current_end <- lwgeom::st_endpoint(current_line$geometry)
-        # mapview(start_point, col.regions = "gray") + mapview(current_line) + mapview(current_start, col.regions="pink") + mapview(current_end, col.regions="gray")
-        # If start_point is closest to line end point than start point, invert geometry
-        if (st_distance(start_point, current_start) > st_distance(start_point, current_end)) {
+
+        # If second_point is defined, check if the current line is oriented towards it (end is closest)
+        # otherwise, reverse the geometry
+        if (!is.null(second_point)) {
+            second_point <- st_transform(second_point, metric_crs)
+            if (st_distance(second_point, current_start) < st_distance(second_point, current_end)) {
+                current_line$geometry <- st_reverse(current_line$geometry)
+            }
+        # If second_point is not defined, check if the current line is oriented away from the start_point (start is closest)
+        # otherwise, reverse the geometry
+        } else if (st_distance(start_point, current_start) > st_distance(start_point, current_end)) {
             current_line$geometry <- st_reverse(current_line$geometry)
         }
+        remaining_lines <- linestrings[-nearest_idx, ]
     } else {
         current_line <- linestrings[1, ] # Start with the first line
+        remaining_lines <- linestrings[-1, ] 
     }
+
+    ordered_lines <- list()
     ordered_lines[[1]] <- current_line$geometry
-    remaining_lines <- linestrings[-1, ]
 
-    # mapview(linestrings, layer.name="OSM original route relation", homebutton=FALSE, color="#440154") + mapview(ordered_lines[[1]], color = "red", homebutton=FALSE) + mapview(start_point, col.regions = "gray", homebutton=FALSE)
-
-    while (nrow(remaining_lines) > 0 && length(ordered_lines)<=65) { 
-        # && length(ordered_lines)<=12 # 7
-        #  && length(ordered_lines)<=31 # 10
-        last_point <- lwgeom::st_endpoint(current_line$geometry)
-        # mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, color="blue")
-        # mapview(remaining_lines)
-        # Find the closest line segment to continue the route
-        nearest_idx_start <- st_nearest_feature(last_point, remaining_lines$start)
-        nearest_idx_end <- st_nearest_feature(last_point, remaining_lines$end)
-        if (st_distance(last_point, remaining_lines[nearest_idx_start, ]$start) <= st_distance(last_point, remaining_lines[nearest_idx_end, ]$end)) {
-            nearest_idx <- nearest_idx_start
-        } else {
-            nearest_idx <- nearest_idx_end
+    next_point_index <- NULL
+    next_point <- NULL
+    while (nrow(remaining_lines) > 0) { 
+        if (!is.null(points_df)) {
+            # Get index of the next point in points_df that has not been visited yet
+            next_point_index <- points_df |> filter(!visited) |> slice(1) |> pull(order)
+            if (length(next_point_index) == 0) {
+                next_point_index <- NULL
+                next_point <- NULL
+            } else {
+                next_point <- points_df |> filter(order == next_point_index) |> pull(geometry)
+                distance_to_next_point <- st_distance(current_line, next_point)
+            }
         }
+        last_point <- lwgeom::st_endpoint(current_line$geometry)
+
+        # Find distance from last_point to all remaining lines' start and end points
+        distance_to_start <- as.numeric(st_distance(last_point, remaining_lines$start))
+        distance_to_end <- as.numeric(st_distance(last_point, remaining_lines$end))
+
+        # Exclude segments with identical geometry to current_line from candidate selection.
+        same_as_current <- as.logical(sf::st_equals(remaining_lines$geometry, current_line$geometry, sparse = FALSE)[, 1])
+        if (any(same_as_current)) {
+            # message(sprintf("> Excluding %d remaining segments with identical geometry to current line from candidate selection...", sum(same_as_current)))
+            distance_to_start[same_as_current] <- Inf
+            distance_to_end[same_as_current] <- Inf
+        }
+        if (all(is.infinite(distance_to_start)) && all(is.infinite(distance_to_end))) {
+            # message("> All remaining segments match current geometry, stopping extension...")
+            break
+        }
+
+        # Find the closest line segment to continue the route
+        # Tie-breaks:
+        # 1) If next_point is provided, pick the candidate whose geometry is closest to next_point
+        # 2) If still tied, pick the one whose start point is closest to last_point
+        min_distance <- min(c(distance_to_start, distance_to_end))
+        candidate_start_idx <- which(distance_to_start == min_distance)
+        candidate_end_idx <- which(distance_to_end == min_distance)
+        candidate_df <- data.frame(
+            idx = c(candidate_start_idx, candidate_end_idx),
+            stringsAsFactors = FALSE
+        )
+        candidate_df <- unique(candidate_df)
+        
+        if (nrow(candidate_df) > 1 && !is.null(next_point)) { # 1)
+            candidate_df$geometry_to_next <- vapply(
+                candidate_df$idx,
+                function(candidate_i) as.numeric(st_distance(next_point, remaining_lines[candidate_i, ]$geometry)),
+                numeric(1)
+            )
+            candidate_df <- candidate_df[candidate_df$geometry_to_next == min(candidate_df$geometry_to_next), , drop = FALSE]
+        }
+
+        if (nrow(candidate_df) > 1 && !is.null(last_point)) { # 2)
+            candidate_df$start_to_last_point <- vapply(
+                candidate_df$idx,
+                function(candidate_i) as.numeric(st_distance(last_point, remaining_lines[candidate_i, ]$start)),
+                numeric(1)
+            )
+            candidate_df <- candidate_df[candidate_df$start_to_last_point == min(candidate_df$start_to_last_point), , drop = FALSE]
+        }
+
+        nearest_idx <- candidate_df$idx[1]
         next_line <- remaining_lines[nearest_idx, ]
         next_start <- lwgeom::st_startpoint(next_line$geometry)
         next_end <- lwgeom::st_endpoint(next_line$geometry)
 
-        # mapview(start_point, col.regions="gray") + mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, col.regions="orange") + mapview(next_line, color="green")
-        mapview(start_point, col.regions="gray", layer.name="Start Point", homebutton=FALSE) + 
-            mapview(linestrings, layer.name="OSM original route relation", homebutton=FALSE, color="#440154") + 
-            mapview(ordered_lines, color="yellow", layer.name = "OSM matched geometry", homebutton=FALSE) +
-            mapview(current_line, color="red", layer.name="Current segment", homebutton=FALSE) + 
-            mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE) + 
-            mapview(next_line, color="green", layer.name="Next segment", homebutton=FALSE)
-        # mapview(remaining_lines$geom) + mapview(remaining_lines$start, col.regions="pink") + mapview(remaining_lines$end, col.regions="black")
-        # mapview(remaining_lines[nearest_idx_start, ], color="green") + mapview(remaining_lines[nearest_idx_start, ]$start, col.regions="green") +mapview(remaining_lines[nearest_idx_end, ], color="purple") + mapview(remaining_lines[nearest_idx_end, ]$end, col.regions="purple") + mapview(last_point)
-        mapview(linestrings, layer.name="OSM original route relation", homebutton=FALSE, color="#440154") + 
-            mapview(ordered_lines, color="#E7BF00", layer.name = "OSM matched geometry", homebutton=FALSE) +
-            mapview(current_line, color="#E7BF00", layer.name="OSM matched geometry", homebutton=FALSE)  + 
-            mapview(start_point, col.regions="gray", layer.name="Start Point", homebutton=FALSE) + 
-            mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE)
-
-
-        # If they have same geometry, consider other nearest
-        if (next_line$geometry == current_line$geometry) {
-            message("> Next has same geometry as current, considering other match...")
-            if (nearest_idx == nearest_idx_start) {
-                nearest_idx <- nearest_idx_end
-            } else {
-                nearest_idx <- nearest_idx_start
-            }
-            next_line <- remaining_lines[nearest_idx, ]
-            next_start <- lwgeom::st_startpoint(next_line$geometry)
-            next_end <- lwgeom::st_endpoint(next_line$geometry)
-        }
-
         # Check if distance between current and next exceeds their aggregated length and if so, discard...
         if (st_distance(current_line, next_line) > (st_length(current_line) + st_length(next_line))) {
-            message("> Next is farther than current + next length, discarding it...")
+            # message("> Next is farther than current + next length, discarding it...")
             remaining_lines <- remaining_lines[-nearest_idx, ]
             next
         }
@@ -168,34 +216,44 @@ multiline_to_sorted_linestring <- function(multilinestring, start_point = NULL, 
         if (next_start == next_end) {
             # message("> Circular shape...")
         } else if (st_distance(last_point, next_start) > st_distance(last_point, next_end)) {
-            message("> Inverting next line...")
+            # message("> Inverting next line...")
             next_line$geometry <- st_reverse(next_line$geometry)
         }
 
         ordered_lines[[length(ordered_lines) + 1]] <- next_line$geometry
         remaining_lines <- remaining_lines[-nearest_idx, ]
         current_line <- next_line
+
+        if (!is.null(points_df)) {
+            # Mark consecutive next points as visited while current_line stays at least as close as any remaining line for the next unvisited point
+            repeat {
+                next_unvisited <- points_df |> filter(!visited) |> slice(1)
+                if (nrow(next_unvisited) == 0) {
+                    break
+                }
+                next_point_index <- next_unvisited |> pull(order)
+                next_point <- next_unvisited |> pull(geometry)
+                distance_current_to_next <- as.numeric(st_distance(current_line, next_point))
+                distance_remaining_to_next <- if (nrow(remaining_lines) > 0) {
+                    min(as.numeric(st_distance(remaining_lines$geometry, next_point)))
+                } else {
+                    Inf
+                }
+                if (distance_current_to_next <= distance_remaining_to_next) {
+                    # message(sprintf("> (Iteration %d) Next point %d is closer to current line rather than any other remaining, marking it as visited...", length(ordered_lines), next_point_index))
+                    points_df$visited[points_df$order == next_point_index] <- TRUE
+                } else {
+                    break
+                }
+            }
+        }
     }
 
-    # 4. Extract ALL coordinates in order
+    # 3. Extract ALL coordinates in order
     all_coords <- do.call(rbind, lapply(ordered_lines, st_coordinates))[, 1:2]
 
-    # Convert list of linestrings to dataframe of linestrings, preserving list order
-    combined_sfc <- do.call(c, ordered_lines)
-    line_df <- st_sf(geometry = combined_sfc) |> mutate(order = row_number())
-    # mapview(start_point, col.regions="gray") + mapview(line_df, zcol = "order")
-    # View(line_df|>st_drop_geometry())
-
-    # Convert matrix to data.frame with x and y columns
-    all_cords_df <- as.data.frame(all_coords) |>
-        st_as_sf(coords = c("X", "Y"), crs = st_crs(multilinestring)) |>
-        mutate(order = row_number())
-
-    # mapview(all_cords_df, zcol = "order")
-
-    # 5. Create new LINESTRING from the combined coordinates
+    # 4. Create new LINESTRING from the combined coordinates
     result <- st_sfc(st_linestring(all_coords), crs = st_crs(linestrings))
-    # mapview(result)
     if (!is.na(original_crs)) {
         result <- st_transform(result, original_crs)
     }
