@@ -6,15 +6,17 @@
 \usage{
 multiline_to_sorted_linestring(
   multilinestring,
-  start_point = NULL,
+  points = NULL,
   metric_crs = 3857
 )
 }
 \arguments{
 \item{multilinestring}{sf object with MULTILINESTRING geometry}
 
-\item{start_point}{(Optional) sf point geometry. If provided, the sorting of the linestrings
-will start from this point.}
+\item{points}{(Optional) collection of sorted point geometries used to guide ordering.
+If provided, the first point defines the initial segment and the second
+point (when available) is used for its orientation. Remaining points are
+used as iterative tie-break guidance.}
 
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.}
 }
@@ -32,33 +34,38 @@ The algorithm is formulated as follows:
 Let \eqn{\mathcal{L} = \{L_1, \dots, L_n\}} be the set of individual LINESTRING components.
 Each component \eqn{L_i} is characterized by its start point \eqn{S(L_i)} and end point \eqn{E(L_i)}.
 
-\bold{1. Initialization:}
-Let \eqn{L^{(1)}} be the first segment in the sorted sequence.
+\bold{1. Initialization}
 
-If a \code{start_point} \eqn{P_{\text{start}}} is provided:
-\deqn{L^{(1)} = \operatorname{argmin}_{L \in \mathcal{L}} d(P_{\text{start}}, L)}{L^(1) = argmin_{L \in \mathcal{L}} d(P_start, L)}
-where \eqn{d(\cdot)} is the Euclidean distance. If \eqn{d(P_{\text{start}}, S(L^{(1)})) > d(P_{\text{start}}, E(L^{(1)}))},
-the component's geometry is reversed so that it starts near \eqn{P_{\text{start}}}.
+If guiding points are provided, let \eqn{\mathrm{start\_point}=P_1} be the first point and
+\eqn{P_2} the second point (if available). The initial segment is chosen as
+\deqn{L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}} d(\mathrm{start\_point}, L).}
+where \eqn{d(\cdot)} is the Euclidean distance. If \eqn{P_2} exists, \eqn{L^{(1)}} is oriented so that its end is closer to
+\eqn{P_2}; otherwise it is oriented so that its start is closer to \eqn{P_1}.
+If no points are provided, \eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
 
-If no \code{start_point} is provided:
-\deqn{L^{(1)} = L_1}{L^(1) = L_1}
+\bold{2. Iterative Step}
 
-The set of remaining segments is initialized as \eqn{\mathcal{R}^{(1)} = \mathcal{L} \setminus \{L^{(1)}\}}.
+At iteration \eqn{k}, with current endpoint \eqn{e^{(k)} = E(L^{(k)})}, define
+for each remaining segment \eqn{L \in \mathcal{R}^{(k)}}:
+\deqn{d_s(L) = d\!\left(e^{(k)}, S(L)\right), \qquad d_e(L) = d\!\left(e^{(k)}, E(L)\right).}
+Segments with geometry equal to \eqn{L^{(k)}} are excluded. Candidate segments
+minimize endpoint proximity:
+\deqn{\mathcal{C}^{(k)} = \left\{L \in \mathcal{R}^{(k)} : \min\big(d_s(L), d_e(L)\big) = m^{(k)}\right\},
+\quad m^{(k)} = \min_{J \in \mathcal{R}^{(k)}} \min\big(d_s(J), d_e(J)\big).}
+Ties are broken as follows:
+\deqn{\text{(i) if next unvisited point } Q \text{ exists, choose closest candidate, minimizing } d(Q,L) \text{ over } L \in \mathcal{C}^{(k)};}
+\deqn{\text{(ii) if still tied, choose candidate closest to the current endpoint } e^{(k)}, \text{ minimizing } d\!\left(e^{(k)}, S(L)\right) \text{ over } L \in \mathcal{C}^{(k)}.}
 
-\bold{2. Iterative Step:}
-For each step \eqn{k \ge 1}, let \eqn{L^{(k)}} be the current segment and \eqn{E^{(k)} = E(L^{(k)})} its endpoint.
-The algorithm searches the remaining components \eqn{\mathcal{R}^{(k)}} for the closest segment:
-\deqn{L_{\text{start}} = \operatorname{argmin}_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, S(L))}{L_start = argmin_{L \in \mathcal{R}^{(k)}} d(E^(k), S(L))}
-\deqn{L_{\text{end}} = \operatorname{argmin}_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, E(L))}{L_end = argmin_{L \in \mathcal{R}^{(k)}} d(E^(k), E(L))}
-Let \eqn{d_{\text{start}} = d(E^{(k)}, S(L_{\text{start}}))} and \eqn{d_{\text{end}} = d(E^{(k)}, E(L_{\text{end}}))}.
-The candidate segment \eqn{L^*} is:
-\deqn{L^* = \begin{cases} L_{\text{start}} & \text{if } d_{\text{start}} \leq d_{\text{end}} \\ L_{\text{end}} & \text{otherwise} \end{cases}}{L* = L_start if d_start <= d_end, else L_end}
+\bold{3. Verification and Assembly}
 
-\bold{3. Verification & Assembly:}
-If the distance between the current segment and the candidate exceeds their combined length:
-\deqn{d(L^{(k)}, L^*) > \text{len}(L^{(k)}) + \text{len}(L^*)}{d(L^(k), L*) > len(L^(k)) + len(L*)}
-then \eqn{L^*} is discarded, \eqn{\mathcal{R}^{(k+1)} = \mathcal{R}^{(k)} \setminus \{L^*\}} and we find the next candidate.
-Otherwise, \eqn{L^{(k+1)} = L^*} (reversed if \eqn{L^* = L_{\text{end}}}) and \eqn{\mathcal{R}^{(k+1)} = \mathcal{R}^{(k)} \setminus \{L^*\}}.
+Let \eqn{L^*} be the selected candidate. If
+\deqn{d\!\left(L^{(k)}, L^*\right) > \operatorname{len}\!\left(L^{(k)}\right) + \operatorname{len}(L^*),}
+then \eqn{L^*} is removed from the remaining set and the loop restarts.
+Otherwise, \eqn{L^*} is oriented to connect from \eqn{e^{(k)}} and
+appended to the ordered sequence. When points are provided, consecutive
+unvisited points \eqn{Q} are marked visited when
+\deqn{d\!\left(L^{(k+1)}, Q\right) \leq \min_{J \in \mathcal{R}^{(k+1)}} d(J, Q).}
 
-The process repeats until no segments remain, and the components are merged into a single \code{LINESTRING}.
+The ordered segments are concatenated into a single \code{LINESTRING} and
+transformed back to the original CRS of \code{multilinestring}.
 }
