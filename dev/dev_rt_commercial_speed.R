@@ -18,6 +18,11 @@ GTFS_FEED_URL = "https://github.com/U-Shift/busclar/releases/download/0.9/gtfs_c
 OSM_SHAPES = "https://github.com/U-Shift/busclar/releases/download/0.9/shapes_match_carris_gtfs20260527_run20260626.gpkg"
 TRIP_ID_GTFS = "5977_20260101_108_3_2"
 
+GTFS_RT_SAMPLE = "https://github.com/U-Shift/GTFShift-web/releases/download/v1.1/updates_case_study_carris_22224_20260101_251_0_21.csv"
+TRIP_ID_GTFS = "22224_20260101_251_0_21"
+TRIP_ID_UPDATES = "22224_20260101_251_0_21"
+
+
 # Carris Metropolitana
 GTFS_RT_SAMPLE = "https://github.com/U-Shift/GTFShift-web/releases/download/v1.1/updates_case_study_cmet_20260413_.KFULM.3526_1_1_0930_0959_0_ESC_DU.csv"
 GTFS_FEED_URL = "https://github.com/U-Shift/busclar/releases/download/0.9/gtfs_carris_metropolitana.zip"
@@ -49,11 +54,30 @@ osm_shapes_trip_linestring = multiline_to_sorted_linestring(
 mapview(osm_shapes_trip_linestring)
 osm_shapes_trip$geom = osm_shapes_trip_linestring
 
-rt_collection = read.csv(GTFS_RT_SAMPLE) |> sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
+rt_collection = read.csv(GTFS_RT_SAMPLE) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
 trip_df = rt_collection
+points = trip_df
 # trips_geometries = gtfs_shapes_sf |> filter(shape_id == trip_shape_id) |> mutate(trip_id = TRIP_ID_UPDATES) 
 trips_geometries = osm_shapes_trip |> filter(shape_id == trip_shape_id) |> mutate(trip_id = TRIP_ID_UPDATES) 
 geometry_sample_meters = 10
 metric_crs = METRIC_CRS
 
+result_2 <- rt_commercial_speed(
+  rt_collection,
+  trips_geometries,
+  rt_collection_trips_geometries_match_col = "trip_id", 
+  metric_crs = METRIC_CRS
+)
+View(result_2)
+
+projected_test <- project_points_along_geometry(
+  geometry = trips_geometries$geom,
+  points = trip_df$geometry,
+  metric_crs = METRIC_CRS
+)
+View(projected_test)
+
 mapview(trips_geometries)
+
+mapview(rt_collection, zcol="spee")
+
