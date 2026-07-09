@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
     <li><a class="dropdown-item" href="../articles/osm_update.html">Update OSM data</a></li>
     <li><a class="dropdown-item" href="../articles/gtfs_from_osm.html">Generate GTFS with OSM geometries</a></li>
   </ul></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Dashboard</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Bus lane prioritization dashboard</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/U-Shift/GTFShift/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -70,7 +70,8 @@
 <span>  direction_wise <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  unified <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  date <span class="op">=</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="calendar_nextBusinessWednesday.html">calendar_nextBusinessWednesday</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  use_osm_routes <span class="op">=</span> <span class="cn">NA</span></span>
+<span>  use_osm_routes <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  metric_crs <span class="op">=</span> <span class="fl">3857</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,6 +97,10 @@
 
 <dt id="arg-use-osm-routes">use_osm_routes<a class="anchor" aria-label="anchor" href="#arg-use-osm-routes"></a></dt>
 <dd><p>osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using <code><a href="osm_shapes_to_routes.html">GTFShift::osm_shapes_to_routes</a></code>.</p></dd>
+
+
+<dt id="arg-metric-crs">metric_crs<a class="anchor" aria-label="anchor" href="#arg-metric-crs"></a></dt>
+<dd><p>Integer or character (Default 3857). Projected CRS used to compute route lengths in meters.</p></dd>
 
 
 <dt id="arg-route-identifier-">route_identifier.<a class="anchor" aria-label="anchor" href="#arg-route-identifier-"></a></dt>
@@ -131,11 +136,11 @@ For a detailed example, see the <code><a href="../articles/analyse.html">vignett
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Gonçalo Matos, Rosa Félix.</p>
+  <p>Developed by Gonçalo F. Matos, Rosa Félix.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

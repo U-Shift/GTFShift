@@ -69,31 +69,31 @@ frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
 frequency_los = GTFShift::classify_frequency_los(frequency_analysis)
 
 frequency_los
-#> Simple feature collection with 432 features and 7 fields
+#> Simple feature collection with 425 features and 7 fields
 #> Geometry type: LINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -9.084467 ymin: 38.57161 xmax: -9.01185 ymax: 38.67369
 #> Geodetic CRS:  WGS 84
-#> # A tibble: 432 × 8
+#> # A tibble: 425 × 8
 #>    route_id       shape_id    route_short_name direction_id  hour frequency
 #>  * <chr>          <chr>       <chr>                   <int> <int>     <int>
-#>  1 10_10-COINA-FT 10-COINA-FT 10                          0     6         1
-#>  2 10_10-COINA-FT 10-COINA-FT 10                          0     7         2
-#>  3 10_10-COINA-FT 10-COINA-FT 10                          0     8         1
-#>  4 10_10-COINA-FT 10-COINA-FT 10                          0     9         2
-#>  5 10_10-COINA-FT 10-COINA-FT 10                          0    10         1
-#>  6 10_10-COINA-FT 10-COINA-FT 10                          0    11         2
-#>  7 10_10-COINA-FT 10-COINA-FT 10                          0    12         1
-#>  8 10_10-COINA-FT 10-COINA-FT 10                          0    13         2
-#>  9 10_10-COINA-FT 10-COINA-FT 10                          0    14         1
-#> 10 10_10-COINA-FT 10-COINA-FT 10                          0    15         2
-#> # ℹ 422 more rows
+#>  1 10_10-COINA-FT 10-COINA-FT 10                          0     7         1
+#>  2 10_10-COINA-FT 10-COINA-FT 10                          0     8         1
+#>  3 10_10-COINA-FT 10-COINA-FT 10                          0     9         2
+#>  4 10_10-COINA-FT 10-COINA-FT 10                          0    10         1
+#>  5 10_10-COINA-FT 10-COINA-FT 10                          0    11         1
+#>  6 10_10-COINA-FT 10-COINA-FT 10                          0    12         2
+#>  7 10_10-COINA-FT 10-COINA-FT 10                          0    13         1
+#>  8 10_10-COINA-FT 10-COINA-FT 10                          0    14         2
+#>  9 10_10-COINA-FT 10-COINA-FT 10                          0    15         1
+#> 10 10_10-COINA-FT 10-COINA-FT 10                          0    16         2
+#> # ℹ 415 more rows
 #> # ℹ 2 more variables: geometry <LINESTRING [°]>, frequency_los <chr>
 
 table(frequency_los$frequency_los)
 #> 
 #>   A   B   C   D   E 
-#>   4  38  95 105 190
+#>   3  25  89 110 198
 ```
 
 ``` r

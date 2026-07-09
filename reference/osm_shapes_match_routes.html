@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
     <li><a class="dropdown-item" href="../articles/osm_update.html">Update OSM data</a></li>
     <li><a class="dropdown-item" href="../articles/gtfs_from_osm.html">Generate GTFS with OSM geometries</a></li>
   </ul></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Dashboard</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Bus lane prioritization dashboard</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/U-Shift/GTFShift/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -75,7 +75,8 @@
 <span>  osm_file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  num_cores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  osm_stop_order_relaxed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  osm_route_type <span class="op">=</span> <span class="st">"bus"</span></span>
+<span>  osm_route_type <span class="op">=</span> <span class="st">"bus"</span>,</span>
+<span>  metric_crs <span class="op">=</span> <span class="fl">3857</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -126,6 +127,10 @@
 <dt id="arg-osm-route-type">osm_route_type<a class="anchor" aria-label="anchor" href="#arg-osm-route-type"></a></dt>
 <dd><p>character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').</p></dd>
 
+
+<dt id="arg-metric-crs">metric_crs<a class="anchor" aria-label="anchor" href="#arg-metric-crs"></a></dt>
+<dd><p>Integer or character (Default 3857). Projected CRS used to compute shapes and routes lengths and stop-to-stop distances.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -167,18 +172,32 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For each route, matches its trips' shapes with OSM route relations.</p>
-<p>The calculation is performed considering, for each GTFS route, the subset of OSM routes that match
-the route identifier (based on <code>gtfs_match</code> and <code>osm_match</code>). Then, for each shape,
-the geometrical match is performed considering the OSM route \(j\) that minimizes the closeness
-metric \(C(i, j)\) for GTFS shape \(i\):</p>
-<p>$$C(i, j) = d(\text{init}_{GTFS, i}, \text{init}_{OSM, j}) + d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j}) + |L_{GTFS, i} - L_{OSM, j}| + \frac{L_{GTFS, i}}{N_{stops, i}} \cdot |N_{stops, i} - N_{stops, j}|$$</p>
-<p>where:</p><ul><li><p>\(d(\text{init}_{GTFS, i}, \text{init}_{OSM, j})\) is the distance between the starting points/stops of the GTFS shape \(i\) and the OSM route \(j\).</p></li>
-<li><p>\(d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j})\) is the distance between the ending points/stops of the GTFS shape \(i\) and the OSM route \(j\).</p></li>
-<li><p>\(L_{GTFS, i}\) and \(L_{OSM, j}\) are the total lengths of the GTFS shape \(i\) and the OSM route \(j\), respectively.</p></li>
-<li><p>\(N_{stops, i}\) and \(N_{stops, j}\) are the number of stops on the GTFS shape \(i\) and the OSM route \(j\), respectively. The term \(\frac{L_{GTFS, i}}{N_{stops, i}}\) represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.</p></li>
-</ul><p>Be aware that the result might ignore some GTFS routes, in the following cases:</p><ul><li><p>If there is no OSM route relation that matches the GTFS route identifier;</p></li>
-<li><p>If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order;</p></li>
-<li><p>If, for the same route, distinct shapes are associated to the same OSM route.</p></li>
+<p>The matching algorithm is formulated as follows:
+Let \(R\) be a GTFS route identifier.</p>
+<p><b>1. Filtering and Base Data Selection:</b>
+Let \(\mathcal{O}_R = \{O_1, \dots, O_m\}\) be the set of candidate OSM route relations matching the identifier \(R\)
+(based on <code>gtfs_match</code> and <code>osm_match</code>).
+If \(\mathcal{O}_R\) is empty, route \(R\) is skipped.
+Unless <code>osm_stop_order_relaxed = TRUE</code>, any relation in \(\mathcal{O}_R\) with entry/exit stops not in the correct order is discarded.
+We also retrieve the set of GTFS shapes associated with route \(R\), denoted as \(\mathcal{S}_R = \{S_1, \dots, S_n\}\).</p>
+<p><b>2. Feature Extraction:</b>
+For each GTFS shape \(S_i \in \mathcal{S}_R\):</p><ul><li><p>Extract the start and end coordinates of its trips' first and last stops: \(\text{init}_{GTFS, i}\) and \(\text{fin}_{GTFS, i}\).</p></li>
+<li><p>Compute the shape's total length \(L_{GTFS, i}\) and the number of stop times \(N_{stops, i}\).</p></li>
+</ul><p>For each candidate OSM route relation \(O_j \in \mathcal{O}_R\):</p><ul><li><p>Extract the coordinates of the first and last stops/platforms: \(\text{init}_{OSM, j}\) and \(\text{fin}_{OSM, j}\).</p></li>
+<li><p>Compute the relation's geometry length \(L_{OSM, j}\) and the number of stop/platform nodes \(N_{stops, j}\).</p></li>
+</ul><p><b>3. Closeness Metric Evaluation:</b>
+For each GTFS shape \(S_i\), we calculate the closeness metric \(C(i, j)\) for all candidate OSM routes \(O_j \in \mathcal{O}_R\):
+$$C(i, j) = d(\text{init}_{GTFS, i}, \text{init}_{OSM, j}) + d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j}) + |L_{GTFS, i} - L_{OSM, j}| + \frac{L_{GTFS, i}}{N_{stops, i}} \cdot |N_{stops, i} - N_{stops, j}|$$</p>
+<p>where:</p><ul><li><p>\(d(\cdot)\) is the Euclidean distance.</p></li>
+<li><p>The term \(\frac{L_{GTFS, i}}{N_{stops, i}}\) represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.</p></li>
+</ul><p>Shape \(S_i\) is associated with the OSM route \(O_{j^*}\) that minimizes the closeness metric:
+$$j^* = \operatorname{argmin}_{j} C(i, j)$$</p>
+<p><b>4. Conflict Resolution:</b>
+If multiple GTFS shapes are associated with the same OSM route \(O_j\), only the shape \(S_i\) that minimizes the closeness metric is retained. The other conflicting shapes are ignored and a warning is triggered.</p>
+
+<p>Be aware that the result might ignore some GTFS routes, in the following cases:</p><ul><li><p>If there is no OSM route relation that matches the GTFS route identifier;</p></li>
+<li><p>If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order (unless <code>osm_stop_order_relaxed</code> is set to TRUE);</p></li>
+<li><p>If, for the same route, distinct shapes are associated to the same OSM route. In that case, only the shape that minimizes the closeness metric is retained.</p></li>
 </ul><p>If any of these errors occurs, warnings will be thrown at end of the method execution, and those GTFS route will be ignored in the results.</p>
 <p>Nevertheless, provided there are enough OSM routes, all the GTFS shapes for each route will necessarily be associated with
 an OSM one. This might generate wrong results if the topology of routes on OSM does not match the GTFS shapes for that route.
@@ -191,7 +210,7 @@ Refer to  <code>distance_diff</code>, <code>points_diff</code> and <code>stops_d
 <span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu"><a href="load_feed.html">load_feed</a></span><span class="op">(</span><span class="st">"gtfs.zip"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">q</span> <span class="op">&lt;-</span> <span class="fu">opq</span><span class="op">(</span><span class="st">"Lisbon"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">add_osm_feature</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"route"</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bus"</span>, <span class="st">"tram"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">add_osm_feature</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"route"</span>, value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bus"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">add_osm_feature</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"network"</span>, value <span class="op">=</span> <span class="st">"Carris"</span>, key_exact <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># To use OSM API:</span></span></span>
@@ -209,11 +228,11 @@ Refer to  <code>distance_diff</code>, <code>points_diff</code> and <code>stops_d
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Gonçalo Matos, Rosa Félix.</p>
+  <p>Developed by Gonçalo F. Matos, Rosa Félix.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

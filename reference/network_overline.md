@@ -11,7 +11,8 @@ network_overline(
   attr,
   target_network_split = 100,
   fun = sum,
-  join_dist = 10
+  join_dist = 10,
+  metric_crs = 3857
 )
 ```
 
@@ -43,6 +44,11 @@ network_overline(
 
   Integer (Default 10). Meters to consider when joining routes and
   network segments.
+
+- metric_crs:
+
+  Integer or character (Default 3857). Projected CRS used to compute
+  segment lengths and join distances in meters.
 
 ## Value
 

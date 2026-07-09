@@ -7,12 +7,12 @@
 - [`query_mobilitydatabase()`](https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.md)
   : Query Mobility Database API for GTFS feeds
 
-## Prioritize
+## Prioritize for bus lane implementation
 
 - [`prioritize_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritize_lanes.md)
   : Prioritize road network lanes for bus lane implementation
 - [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
-  : Extend prioritization with GTFS-RT metrics
+  : Extend prioritization with GTFS-RT based speed metrics
 - [`get_prioritization_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritization_stats.md)
   : Get prioritization stats
 
@@ -74,8 +74,10 @@
 - [`rt_collect_protobuf()`](https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.md)
   : Collect GTFS-RT data from a Protocol Buffers feed at regular
   intervals
+- [`rt_commercial_speed()`](https://u-shift.github.io/GTFShift/reference/rt_commercial_speed.md)
+  : Estimate commercial speed from GTFS-RT trip updates
 - [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
-  : Extend prioritization with GTFS-RT metrics
+  : Extend prioritization with GTFS-RT based speed metrics
 
 ## Utils
 
@@ -83,3 +85,5 @@
   : Get next business Wednesday
 - [`multiline_to_sorted_linestring()`](https://u-shift.github.io/GTFShift/reference/multiline_to_sorted_linestring.md)
   : Convert a MULTILINESTRING to a sorted LINESTRING
+- [`project_points_along_geometry()`](https://u-shift.github.io/GTFShift/reference/project_points_along_geometry.md)
+  : Project points onto a linear geometry

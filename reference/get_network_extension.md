@@ -11,7 +11,8 @@ get_network_extension(
   direction_wise = TRUE,
   unified = FALSE,
   date = GTFShift::calendar_nextBusinessWednesday(),
-  use_osm_routes = NA
+  use_osm_routes = NA,
+  metric_crs = 3857
 )
 ```
 
@@ -42,6 +43,11 @@ get_network_extension(
   osmdata::opq (Default NA). If overpass query for transit network is
   defined, analysis is performed considering OSM route geometry, using
   [`GTFShift::osm_shapes_to_routes`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md).
+
+- metric_crs:
+
+  Integer or character (Default 3857). Projected CRS used to compute
+  route lengths in meters.
 
 - route_identifier.:
 

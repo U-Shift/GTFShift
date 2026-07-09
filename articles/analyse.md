@@ -327,7 +327,7 @@ for more details.
 ``` r
 
 network = sf::st_read(
-  system.file("extdata", "centerline_carris.gpkg", package = "GTFShift"), 
+  "https://github.com/U-Shift/GTFShift/releases/download/v0.5.0/centerline_carris.gpkg", 
   quiet = TRUE
 )
 

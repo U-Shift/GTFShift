@@ -16,7 +16,8 @@ osm_shapes_match_routes(
   osm_file = NULL,
   num_cores = 1,
   osm_stop_order_relaxed = FALSE,
-  osm_route_type = "bus"
+  osm_route_type = "bus",
+  metric_crs = 3857
 )
 ```
 
@@ -81,6 +82,11 @@ osm_shapes_match_routes(
   character (Default "bus"). OSM route type. Used to query OSM network
   (e.g., 'bus', 'train').
 
+- metric_crs:
+
+  Integer or character (Default 3857). Projected CRS used to compute
+  shapes and routes lengths and stop-to-stop distances.
+
 ## Value
 
 A `data.frame` (`sf` if `geometry=TRUE`) with the following columns:
@@ -134,35 +140,58 @@ A `data.frame` (`sf` if `geometry=TRUE`) with the following columns:
 
 For each route, matches its trips' shapes with OSM route relations.
 
-The calculation is performed considering, for each GTFS route, the
-subset of OSM routes that match the route identifier (based on
-`gtfs_match` and `osm_match`). Then, for each shape, the geometrical
-match is performed considering the OSM route \\j\\ that minimizes the
-closeness metric \\C(i, j)\\ for GTFS shape \\i\\:
+The matching algorithm is formulated as follows: Let \\R\\ be a GTFS
+route identifier.
 
-\$\$C(i, j) = d(\text{init}\_{GTFS, i}, \text{init}\_{OSM, j}) +
-d(\text{fin}\_{GTFS, i}, \text{fin}\_{OSM, j}) + \|L\_{GTFS, i} -
-L\_{OSM, j}\| + \frac{L\_{GTFS, i}}{N\_{stops, i}} \cdot \|N\_{stops,
-i} - N\_{stops, j}\|\$\$
+**1. Filtering and Base Data Selection:** Let \\\mathcal{O}\_R = \\O_1,
+\dots, O_m\\\\ be the set of candidate OSM route relations matching the
+identifier \\R\\ (based on `gtfs_match` and `osm_match`). If
+\\\mathcal{O}\_R\\ is empty, route \\R\\ is skipped. Unless
+`osm_stop_order_relaxed = TRUE`, any relation in \\\mathcal{O}\_R\\ with
+entry/exit stops not in the correct order is discarded. We also retrieve
+the set of GTFS shapes associated with route \\R\\, denoted as
+\\\mathcal{S}\_R = \\S_1, \dots, S_n\\\\.
+
+**2. Feature Extraction:** For each GTFS shape \\S_i \in
+\mathcal{S}\_R\\:
+
+- Extract the start and end coordinates of its trips' first and last
+  stops: \\\text{init}\_{GTFS, i}\\ and \\\text{fin}\_{GTFS, i}\\.
+
+- Compute the shape's total length \\L\_{GTFS, i}\\ and the number of
+  stop times \\N\_{stops, i}\\.
+
+For each candidate OSM route relation \\O_j \in \mathcal{O}\_R\\:
+
+- Extract the coordinates of the first and last stops/platforms:
+  \\\text{init}\_{OSM, j}\\ and \\\text{fin}\_{OSM, j}\\.
+
+- Compute the relation's geometry length \\L\_{OSM, j}\\ and the number
+  of stop/platform nodes \\N\_{stops, j}\\.
+
+**3. Closeness Metric Evaluation:** For each GTFS shape \\S_i\\, we
+calculate the closeness metric \\C(i, j)\\ for all candidate OSM routes
+\\O_j \in \mathcal{O}\_R\\: \$\$C(i, j) = d(\text{init}\_{GTFS, i},
+\text{init}\_{OSM, j}) + d(\text{fin}\_{GTFS, i}, \text{fin}\_{OSM,
+j}) + \|L\_{GTFS, i} - L\_{OSM, j}\| + \frac{L\_{GTFS, i}}{N\_{stops,
+i}} \cdot \|N\_{stops, i} - N\_{stops, j}\|\$\$
 
 where:
 
-- \\d(\text{init}\_{GTFS, i}, \text{init}\_{OSM, j})\\ is the distance
-  between the starting points/stops of the GTFS shape \\i\\ and the OSM
-  route \\j\\.
+- \\d(\cdot)\\ is the Euclidean distance.
 
-- \\d(\text{fin}\_{GTFS, i}, \text{fin}\_{OSM, j})\\ is the distance
-  between the ending points/stops of the GTFS shape \\i\\ and the OSM
-  route \\j\\.
+- The term \\\frac{L\_{GTFS, i}}{N\_{stops, i}}\\ represents the average
+  distance between stops on the GTFS shape, serving as a scale factor
+  for the difference in the number of stops.
 
-- \\L\_{GTFS, i}\\ and \\L\_{OSM, j}\\ are the total lengths of the GTFS
-  shape \\i\\ and the OSM route \\j\\, respectively.
+Shape \\S_i\\ is associated with the OSM route \\O\_{j^\*}\\ that
+minimizes the closeness metric: \$\$j^\* = \operatorname{argmin}\_{j}
+C(i, j)\$\$
 
-- \\N\_{stops, i}\\ and \\N\_{stops, j}\\ are the number of stops on the
-  GTFS shape \\i\\ and the OSM route \\j\\, respectively. The term
-  \\\frac{L\_{GTFS, i}}{N\_{stops, i}}\\ represents the average distance
-  between stops on the GTFS shape, serving as a scale factor for the
-  difference in the number of stops.
+**4. Conflict Resolution:** If multiple GTFS shapes are associated with
+the same OSM route \\O_j\\, only the shape \\S_i\\ that minimizes the
+closeness metric is retained. The other conflicting shapes are ignored
+and a warning is triggered.
 
 Be aware that the result might ignore some GTFS routes, in the following
 cases:
@@ -171,10 +200,12 @@ cases:
   identifier;
 
 - If, for a GTFS route, there is any OSM route relation that has
-  entry/exit stops not respecting the right order;
+  entry/exit stops not respecting the right order (unless
+  `osm_stop_order_relaxed` is set to TRUE);
 
 - If, for the same route, distinct shapes are associated to the same OSM
-  route.
+  route. In that case, only the shape that minimizes the closeness
+  metric is retained.
 
 If any of these errors occurs, warnings will be thrown at end of the
 method execution, and those GTFS route will be ignored in the results.
@@ -193,7 +224,7 @@ if (FALSE) { # \dontrun{
 gtfs <- GTFShift::load_feed("gtfs.zip")
 
 q <- opq("Lisbon") |>
-  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "route", value = c("bus")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
 # To use OSM API:

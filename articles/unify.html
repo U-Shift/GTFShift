@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,7 @@
     <li><a class="dropdown-item" href="../articles/gtfs_from_osm.html">Generate GTFS with OSM geometries</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Dashboard</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Bus lane prioritization dashboard</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -136,17 +136,17 @@ Portugal as an example. Refer to the <a href="./download">vignette(“download�
 <pre><code><span><span class="co">#&gt; tidygtfs object</span></span>
 <span><span class="co">#&gt; files        agency, routes, stop_times, trips, shapes, dead_runs, layover, blocks, calendar, calendar_dates, feed_info, stops</span></span>
 <span><span class="co">#&gt; agency       Transportes Colectivos do Barreiro</span></span>
-<span><span class="co">#&gt; service      from 2026-05-06 to 2026-12-31</span></span>
+<span><span class="co">#&gt; service      from 2026-06-08 to 2026-12-31</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
 <span><span class="co">#&gt; # routes       76</span></span>
-<span><span class="co">#&gt; # trips      3239</span></span>
+<span><span class="co">#&gt; # trips      3247</span></span>
 <span><span class="co">#&gt; # stop_ids    279</span></span>
 <span><span class="co">#&gt; # stop_names  162</span></span>
 <span><span class="co">#&gt; # shapes       76</span></span>
 <span><span class="co">#&gt; tidygtfs object</span></span>
 <span><span class="co">#&gt; files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops</span></span>
 <span><span class="co">#&gt; agency       Fertagus</span></span>
-<span><span class="co">#&gt; service      from 2026-04-13 to 2026-10-13</span></span>
+<span><span class="co">#&gt; service      from 2026-07-07 to 2027-01-07</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
 <span><span class="co">#&gt; # routes       3</span></span>
 <span><span class="co">#&gt; # trips      260</span></span>
@@ -170,10 +170,10 @@ different GTFS.</p>
 <span><span class="co">#&gt; tidygtfs object</span></span>
 <span><span class="co">#&gt; files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, transfers, dead_runs, layover, blocks, vehicles, ., calendar, calendar_dates, feed_info, stops</span></span>
 <span><span class="co">#&gt; agencies     Transportes Colectivos do Barreiro, Fertagus</span></span>
-<span><span class="co">#&gt; service      from 2026-04-13 to 2026-12-31</span></span>
+<span><span class="co">#&gt; service      from 2026-06-08 to 2027-01-07</span></span>
 <span><span class="co">#&gt; uses         stop_times (no frequencies)</span></span>
 <span><span class="co">#&gt; # routes       79</span></span>
-<span><span class="co">#&gt; # trips      3499</span></span>
+<span><span class="co">#&gt; # trips      3507</span></span>
 <span><span class="co">#&gt; # stop_ids    293</span></span>
 <span><span class="co">#&gt; # stop_names  176</span></span>
 <span><span class="co">#&gt; # shapes       82</span></span>
@@ -234,11 +234,11 @@ different GTFS.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Gonçalo Matos, Rosa Félix.</p>
+  <p>Developed by Gonçalo F. Matos, Rosa Félix.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

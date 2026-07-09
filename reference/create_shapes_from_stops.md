@@ -16,7 +16,8 @@ create_shapes_from_stops(gtfs)
 
 ## Value
 
-A `data.table` representing a GTFS shapes table.
+The gtfs feed with the shapes table defined and the trips table updated
+with the matching shape_id.
 
 ## Details
 

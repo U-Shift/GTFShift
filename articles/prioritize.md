@@ -164,14 +164,23 @@ stats
 #> $speed_max
 #> [1] 64.79895
 #> 
-#> $n_lanes_avg
-#> [1] 2.384589
+#> $n_lanes_circulation_avg
+#> [1] 2.368861
 #> 
-#> $n_lanes_min
+#> $n_lanes_circulation_min
 #> [1] 1
 #> 
-#> $n_lanes_max
+#> $n_lanes_circulation_max
 #> [1] 7
+#> 
+#> $n_lanes_parking_avg
+#> [1] 0.01572834
+#> 
+#> $n_lanes_parking_min
+#> [1] 0
+#> 
+#> $n_lanes_parking_max
+#> [1] 2
 
 # At route level, length weight is more appropriate,
 # to give more importance to the segments with higher extension,
@@ -194,14 +203,23 @@ stats_736
 #> $speed_max
 #> [1] 18.62128
 #> 
-#> $n_lanes_avg
+#> $n_lanes_circulation_avg
 #> [1] 2.624208
 #> 
-#> $n_lanes_min
+#> $n_lanes_circulation_min
 #> [1] 1
 #> 
-#> $n_lanes_max
+#> $n_lanes_circulation_max
 #> [1] 6
+#> 
+#> $n_lanes_parking_avg
+#> [1] 0
+#> 
+#> $n_lanes_parking_min
+#> [1] 0
+#> 
+#> $n_lanes_parking_max
+#> [1] 0
 ```
 
 ### Visualize results

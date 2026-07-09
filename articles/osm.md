@@ -13,6 +13,11 @@ OpenStreetMaps (OSM) is an important data source for transit analysis,
 due to its rich, open, and detailed geographic data. GTFShift includes
 some methods that allow to access its information directly.
 
+> Mind that despite this tutorial is mostly focused on the bus mode,
+> GTFShift supports other transit modes, through the parameter
+> `osm_route_type`, available in most methods that deal with OSM data.
+> Refer to each method’s documentation for more details.
+
 ### Using OSM API vs. local OSM extract
 
 By default, GTFShift methods use OSM API to access OpenStreetMaps data
@@ -41,7 +46,7 @@ gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FAL
 # Build OSM query
 library(osmdata)
 q <- opq("Lisbon") |>
-  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "route", value = c("bus")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
 # Call method with osm_file parameter
@@ -93,12 +98,12 @@ bus_lanes <- GTFShift::osm_bus_lanes(lisboa) |> select(osm_id)
 mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 ```
 
-## Get OSM data for bus routes
+## Get OSM data for transit routes
 
-OpenStreetMaps defines bus routes as a
-[relation](https://wiki.openstreetmap.org/wiki/Tag:route%3Dbus) of ways
-(usually roads) and nodes (stops and platforms). GTFShift provides
-methods to use them in the GTFS analysis.
+OpenStreetMaps defines transit routes as a
+[relation](https://wiki.openstreetmap.org/wiki/Public_transport#Service_routes)
+of ways (roads or railways, for instance) and nodes (stops and
+platforms). GTFShift provides methods to use them in the GTFS analysis.
 
 > For demonstration purposes, the next snippets will use the Lisbon
 > urban bus network.
@@ -113,14 +118,14 @@ gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FAL
 # Build OSM query
 library(osmdata)
 q <- opq("Lisbon") |>
-  add_osm_feature(key = "route", value = c("bus", "tram")) |>
+  add_osm_feature(key = "route", value = c("bus")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 ```
 
 ### Routes (matching GTFS id)
 
-GTFS routes shapes and OSM bus routes are linked through OSM `gtfs:*`
-keys.
+GTFS routes shapes and OSM transit routes are linked through OSM
+`gtfs:*` keys.
 [`GTFShift::osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
 allows to query OSM for the routes matching the feed trips, given their
 shape id.
@@ -215,8 +220,8 @@ set (9 784 of 312 049).
 
 To overcome this issue,
 [`GTFShift::osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)
-performs the association between the OSM bus routes and the GTFS shapes
-considering a geometrical match. For each GTFS route identifier
+performs the association between the OSM transit routes and the GTFS
+shapes considering a geometrical match. For each GTFS route identifier
 (provided as a parameter), the function first selects the subset of OSM
 route relations that match it. Then, for each GTFS shape associated with
 the route, it identifies the most similar OSM route relation by

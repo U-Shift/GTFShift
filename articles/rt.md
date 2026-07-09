@@ -37,7 +37,7 @@ rt_collect_file <- "gtfs_rt_data.csv"
 GTFShift::rt_collect_protobuf(data$URL.RT[data$ID == gtfs_id], rt_collect_file) # Run until manually stopped (CTRL+C)
 ```
 
-## Extend prioritization with GTFS-RT data
+## Extend prioritization with speed from GTFS-RT data
 
 Once GTFS-RT data is collected, it can be used to extend lane
 prioritization analysis.
@@ -118,3 +118,17 @@ mapview::mapview(
   lwd=3
 )
 ```
+
+### When speed information is missing: infer speed from position updates
+
+If GTFS-RT does not provide speed information, it can be inferred from
+the progression of position updates through time. The method
+[`GTFShift::rt_commercial_speed()`](https://u-shift.github.io/GTFShift/reference/rt_commercial_speed.md)
+implements this functionality, calculating, for each GTFS-RT update, the
+speed based on the distance between the current and previous position
+(projected on the route geometry), divided by the time difference
+between the two updates.
+
+For more details, refer to the method documentation. The resulting speed
+can then be used to extend the prioritization analysis as described
+above.

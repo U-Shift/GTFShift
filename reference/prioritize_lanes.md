@@ -75,10 +75,6 @@ An `sf` `data.frame` object with the following columns:
 
   The number of circulation lanes.
 
-- n_lanes:
-
-  The total number of lanes.
-
 - n_directions:
 
   The number of travel directions.
@@ -86,10 +82,6 @@ An `sf` `data.frame` object with the following columns:
 - n_lanes_circulation_direction:
 
   The number of circulation lanes per direction.
-
-- n_lanes_direction:
-
-  The number of total lanes per direction.
 
 - routes:
 

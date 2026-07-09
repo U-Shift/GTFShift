@@ -7,7 +7,8 @@ Get statistics about lane prioritization
 ``` r
 get_prioritization_stats(
   lane_prioritization,
-  weight = c("length", "frequency")
+  weight = c("length", "frequency"),
+  metric_crs = 3857
 )
 ```
 
@@ -21,6 +22,11 @@ get_prioritization_stats(
 
   Character. Weight to use for weighted mean. Accepted values: "length",
   "frequency".
+
+- metric_crs:
+
+  Integer or character (Default 3857). Projected CRS used to compute
+  lengths in meters.
 
 ## Value
 
@@ -47,15 +53,15 @@ attributes:
 
   Maximum speed of the prioritized network, in km/h.
 
-- n_lanes_avg:
+- n_lanes_circulation_avg:
 
   Average number of lanes in the prioritized network.
 
-- n_lanes_min:
+- n_lanes_circulation_min:
 
   Minimum number of lanes in the prioritized network.
 
-- n_lanes_max:
+- n_lanes_circulation_max:
 
   Maximum number of lanes in the prioritized network.
 

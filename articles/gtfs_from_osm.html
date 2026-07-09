@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,7 @@
     <li><a class="dropdown-item" href="../articles/gtfs_from_osm.html">Generate GTFS with OSM geometries</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Dashboard</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://ushift.pt/apps/gtfshift" target="_blank">Bus lane prioritization dashboard</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -98,12 +98,17 @@
 </h2>
 <p>The match between GTFS shapes and OSM routes geometries using either
 <code><a href="../reference/osm_shapes_match_routes.html">GTFShift::osm_shapes_match_routes()</a></code> or
-<code><a href="../reference/osm_shapes_to_routes.html">GTFShift:: osm_shapes_to_routes()</a></code> enables the retrieval of
+<code><a href="../reference/osm_shapes_to_routes.html">GTFShift::osm_shapes_to_routes()</a></code> enables the retrieval of
 harmonized geometries for the GTFS network. However, OSM geometries are
 often MULTILINESTRING objects. In contrast, GTFS shapes.txt file
 requires a sequence of points to define each shape.</p>
-<p><code><a href="../reference/create_shapes_from_sf.html">GTFShift::create_shapes_from_sf()</a></code> can be used to convert
-the MULTILINESTRING objects to sorted LINESTRING objects.</p>
+<p><code><a href="../reference/create_shapes_from_sf.html">GTFShift::create_shapes_from_sf()</a></code> can be used to
+overcome this limitation, encapsulating the conversion of
+MULTILINESTRING objects into sorted LINESTRING objects and generating
+the corresponding GTFS shapes.txt structured table. Additionally, it can
+compute the cumulative distance along the shape
+(<code>shape_dist_traveled</code>), an optional parameter recommended
+for routes that have looping or inlining.</p>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -147,11 +152,11 @@ the MULTILINESTRING objects to sorted LINESTRING objects.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Gonçalo Matos, Rosa Félix.</p>
+  <p>Developed by Gonçalo F. Matos, Rosa Félix.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

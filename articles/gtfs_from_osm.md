@@ -5,14 +5,18 @@
 The match between GTFS shapes and OSM routes geometries using either
 [`GTFShift::osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)
 or
-[`GTFShift:: osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
+[`GTFShift::osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
 enables the retrieval of harmonized geometries for the GTFS network.
 However, OSM geometries are often MULTILINESTRING objects. In contrast,
 GTFS shapes.txt file requires a sequence of points to define each shape.
 
 [`GTFShift::create_shapes_from_sf()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_sf.md)
-can be used to convert the MULTILINESTRING objects to sorted LINESTRING
-objects.
+can be used to overcome this limitation, encapsulating the conversion of
+MULTILINESTRING objects into sorted LINESTRING objects and generating
+the corresponding GTFS shapes.txt structured table. Additionally, it can
+compute the cumulative distance along the shape (`shape_dist_traveled`),
+an optional parameter recommended for routes that have looping or
+inlining.
 
 ## Example
 
