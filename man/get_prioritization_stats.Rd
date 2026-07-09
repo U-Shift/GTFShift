@@ -6,13 +6,16 @@
 \usage{
 get_prioritization_stats(
   lane_prioritization,
-  weight = c("length", "frequency")
+  weight = c("length", "frequency"),
+  metric_crs = 3857
 )
 }
 \arguments{
 \item{lane_prioritization}{sf data.frame. Lane prioritization.}
 
 \item{weight}{Character. Weight to use for weighted mean. Accepted values: "length", "frequency".}
+
+\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute lengths in meters.}
 }
 \value{
 List with statistics about lane prioritization, with the following attributes:
@@ -22,9 +25,9 @@ List with statistics about lane prioritization, with the following attributes:
   \item{speed_avg}{Average speed of the prioritized network, in km/h.}
   \item{speed_min}{Minimum speed of the prioritized network, in km/h.}
   \item{speed_max}{Maximum speed of the prioritized network, in km/h.}
-  \item{n_lanes_avg}{Average number of lanes in the prioritized network.}
-  \item{n_lanes_min}{Minimum number of lanes in the prioritized network.}
-  \item{n_lanes_max}{Maximum number of lanes in the prioritized network.}
+  \item{n_lanes_circulation_avg}{Average number of lanes in the prioritized network.}
+  \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritized network.}
+  \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritized network.}
 }
 }
 \description{

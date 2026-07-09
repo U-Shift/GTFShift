@@ -8,6 +8,7 @@
 #' @param unified Boolean (Default \code{FALSE}). If TRUE, overlapping route segments are only counted once in the total extension.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
 #' @param use_osm_routes osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.
+#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute route lengths in meters.
 #'
 #' @details
 #' This method calculates the sum of the GTFS feed routes length, considering, for each, the shape of the variant with the highest frequency for the given date
@@ -34,11 +35,23 @@ get_network_extension <- function(
   direction_wise = TRUE,
   unified = FALSE,
   date = GTFShift::calendar_nextBusinessWednesday(),
-  use_osm_routes = NA
+  use_osm_routes = NA,
+  metric_crs = 3857
 ) {
+  metric_crs_is_default <- missing(metric_crs)
   # 0. Validations
   if (!(route_identifier %in% c("route_id", "route_short_name", "route_long_name"))) {
     stop("route_identifier should be one of: route_id, route_short_name or route_long_name")
+  }
+  metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+  if (is.na(metric_crs)) {
+    stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+  }
+  if (metric_crs_is_default) {
+    warning(
+      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+      call. = FALSE
+    )
   }
 
   # Compute hourly frequencies for each route
@@ -75,7 +88,7 @@ get_network_extension <- function(
   network_redux_shapes <- network_redux_max |>
     left_join(shapes_unique, by = "shape_id") |>
     st_as_sf() |>
-    st_transform(crs = 3857) # For units in meters
+    st_transform(crs = metric_crs) # For units in meters
 
   geom_col <- st_geometry(network_redux_shapes)
   network_redux_shapes <- network_redux_shapes |> mutate(length = st_length(geom_col))

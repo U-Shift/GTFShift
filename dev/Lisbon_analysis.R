@@ -40,7 +40,7 @@ mapview::mapview(
 )
 
 # Overline
-network <- sf::st_read(system.file("extdata", "centerline_carris.gpkg", package = "GTFShift"))
+network <- sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.5.0/centerline_carris.gpkg")
 
 frequencies_route_overline_improved = GTFShift::network_overline(
   network,
