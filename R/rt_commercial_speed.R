@@ -17,23 +17,36 @@
 #'   compute distances and speeds.
 #'
 #' @details
-#' For each trip (grouped by \code{trip_id}), updates are ordered by
-#' \code{timestamp}. Point-to-line projection and cumulative distance are
-#' computed with \code{GTFShift::project_points_along_geometry()}. Speed is then estimated
-#' between consecutive updates.
+#' For each trip, let \eqn{\{(x_i, t_i)\}_{i=1}^n} denote the ordered sequence of
+#' real-time observations, where \eqn{x_i} is the vehicle position and
+#' \eqn{t_i} the corresponding timestamp, with
+#' \eqn{t_1 \le t_2 \le \dots \le t_n}. Each observation is projected onto the
+#' trip geometry using \code{GTFShift::project_points_along_geometry()}, yielding
+#' a projected point \eqn{\hat{x}_i} and two cumulative distances:
+#' \deqn{d_i = \text{distance\_along\_geometry}(\hat{x}_i)}
+#' \deqn{d_i^{\mathrm{rev}} = \text{distance\_along\_geometry\_reversed}(\hat{x}_i)}
 #'
-#' Distance between consecutive updates is computed as the minimum between two
-#' alternatives, both using absolute differences:
-#' \enumerate{
-#'   \item Normal direction: difference in \code{distance_along_geometry}.
-#'   \item Reversed direction: difference using \code{distance_along_geometry_reversed}
-#'   to better handle circular shapes.
-#' }
+#' For each pair of consecutive observations \eqn{(i-1, i)}, the elapsed time is
+#' computed as
+#' \deqn{\Delta t_i = t_i - t_{i-1}.}
 #'
-#' The selected distance increment is used to compute speed as:
-#' \deqn{speed_{km/h} = \frac{\Delta distance\ (m)}{1000} \div \frac{\Delta time\ (s)}{3600}}
+#' The distance increment is defined as the minimum of the forward and reversed
+#' cumulative-distance differences:
+#' \deqn{\Delta d_i^{\mathrm{fwd}} = \left| d_i - d_{i-1} \right|}
+#' \deqn{\Delta d_i^{\mathrm{rev}} = \left| d_i^{\mathrm{rev}} - d_{i-1}^{\mathrm{rev}} \right|}
+#' \deqn{\Delta d_i = \min\left(\Delta d_i^{\mathrm{fwd}}, \Delta d_i^{\mathrm{rev}}\right).}
 #'
-#' Trips with fewer than 2 updates are ignored with a warning.
+#' This formulation improves robustness for circular or near-circular shapes, for
+#' which a purely forward cumulative distance may overstate local movement across
+#' the artificial origin of the geometry.
+#'
+#' Commercial speed is then estimated by
+#' \deqn{v_i = \frac{\Delta d_i}{\Delta t_i}}
+#' and reported in kilometers per hour as
+#' \deqn{v_i^{\mathrm{km/h}} = \frac{\Delta d_i}{1000} \cdot \frac{3600}{\Delta t_i}.}
+#'
+#' Trips with fewer than two observations are ignored with a warning because
+#' \eqn{\Delta t_i} and \eqn{\Delta d_i} are undefined in that case.
 #' 
 #' Method \code{GTFShift::multiline_to_sorted_linestring()} can be used to convert MULTILINESTRING 
 #' geometries to LINESTRING if needed.
