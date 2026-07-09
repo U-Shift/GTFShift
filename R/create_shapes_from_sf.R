@@ -12,7 +12,7 @@
 #' It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
 #' \code{multiline_to_sorted_linestring}, using a point guide per shape:
 #' all ordered stops when the selected trip is circular (first and last
-#' \code{stop_id} are equal), or only the first stop otherwise.
+#' \code{stop_id} are equal), or the first two stops otherwise.
 #' Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
 #' \code{gtfstools::convert_sf_to_shapes}.
 #' 
@@ -68,7 +68,7 @@ create_shapes_from_sf <- function(
 
     # Build point guides per shape
     # > circular trip: all stops in sequence
-    # > non-circular trip: first stop only
+    # > non-circular trip: first two stops
     trips_stops_sf <- gtfs$stop_times |>
         arrange(trip_id, stop_sequence) |>
         left_join(gtfs$trips |> select(trip_id, shape_id), by = "trip_id") |>
@@ -78,7 +78,7 @@ create_shapes_from_sf <- function(
     trips_points <- split(trips_stops_sf, trips_stops_sf$trip_id) |>
         lapply(function(trip_sf) {
             is_circular <- nrow(trip_sf) > 1 && trip_sf$stop_id[1] == trip_sf$stop_id[nrow(trip_sf)]
-            trip_points <- if (is_circular) sf::st_geometry(trip_sf) else sf::st_geometry(trip_sf)[1]
+            trip_points <- if (is_circular) sf::st_geometry(trip_sf) else sf::st_geometry(trip_sf)[seq_len(min(2, nrow(trip_sf)))]
 
             data.frame(
                 trip_id = trip_sf$trip_id[1],
