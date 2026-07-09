@@ -1,6 +1,6 @@
-#' Extend prioritization with GTFS-RT metrics
+#' Extend prioritization with GTFS-RT based speed metrics
 #'
-#' This function extends lane segment indicators for prioritization with metrics produced with GTFS-RT data.
+#' This function extends lane segment indicators for prioritization with speed metrics produced with GTFS-RT data.
 #'
 #' @param lane_prioritization sf data.frame. Result of \code{GTFShift::prioritize_lanes()}
 #' @param rt_collection sf data.frame. GTFS-RT data collection. Must include \code{speed} column.
@@ -10,6 +10,8 @@
 #'
 #' @details
 #' Extends the \code{lane_prioritization} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
+#' 
+#' If GTFS-RT data does not provide speed information, it can be inferred from the progression of position updates through time using \code{GTFShift::rt_commercial_speed()}.
 #'
 #' Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 #'

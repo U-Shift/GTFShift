@@ -2,7 +2,7 @@
 % Please edit documentation in R/rt_extend_prioritization.R
 \name{rt_extend_prioritization}
 \alias{rt_extend_prioritization}
-\title{Extend prioritization with GTFS-RT metrics}
+\title{Extend prioritization with GTFS-RT based speed metrics}
 \usage{
 rt_extend_prioritization(
   lane_prioritization,
@@ -34,10 +34,12 @@ The \code{lane_prioritization} \code{sf} \code{data.frame}, extended with the fo
 }
 }
 \description{
-This function extends lane segment indicators for prioritization with metrics produced with GTFS-RT data.
+This function extends lane segment indicators for prioritization with speed metrics produced with GTFS-RT data.
 }
 \details{
 Extends the \code{lane_prioritization} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
+
+If GTFS-RT data does not provide speed information, it can be inferred from the progression of position updates through time using \code{GTFShift::rt_commercial_speed()}.
 
 Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 }
