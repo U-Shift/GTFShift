@@ -1,15 +1,17 @@
-#' Extend prioritization with GTFS-RT metrics
+#' Extend prioritization with GTFS-RT based speed metrics
 #'
-#' This function extends lane segment indicators for prioritization with metrics produced with GTFS-RT data.
+#' This function extends lane segment indicators for prioritization with speed metrics produced with GTFS-RT data.
 #'
 #' @param lane_prioritization sf data.frame. Result of \code{GTFShift::prioritize_lanes()}
 #' @param rt_collection sf data.frame. GTFS-RT data collection. Must include \code{speed} column.
+#' @param rt_current_status Character vector (Default \code{c("IN_TRANSIT_TO")}). If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status} in this vector are considered.
 #' @param lane_buffer numeric (Default 15). Buffer distance (in meters) to create around lane segments to capture nearby GTFS-RT points.
+#' @param metric_crs Integer or character (Default 3857). Projected CRS used to apply lane buffer distances in meters.
 #'
 #' @details
 #' Extends the \code{lane_prioritization} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
-#'
-#' If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status == "IN_TRANSIT_TO"} are considered.
+#' 
+#' If GTFS-RT data does not provide speed information, it can be inferred from the progression of position updates through time using \code{GTFShift::rt_commercial_speed()}.
 #'
 #' Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 #'
@@ -44,8 +46,11 @@
 rt_extend_prioritization <- function(
   lane_prioritization,
   rt_collection,
-  lane_buffer = 15 # in meters
+  rt_current_status = c("IN_TRANSIT_TO"),
+  lane_buffer = 15, # in meters
+  metric_crs = 3857
 ) {
+  metric_crs_is_default <- missing(metric_crs)
   # 1. Validate inputs
   required_cols <- c("way_osm_id")
   missing_cols <- setdiff(required_cols, colnames(lane_prioritization))
@@ -58,6 +63,17 @@ rt_extend_prioritization <- function(
   if (length(missing_rt_cols) > 0) {
     stop(paste("rt_collection is missing required columns:", paste(missing_rt_cols, collapse = ", ")))
   }
+  metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+  if (is.na(metric_crs)) {
+    stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+  }
+  if (metric_crs_is_default) {
+    warning(
+      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+      call. = FALSE
+    )
+  }
+  rt_collection_crs <- sf::st_crs(rt_collection)
 
   # Display feedback
   pb <- progress::progress_bar$new( # Track progress
@@ -67,9 +83,9 @@ rt_extend_prioritization <- function(
   pb$update(0)
 
   # 2. Get only updates IN_TRANSIT
-  if ("current_status" %in% colnames(rt_collection)) {
+  if (!is.null(rt_current_status) && "current_status" %in% colnames(rt_collection)) {
     rt_collection <- rt_collection %>%
-      dplyr::filter(current_status == "IN_TRANSIT_TO")
+      dplyr::filter(current_status %in% rt_current_status)
   }
   pb$update(0.166)
 
@@ -88,12 +104,12 @@ rt_extend_prioritization <- function(
   pb$update(0.333)
 
   # 4. Create buffers in lane segments to overlap with updates
-  job <- callr::r_bg(function(lanes_unique, lane_buffer) { # update spinner while blocking method call
+  job <- callr::r_bg(function(lanes_unique, lane_buffer, metric_crs, rt_collection_crs) { # update spinner while blocking method call
     return(sf::st_buffer(
-      sf::st_transform(lanes_unique, crs = 3857),
+      sf::st_transform(lanes_unique, crs = metric_crs),
       dist = lane_buffer
-    ) |> sf::st_transform(crs = sf::st_crs(lanes_unique)))
-  }, args = list(lanes_unique, lane_buffer))
+    ) |> sf::st_transform(crs = rt_collection_crs))
+  }, args = list(lanes_unique, lane_buffer, metric_crs, rt_collection_crs))
   while (job$is_alive()) {
     pb$tick(0)
     Sys.sleep(0.1)

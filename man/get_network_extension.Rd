@@ -10,7 +10,8 @@ get_network_extension(
   direction_wise = TRUE,
   unified = FALSE,
   date = GTFShift::calendar_nextBusinessWednesday(),
-  use_osm_routes = NA
+  use_osm_routes = NA,
+  metric_crs = 3857
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ get_network_extension(
 \item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
 
 \item{use_osm_routes}{osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.}
+
+\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute route lengths in meters.}
 
 \item{route_identifier.}{String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
 }
