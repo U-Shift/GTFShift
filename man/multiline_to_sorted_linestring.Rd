@@ -15,7 +15,7 @@ multiline_to_sorted_linestring(
 
 \item{points}{(Optional) collection of sorted point geometries used to guide ordering.
 If provided, the first point defines the initial segment and the second
-point (when available) is used for its orientation. Remaining points are
+point (when available) is used as tie-break guidance for its orientation. Remaining points are
 used as iterative tie-break guidance.}
 
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.}
@@ -39,13 +39,19 @@ Each component \eqn{L_i} is characterized by its start point \eqn{S(L_i)} and en
 If guiding points are provided, let \eqn{\mathrm{start\_point}=P_1} be the first point and
 \eqn{P_2} the second point (if available). The initial segment is chosen as
 \deqn{L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}} d(\mathrm{start\_point}, L).}
-where \eqn{d(\cdot)} is the Euclidean distance. If \eqn{P_2} exists, \eqn{L^{(1)}} is oriented so that its end is closer to
-\eqn{P_2}; otherwise it is oriented so that its start is closer to \eqn{P_1}.
-If no points are provided, \eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
+where \eqn{d(\cdot)} is the Euclidean distance. If no points are provided, \eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
+
+Additionaly, the orientation of \eqn{L^{(1)}} is determined by comparing the distances 
+from its edges to the remaining segments in \eqn{\mathcal{L} \setminus \{L^{(1)}\}}. 
+The edge that is closest to any remaining segment is designated as the end of \eqn{L^{(1)}}. 
+
+If both edges are equidistant to the remaining segments, the orientation is determined 
+by the proximity to \eqn{P_2} (if available) or by orienting away from \eqn{P_1}.
+
 
 \bold{2. Iterative Step}
 
-At iteration \eqn{k}, with current endpoint \eqn{e^{(k)} = E(L^{(k)})}, define
+At iteration \eqn{k}, with current segment endpoint \eqn{e^{(k)} = E(L^{(k)})}, define
 for each remaining segment \eqn{L \in \mathcal{R}^{(k)}}:
 \deqn{d_s(L) = d\!\left(e^{(k)}, S(L)\right), \qquad d_e(L) = d\!\left(e^{(k)}, E(L)\right).}
 Segments with geometry equal to \eqn{L^{(k)}} are excluded. Candidate segments

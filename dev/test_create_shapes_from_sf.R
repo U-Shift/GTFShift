@@ -19,6 +19,8 @@ OSM_SHAPES = "https://github.com/U-Shift/busclar/releases/download/0.9/shapes_ma
 SHAPE_ID = "226_0_CIRC_shp" # Circular
 SHAPE_ID = "109_3_ASC_shp" # 751
 SHAPE_ID = "221_0_CIRC_shp" # 79B
+SHAPE_ID = "163_1_ASC_shp" # 797 (circular sub-path)
+SHAPE_ID = "190_0_DESC_shp" # 751
 
 gtfs <- GTFShift::load_feed(GTFS_FEED_URL)
 summary(gtfs)
@@ -47,11 +49,11 @@ mapview(multilinestring) + mapview(start_point, col.regions="green")
 metric_crs = METRIC_CRS
 
 # > All points
-result <- GTFShift::multiline_to_sorted_linestring(multilinestring, points = points, metric_crs = metric_crs)
+result <- multiline_to_sorted_linestring(multilinestring, points = points, metric_crs = metric_crs)
 # > No points
-result <- GTFShift::multiline_to_sorted_linestring(multilinestring, points = NULL, metric_crs = metric_crs)
-# > Only start point
-result <- GTFShift::multiline_to_sorted_linestring(multilinestring, points = points[c(1, 2)], metric_crs = metric_crs)
+result <- multiline_to_sorted_linestring(multilinestring, points = NULL, metric_crs = metric_crs)
+# > Only start points
+result <- multiline_to_sorted_linestring(multilinestring, points = points[c(1, 2)], metric_crs = metric_crs)
 
 mapview(result, color="black", lwd=3) + mapview(start_point, col.regions="green") + mapview(sf_shapes |> filter(shape_id==SHAPE_ID), color="orange", alpha=0.5, lwd=10) 
 
@@ -65,15 +67,23 @@ mapview(result_sampled_points_df, zcol = "cumdist_m", layer.name = "Cumulative D
 
 
 # Debug maps
+# During start point definition
+mapview(current_line, color="red") + mapview(current_start, col.regions="pink") + mapview(current_end, col.regions="gray") 
 # After start_point definition
 mapview(start_point, col.regions = "gray") + mapview(current_line) + mapview(current_start, col.regions="pink") + mapview(current_end, col.regions="gray")
 # After ordered_lines[[1]] definition
 mapview(linestrings, layer.name="OSM original route relation", homebutton=FALSE, color="#440154") + mapview(ordered_lines[[1]], color = "red", homebutton=FALSE) + mapview(start_point, col.regions = "gray", homebutton=FALSE)
 # After last_point definition (inside while loop)
 mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, color="blue")
+# After candidate_df definition (inside while loop)
+mapview(ordered_lines, color="gray", layer.name="Ordered lines", homebutton=FALSE) +
+  mapview(remaining_lines, color="yellow", layer.name="Remaining segments", homebutton=FALSE) +
+  mapview(current_line, color="red", layer.name="Current segment", homebutton=FALSE) + 
+  mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE) +
+  mapview(remaining_lines[candidate_df$idx, ], color="blue", layer.name="Candidate segments", homebutton=FALSE)
 # After nearest_idx definition (inside while loop)
-# mapview(ordered_lines, color="gray", layer.name="Ordered lines", homebutton=FALSE) +
-mapview(remaining_lines, color="yellow", layer.name="Remaining segments", homebutton=FALSE) +
+mapview(ordered_lines, color="gray", layer.name="Ordered lines", homebutton=FALSE) +
+  mapview(remaining_lines, color="yellow", layer.name="Remaining segments", homebutton=FALSE) +
   mapview(current_line, color="red", layer.name="Current segment", homebutton=FALSE) + 
   mapview(remaining_lines[nearest_idx, ], color="blue", layer.name="Selected next segment", homebutton=FALSE) + 
   mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE) +
