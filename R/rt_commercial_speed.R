@@ -17,14 +17,15 @@
 #'   compute distances and speeds.
 #'
 #' @details
-#' For each trip, let \eqn{\{(x_i, t_i)\}_{i=1}^n} denote the ordered sequence of
+#' For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n} 
+#' denote the ordered sequence of
 #' real-time observations, where \eqn{x_i} is the vehicle position and
 #' \eqn{t_i} the corresponding timestamp, with
 #' \eqn{t_1 \le t_2 \le \dots \le t_n}. Each observation is projected onto the
 #' trip geometry using \code{GTFShift::project_points_along_geometry()}, yielding
 #' a projected point \eqn{\hat{x}_i} and two cumulative distances:
-#' \deqn{d_i = \text{distance\_along\_geometry}(\hat{x}_i)}
-#' \deqn{d_i^{\mathrm{rev}} = \text{distance\_along\_geometry\_reversed}(\hat{x}_i)}
+#' \deqn{d_i = \text{distance_along_geometry}(\hat{x}_i)}
+#' \deqn{d_i^{\mathrm{rev}} = \text{distance_along_geometry_reversed}(\hat{x}_i)}
 #'
 #' For each pair of consecutive observations \eqn{(i-1, i)}, the elapsed time is
 #' computed as
@@ -36,9 +37,19 @@
 #' \deqn{\Delta d_i^{\mathrm{rev}} = \left| d_i^{\mathrm{rev}} - d_{i-1}^{\mathrm{rev}} \right|}
 #' \deqn{\Delta d_i = \min\left(\Delta d_i^{\mathrm{fwd}}, \Delta d_i^{\mathrm{rev}}\right).}
 #'
-#' This formulation improves robustness for circular or near-circular shapes, for
-#' which a purely forward cumulative distance may overstate local movement across
-#' the artificial origin of the geometry.
+#' Trips with fewer than 2 updates are ignored with a warning.
+#' The distance increment is defined as the minimum of two alternative
+#' cumulative-distance differences:
+#' \deqn{\Delta d_i^{\mathrm{fwd}} = \left| d_i - d_{i-1} \right|}
+#' \deqn{\Delta d_i^{\mathrm{circ}} = \left| d_i - d_{i-1}^{\mathrm{rev}} \right|}
+#' \deqn{\Delta d_i = \min\left(\Delta d_i^{\mathrm{fwd}}, \Delta d_i^{\mathrm{circ}}\right).}
+#'
+#' The second term is a redundancy designed to avoid overstating movement on circular
+#' geometries. In particular, after a vehicle completes a loop, a
+#' forward comparison may treat two nearby physical positions as far apart in
+#' cumulative distance if the geometry origin has been crossed.
+#' Comparing \eqn{d_i} against \eqn{d_{i-1}^{\mathrm{rev}}} provides an auxiliary
+#' distance candidate that helps avoid overstating movement in that situation.
 #'
 #' Commercial speed is then estimated by
 #' \deqn{v_i = \frac{\Delta d_i}{\Delta t_i}}
