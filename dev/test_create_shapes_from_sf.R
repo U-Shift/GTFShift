@@ -17,8 +17,10 @@ SHAPE_ID = "3526_1_1"
 GTFS_FEED_URL = "https://github.com/U-Shift/busclar/releases/download/0.9/gtfs_carris.zip"
 OSM_SHAPES = "https://github.com/U-Shift/busclar/releases/download/0.9/shapes_match_carris_gtfs20260527_run20260626.gpkg"
 SHAPE_ID = "226_0_CIRC_shp" # Circular
+SHAPE_ID = "109_3_ASC_shp" # 751
+SHAPE_ID = "221_0_CIRC_shp" # 79B
 
-gtfs <- load_feed(GTFS_FEED_URL)
+gtfs <- GTFShift::load_feed(GTFS_FEED_URL)
 summary(gtfs)
 sf_shapes_original <- tidytransit::shapes_as_sf(gtfs$shapes)
 
@@ -39,19 +41,19 @@ mapview(sf_shapes |> filter(shape_id==SHAPE_ID))
 # To debug GTFShift::multiline_to_sorted_linestring()
 multilinestring = (sf_shapes |> filter(shape_id==SHAPE_ID)) |> pull(geom)
 start_point = gtfs_trip$stop_times |> arrange(stop_sequence) |> slice(1) |> left_join(gtfs_trip$trips, by="trip_id") |> left_join(gtfs_trip$stops, by="stop_id") |> st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326) |> pull(geometry)
-all_points = gtfs_trip$stop_times |> distinct(stop_id, .keep_all = TRUE) |> arrange(stop_sequence) |> left_join(gtfs_trip$trips, by="trip_id") |> left_join(gtfs_trip$stops, by="stop_id") |> st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326) |> pull(geometry)
-mapview(st_as_sf(data.frame(geometry = all_points) |> mutate(nrow = row_number())), zcol="nrow")
+points = gtfs_trip$stop_times |> arrange(stop_sequence) |> left_join(gtfs_trip$trips, by="trip_id") |> left_join(gtfs_trip$stops, by="stop_id") |> st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326) |> pull(geometry)
+mapview(st_as_sf(data.frame(geometry = points) |> mutate(nrow = row_number())), zcol="nrow") +
 mapview(multilinestring) + mapview(start_point, col.regions="green")
 metric_crs = METRIC_CRS
 
 # > All points
-result <- multiline_to_sorted_linestring(multilinestring, points = all_points, metric_crs = metric_crs)
+result <- GTFShift::multiline_to_sorted_linestring(multilinestring, points = points, metric_crs = metric_crs)
 # > No points
-result <- multiline_to_sorted_linestring(multilinestring, points = NULL, metric_crs = metric_crs)
+result <- GTFShift::multiline_to_sorted_linestring(multilinestring, points = NULL, metric_crs = metric_crs)
 # > Only start point
-result <- multiline_to_sorted_linestring(multilinestring, points = all_points[1], metric_crs = metric_crs)
+result <- GTFShift::multiline_to_sorted_linestring(multilinestring, points = points[c(1, 2)], metric_crs = metric_crs)
 
-mapview(result) + mapview(start_point, col.regions="green") + mapview(sf_shapes |> filter(shape_id==SHAPE_ID), col.regions="gray", alpha=0.5) 
+mapview(result, color="black", lwd=3) + mapview(start_point, col.regions="green") + mapview(sf_shapes |> filter(shape_id==SHAPE_ID), color="orange", alpha=0.5, lwd=10) 
 
 line_len_m = st_length(result |> st_transform(metric_crs)) |> as.numeric()
 result_sampled <- sf::st_line_sample(result |> st_transform(metric_crs), density = 1 / 10)
@@ -71,18 +73,17 @@ mapview(linestrings, layer.name="OSM original route relation", homebutton=FALSE,
 mapview(linestrings) + mapview(ordered_lines, color="yellow") + mapview(current_line, color="red") + mapview(last_point, color="blue")
 # After nearest_idx definition (inside while loop)
 # mapview(ordered_lines, color="gray", layer.name="Ordered lines", homebutton=FALSE) +
-mapview(current_line, color="red", layer.name="Current segment", homebutton=FALSE) + 
-  mapview(remaining_lines, color="yellow", layer.name="Remaining segments", homebutton=FALSE) +
-  mapview(remaining_lines[nearest_idx_start, ], color="green", layer.name="Nearest start segment", homebutton=FALSE) + 
-  mapview(remaining_lines[nearest_idx_end, ], color="purple", layer.name="Nearest end segment", homebutton=FALSE) + 
+mapview(remaining_lines, color="yellow", layer.name="Remaining segments", homebutton=FALSE) +
+  mapview(current_line, color="red", layer.name="Current segment", homebutton=FALSE) + 
   mapview(remaining_lines[nearest_idx, ], color="blue", layer.name="Selected next segment", homebutton=FALSE) + 
   mapview(last_point, col.regions="orange", layer.name="Last Point", homebutton=FALSE) +
   mapview(next_point, col.regions="pink", layer.name="Next Point", homebutton=FALSE) +
-  mapview(all_points_df, zcol="visited", layer.name="Stops", homebutton=FALSE)
+  mapview(points_df, zcol="visited", layer.name="Stops", homebutton=FALSE)
+mapview(ordered_lines, color="yellow", layer.name="Ordered lines", homebutton=FALSE)
 # After all_coords definition (after while loop)
 combined_sfc <- do.call(c, ordered_lines)
 line_df <- st_sf(geometry = combined_sfc) |> mutate(order = row_number())
-mapview(start_point, col.regions="gray") + mapview(line_df, zcol = "order") + mapview(all_points_df, zcol = "visited")
+mapview(start_point, col.regions="gray") + mapview(line_df, zcol = "order") + mapview(points_df, zcol = "visited")
 
 # To debug GTFShift:create_shapes_from_sf()
 gtfs_osm_shapes <- create_shapes_from_sf(
