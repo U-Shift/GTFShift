@@ -17,10 +17,15 @@
 #'   compute distances and speeds.
 #'
 #' @details
-#' For each trip (grouped by \code{trip_id}), updates are ordered by
-#' \code{timestamp}. Point-to-line projection and cumulative distance are
-#' computed with \code{GTFShift::project_points_along_geometry()}. Speed is then estimated
-#' between consecutive updates.
+#' For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n} 
+#' denote the ordered sequence of
+#' real-time observations, where \eqn{x_i} is the vehicle position and
+#' \eqn{t_i} the corresponding timestamp, with
+#' \eqn{t_1 \le t_2 \le \dots \le t_n}. Each observation is projected onto the
+#' trip geometry using \code{GTFShift::project_points_along_geometry()}, yielding
+#' a projected point \eqn{\hat{x}_i} and two cumulative distances:
+#' \deqn{d_i = \text{distance_along_geometry}(\hat{x}_i)}
+#' \deqn{d_i^{\mathrm{rev}} = \text{distance_along_geometry_reversed}(\hat{x}_i)}
 #'
 #' Distance between consecutive updates is computed as the minimum between two
 #' alternatives, both using absolute differences:
@@ -34,6 +39,26 @@
 #' \deqn{speed_{km/h} = \frac{\Delta distance\ (m)}{1000} \div \frac{\Delta time\ (s)}{3600}}
 #'
 #' Trips with fewer than 2 updates are ignored with a warning.
+#' The distance increment is defined as the minimum of two alternative
+#' cumulative-distance differences:
+#' \deqn{\Delta d_i^{\mathrm{fwd}} = \left| d_i - d_{i-1} \right|}
+#' \deqn{\Delta d_i^{\mathrm{circ}} = \left| d_i - d_{i-1}^{\mathrm{rev}} \right|}
+#' \deqn{\Delta d_i = \min\left(\Delta d_i^{\mathrm{fwd}}, \Delta d_i^{\mathrm{circ}}\right).}
+#'
+#' The second term is a redundancy designed to avoid overstating movement on circular
+#' geometries. In particular, after a vehicle completes a loop, a
+#' forward comparison may treat two nearby physical positions as far apart in
+#' cumulative distance if the geometry origin has been crossed.
+#' Comparing \eqn{d_i} against \eqn{d_{i-1}^{\mathrm{rev}}} provides an auxiliary
+#' distance candidate that helps avoid overstating movement in that situation.
+#'
+#' Commercial speed is then estimated by
+#' \deqn{v_i = \frac{\Delta d_i}{\Delta t_i}}
+#' and reported in kilometers per hour as
+#' \deqn{v_i^{\mathrm{km/h}} = \frac{\Delta d_i}{1000} \cdot \frac{3600}{\Delta t_i}.}
+#'
+#' Trips with fewer than two observations are ignored with a warning because
+#' \eqn{\Delta t_i} and \eqn{\Delta d_i} are undefined in that case.
 #' 
 #' Method \code{GTFShift::multiline_to_sorted_linestring()} can be used to convert MULTILINESTRING 
 #' geometries to LINESTRING if needed.
