@@ -10,9 +10,9 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/U-Shift/GTFShift/blob/v0.11/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/U-Shift/GTFShift/blob/main/DESCRIPTION)
 
-Matos G, Félix R (2026). *GTFShift: Explore and Analyse General Transit
+Matos GF, Félix R (2026). *GTFShift: Explore and Analyse General Transit
 Feed Specification (GTFS) Files With a Focus on Urban Mobility*. R
 package version 0.11.0, <https://github.com/U-Shift/GTFShift>.
 
