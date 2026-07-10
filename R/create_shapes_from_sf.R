@@ -10,7 +10,9 @@
 #' This function builds the shapes.txt file from a simple feature object.
 #' 
 #' It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
-#' \code{multiline_to_sorted_linestring}, with the first stop of each trip as the starting point.
+#' \code{multiline_to_sorted_linestring}, using a point guide per shape:
+#' all ordered stops when the selected trip is circular (first and last
+#' \code{stop_id} are equal), or the first two stops otherwise.
 #' Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
 #' \code{gtfstools::convert_sf_to_shapes}.
 #' 
@@ -64,37 +66,50 @@ create_shapes_from_sf <- function(
         stop("The sf_shapes object must contain a \"shape_id\" column.")
     }
 
-    # Get first stop geometry for each shape
-    shapes_stops <- gtfs$stop_times |>
-        arrange(stop_sequence) |>
-        group_by(trip_id) |>
-        slice(1) |> # Only departures from origin (first stop)
-        select(trip_id, stop_id) |>
+    # Build point guides per shape
+    # > circular trip: all stops in sequence
+    # > non-circular trip: first two stops
+    trips_stops_sf <- gtfs$stop_times |>
+        arrange(trip_id, stop_sequence) |>
         left_join(gtfs$trips |> select(trip_id, shape_id), by = "trip_id") |>
         left_join(gtfs$stops |> select(stop_id, stop_name, stop_lat, stop_lon), by = "stop_id") |>
-        st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326) |>
-        rename(stop_point = geometry)
-    
-    # shape_id_debug from dev/test_create_shapes_from_sf.R
-    multilinestring <- (sf_shapes |> filter(shape_id==shape_id_debug))[1, ]$geom
-    start_point <- (sf_shapes_linestrings |> filter(shape_id==shape_id_debug))[1, ]$stop_point
-    
+        st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326)
+
+    trips_points <- split(trips_stops_sf, trips_stops_sf$trip_id) |>
+        lapply(function(trip_sf) {
+            is_circular <- nrow(trip_sf) > 1 && trip_sf$stop_id[1] == trip_sf$stop_id[nrow(trip_sf)]
+            trip_points <- if (is_circular) sf::st_geometry(trip_sf) else sf::st_geometry(trip_sf)[seq_len(min(2, nrow(trip_sf)))]
+
+            data.frame(
+                trip_id = trip_sf$trip_id[1],
+                shape_id = trip_sf$shape_id[1],
+                is_circular = is_circular,
+                stringsAsFactors = FALSE,
+                points = I(list(trip_points))
+            )
+        }) |>
+        bind_rows()
+
+    shapes_points <- trips_points |>
+        arrange(shape_id, desc(is_circular), trip_id) |>
+        group_by(shape_id) |>
+        slice(1) |>
+        ungroup() |>
+        select(shape_id, points)
 
     # Convert MULTILINESTRING to LINESTRING
     current_geom_col <- attr(sf_shapes, "sf_column")
     sf_shapes_linestrings <- sf_shapes |>
         left_join(
-            as.data.frame(shapes_stops) |>
-                select(shape_id, stop_point) |>
-                distinct(shape_id, .keep_all = TRUE),
+            shapes_points,
             by = "shape_id"
         ) |>
-        filter(!st_is_empty(stop_point)) |> # Only consider sf_shapes that have a GTFS match
+        filter(lengths(points) > 0) |> # Only consider sf_shapes that have a GTFS match
         # sample_n(10) |> # For debug only
         rowwise() |>
         mutate(!!current_geom_col := multiline_to_sorted_linestring(
             multilinestring = .data[[current_geom_col]],
-            start_point = stop_point,
+            points = points,
             metric_crs = metric_crs
         )) |>
         ungroup() |>

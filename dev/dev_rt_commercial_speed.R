@@ -20,7 +20,11 @@ TRIP_ID_GTFS = "5977_20260101_108_3_2"
 
 GTFS_RT_SAMPLE = "https://github.com/U-Shift/GTFShift-web/releases/download/v1.1/updates_case_study_carris_22224_20260101_251_0_21.csv"
 TRIP_ID_GTFS = "22224_20260101_251_0_21"
-TRIP_ID_UPDATES = "22224_20260101_251_0_21"
+TRIP_ID_UPDATES = "22224_20260101_251_0_21" # Circular shape
+
+GTFS_RT_SAMPLE = "https://github.com/U-Shift/GTFShift-web/releases/download/v1.1/updates_case_study_carris_19141_20260101_226_0_6.csv"
+TRIP_ID_UPDATES = "19141_20260101_226_0_6" # Circular geometry II
+TRIP_ID_GTFS = "19141_20260101_226_0_6" 
 
 
 # Carris Metropolitana
@@ -62,22 +66,29 @@ trips_geometries = osm_shapes_trip |> filter(shape_id == trip_shape_id) |> mutat
 geometry_sample_meters = 10
 metric_crs = METRIC_CRS
 
-result_2 <- rt_commercial_speed(
+# Debug rt_commercial_speed()
+result <- rt_commercial_speed(
   rt_collection,
   trips_geometries,
   rt_collection_trips_geometries_match_col = "trip_id", 
   metric_crs = METRIC_CRS
 )
-View(result_2)
+View(result)
+mapview(trips_geometries, color = "blue", layer.name = "Trip Geometry", alpha = 0.5) +
+  mapview(result, zcol="speed_kmh", layer.name = "Speed (km/h)", legend = TRUE) 
 
+# Debug project_points_along_geometry()
 projected_test <- project_points_along_geometry(
   geometry = trips_geometries$geom,
   points = trip_df$geometry,
   metric_crs = METRIC_CRS
 )
+# > Run after cumdist_m_reversed defined
+geometry_sampled_points_df <- sf::st_sf(geometry = geometry_sampled_points, cumdist_m = cumdist_m, cumdist_m_reversed = cumdist_m_reversed)
+mapview(geometry_sampled_points_df, zcol = "cumdist_m", layer.name = "Cumulative Distance (m)", legend = TRUE)
+
 View(projected_test)
 
 mapview(trips_geometries)
 
-mapview(rt_collection, zcol="spee")
 
