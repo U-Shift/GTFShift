@@ -166,7 +166,7 @@ summary(gtfs)
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
 #> # routes      187
-#> # trips      1857
+#> # trips      1846
 #> # stop_ids    454
 #> # stop_names  454
 #> # shapes      263

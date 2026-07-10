@@ -7,7 +7,7 @@ Convert a MULTILINESTRING to a sorted LINESTRING
 ``` r
 multiline_to_sorted_linestring(
   multilinestring,
-  start_point = NULL,
+  points = NULL,
   metric_crs = 3857
 )
 ```
@@ -18,10 +18,13 @@ multiline_to_sorted_linestring(
 
   sf object with MULTILINESTRING geometry
 
-- start_point:
+- points:
 
-  (Optional) sf point geometry. If provided, the sorting of the
-  linestrings will start from this point.
+  (Optional) collection of sorted point geometries used to guide
+  ordering. If provided, the first point defines the initial segment and
+  the second point (when available) is used as tie-break guidance for
+  its orientation. Remaining points are used as iterative tie-break
+  guidance.
 
 - metric_crs:
 
@@ -43,39 +46,50 @@ The algorithm is formulated as follows: Let \\\mathcal{L} = \\L_1,
 component \\L_i\\ is characterized by its start point \\S(L_i)\\ and end
 point \\E(L_i)\\.
 
-**1. Initialization:** Let \\L^{(1)}\\ be the first segment in the
-sorted sequence.
+**1. Initialization**
 
-If a `start_point` \\P\_{\text{start}}\\ is provided: \$\$L^{(1)} =
-\operatorname{argmin}\_{L \in \mathcal{L}} d(P\_{\text{start}}, L)\$\$
-where \\d(\cdot)\\ is the Euclidean distance. If \\d(P\_{\text{start}},
-S(L^{(1)})) \> d(P\_{\text{start}}, E(L^{(1)}))\\, the component's
-geometry is reversed so that it starts near \\P\_{\text{start}}\\.
+If guiding points are provided, let \\\mathrm{start\\point}=P_1\\ be the
+first point and \\P_2\\ the second point (if available). The initial
+segment is chosen as \$\$L^{(1)} = \operatorname\*{argmin}\_{L \in
+\mathcal{L}} d(\mathrm{start\\point}, L).\$\$ where \\d(\cdot)\\ is the
+Euclidean distance. If no points are provided, \\L^{(1)} = L_1\\
+(assuming the input MULTILINESTRING is ordered).
 
-If no `start_point` is provided: \$\$L^{(1)} = L_1\$\$
+Additionaly, the orientation of \\L^{(1)}\\ is determined by comparing
+the distances from its edges to the remaining segments in \\\mathcal{L}
+\setminus \\L^{(1)}\\\\. The edge that is closest to any remaining
+segment is designated as the end of \\L^{(1)}\\.
 
-The set of remaining segments is initialized as \\\mathcal{R}^{(1)} =
-\mathcal{L} \setminus \\L^{(1)}\\\\.
+If both edges are equidistant to the remaining segments, the orientation
+is determined by the proximity to \\P_2\\ (if available) or by orienting
+away from \\P_1\\.
 
-**2. Iterative Step:** For each step \\k \ge 1\\, let \\L^{(k)}\\ be the
-current segment and \\E^{(k)} = E(L^{(k)})\\ its endpoint. The algorithm
-searches the remaining components \\\mathcal{R}^{(k)}\\ for the closest
-segment: \$\$L\_{\text{start}} = \operatorname{argmin}\_{L \in
-\mathcal{R}^{(k)}} d(E^{(k)}, S(L))\$\$ \$\$L\_{\text{end}} =
-\operatorname{argmin}\_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, E(L))\$\$
-Let \\d\_{\text{start}} = d(E^{(k)}, S(L\_{\text{start}}))\\ and
-\\d\_{\text{end}} = d(E^{(k)}, E(L\_{\text{end}}))\\. The candidate
-segment \\L^\*\\ is: \$\$L^\* = \begin{cases} L\_{\text{start}} &
-\text{if } d\_{\text{start}} \leq d\_{\text{end}} \\ L\_{\text{end}} &
-\text{otherwise} \end{cases}\$\$
+**2. Iterative Step**
 
-**3. Verification & Assembly:** If the distance between the current
-segment and the candidate exceeds their combined length: \$\$d(L^{(k)},
-L^\*) \> \text{len}(L^{(k)}) + \text{len}(L^\*)\$\$ then \\L^\*\\ is
-discarded, \\\mathcal{R}^{(k+1)} = \mathcal{R}^{(k)} \setminus
-\\L^\*\\\\ and we find the next candidate. Otherwise, \\L^{(k+1)} =
-L^\*\\ (reversed if \\L^\* = L\_{\text{end}}\\) and
-\\\mathcal{R}^{(k+1)} = \mathcal{R}^{(k)} \setminus \\L^\*\\\\.
+At iteration \\k\\, with current segment endpoint \\e^{(k)} =
+E(L^{(k)})\\, define for each remaining segment \\L \in
+\mathcal{R}^{(k)}\\: \$\$d_s(L) = d\\\left(e^{(k)}, S(L)\right), \qquad
+d_e(L) = d\\\left(e^{(k)}, E(L)\right).\$\$ Segments with geometry equal
+to \\L^{(k)}\\ are excluded. Candidate segments minimize endpoint
+proximity: \$\$\mathcal{C}^{(k)} = \left\\L \in \mathcal{R}^{(k)} :
+\min\big(d_s(L), d_e(L)\big) = m^{(k)}\right\\, \quad m^{(k)} = \min\_{J
+\in \mathcal{R}^{(k)}} \min\big(d_s(J), d_e(J)\big).\$\$ Ties are broken
+as follows: \$\$\text{(i) if next unvisited point } Q \text{ exists,
+choose closest candidate, minimizing } d(Q,L) \text{ over } L \in
+\mathcal{C}^{(k)};\$\$ \$\$\text{(ii) if still tied, choose candidate
+closest to the current endpoint } e^{(k)}, \text{ minimizing }
+d\\\left(e^{(k)}, S(L)\right) \text{ over } L \in \mathcal{C}^{(k)}.\$\$
 
-The process repeats until no segments remain, and the components are
-merged into a single `LINESTRING`.
+**3. Verification and Assembly**
+
+Let \\L^\*\\ be the selected candidate. If \$\$d\\\left(L^{(k)},
+L^\*\right) \> \operatorname{len}\\\left(L^{(k)}\right) +
+\operatorname{len}(L^\*),\$\$ then \\L^\*\\ is removed from the
+remaining set and the loop restarts. Otherwise, \\L^\*\\ is oriented to
+connect from \\e^{(k)}\\ and appended to the ordered sequence. When
+points are provided, consecutive unvisited points \\Q\\ are marked
+visited when \$\$d\\\left(L^{(k+1)}, Q\right) \leq \min\_{J \in
+\mathcal{R}^{(k+1)}} d(J, Q).\$\$
+
+The ordered segments are concatenated into a single `LINESTRING` and
+transformed back to the original CRS of `multilinestring`.

@@ -89,17 +89,15 @@ yielding a projected point \\\hat{x}\_i\\ and two cumulative distances:
 \$\$d_i^{\mathrm{rev}} =
 \text{distance_along_geometry_reversed}(\hat{x}\_i)\$\$
 
-Distance between consecutive updates is computed as the minimum between
-two alternatives, both using absolute differences:
+For each pair of consecutive observations \\(i-1, i)\\, the elapsed time
+is computed as \$\$\Delta t_i = t_i - t\_{i-1}.\$\$
 
-1.  Normal direction: difference in `distance_along_geometry`.
-
-2.  Reversed direction: difference using
-    `distance_along_geometry_reversed` to better handle circular shapes.
-
-The selected distance increment is used to compute speed as:
-\$\$speed\_{km/h} = \frac{\Delta distance\\ (m)}{1000} \div \frac{\Delta
-time\\ (s)}{3600}\$\$
+The distance increment is defined as the minimum of the forward and
+reversed cumulative-distance differences: \$\$\Delta d_i^{\mathrm{fwd}}
+= \left\| d_i - d\_{i-1} \right\|\$\$ \$\$\Delta d_i^{\mathrm{rev}} =
+\left\| d_i^{\mathrm{rev}} - d\_{i-1}^{\mathrm{rev}} \right\|\$\$
+\$\$\Delta d_i = \min\left(\Delta d_i^{\mathrm{fwd}}, \Delta
+d_i^{\mathrm{rev}}\right).\$\$
 
 Trips with fewer than 2 updates are ignored with a warning. The distance
 increment is defined as the minimum of two alternative

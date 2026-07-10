@@ -17,7 +17,7 @@ between consecutive updates."><meta property="og:image" content="https://u-shift
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,7 +58,7 @@ between consecutive updates."><meta property="og:image" content="https://u-shift
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Estimate commercial speed from GTFS-RT trip updates</h1>
-      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/v0.10/R/rt_commercial_speed.R" class="external-link"><code>R/rt_commercial_speed.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/main/R/rt_commercial_speed.R" class="external-link"><code>R/rt_commercial_speed.R</code></a></small>
       <div class="d-none name"><code>rt_commercial_speed.Rd</code></div>
     </div>
 
@@ -145,12 +145,14 @@ trip geometry using <code><a href="project_points_along_geometry.html">GTFShift:
 a projected point \(\hat{x}_i\) and two cumulative distances:
 $$d_i = \text{distance_along_geometry}(\hat{x}_i)$$
 $$d_i^{\mathrm{rev}} = \text{distance_along_geometry_reversed}(\hat{x}_i)$$</p>
-<p>Distance between consecutive updates is computed as the minimum between two
-alternatives, both using absolute differences:</p><ol><li><p>Normal direction: difference in <code>distance_along_geometry</code>.</p></li>
-<li><p>Reversed direction: difference using <code>distance_along_geometry_reversed</code>
-  to better handle circular shapes.</p></li>
-</ol><p>The selected distance increment is used to compute speed as:
-$$speed_{km/h} = \frac{\Delta distance\ (m)}{1000} \div \frac{\Delta time\ (s)}{3600}$$</p>
+<p>For each pair of consecutive observations \((i-1, i)\), the elapsed time is
+computed as
+$$\Delta t_i = t_i - t_{i-1}.$$</p>
+<p>The distance increment is defined as the minimum of the forward and reversed
+cumulative-distance differences:
+$$\Delta d_i^{\mathrm{fwd}} = \left| d_i - d_{i-1} \right|$$
+$$\Delta d_i^{\mathrm{rev}} = \left| d_i^{\mathrm{rev}} - d_{i-1}^{\mathrm{rev}} \right|$$
+$$\Delta d_i = \min\left(\Delta d_i^{\mathrm{fwd}}, \Delta d_i^{\mathrm{rev}}\right).$$</p>
 <p>Trips with fewer than 2 updates are ignored with a warning.
 The distance increment is defined as the minimum of two alternative
 cumulative-distance differences:

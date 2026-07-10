@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Convert a MULTILINESTRING to a sorted LINESTRING</h1>
-      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/v0.10/R/multiline_to_sorted_linestring.R" class="external-link"><code>R/multiline_to_sorted_linestring.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/main/R/multiline_to_sorted_linestring.R" class="external-link"><code>R/multiline_to_sorted_linestring.R</code></a></small>
       <div class="d-none name"><code>multiline_to_sorted_linestring.Rd</code></div>
     </div>
 
@@ -66,7 +66,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">multiline_to_sorted_linestring</span><span class="op">(</span></span>
 <span>  <span class="va">multilinestring</span>,</span>
-<span>  start_point <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  points <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  metric_crs <span class="op">=</span> <span class="fl">3857</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -79,9 +79,11 @@
 <dd><p>sf object with MULTILINESTRING geometry</p></dd>
 
 
-<dt id="arg-start-point">start_point<a class="anchor" aria-label="anchor" href="#arg-start-point"></a></dt>
-<dd><p>(Optional) sf point geometry. If provided, the sorting of the linestrings
-will start from this point.</p></dd>
+<dt id="arg-points">points<a class="anchor" aria-label="anchor" href="#arg-points"></a></dt>
+<dd><p>(Optional) collection of sorted point geometries used to guide ordering.
+If provided, the first point defines the initial segment and the second
+point (when available) is used as tie-break guidance for its orientation. Remaining points are
+used as iterative tie-break guidance.</p></dd>
 
 
 <dt id="arg-metric-crs">metric_crs<a class="anchor" aria-label="anchor" href="#arg-metric-crs"></a></dt>
@@ -99,29 +101,38 @@ by sorting the linestrings and combining them in the correct order.</p>
 <p>The algorithm is formulated as follows:
 Let \(\mathcal{L} = \{L_1, \dots, L_n\}\) be the set of individual LINESTRING components.
 Each component \(L_i\) is characterized by its start point \(S(L_i)\) and end point \(E(L_i)\).</p>
-<p><b>1. Initialization:</b>
-Let \(L^{(1)}\) be the first segment in the sorted sequence.</p>
-<p>If a <code>start_point</code> \(P_{\text{start}}\) is provided:
-$$L^{(1)} = \operatorname{argmin}_{L \in \mathcal{L}} d(P_{\text{start}}, L)$$
-where \(d(\cdot)\) is the Euclidean distance. If \(d(P_{\text{start}}, S(L^{(1)})) &gt; d(P_{\text{start}}, E(L^{(1)}))\),
-the component's geometry is reversed so that it starts near \(P_{\text{start}}\).</p>
-<p>If no <code>start_point</code> is provided:
-$$L^{(1)} = L_1$$</p>
-<p>The set of remaining segments is initialized as \(\mathcal{R}^{(1)} = \mathcal{L} \setminus \{L^{(1)}\}\).</p>
-<p><b>2. Iterative Step:</b>
-For each step \(k \ge 1\), let \(L^{(k)}\) be the current segment and \(E^{(k)} = E(L^{(k)})\) its endpoint.
-The algorithm searches the remaining components \(\mathcal{R}^{(k)}\) for the closest segment:
-$$L_{\text{start}} = \operatorname{argmin}_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, S(L))$$
-$$L_{\text{end}} = \operatorname{argmin}_{L \in \mathcal{R}^{(k)}} d(E^{(k)}, E(L))$$
-Let \(d_{\text{start}} = d(E^{(k)}, S(L_{\text{start}}))\) and \(d_{\text{end}} = d(E^{(k)}, E(L_{\text{end}}))\).
-The candidate segment \(L^*\) is:
-$$L^* = \begin{cases} L_{\text{start}} &amp; \text{if } d_{\text{start}} \leq d_{\text{end}} \\ L_{\text{end}} &amp; \text{otherwise} \end{cases}$$</p>
-<p><b>3. Verification &amp; Assembly:</b>
-If the distance between the current segment and the candidate exceeds their combined length:
-$$d(L^{(k)}, L^*) &gt; \text{len}(L^{(k)}) + \text{len}(L^*)$$
-then \(L^*\) is discarded, \(\mathcal{R}^{(k+1)} = \mathcal{R}^{(k)} \setminus \{L^*\}\) and we find the next candidate.
-Otherwise, \(L^{(k+1)} = L^*\) (reversed if \(L^* = L_{\text{end}}\)) and \(\mathcal{R}^{(k+1)} = \mathcal{R}^{(k)} \setminus \{L^*\}\).</p>
-<p>The process repeats until no segments remain, and the components are merged into a single <code>LINESTRING</code>.</p>
+<p><b>1. Initialization</b></p>
+<p>If guiding points are provided, let \(\mathrm{start\_point}=P_1\) be the first point and
+\(P_2\) the second point (if available). The initial segment is chosen as
+$$L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}} d(\mathrm{start\_point}, L).$$
+where \(d(\cdot)\) is the Euclidean distance. If no points are provided, \(L^{(1)} = L_1\) (assuming the input MULTILINESTRING is ordered).</p>
+<p>Additionaly, the orientation of \(L^{(1)}\) is determined by comparing the distances
+from its edges to the remaining segments in \(\mathcal{L} \setminus \{L^{(1)}\}\).
+The edge that is closest to any remaining segment is designated as the end of \(L^{(1)}\).</p>
+<p>If both edges are equidistant to the remaining segments, the orientation is determined
+by the proximity to \(P_2\) (if available) or by orienting away from \(P_1\).</p>
+
+<p><b>2. Iterative Step</b></p>
+<p>At iteration \(k\), with current segment endpoint \(e^{(k)} = E(L^{(k)})\), define
+for each remaining segment \(L \in \mathcal{R}^{(k)}\):
+$$d_s(L) = d\!\left(e^{(k)}, S(L)\right), \qquad d_e(L) = d\!\left(e^{(k)}, E(L)\right).$$
+Segments with geometry equal to \(L^{(k)}\) are excluded. Candidate segments
+minimize endpoint proximity:
+$$\mathcal{C}^{(k)} = \left\{L \in \mathcal{R}^{(k)} : \min\big(d_s(L), d_e(L)\big) = m^{(k)}\right\},
+\quad m^{(k)} = \min_{J \in \mathcal{R}^{(k)}} \min\big(d_s(J), d_e(J)\big).$$
+Ties are broken as follows:
+$$\text{(i) if next unvisited point } Q \text{ exists, choose closest candidate, minimizing } d(Q,L) \text{ over } L \in \mathcal{C}^{(k)};$$
+$$\text{(ii) if still tied, choose candidate closest to the current endpoint } e^{(k)}, \text{ minimizing } d\!\left(e^{(k)}, S(L)\right) \text{ over } L \in \mathcal{C}^{(k)}.$$</p>
+<p><b>3. Verification and Assembly</b></p>
+<p>Let \(L^*\) be the selected candidate. If
+$$d\!\left(L^{(k)}, L^*\right) &gt; \operatorname{len}\!\left(L^{(k)}\right) + \operatorname{len}(L^*),$$
+then \(L^*\) is removed from the remaining set and the loop restarts.
+Otherwise, \(L^*\) is oriented to connect from \(e^{(k)}\) and
+appended to the ordered sequence. When points are provided, consecutive
+unvisited points \(Q\) are marked visited when
+$$d\!\left(L^{(k+1)}, Q\right) \leq \min_{J \in \mathcal{R}^{(k+1)}} d(J, Q).$$</p>
+<p>The ordered segments are concatenated into a single <code>LINESTRING</code> and
+transformed back to the original CRS of <code>multilinestring</code>.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

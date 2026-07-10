@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Build shapes from simple feature object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/v0.10/R/create_shapes_from_sf.R" class="external-link"><code>R/create_shapes_from_sf.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/main/R/create_shapes_from_sf.R" class="external-link"><code>R/create_shapes_from_sf.R</code></a></small>
       <div class="d-none name"><code>create_shapes_from_sf.Rd</code></div>
     </div>
 
@@ -102,7 +102,9 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function builds the shapes.txt file from a simple feature object.</p>
 <p>It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
-<code>multiline_to_sorted_linestring</code>, with the first stop of each trip as the starting point.
+<code>multiline_to_sorted_linestring</code>, using a point guide per shape:
+all ordered stops when the selected trip is circular (first and last
+<code>stop_id</code> are equal), or only the first stop otherwise.
 Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
 <code><a href="https://rdrr.io/pkg/gtfstools/man/convert_sf_to_shapes.html" class="external-link">gtfstools::convert_sf_to_shapes</a></code>.</p>
 <p>Coordinates are 4326 (WGS 84) by default, following GTFS specifications.</p>
