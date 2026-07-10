@@ -1,4 +1,4 @@
-#' Estimate commercial speed from GTFS-RT trip updates
+#' Estimate average speed for GTFS-RT trip updates
 #'
 #' Projects each real-time vehicle position to its corresponding trip geometry,
 #' computes cumulative distance along the shape, and derives segment speed
@@ -51,7 +51,7 @@
 #' Comparing \eqn{d_i} against \eqn{d_{i-1}^{\mathrm{rev}}} provides an auxiliary
 #' distance candidate that helps avoid overstating movement in that situation.
 #'
-#' Commercial speed is then estimated by
+#' Average speed is then estimated by
 #' \deqn{v_i = \frac{\Delta d_i}{\Delta t_i}}
 #' and reported in kilometers per hour as
 #' \deqn{v_i^{\mathrm{km/h}} = \frac{\Delta d_i}{1000} \cdot \frac{3600}{\Delta t_i}.}
@@ -77,7 +77,7 @@
 #' \dontrun{
 #' rt_collection <- read.csv("rt_collection.csv") # sf object with GTFS-RT updates (trip_id, timestamp, geometry)
 #' trips_geometries <- sf::st_read("osm_geometries.gpkg") # sf object with LINESTRING geometry per trip
-#' speeds <- GTFShift::rt_commercial_speed(rt_collection, trips_geometries)
+#' speeds <- GTFShift::rt_average_speed(rt_collection, trips_geometries)
 #' }
 #'
 #' @seealso \code{GTFShift::project_points_along_geometry()}
@@ -89,7 +89,7 @@
 #' @import rlang
 #'
 #' @export
-rt_commercial_speed <- function(
+rt_average_speed <- function(
   rt_collection, # sf data.frame with GTFS-RT updates for multiple trips 
   trips_geometries, # sf data.frame with trips geometry (LINESTRING) 
   rt_collection_trips_geometries_match_col = "trip_id", # column name in rt_collection and trips_geometries to match trips

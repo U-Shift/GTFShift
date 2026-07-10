@@ -133,7 +133,7 @@ mapview::mapview(
 ## When speed information is missing: infer speed from position updates
 
 If GTFS-RT does not provide speed information, it can be inferred from the progression of position updates through time.
-The method `GTFShift::rt_commercial_speed()` implements this functionality, calculating, for each GTFS-RT update, the speed
+The method `GTFShift::rt_average_speed()` implements this functionality, calculating, for each GTFS-RT update, the speed
 based on the distance between the current and previous position (projected on the route geometry), 
 divided by the time difference between the two updates. 
 
