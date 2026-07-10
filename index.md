@@ -76,8 +76,7 @@ decision-making process, suitable to different contexts and criteria.
 
 > Example of bus lane prioritization analysis for Lisbon city,
 > considering road segments with a minimum frequency of 10 buses/hour,
-> average commercial speed below 9.7 km/h and more than 1 lane per
-> direction.
+> average speed below 9.7 km/h and more than 1 lane per direction.
 
 #### Dashboard
 

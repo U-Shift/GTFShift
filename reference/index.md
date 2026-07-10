@@ -69,13 +69,13 @@
 
 ## Realtime
 
+- [`rt_average_speed()`](https://u-shift.github.io/GTFShift/reference/rt_average_speed.md)
+  : Estimate average speed for GTFS-RT trip updates
 - [`rt_collect_json()`](https://u-shift.github.io/GTFShift/reference/rt_collect_json.md)
   : Collect GTFS-RT data from a JSON feed at regular intervals
 - [`rt_collect_protobuf()`](https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.md)
   : Collect GTFS-RT data from a Protocol Buffers feed at regular
   intervals
-- [`rt_commercial_speed()`](https://u-shift.github.io/GTFShift/reference/rt_commercial_speed.md)
-  : Estimate commercial speed from GTFS-RT trip updates
 - [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
   : Extend prioritization with GTFS-RT based speed metrics
 

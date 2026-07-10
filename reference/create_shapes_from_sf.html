@@ -104,7 +104,7 @@
 <p>It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
 <code>multiline_to_sorted_linestring</code>, using a point guide per shape:
 all ordered stops when the selected trip is circular (first and last
-<code>stop_id</code> are equal), or only the first stop otherwise.
+<code>stop_id</code> are equal), or the first two stops otherwise.
 Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
 <code><a href="https://rdrr.io/pkg/gtfstools/man/convert_sf_to_shapes.html" class="external-link">gtfstools::convert_sf_to_shapes</a></code>.</p>
 <p>Coordinates are 4326 (WGS 84) by default, following GTFS specifications.</p>

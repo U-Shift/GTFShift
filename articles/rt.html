@@ -218,11 +218,10 @@ updates<a class="anchor" aria-label="anchor" href="#when-speed-information-is-mi
 </h3>
 <p>If GTFS-RT does not provide speed information, it can be inferred
 from the progression of position updates through time. The method
-<code><a href="../reference/rt_commercial_speed.html">GTFShift::rt_commercial_speed()</a></code> implements this
-functionality, calculating, for each GTFS-RT update, the speed based on
-the distance between the current and previous position (projected on the
-route geometry), divided by the time difference between the two
-updates.</p>
+<code><a href="../reference/rt_average_speed.html">GTFShift::rt_average_speed()</a></code> implements this functionality,
+calculating, for each GTFS-RT update, the speed based on the distance
+between the current and previous position (projected on the route
+geometry), divided by the time difference between the two updates.</p>
 <p>For more details, refer to the method documentation. The resulting
 speed can then be used to extend the prioritization analysis as
 described above.</p>

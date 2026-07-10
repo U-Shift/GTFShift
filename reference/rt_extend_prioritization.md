@@ -75,7 +75,7 @@ segment.
 
 If GTFS-RT data does not provide speed information, it can be inferred
 from the progression of position updates through time using
-[`GTFShift::rt_commercial_speed()`](https://u-shift.github.io/GTFShift/reference/rt_commercial_speed.md).
+[`GTFShift::rt_average_speed()`](https://u-shift.github.io/GTFShift/reference/rt_average_speed.md).
 
 Refer to
 [`GTFShift::rt_collect_json()`](https://u-shift.github.io/GTFShift/reference/rt_collect_json.md)

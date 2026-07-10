@@ -123,7 +123,7 @@ mapview::mapview(
 
 If GTFS-RT does not provide speed information, it can be inferred from
 the progression of position updates through time. The method
-[`GTFShift::rt_commercial_speed()`](https://u-shift.github.io/GTFShift/reference/rt_commercial_speed.md)
+[`GTFShift::rt_average_speed()`](https://u-shift.github.io/GTFShift/reference/rt_average_speed.md)
 implements this functionality, calculating, for each GTFS-RT update, the
 speed based on the distance between the current and previous position
 (projected on the route geometry), divided by the time difference
