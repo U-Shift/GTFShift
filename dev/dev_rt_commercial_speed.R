@@ -66,8 +66,8 @@ trips_geometries = osm_shapes_trip |> filter(shape_id == trip_shape_id) |> mutat
 geometry_sample_meters = 10
 metric_crs = METRIC_CRS
 
-# Debug rt_commercial_speed()
-result <- rt_commercial_speed(
+# Debug rt_average_speed()
+result <- rt_average_speed(
   rt_collection,
   trips_geometries,
   rt_collection_trips_geometries_match_col = "trip_id", 

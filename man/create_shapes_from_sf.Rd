@@ -34,7 +34,7 @@ This function builds the shapes.txt file from a simple feature object.
 It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
 \code{multiline_to_sorted_linestring}, using a point guide per shape:
 all ordered stops when the selected trip is circular (first and last
-\code{stop_id} are equal), or only the first stop otherwise.
+\code{stop_id} are equal), or the first two stops otherwise.
 Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
 \code{gtfstools::convert_sf_to_shapes}.
 

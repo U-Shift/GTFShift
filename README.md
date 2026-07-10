@@ -60,7 +60,7 @@ and criteria.
 ![](man/figures/prioritization.png)
 
 > Example of bus lane prioritization analysis for Lisbon city, considering road segments with
-a minimum frequency of 10 buses/hour, average commercial speed below 9.7 km/h and more than 1 lane per direction. 
+a minimum frequency of 10 buses/hour, average speed below 9.7 km/h and more than 1 lane per direction. 
 
 #### Dashboard 
 
