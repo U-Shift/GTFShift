@@ -124,6 +124,8 @@ multiline_to_sorted_linestring <- function(
         remaining_lines <- linestrings[-nearest_idx, ]        
     } else {
         current_line <- linestrings[1, ] # Start with the first line
+        current_start <- lwgeom::st_startpoint(current_line$geometry)
+        current_end <- lwgeom::st_endpoint(current_line$geometry)
         remaining_lines <- linestrings[-1, ] 
     }
     # Validate start segment orientation
