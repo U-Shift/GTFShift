@@ -7,7 +7,6 @@ docs
 
 *.csv
 *.gpkg
-*.zip
 
 releases/
 vignettes/*_cache/*
