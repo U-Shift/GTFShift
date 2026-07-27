@@ -147,6 +147,13 @@ jobs:
           name: coverage-report
           path: coverage.xml
 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false   # don't fail the PR if Codecov is unreachable
+
       - name: Enforce minimum coverage threshold
         run: |
           pct <- as.numeric(Sys.getenv("COVERAGE_PCT"))
