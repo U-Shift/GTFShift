@@ -1,5 +1,7 @@
 library(dplyr)
 
+# Sample GTFS -----------------------------------------------
+
 TABLES <- c("agency", "routes", "trips", "shapes", "calendar", "calendar_dates", "stops", "stop_times")
 simplify_gtfs <- function(gtfs) {
   # Remove tables not in TABLES
@@ -117,3 +119,49 @@ gtfs_merged <- unify(gtfs_tcb_filtered_simpler, gtfs_ttsl_filtered) # , prefix =
 # Store samples to extdara
 tidytransit::write_gtfs(gtfs_tcb_filtered, "inst/extdata/gtfs_tcb_sample.zip")
 tidytransit::write_gtfs(gtfs_merged, "inst/extdata/gtfs_merged_sample.zip")
+
+# Sample OSM -----------------------------------------------
+
+# Filter TCB relations directly from the PBF
+bash = """
+# 1. Filter ALL bus routes
+osmium tags-filter portugal-latest.osm.pbf r/route=bus -o all_buses.pbf --overwrite
+
+# 2. Filter ONLY TCB networks from those bus routes (using exact string matching)
+osmium tags-filter all_buses.pbf \
+  r/network=TCB \
+  r/network="Transportes Coletivos do Barreiro" \
+  r/network="Transportes Colectivos do Barreiro" \
+  r/operator=TCB \
+  r/operator="Transportes Coletivos do Barreiro" \
+  -o tcb_relations.pbf --overwrite
+
+# Generate the recursive members file directly from the full Portugal PBF
+osmium getid -r -t -I tcb_relations.pbf portugal-latest.osm.pbf -o osmextract_tcb_network.pbf --overwrite
+
+# Generate gpkg to validate 
+ogr2ogr -f GPKG osmextract_tcb_network.gpkg osmextract_tcb_network.pbf
+"""
+
+# Test
+bbox = tidytransit::shapes_as_sf(gtfs_tcb$shapes) |> st_transform(3763) |> st_buffer(1000) |> st_transform(4326) |> st_bbox() 
+# mapview::mapview(bbox)
+osm_file = "/home/goncalo/.local/share/R/osmextract/tcb_complete.pbf"
+q = osmdata::opq(bbox = bbox) |>
+  osmdata::add_osm_feature(key = "route", value = c("bus"), key_exact = TRUE) |>
+  osmdata::add_osm_feature(key = "network", value = c("TCB", "Transportes Coletivos do Barreiro", "Transportes Colectivos do Barreiro"), key_exact = TRUE)
+
+pb <- progress::progress_bar$new( # Track progress
+  format = "Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
+  clear = FALSE, show_after = 0
+)
+pb$update(0)
+relations_df <- get_osm_relations(osm_file, q, pb)
+
+osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
+mapview::mapview(osm_ways)
+
+osm_stops <- osmextract::oe_read(osm_file, layer = "points", boundary = bbox, quiet = TRUE, extra_tags = c("public_transport")) |>
+      dplyr::filter(public_transport == "stop_position" | public_transport == "platform") |>
+      select(osm_id)
+mapview::mapview(osm_stops)
