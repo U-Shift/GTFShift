@@ -103,15 +103,11 @@ jobs:
           )
 
           # One row per file, sorted ascending by coverage (worst first)
-          file_pcts <- vapply(df, function(x) {
-            hits   <- sum(x > 0, na.rm = TRUE)
-            total  <- sum(!is.na(x))
-            if (total == 0) return(NA_real_)
-            100 * hits / total
-          }, numeric(1))
+          # filecoverage values are already per-file percentages (0–100)
+          file_pcts <- unlist(covr::coverage_to_list(cov)$filecoverage)
 
           order_idx  <- order(file_pcts, na.last = TRUE)
-          file_names <- names(df)[order_idx]
+          file_names <- names(file_pcts)[order_idx]
           file_pcts  <- file_pcts[order_idx]
 
           for (i in seq_along(file_names)) {
