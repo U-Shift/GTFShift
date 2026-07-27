@@ -35,7 +35,7 @@ osm_centerlines <- function(bbox=NULL, place=NULL, use_buildings = TRUE, venv=NA
   reticulate::use_virtualenv(venv, required = TRUE)
 
   # Ensure dependencies are installed
-  py_install(packages = c("osmnx", "pandas", "geopandas", "shapely", "neatnet"), pip = TRUE, pip_ignore_installed=FALSE)
+  reticulate::py_install(packages = c("osmnx", "pandas", "geopandas", "shapely", "neatnet"), pip = TRUE, pip_ignore_installed=FALSE)
 
   # Define path to script and temp output
   py_script <- system.file("python", "osm_centerline_neatnet.py", package = "GTFShift")
