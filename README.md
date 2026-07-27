@@ -1,7 +1,7 @@
 # GTFShift <img align="right" src="man/figures/logo.png" alt="logo" width="180">
 
 <!-- badges: start -->
-[![](https://github.com/U-Shift/GTFShift/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/pkgdown.yaml) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21292010.svg)](https://doi.org/10.5281/zenodo.21292010)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21292010.svg)](https://doi.org/10.5281/zenodo.21292010) [![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 **GTFShift** encompasses a complete bundle of methods to harmonize GTFS and OSM data, enabling the integration and exploration of different layers of transit data, starting with the planned operations (GTFS), but also the infrastructure topology (OSM) and real-time information (GTFS-RT).
