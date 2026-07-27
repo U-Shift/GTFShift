@@ -31,14 +31,17 @@ Imports:
   progress,
   callr,
   stringi,
-  parallel
+  parallel,
+  lwgeom,
+  purrr,
+  rlang,
+  xml2,
+  RProtoBuf
 URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
 Suggests: 
     knitr,
     rmarkdown,
     mapview,
-    xml2,
-    RProtoBuf,
     osmextract,
     rosmium,
     testthat
