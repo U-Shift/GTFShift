@@ -29,7 +29,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr, any::xml2, local::.
+          extra-packages: any::covr, any::xml2, any::testthat, any::rosmium, local::.
           needs: coverage
 
       - name: Run tests and compute coverage
