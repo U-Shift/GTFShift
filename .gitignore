@@ -5,7 +5,6 @@
 inst/doc
 docs
 
-*.csv
 *.gpkg
 
 releases/
