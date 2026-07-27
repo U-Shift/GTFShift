@@ -88,7 +88,6 @@ jobs:
         shell: Rscript {0}
 
       - name: Build per-file coverage report
-        id: build_report
         run: |
           cov <- readRDS("coverage.rds")
           df  <- covr::coverage_to_list(cov)$filecoverage
