@@ -72,6 +72,7 @@ osm_shapes_to_routes <- function(
   )
   pb$update(0)
 
+  initial_osm_file <- osm_file
   if (!is.null(osm_file)) {
     # 1.1. Get relations
     relations_df <- get_osm_relations(osm_file, q, pb, osm_route_type, 0.1, 0.2, 0.3, 0.94) |>
@@ -98,6 +99,7 @@ osm_shapes_to_routes <- function(
     }
   } else {
     osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
+
     job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
       osmdata::osmdata_xml(q, filename = osm_file, quiet = FALSE)
     }, args = list(q, osm_file))
@@ -147,7 +149,7 @@ osm_shapes_to_routes <- function(
   pb$terminate()
 
   # If relation disaggregation
-  if (ways && is.null(osm_file)) {
+  if (ways && is.null(initial_osm_file)) {
     # 4. Processing OSM relations (already have the file!)
     pb <- progress::progress_bar$new( # Track progress
       format = sprintf("3/%d: Matching OSM routes with ways [:bar] :percent :spin elapsed=:elapsed", total_steps),
@@ -200,7 +202,7 @@ osm_shapes_to_routes <- function(
 
     pb$update(1)
     pb$terminate()
-  } else if (ways && !is.null(ways_tags) && length(ways_tags) > 0) {
+  } else if (ways && !is.null(initial_osm_file) && !is.null(ways_tags) && length(ways_tags) > 0) {
     ways_other_tags <- osmextract::oe_get_keys(osm_ways)
     # Filter ways_other_tags for elements that contain any of strings in ways_tags
     tags_to_extract <- ways_other_tags[Reduce(`|`, lapply(ways_tags, function(t) grepl(t, ways_other_tags)))]

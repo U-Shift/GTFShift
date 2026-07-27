@@ -74,11 +74,12 @@ project_points_along_geometry <- function(
     stop("geometry must contain exactly one feature")
   }
   if (length(points_sfc) == 0) {
-    return(data.frame(
+    return(sf::st_sf(
       closest_on_geometry = points_sfc,
       distance_to_closest_on_geometry = numeric(0),
       distance_along_geometry = numeric(0),
-      distance_along_geometry_reversed = numeric(0)
+      distance_along_geometry_reversed = numeric(0),
+      sf_column_name = "closest_on_geometry"
     ))
   }
 
@@ -95,13 +96,18 @@ project_points_along_geometry <- function(
   geometry_metric <- sf::st_transform(geometry_sfc, metric_crs)
   points_metric <- sf::st_transform(points_sfc, metric_crs)
 
+  if (geometry_type == "MULTILINESTRING") {
+    geom_merged <- sf::st_line_merge(geometry_metric)
+    geom_cast <- sf::st_cast(geom_merged, "LINESTRING")
+    geometry_metric <- sf::st_sfc(geom_cast[[1]], crs = metric_crs)
+  }
+
   closest_points <- sf::st_nearest_points(points_metric, geometry_metric)
   closest_points_length <- sf::st_length(closest_points)
   pts_all <- sf::st_cast(closest_points, "POINT")
   closest_on_geometry_metric <- pts_all[seq(2, length(pts_all), by = 2)]
   closest_on_geometry <- sf::st_transform(closest_on_geometry_metric, geometry_crs_original)
   # mapview(closest_on_geometry) + mapview(closest_points) + mapview(geometry_sfc)
-
   line_len_m <- as.numeric(sf::st_length(geometry_metric))
   geometry_sampled <- sf::st_line_sample(geometry_metric, density = 1 / geometry_sample_meters)
   geometry_sampled_points <- sf::st_cast(geometry_sampled, "POINT")
@@ -112,10 +118,11 @@ project_points_along_geometry <- function(
   distance_along_geometry <- cumdist_m[idx]
   distance_along_geometry_reversed <- cumdist_m_reversed[idx]
 
-  data.frame(
+  sf::st_sf(
     closest_on_geometry = closest_on_geometry,
     distance_to_closest_on_geometry = as.numeric(closest_points_length),
     distance_along_geometry = distance_along_geometry,
-    distance_along_geometry_reversed = distance_along_geometry_reversed
+    distance_along_geometry_reversed = distance_along_geometry_reversed,
+    sf_column_name = "closest_on_geometry"
   )
 }
