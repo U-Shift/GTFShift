@@ -98,9 +98,8 @@ get_network_extension <- function(
     network_union <- network_redux_shapes |>
       st_union() |>
       stplanr::line_cast() |>
-      st_as_sf() |>
-      mutate(length = st_length(geom_col))
-    return(sum(network_union$length))
+      st_as_sf()
+    return(sum(st_length(st_geometry(network_union))))
   }
 
   return(sum(network_redux_shapes$length))

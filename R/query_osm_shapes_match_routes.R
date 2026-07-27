@@ -120,19 +120,19 @@ osm_shapes_match_routes <- function(
   metric_crs = 3857
 ) {
   metric_crs_is_default <- missing(metric_crs)
+  initial_osm_file <- osm_file
   total_steps <- 4
   if (!is.null(osm_file)) {
     total_steps <- 3
   }
 
-  if (!is.na(log_file)) {
+  if (!is.null(log_file) && length(log_file) == 1 && !is.na(log_file)) {
     cat(
       sprintf("-----------------------------\n%s: Running osm_shapes_match_routes() for %s...\n\n", Sys.time(), paste(gtfs$agency$agency_name, collapse = ", ")),
       file = log_file, append = TRUE
     )
   }
 
-  # 0. Validations
   if (!(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
     stop("gtfs_match should be one of: route_id, route_short_name or route_long_name")
   }
@@ -144,10 +144,12 @@ osm_shapes_match_routes <- function(
     stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
   }
   if (metric_crs_is_default) {
+    w <- "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations."
     warning(
-      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+      w,
       call. = FALSE
     )
+    if (!is.null(log_file) && length(log_file) == 1 && !is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
 
   # 1. Get geometry for shapes and stops
@@ -274,7 +276,7 @@ osm_shapes_match_routes <- function(
 
 
   # 4. Processing OSM relations (already have the file!)
-  if (is.null(osm_file)) {
+  if (is.null(initial_osm_file)) {
     pb <- progress::progress_bar$new(
       format = sprintf("3/%d: Processing OSM relations [:bar] :percent :spin elapsed=:elapsed", total_steps),
       clear = FALSE, show_after = 0
