@@ -111,6 +111,7 @@
 #' @import dplyr
 #' @importFrom purrr map_dfr
 #' @import rlang
+#' @importFrom rlang .data
 #'
 #' @export
 rt_average_speed <- function(
@@ -150,14 +151,14 @@ rt_average_speed <- function(
   # 1. Compute speed for each trip update
   rt_collection |>
     sf::st_transform(crs = metric_crs) |>
-    group_split(trip_id) |>
+    group_split(.data$trip_id) |>
     purrr::map_dfr(function(trip_df) {
       # If trip has less than 2 updates, ignore it
       if (nrow(trip_df) < 2) {
         warning(paste("Trip", trip_df[[rt_collection_trips_geometries_match_col]][[1]], "has less than 2 updates. Ignoring it."))
         return(NULL)
       }
-      trip_df <- trip_df |> arrange(timestamp) |> st_transform(crs = metric_crs)
+      trip_df <- trip_df |> arrange(.data$timestamp) |> st_transform(crs = metric_crs)
       trip_geometry <- trips_geometries |> 
         filter(!!sym(rt_collection_trips_geometries_match_col) == trip_df[[rt_collection_trips_geometries_match_col]][[1]]) |> 
         st_transform(crs = metric_crs)
@@ -177,19 +178,19 @@ rt_average_speed <- function(
           distance_to_closest_on_geometry = projected$distance_to_closest_on_geometry
         )
       trip_df <- trip_df |> mutate(
-        time_since_prev_sec = timestamp - lag(timestamp),
+        time_since_prev_sec = .data$timestamp - lag(.data$timestamp),
         # When computing distances
         # 1. Use absolute value to avoid negative distances
         # 2. Consider both normal and reversed distances (to work with circular shapes) and take the minimum
-        distance_since_prev_meters_normal = abs(distance_along_geometry - lag(distance_along_geometry)), 
-        distance_since_prev_meters_reversed = abs(distance_along_geometry - lag(distance_along_geometry_reversed)),
-        distance_since_prev_meters = pmin(distance_since_prev_meters_normal, distance_since_prev_meters_reversed, na.rm = TRUE),
+        distance_since_prev_meters_normal = abs(.data$distance_along_geometry - lag(.data$distance_along_geometry)), 
+        distance_since_prev_meters_reversed = abs(.data$distance_along_geometry - lag(.data$distance_along_geometry_reversed)),
+        distance_since_prev_meters = pmin(.data$distance_since_prev_meters_normal, .data$distance_since_prev_meters_reversed, na.rm = TRUE),
         # Compute speed in km/h
-        speed_kmh = (distance_since_prev_meters / 1000) / (time_since_prev_sec / 3600),
-        distance_since_prev_meters = round(distance_since_prev_meters, 2),
-        speed_kmh = round(speed_kmh, 2),
-        distance_along_geometry = round(distance_along_geometry, 2)
-      ) |> select(-distance_since_prev_meters_normal, -distance_since_prev_meters_reversed)
+        speed_kmh = (.data$distance_since_prev_meters / 1000) / (.data$time_since_prev_sec / 3600),
+        distance_since_prev_meters = round(.data$distance_since_prev_meters, 2),
+        speed_kmh = round(.data$speed_kmh, 2),
+        distance_along_geometry = round(.data$distance_along_geometry, 2)
+      ) |> select(-.data$distance_since_prev_meters_normal, -.data$distance_since_prev_meters_reversed)
       # mapview(trip_df, zcol = "distance_along_geometry", layer.name = "Distance along geometry") + mapview(trip_df, zcol = "speed_kmh", layer.name = "Speed (km/h)") +  mapview(trip_geometry, color = "blue", lwd = 3, layer.name = "Trip geometry")
       # |> filter(
       #  !is.na(speed_kmh) &

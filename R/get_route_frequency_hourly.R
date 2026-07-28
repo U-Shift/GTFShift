@@ -57,6 +57,7 @@
 #' @import lubridate
 #' @importFrom stplanr overline2
 #' @importFrom tidyselect any_of
+#' @importFrom rlang .data
 #'
 #' @export
 get_route_frequency_hourly <- function(
@@ -102,11 +103,11 @@ get_route_frequency_hourly <- function(
     )))
 
   stop_times <- stop_times |>
-    arrange(stop_sequence) |>
-    group_by(trip_id) |>
+    arrange(.data$stop_sequence) |>
+    group_by(.data$trip_id) |>
     slice(1) |> # Only departures from origin (first stop)
     ungroup() |>
-    mutate(hour = lubridate::hour(departure_time))
+    mutate(hour = lubridate::hour(.data$departure_time))
 
   freq_data <- stop_times |>
     group_by(across(any_of(c("route_id", "shape_id", "route_short_name", "direction_id", "hour")))) |>
@@ -123,9 +124,9 @@ get_route_frequency_hourly <- function(
     routes_freq_all <- data.frame()
     for (h in unique(routes_freq$hour)) { # hours of the day
       routes_freq_h <- routes_freq |>
-        filter(hour == h) |>
+        filter(.data$hour == h) |>
         stplanr::overline2(attrib = "frequency") |>
-        arrange(frequency) |>
+        arrange(.data$frequency) |>
         mutate(hour = h)
 
       routes_freq_all <- rbind(routes_freq_all, routes_freq_h)

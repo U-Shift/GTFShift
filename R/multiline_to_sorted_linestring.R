@@ -75,6 +75,7 @@
 #' @import dplyr
 #' @import sf
 #' @importFrom lwgeom st_startpoint st_endpoint
+#' @importFrom rlang .data
 #'
 #' @export
 multiline_to_sorted_linestring <- function(
@@ -103,8 +104,8 @@ multiline_to_sorted_linestring <- function(
         st_set_geometry("geometry") |>
         st_transform(metric_crs) |>
         mutate(
-            start = lwgeom::st_startpoint(geometry),
-            end = lwgeom::st_endpoint(geometry)
+            start = lwgeom::st_startpoint(.data$geometry),
+            end = lwgeom::st_endpoint(.data$geometry)
         )
 
     # 2. Reorder the linestrings by finding the best sequence
@@ -120,9 +121,9 @@ multiline_to_sorted_linestring <- function(
         )) |>
             mutate(order = row_number()) |>
             st_transform(metric_crs)
-        start_point <- points_df |> slice(1) |> pull(geometry)
+        start_point <- points_df |> slice(1) |> pull(.data$geometry)
         if (length(points) > 1) {
-            second_point <- points_df |> slice(2) |> pull(geometry)
+            second_point <- points_df |> slice(2) |> pull(.data$geometry)
         }
         # Mark the first point as visited
         points_df$visited[1] <- TRUE
@@ -182,12 +183,12 @@ multiline_to_sorted_linestring <- function(
     while (nrow(remaining_lines) > 0) { 
         if (!is.null(points_df)) {
             # Get index of the next point in points_df that has not been visited yet
-            next_point_index <- points_df |> filter(!visited) |> slice(1) |> pull(order)
+            next_point_index <- points_df |> filter(!.data$visited) |> slice(1) |> pull(.data$order)
             if (length(next_point_index) == 0) {
                 next_point_index <- NULL
                 next_point <- NULL
             } else {
-                next_point <- points_df |> filter(order == next_point_index) |> pull(geometry)
+                next_point <- points_df |> filter(.data$order == next_point_index) |> pull(.data$geometry)
                 distance_to_next_point <- st_distance(current_line, next_point)
             }
         }
@@ -267,7 +268,7 @@ multiline_to_sorted_linestring <- function(
         if (!is.null(points_df)) {
             # Mark consecutive next points as visited while current_line stays at least as close as any remaining line for the next unvisited point
             repeat {
-                next_unvisited <- points_df |> filter(!visited) |> slice(1)
+                next_unvisited <- points_df |> filter(!.data$visited) |> slice(1)
                 if (nrow(next_unvisited) == 0) {
                     break
                 }

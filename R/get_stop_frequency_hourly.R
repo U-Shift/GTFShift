@@ -36,6 +36,7 @@
 #' @import lubridate
 #' @import tidytransit
 #' @import dplyr
+#' @importFrom rlang .data
 #'
 #' @export
 get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusinessWednesday()) {
@@ -74,35 +75,35 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   shape_lengths <- pattern_gtfs$shapes |>
     as.data.frame() |>
-    select(shape_id, length, -geometry)
+    select(.data$shape_id, .data$length, -.data$geometry)
 
   ## Get statistics: for each service pattern, get nr of trips, routes, total and avg distance and number of stops covered
   service_pattern_summary <- pattern_gtfs$trips |> # Join trips
     left_join(pattern_gtfs$.$servicepatterns, by="service_id") |> # with service pattern
     left_join(shape_lengths, by="shape_id") |> # with shape length
     left_join(pattern_gtfs$stop_times, by="trip_id") |> # with planned route (stops and times)
-    group_by(servicepattern_id) |> # group by service pattern
+    group_by(.data$servicepattern_id) |> # group by service pattern
     summarise(
       trips = n(),
-      routes = n_distinct(route_id),
-      total_distance_per_day_km = sum(as.numeric(length), na.rm=TRUE)/1e3, # divide by 1e3 to convert meters to kms
-      route_avg_distance_km = (sum(as.numeric(length), na.rm=TRUE)/1e3)/(trips*routes),
-      stops=(n_distinct(stop_id)/2) # divided by two because usually there is one stop per direction
+      routes = n_distinct(.data$route_id),
+      total_distance_per_day_km = sum(as.numeric(.data$length), na.rm=TRUE)/1e3, # divide by 1e3 to convert meters to kms
+      route_avg_distance_km = (sum(as.numeric(.data$length), na.rm=TRUE)/1e3)/(.data$trips*.data$routes),
+      stops=(n_distinct(.data$stop_id)/2) # divided by two because usually there is one stop per direction
     )
 
   ## Add the number of days that each service is in operation (by join with $.$dates_servicepatterns)
   service_pattern_summary <- pattern_gtfs$.$dates_servicepatterns |>
-    group_by(servicepattern_id) |>
+    group_by(.data$servicepattern_id) |>
     summarise(days_in_service = n()) |>
     left_join(service_pattern_summary, by = "servicepattern_id")
 
   ## Get service patterns that run on the date selected
   service_pattern_ids = pattern_gtfs$.$dates_servicepatterns |>
-    filter(date==date)
+    filter(.data$date==date)
 
   service_ids = pattern_gtfs$.$servicepattern |>
-    filter(servicepattern_id %in% service_pattern_ids$servicepattern_id) |>
-    pull(service_id)
+    filter(.data$servicepattern_id %in% service_pattern_ids$servicepattern_id) |>
+    pull(.data$service_id)
 
   #### Filter by date
 
@@ -110,7 +111,7 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   frame = data.frame()
 
-  stop_times = gtfs_date$stop_times |> mutate(hour = lubridate::hour(departure_time))
+  stop_times = gtfs_date$stop_times |> mutate(hour = lubridate::hour(.data$departure_time))
   min_hour = min(stop_times$hour, na.rm=TRUE)
   max_hour = max(stop_times$hour, na.rm=TRUE)
 
@@ -126,8 +127,8 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
     )
 
     stop_frequency <- stop_frequency |>
-      group_by(stop_id) |>
-      summarise(frequency = sum(n_departures)) |>
+      group_by(.data$stop_id) |>
+      summarise(frequency = sum(.data$n_departures)) |>
       mutate(hour = i)
 
     frame <- rbind(frame, stop_frequency)
@@ -135,13 +136,13 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   frequency <- frame |>
     ungroup() |>
-    group_by(stop_id, hour) |>
-    summarise(frequency = sum(frequency)) |>
+    group_by(.data$stop_id, .data$hour) |>
+    summarise(frequency = sum(.data$frequency)) |>
     ungroup()
 
   table <- frequency |>
     left_join(gtfs_date$stops |>
-                select(stop_id, stop_lon, stop_lat), by = "stop_id") |>
+                select(.data$stop_id, .data$stop_lon, .data$stop_lat), by = "stop_id") |>
     st_as_sf(crs = 4326, coords = c("stop_lon", "stop_lat"))
 
   message("Finished GTFS analysis!")

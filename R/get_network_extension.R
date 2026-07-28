@@ -32,6 +32,7 @@
 #'
 #' @import dplyr
 #' @import sf
+#' @importFrom rlang .data
 #'
 #' @export
 get_network_extension <- function(
@@ -65,28 +66,28 @@ get_network_extension <- function(
   # Get unique shapes
   shapes_unique <- network |>
     st_drop_geometry() |>
-    select(shape_id) |>
+    select(.data$shape_id) |>
     distinct() |>
     left_join(network, by = "shape_id", multiple = "first")
 
   # Compute daily frequencies per route shape
   network_redux <- network |>
     st_drop_geometry() |>
-    group_by(.data[[route_identifier]], direction_id, shape_id) |>
-    summarise(frequency_day = sum(frequency)) |>
+    group_by(.data[[route_identifier]], .data$direction_id, .data$shape_id) |>
+    summarise(frequency_day = sum(.data$frequency)) |>
     ungroup()
 
   # Get shape with max frequencies per route
   network_redux_max <- network_redux |>
     # Get max frequency shape per route (and direction, if direction_wise=TRUE)
-    group_by(.data[[route_identifier]], shape_id, !!!if (direction_wise) rlang::syms("direction_id")) |>
-    summarise(frequency_max = max(frequency_day)) |>
+    group_by(.data[[route_identifier]], .data$shape_id, !!!if (direction_wise) rlang::syms("direction_id")) |>
+    summarise(frequency_max = max(.data$frequency_day)) |>
     # Get shape with max frequency per route (and direction, if direction_wise=TRUE)
     group_by(
       .data[[route_identifier]],
       !!!if (direction_wise) rlang::syms("direction_id")
     ) |>
-    slice_max(order_by = frequency_max, n = 1, with_ties = FALSE) |>
+    slice_max(order_by = .data$frequency_max, n = 1, with_ties = FALSE) |>
     ungroup()
 
   # Join with the original network to get the shapes and compute its distance

@@ -43,6 +43,8 @@
 #'
 #' @import dplyr
 #' @import sf
+#' @importFrom stats weighted.mean
+#' @importFrom rlang .data
 #'
 #' @export
 get_prioritisation_stats <- function(
@@ -78,7 +80,7 @@ get_prioritisation_stats <- function(
     # Compute bus lane extension
     stats$extension <- sum(prioritisation_internal$length, na.rm = TRUE)
     stats$extension_bus_lane <- sum(
-        prioritisation_internal |> filter(is_bus_lane) |> pull(length),
+        prioritisation_internal |> filter(.data$is_bus_lane) |> pull(.data$length),
         na.rm = TRUE
     )
 

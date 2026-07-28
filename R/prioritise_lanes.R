@@ -55,6 +55,7 @@
 #' 
 #' @import dplyr
 #' @import tidytransit
+#' @importFrom rlang .data
 #'
 #' @export
 prioritise_lanes <- function(
@@ -68,7 +69,7 @@ prioritise_lanes <- function(
   way_frequency <- GTFShift::get_way_frequency_hourly(gtfs, q, date, TRUE, osm_file = osm_file)
 
   # Get bus lanes
-  bus_lanes <- filter_osm_bus_lanes(way_frequency |> distinct(way_osm_id, .keep_all = TRUE))
+  bus_lanes <- filter_osm_bus_lanes(way_frequency |> distinct(.data$way_osm_id, .keep_all = TRUE))
 
   # Aggregate data
   # > Add missing lanes columns, to prevent errors
@@ -84,9 +85,9 @@ prioritise_lanes <- function(
 
   # > Compute aggregation
   lanes <- way_frequency |>
-    left_join(bus_lanes |> st_drop_geometry() |> select(way_osm_id) |> mutate(is_bus_lane = TRUE), by = "way_osm_id") |>
+    left_join(bus_lanes |> st_drop_geometry() |> select(.data$way_osm_id) |> mutate(is_bus_lane = TRUE), by = "way_osm_id") |>
     mutate(
-      is_bus_lane = ifelse(is.na(is_bus_lane), FALSE, is_bus_lane),
+      is_bus_lane = ifelse(is.na(.data$is_bus_lane), FALSE, .data$is_bus_lane),
       n_lanes_parking = dplyr::case_when(
         # Any 'parking:both' or 'parking:lane:both' column present with value different from 'no'
         if_any(matches("^parking(:lane)?:both"), ~ !is.na(.) & . != "no") ~ 2L,
@@ -103,7 +104,7 @@ prioritise_lanes <- function(
       ),
       n_lanes_circulation = coalesce(
         # Global count
-        parse_lanes(lanes),
+        parse_lanes(.data$lanes),
         # Directional count (sum existing ones; returns NA if all are missing)
         na_if(
           rowSums(across(matches("^lanes(:[^:]+)*:forward$"), ~ coalesce(parse_lanes(.), 0)), na.rm = TRUE) +
@@ -112,12 +113,12 @@ prioritise_lanes <- function(
           0
         ),
         # If oneway=="yes", then 1
-        ifelse(oneway == "yes", 1, NA_integer_),
+        ifelse(.data$oneway == "yes", 1, NA_integer_),
         # Else, assume 2 lanes, one per direction
         2 # NA_integer_
       ),
       n_directions = case_when(
-        n_lanes_circulation == 1 ~ 1, # When only one lane, assume one direction
+        .data$n_lanes_circulation == 1 ~ 1, # When only one lane, assume one direction
         # any oneway:* tag indicating "no"
         if_any(matches("oneway"), ~ tolower(.x) %in% c("no", "0", "false")) ~ 2,
         # any oneway:* tag indicating "yes"
@@ -125,15 +126,15 @@ prioritise_lanes <- function(
         TRUE ~ 2
       ),
       n_lanes_circulation_direction = case_when(
-        n_lanes_circulation / n_directions < 1 ~ 1,
-        !is.na(n_lanes_circulation) & !is.na(n_directions) ~ n_lanes_circulation / n_directions,
+        .data$n_lanes_circulation / .data$n_directions < 1 ~ 1,
+        !is.na(.data$n_lanes_circulation) & !is.na(.data$n_directions) ~ .data$n_lanes_circulation / .data$n_directions,
         TRUE ~ NA_real_
       )
     )
 
   if (!keep_osm_attributes) {
     lanes <- lanes |>
-      select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_parking, n_lanes_circulation, n_directions, n_lanes_circulation_direction, routes, shapes, geometry)
+      select(.data$way_osm_id, .data$hour, .data$frequency, .data$is_bus_lane, .data$n_lanes_parking, .data$n_lanes_circulation, .data$n_directions, .data$n_lanes_circulation_direction, .data$routes, .data$shapes, .data$geometry)
   }
 
   return(lanes)

@@ -110,6 +110,7 @@
 #' @importFrom parallel mclapply
 #' @importFrom stringi stri_trans_general
 #' @importFrom xml2 xml_find_all xml_attr
+#' @importFrom rlang .data
 #'
 #' @export
 osm_shapes_match_routes <- function(
@@ -557,12 +558,15 @@ osm_shapes_match_routes <- function(
 
     # > Match OSM network and GTFS shapes considering the match with min aggregated distance (init + fin)
     closeness <- abs(init + fin + length_diff + stops_diff)
+    if (!is.matrix(closeness)) {
+      closeness <- matrix(closeness, nrow = nrow(osm_route_name), ncol = nrow(gtfs_route_name))
+    }
 
     gtfs_route_name_minimos <- gtfs_route_name |>
       dplyr::mutate(osm_id = NA)
 
     for (i in 1:nrow(gtfs_route_name_minimos)) {
-      gtfs_route_name_minimos[i, ]$osm_id <- osm_route_name[which.min(closeness[, i]), ]$osm_id
+      gtfs_route_name_minimos[i, ]$osm_id <- osm_route_name[which.min(closeness[, i, drop = TRUE]), ]$osm_id
     }
 
     gtfs_route_name_result <- gtfs_route_name_minimos |>
@@ -574,12 +578,12 @@ osm_shapes_match_routes <- function(
       ) |>
       dplyr::rowwise() |>
       dplyr::mutate(
-        distance_diff = as.numeric(abs(route_dist_gtfs - route_dist_osm)),
-        points_diff = as.numeric(sf::st_distance(initial_osm |> st_transform(metric_crs), initial_gtfs |> st_transform(metric_crs))) + as.numeric(sf::st_distance(final_osm |> st_transform(metric_crs), final_gtfs |> st_transform(metric_crs))),
-        stops_diff = as.numeric(abs(nr_stops_gtfs - nr_stops_osm))
+        distance_diff = as.numeric(abs(.data$route_dist_gtfs - .data$route_dist_osm)),
+        points_diff = as.numeric(sf::st_distance(.data$initial_osm |> st_transform(metric_crs), .data$initial_gtfs |> st_transform(metric_crs))) + as.numeric(sf::st_distance(.data$final_osm |> st_transform(metric_crs), .data$final_gtfs |> st_transform(metric_crs))),
+        stops_diff = as.numeric(abs(.data$nr_stops_gtfs - .data$nr_stops_osm))
       ) |> # absolute difference
       dplyr::ungroup() |>
-      dplyr::select(-initial_gtfs, -final_gtfs) |>
+      dplyr::select(-.data$initial_gtfs, -.data$final_gtfs) |>
       sf::st_as_sf(sf_column_name = "geometry")
 
     # When multiple osm_id, return those with min distance_diff + points_diff + then stops_diff
