@@ -152,8 +152,9 @@ rt_extend_prioritisation <- function(
 
   # 5. Aggregate speed metrics by way_osm_id
   job <- callr::r_bg(function(overlap, rt_attr_speed) { # update spinner while blocking method call
+    requireNamespace("rlang", quietly = TRUE)
     return(overlap |>
-      dplyr::group_by(.data$way_osm_id) |>
+      dplyr::group_by(rlang::.data$way_osm_id) |>
       dplyr::summarise(
         speed_avg = mean(.data[[rt_attr_speed]], na.rm = TRUE),
         speed_median = stats::median(.data[[rt_attr_speed]], na.rm = TRUE),
