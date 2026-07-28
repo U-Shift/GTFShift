@@ -70,7 +70,7 @@ get_prioritisation_stats <- function(
     geom_col <- st_geometry(prioritisation_internal)
     prioritisation_internal <- prioritisation_internal |>
         mutate(
-            length = units::drop_units(st_length(geom_col))
+            length = as.numeric(st_length(geom_col))
         ) |>
         st_drop_geometry()
     stats <- list()
