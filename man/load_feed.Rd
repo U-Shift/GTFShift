@@ -48,13 +48,17 @@ The other parameters are applied the library default values.
 }
 \examples{
 # Simple call
-gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
+)
 
 summary(gtfs)
 
 
 # Simple call with missing shapes (triggering shapes creation because missing on GTFS file)
-gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+)
 
 summary(gtfs)
 
@@ -62,7 +66,9 @@ summary(gtfs)
 # With some parameters to build transfers and store to given location
 store_path <- tempfile(fileext = ".zip")
 
-gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE, store_path)
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE, store_path
+)
 
 head(gtfs$transfers)
 

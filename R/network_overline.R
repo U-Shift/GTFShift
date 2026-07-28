@@ -21,11 +21,15 @@
 #'
 #' @examples
 #' # Subset GTFS for one route only, for demo purposes
-#' gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
 #' 
 #' # Load OSM network to serve as target network
-#' target_network = sf::st_read(system.file("extdata/samples", "osm_ways_tcb.gpkg", package = "GTFShift"))
+#' target_network = sf::st_read(
+#'   system.file("extdata/samples", "osm_ways_tcb.gpkg", package = "GTFShift")
+#' )
 #' 
 #' head(target_network)
 #' 

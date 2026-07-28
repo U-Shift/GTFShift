@@ -29,11 +29,14 @@
 #'
 #' @examples
 #' # Load sample GTFS
-#' gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
 #' 
 #' # Load TCB OSM routes sample linestring
-#' osm_routes = sf::st_read(system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
-#'   dplyr::filter(shape_id %in% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
+#' osm_routes = sf::st_read(
+#'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift")
+#' ) |> dplyr::filter(shape_id %in% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
 #' 
 #' head(osm_routes)
 #' 

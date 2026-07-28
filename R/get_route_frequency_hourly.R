@@ -36,7 +36,9 @@
 #'
 #' @examples
 #' # Subset GTFS for one route only, for demo purposes
-#' gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 #' 
 #' # Get frequency

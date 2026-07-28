@@ -33,7 +33,10 @@
 #'
 #' names(collection)
 #'
-#' head(collection |> dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude"))
+#' head(
+#'   collection |> 
+#'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
+#' )
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom progress progress_bar

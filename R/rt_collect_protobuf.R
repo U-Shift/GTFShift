@@ -30,7 +30,10 @@
 #'
 #' names(collection)
 #'
-#' head(collection |> dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude"))
+#' head(
+#'   collection |> 
+#'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
+#' )
 #'
 #' @importFrom RProtoBuf readProtoFiles read
 #' @importFrom jsonlite write_json
