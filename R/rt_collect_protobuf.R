@@ -66,7 +66,8 @@ rt_collect_protobuf <- function(
     } else {
       f <- file(gtfs_rt_url, "rb")
     }
-    feed <- RProtoBuf::read(RProtoBuf::FeedMessage, f)
+    feed_desc <- RProtoBuf::new(RProtoBuf::Descriptor, "transit_realtime.FeedMessage")
+    feed <- RProtoBuf::read(feed_desc, f)
     close(f)
 
     # Convert to R list
