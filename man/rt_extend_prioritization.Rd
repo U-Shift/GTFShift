@@ -44,16 +44,32 @@ If GTFS-RT data does not provide speed information, it can be inferred from the 
 Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 }
 \examples{
-\dontrun{
-rt_collect_file <- "gtfs_rt_data.csv"
-GTFShift::rt_collect_json("https://api.example.com/gtfs-rt", rt_collect_file)
-lane_prioritization <- GTFShift::prioritize_lanes(gtfs, osm_query)
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
 
+# Build query and prepare osm extract (possible to use API as alternative)
+q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> osmdata::add_osm_feature(key = "route", value = "bus") |> osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+osm_file <- system.file("extdata", "osmextract_tcb_network.pbf", package = "GTFShift")
+
+# Prioritize lanes
+lane_prioritization <- GTFShift::prioritize_lanes(gtfs, q, osm_file = osm_file, date = gtfs$calendar$start_date[1])
+
+# Extend with GTFS-RT data collection
+rt_collect_file <- system.file("extdata", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift")
 rt_collection <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+
 lane_prioritization_extended <- GTFShift::rt_extend_prioritization(
-  lane_prioritization = lane_prioritization,
-  rt_collection = rt_collection
+  lane_prioritization = lane_prioritization, 
+  rt_collection = rt_collection, 
+  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
 )
-}
+
+head(
+  lane_prioritization_extended |> 
+     sf::st_drop_geometry() |>
+     dplyr::filter(!is.na(speed_count)) |> 
+     dplyr::select(way_osm_id, speed_avg, speed_count)
+)
 
 }

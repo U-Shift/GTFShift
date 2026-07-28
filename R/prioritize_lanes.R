@@ -35,18 +35,24 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
-#'
-#' # To use OSM API:
-#' lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q)
-#'
-#' # To use a local OSM file:
-#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-#' lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q, osm_file = osm_file)
-#' }
-#'
+#' # Subset GTFS for one route only, for demo purposes
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
+#' 
+#' # Build query and prepare osm extract (possible to use API as alternative)
+#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
+#'   osmdata::add_osm_feature(key = "route", value = "bus") |> 
+#'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+#' osm_file <- system.file("extdata", "osmextract_tcb_network.pbf", package = "GTFShift")
+#' 
+#' lane_prioritization <- GTFShift::prioritize_lanes(
+#'   gtfs, q, 
+#'   osm_file = osm_file, 
+#'   date = gtfs$calendar$start_date[1]
+#' )
+#' 
+#' head(lane_prioritization |> dplyr::select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes))
+#' 
 #' @import dplyr
 #' @import tidytransit
 #'
@@ -86,10 +92,10 @@ prioritize_lanes <- function(
         if_any(matches("^parking(:lane)?:both"), ~ !is.na(.) & . != "no") ~ 2L,
         # Otherwise, count left and right sides separately based on specific tags (parking:lane:left/right or parking:left/right)
         TRUE ~ (
-            as.integer(
-              # grepl "no" to account for parking:left:restriction=no_stopping
-              if_any(matches("^parking(:lane)?:left"),  ~ !is.na(.) & !grepl("\\bno\\b|\\bno_", ., ignore.case = TRUE))
-            ) +
+          as.integer(
+            # grepl "no" to account for parking:left:restriction=no_stopping
+            if_any(matches("^parking(:lane)?:left"), ~ !is.na(.) & !grepl("\\bno\\b|\\bno_", ., ignore.case = TRUE))
+          ) +
             as.integer(
               if_any(matches("^parking(:lane)?:right"), ~ !is.na(.) & !grepl("\\bno\\b|\\bno_", ., ignore.case = TRUE))
             )
@@ -100,7 +106,7 @@ prioritize_lanes <- function(
         parse_lanes(lanes),
         # Directional count (sum existing ones; returns NA if all are missing)
         na_if(
-            rowSums(across(matches("^lanes(:[^:]+)*:forward$"), ~ coalesce(parse_lanes(.), 0)), na.rm = TRUE) +
+          rowSums(across(matches("^lanes(:[^:]+)*:forward$"), ~ coalesce(parse_lanes(.), 0)), na.rm = TRUE) +
             rowSums(across(matches("^lanes(:[^:]+)*:backward$"), ~ coalesce(parse_lanes(.), 0)), na.rm = TRUE) +
             rowSums(across(matches("^lanes(:[^:]+)*:both_ways$"), ~ coalesce(parse_lanes(.), 0)), na.rm = TRUE),
           0

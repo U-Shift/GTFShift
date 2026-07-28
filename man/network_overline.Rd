@@ -44,16 +44,36 @@ creates an aggregated network based on the lines overlap. Instead, \code{GTFShif
 segment, the overlapping lines and aggregates their \code{attr} values, using \code{fun}.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
-target_network = st_read("network_centerlines.gpkg")
-frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs, overline=FALSE)
-GTFShift::network_overline(
-  target_network,
-  frequency_analysis |> filter(arrival_hour==8),
-  attr = "frequency"
-)
-}
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
+
+# Load OSM network to serve as target network
+target_network = sf::st_read(system.file("extdata", "osm_ways_tcb.gpkg", package = "GTFShift"))
+
+head(target_network)
+
+# Get route frequency (and geometry)
+frequency_analysis <- GTFShift::get_route_frequency_hourly(
+  gtfs, 
+  date = gtfs$calendar$start_date[1]
+) |> 
+dplyr::group_by(shape_id) |>
+dplyr::summarize(frequency = max(frequency))
+
+head(frequency_analysis)
+
+# Aggregate frequencies based on geometry overlap using GTFShift::network_overline
+suppressWarnings({ 
+  overline <- GTFShift::network_overline(
+    target_network = target_network, 
+    lines = frequency_analysis, 
+    attr = "frequency",
+    metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+  )
+})
+
+head(overline |> st_drop_geometry())
 
 }
 \seealso{

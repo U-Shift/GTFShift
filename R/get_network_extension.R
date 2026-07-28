@@ -18,12 +18,17 @@
 #' @returns The routes extension, in meters.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' route_extension <- GTFShift::get_network_extension(gtfs)
-#' }
+#' # Load GTFS
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' 
+#' # Get route extension
+#' GTFShift::get_network_extension(
+#'   gtfs, 
+#'   metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+#'   date = gtfs$calendar$start_date[1]
+#' )
 #'
-#' @seealso [GTFShift::get_route_frequency_hourly()]
+#' @seealso \code{GTFShift::get_route_frequency_hourly()}
 #'
 #' @import dplyr
 #' @import sf

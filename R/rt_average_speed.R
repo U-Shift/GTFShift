@@ -1,7 +1,7 @@
 #' Estimate average speed for GTFS-RT trip updates
 #'
 #' Projects each real-time vehicle position to its corresponding trip geometry,
-#' computes cumulative distance along the shape, and derives segment speed
+#' computes cumulative distance along the geometry, and derives segment speed
 #' between consecutive updates.
 #'
 #' @param rt_collection sf data.frame with GTFS-RT updates for multiple trips.
@@ -74,11 +74,35 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' rt_collection <- read.csv("rt_collection.csv") # sf object with GTFS-RT updates (trip_id, timestamp, geometry)
-#' trips_geometries <- sf::st_read("osm_geometries.gpkg") # sf object with LINESTRING geometry per trip
-#' speeds <- GTFShift::rt_average_speed(rt_collection, trips_geometries)
-#' }
+#' # Get GTFS-RT data collection
+#' rt_collect_file <- system.file("extdata", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift")
+#' rt_collection <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::select(-speed)
+#' 
+#' head(rt_collection |> dplyr::select(trip_id, timestamp, geometry))
+#' 
+#' nrow(rt_collection)
+#' 
+#' # Get route geometry for data collected
+#' osm_routes <- sf::st_read(system.file("extdata", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
+#'   dplyr::filter(route_id %in% rt_collection$route_id) |>
+#'   dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))
+#' 
+#' head(osm_routes)
+#' 
+#' # Compute average speed (aggregated at route level) based on cumulative distance along the geometry
+#' speed <- GTFShift::rt_average_speed(
+#'   rt_collection = rt_collection, 
+#'   trips_geometries = osm_routes,
+#'   rt_collection_trips_geometries_match_col = "route_id",
+#'   metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+#' )
+#' 
+#' head(speed |> 
+#'   dplyr::filter(!is.na(speed_kmh)) |>
+#'   dplyr::select(trip_id, timestamp, speed_kmh, distance_along_geometry, distance_to_closest_on_geometry)
+#' )
+#' 
+#' nrow(speed)
 #'
 #' @seealso \code{GTFShift::project_points_along_geometry()}
 #' @seealso \code{GTFShift::multiline_to_sorted_linestring()}

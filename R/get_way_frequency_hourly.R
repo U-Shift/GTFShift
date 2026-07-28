@@ -26,17 +26,24 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
-#'
-#' # To use OSM API:
-#' frequency_analysis <- GTFShift::get_way_frequency_hourly(gtfs, q)
-#'
-#' # To use a local OSM file:
-#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-#' frequency_analysis <- GTFShift::get_way_frequency_hourly(gtfs, q, osm_file = osm_file)
-#' }
+#' # Subset GTFS for one route only, for demo purposes
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
+#' 
+#' # Build query and prepare osm extract (possible to use API as alternative)
+#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
+#'   osmdata::add_osm_feature(key = "route", value = "bus") |> 
+#'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+#' osm_file <- system.file("extdata", "osmextract_tcb_network.pbf", package = "GTFShift")
+#' 
+#' # Get frequency
+#' frequency_analysis <- GTFShift::get_way_frequency_hourly(
+#'   gtfs, q, 
+#'   date = gtfs$calendar$start_date[1],
+#'   osm_file = osm_file
+#' )
+#' 
+#' head(frequency_analysis |> sf::st_drop_geometry())
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #' @seealso \code{GTFShift::osm_shapes_to_routes()}
@@ -59,7 +66,9 @@ get_way_frequency_hourly <- function(
 
   ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
-  gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = date)
+  suppressWarnings({ # Ignore missing transfers warnings
+    gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = date)
+  })
 
   # PROCESS GTFS, generating table calculating the frequencies per route
   trips <- gtfs_date$trips
@@ -70,8 +79,8 @@ get_way_frequency_hourly <- function(
   stop_times <- gtfs_date$stop_times
 
   stop_times <- stop_times |>
-    left_join(trips) |>
-    left_join(routes) |>
+    left_join(trips, by = "trip_id") |>
+    left_join(routes, by = "route_id") |>
     select(any_of(c(
       "route_id",
       "route_short_name",
@@ -99,9 +108,13 @@ get_way_frequency_hourly <- function(
 
   routes_freq <-
     freq_data |>
-    left_join(trips |>
-      select(any_of(c("route_id", "direction_id", "shape_id"))) |>
-      distinct(), relationship = "many-to-many") |>
+    left_join(
+      trips |>
+        select(any_of(c("route_id", "direction_id", "shape_id"))) |>
+        distinct(),
+      by = c("route_id", "direction_id"),
+      relationship = "many-to-many"
+    ) |>
     as.data.frame()
 
   # Join with ways

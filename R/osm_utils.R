@@ -16,7 +16,10 @@ filter_osm_bus_lanes <- function(road_osm) {
     if_any(any_of("psv"), ~ .x == "designated") |
       if_any(any_of("highway"), ~ .x == "busway") |
       if_any(any_of(cols_to_check_access), ~ grepl("designated", .x)) |
-      if_any(any_of(cols_to_check_count), ~ {v <- suppressWarnings(as.numeric(sub(";.*$", "", .x))); !is.na(v) & v >= 1})
+      if_any(any_of(cols_to_check_count), ~ {
+        v <- suppressWarnings(as.numeric(sub(";.*$", "", .x)))
+        !is.na(v) & v >= 1
+      })
   )
 
   return(osm_lanes)
@@ -82,7 +85,7 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
   relations_data <- lapply(relations, function(rel) {
     rel_n <<- rel_n + 1
     pb$update(min(
-      round(pb_update_3 + ((pb_update_4 - pb_update_3) * rel_n / length(relations)), digits = 2), 
+      round(pb_update_3 + ((pb_update_4 - pb_update_3) * rel_n / length(relations)), digits = 2),
       ifelse(rel_n < length(relations), 0.99, 1) # Prevent 0.9999 rounding to 1 before reaching last
     ))
     tags <- xml2::xml_find_all(rel, ".//tag")
@@ -115,22 +118,21 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
       return(NULL)
     }
 
-    data.frame(
-      # <relation>
-      relation_osm_id = xml2::xml_attr(rel, "id"),
+    members <- data.frame(
       # <member>
       type = xml2::xml_attr(members, "type"),
       osm_id = xml2::xml_attr(members, "ref"),
-      role = xml2::xml_attr(members, "role"),
-      # <tag>
-      `gtfs:shape_id` = tag_vals["gtfs:shape_id"],
-      `gtfs:route_id` = tag_vals["gtfs:route_id"],
-      name = tag_vals["name"],
-      ref = tag_vals["ref"],
-      roundtrip = tag_vals["roundtrip"],
-      stringsAsFactors = FALSE,
-      check.names = FALSE
+      role = xml2::xml_attr(members, "role")
     )
+    # <relation>
+    members["relation_osm_id"] <- xml2::xml_attr(rel, "id")
+    # <tag>
+    members["gtfs:shape_id"] <- tag_vals["gtfs:shape_id"]
+    members["gtfs:route_id"] <- tag_vals["gtfs:route_id"]
+    members["name"] <- tag_vals["name"]
+    members["ref"] <- tag_vals["ref"]
+    members["roundtrip"] <- tag_vals["roundtrip"]
+    return(members)
   })
   relations_df <- dplyr::bind_rows(relations_data)
 

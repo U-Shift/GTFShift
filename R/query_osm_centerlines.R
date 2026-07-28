@@ -17,10 +17,12 @@
 #' @returns osm_lines in sf format
 #'
 #' @examples
-#' \dontrun{
-#' BBOX = sf::st_bbox(city_limit)
-#' network <- GTFShift::osm_centerlines(BBOX)
-#' }
+#' # Fetch OSM network and get centerlines
+#' network <- GTFShift::osm_centerlines(place = "Arroios, Lisboa, Portugal")
+#' 
+#' head(network)
+#' 
+#' table(network$X_status)
 #'
 #' @import reticulate
 #' @import sf

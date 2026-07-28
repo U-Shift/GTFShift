@@ -11,10 +11,20 @@
 #' @returns A tidygtfs object with the filtered feed.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' gtfs_filtered <- GTFShift::filter_by_modes(gtfs, list(0,1))
-#' }
+#' # Load sample feed with multiple modes
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_merged_sample.zip", package = "GTFShift"))
+#' 
+#' gtfs$routes |> dplyr::select(route_id, route_type)
+#' 
+#' summary(gtfs)
+#' 
+#' 
+#' # Filter by bus mode (ferry agency should be excluded)
+#' gtfs_bus <- gtfs |> GTFShift::filter_by_modes(modes = c(3))
+#' 
+#' gtfs_bus$routes |> dplyr::select(route_id, route_type)
+#' 
+#' summary(gtfs_bus)
 #'
 #' @import tidytransit
 #' @import dplyr

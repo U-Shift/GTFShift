@@ -10,11 +10,22 @@
 #' @returns A tidygtfs object with the filtered feed.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' gtfs_filtered_by_id <- GTFShift::filter_by_agency(gtfs, agency_id=2)
-#' gtfs_filtered_by_name <- GTFShift::filter_by_agency(gtfs, agency_name="City bus company")
-#' }
+#' # Load sample feed with multiple agencies
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_merged_sample.zip", package = "GTFShift"))
+#' 
+#' summary(gtfs)
+#' 
+#' 
+#' # Filter by id
+#' gtfs_id_8 = gtfs |> GTFShift::filter_by_agency(id = "8")
+#' 
+#' summary(gtfs_id_8)
+#' 
+#' 
+#' # Filter by name 
+#' gtfs_ttsl <- gtfs |> GTFShift::filter_by_agency(name = "TTSL - Transtejo Soflusa") 
+#' 
+#' summary(gtfs_ttsl)
 #'
 #' @import tidytransit
 #' @import dplyr

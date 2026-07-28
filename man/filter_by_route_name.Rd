@@ -27,9 +27,15 @@ letters, words or combinations of both.
 This method allows to filter the feed for the route short or long name, with a partial or exact match.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-gtfs_filtered <- GTFShift::filter_by_route_name(gtfs, list("Blue line", "Red line"))
-}
+# Load GTFS
+gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+
+summary(gtfs)
+
+
+# Filter by route
+gtfs_route <- GTFShift::filter_by_route_name(gtfs, c("4"))
+
+summary(gtfs_route)
 
 }

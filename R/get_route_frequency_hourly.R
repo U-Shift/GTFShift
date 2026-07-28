@@ -35,10 +35,17 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
-#' }
+#' # Subset GTFS for one route only, for demo purposes
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
+#' 
+#' # Get frequency
+#' frequency_analysis <- GTFShift::get_route_frequency_hourly(
+#'   gtfs,
+#'   date = gtfs$calendar$start_date[1]
+#' )
+#' 
+#' head(frequency_analysis |> sf::st_drop_geometry())
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #' @seealso \code{GTFShift::osm_shapes_to_routes()}
@@ -62,7 +69,9 @@ get_route_frequency_hourly <- function(
 
   ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
-  gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = date)
+  suppressWarnings({ # Ignore missing transfers warnings
+    gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = date)
+  })
 
   # PROCESS GTFS, generating table calculating the frequencies per route
   trips <- gtfs_date$trip
@@ -77,8 +86,8 @@ get_route_frequency_hourly <- function(
   stop_times <- gtfs_date$stop_times
 
   stop_times <- stop_times |>
-    left_join(trips) |>
-    left_join(routes) |>
+    left_join(trips, by="trip_id") |>
+    left_join(routes, by="route_id") |>
     select(any_of(c(
       "route_id",
       "route_short_name",
@@ -106,7 +115,7 @@ get_route_frequency_hourly <- function(
 
   routes_freq <-
     freq_data |>
-    inner_join(shapes) |>
+    inner_join(shapes, by="shape_id") |>
     st_as_sf()
 
   # Overline?

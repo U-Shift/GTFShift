@@ -10,10 +10,19 @@
 #' @returns The gtfs feed with the shapes table defined and the trips table updated with the matching shape_id.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' gtfs$shapes <- GTFShift::create_shapes_from_stops(gtfs)
-#' }
+#' # Load GTFS without shapes
+#' gtfs <- tidytransit::read_gtfs(system.file("extdata", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+#' 
+#' summary(gtfs)
+#' 
+#' # Create shapes from GTFS stops data
+#' gtfs_with_shapes <- GTFShift::create_shapes_from_stops(gtfs)
+#' 
+#' head(gtfs_with_shapes$shapes)
+#' 
+#' head(gtfs_with_shapes$trips |> dplyr::select(trip_id, shape_id) |> distinct(shape_id, .keep_all = TRUE))
+#' 
+#' summary(gtfs_with_shapes)
 #'
 #' @import dplyr
 #'
@@ -53,7 +62,7 @@ create_shapes_from_stops <- function(gtfs) {
   gtfs$trips <-
     gtfs$trips |>
     select(-shape_id) |>
-    left_join(shapes |> tidyr::unnest(cols = "trip_id"), join_by(trip_id))
+    left_join(shapes |> tidyr::unnest(cols = "trip_id") |> select(trip_id, shape_id) |> distinct(), join_by(trip_id))
 
   # Gather shape_id and shape geometry (from shapes_trips_geom)
   gtfs$shapes <- shapes |>
