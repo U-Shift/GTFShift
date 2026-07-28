@@ -27,19 +27,30 @@
 #'
 #' @examples
 #' # Subset GTFS for one route only, for demo purposes
-#' gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
 #' 
 #' # Build query and prepare osm extract (possible to use API as alternative)
-#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> osmdata::add_osm_feature(key = "route", value = "bus") |> osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
+#'   osmdata::add_osm_feature(key = "route", value = "bus") |> 
+#'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
 #' osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
 #' 
 #' # Prioritise lanes
-#' lane_prioritisation <- GTFShift::prioritise_lanes(gtfs, q, osm_file = osm_file, date = gtfs$calendar$start_date[1])
+#' lane_prioritisation <- GTFShift::prioritise_lanes(
+#'   gtfs, q, 
+#'   osm_file = osm_file, 
+#'   date = gtfs$calendar$start_date[1]
+#' )
 #' 
 #' # Extend with GTFS-RT data collection
-#' rt_collect_file <- system.file("extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift")
-#' rt_collection <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+#' rt_collect_file <- system.file(
+#'   "extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift"
+#' )
+#' rt_collection <- read.csv(rt_collect_file) |> 
+#'   sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
 #' 
 #' lane_prioritisation_extended <- GTFShift::rt_extend_prioritisation(
 #'   lane_prioritisation = lane_prioritisation, 

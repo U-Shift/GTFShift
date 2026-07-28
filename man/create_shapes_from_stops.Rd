@@ -31,7 +31,11 @@ gtfs_with_shapes <- GTFShift::create_shapes_from_stops(gtfs)
 
 head(gtfs_with_shapes$shapes)
 
-head(gtfs_with_shapes$trips |> dplyr::select(trip_id, shape_id) |> dplyr::distinct(shape_id, .keep_all = TRUE))
+head(
+  gtfs_with_shapes$trips |> 
+    dplyr::select(trip_id, shape_id) |> 
+    dplyr::distinct(shape_id, .keep_all = TRUE)
+)
 
 summary(gtfs_with_shapes)
 

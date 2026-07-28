@@ -36,7 +36,9 @@
 #'
 #' @examples
 #' # Subset GTFS for one route only, for demo purposes
-#' gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
 #' 
 #' # Build query and prepare osm extract (possible to use API as alternative)
@@ -51,7 +53,10 @@
 #'   date = gtfs$calendar$start_date[1]
 #' )
 #' 
-#' head(lane_prioritisation |> dplyr::select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes))
+#' head(
+#'   lane_prioritisation |> 
+#'   dplyr::select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes)
+#' )
 #' 
 #' @import dplyr
 #' @import tidytransit

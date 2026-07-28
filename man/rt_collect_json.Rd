@@ -59,6 +59,9 @@ collection <- read.csv(destination_file)
 
 names(collection)
 
-head(collection |> dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude"))
+head(
+  collection |> 
+    dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
+)
 
 }
