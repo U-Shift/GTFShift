@@ -41,7 +41,11 @@
 #' head(osm_routes)
 #' 
 #' # Create shapes.txt for geometries
-#' shapes_txt <- GTFShift::create_shapes_from_sf(osm_routes, gtfs, metric_crs = 3763, shape_dist_traveled = TRUE)
+#' shapes_txt <- GTFShift::create_shapes_from_sf(
+#'   osm_routes, gtfs, 
+#'   metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+#'   shape_dist_traveled = TRUE
+#' )
 #' 
 #' head(shapes_txt)
 #'

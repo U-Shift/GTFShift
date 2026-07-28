@@ -18,7 +18,9 @@
 #' ), crs = 4326))
 #'
 #' # Use sample osmextract for Lisbon highways
-#' osm_file <- system.file("extdata/samples", "osmextract_lisbon_highways_sample.pbf", package = "GTFShift")
+#' osm_file <- system.file(
+#'   "extdata/samples", "osmextract_lisbon_highways_sample.pbf", package = "GTFShift"
+#' )
 #' 
 #' # Export bus lanes
 #' bus_lanes <- GTFShift::osm_bus_lanes(bbox, osm_file = osm_file)

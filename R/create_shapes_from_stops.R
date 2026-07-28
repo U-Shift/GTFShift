@@ -11,7 +11,9 @@
 #'
 #' @examples
 #' # Load GTFS without shapes
-#' gtfs <- tidytransit::read_gtfs(system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+#' gtfs <- tidytransit::read_gtfs(
+#'   system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+#' )
 #' 
 #' summary(gtfs)
 #' 
