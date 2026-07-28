@@ -44,6 +44,7 @@ osm_centerlines <- function(bbox=NULL, place=NULL, use_buildings = TRUE, venv=NA
 
   # Call Python script via reticulate
   source_python(py_script)
+  get_centerline <- get("get_centerline", envir = .GlobalEnv)
   get_centerline(bbox, place, use_buildings, temp_file)
 
   # Read the GPKG file as sf
