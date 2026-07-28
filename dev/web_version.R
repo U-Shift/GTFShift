@@ -93,14 +93,14 @@ for(i in 1:nrow(regions)) {
   }
   assign(sprintf("q_%s_gtfs%s", region$name, region$gtfs_day), q)
 
-  # Prioritize based on planned operation and infrastructure characteristics
-  prioritization = prioritize_lanes(gtfs, q, date=region$gtfs_day)
-  assign(sprintf("prioritization_%s_gtfs%s", region$name, region$gtfs_day), prioritization)
+  # Prioritise based on planned operation and infrastructure characteristics
+  prioritisation = prioritise_lanes(gtfs, q, date=region$gtfs_day)
+  assign(sprintf("prioritisation_%s_gtfs%s", region$name, region$gtfs_day), prioritisation)
 
-  write.csv(prioritization |> sf::st_drop_geometry(), sprintf("%s/prioritization_%s_gtfs%s_run%s.csv", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
-  sf::st_write(prioritization, sprintf("%s/prioritization_%s_gtfs%s_run%s.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
+  write.csv(prioritisation |> sf::st_drop_geometry(), sprintf("%s/prioritisation_%s_gtfs%s_run%s.csv", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
+  sf::st_write(prioritisation, sprintf("%s/prioritisation_%s_gtfs%s_run%s.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
 
-  # prioritization = st_read(sprintf("%s/prioritization_%s_gtfs%s_run%s.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())))
+  # prioritisation = st_read(sprintf("%s/prioritisation_%s_gtfs%s_run%s.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())))
 
   # Extend with real-time data if available
   if (!is.na(region$rt_collection)) {
@@ -112,21 +112,21 @@ for(i in 1:nrow(regions)) {
 
     rt_collection_filtered = rt_collection[lengths(within_distance) == 0, ]
 
-    # Extend prioritization with real-time data
-    prioritization = rt_extend_prioritization(
-      lane_prioritization = prioritization,
+    # Extend prioritisation with real-time data
+    prioritisation = rt_extend_prioritisation(
+      lane_prioritisation = prioritisation,
       rt_collection = rt_collection_filtered
     )
   }
 
-  # Replace route_id with route names, considering that prioritization$routes has multiple route_ids separated by ";"
+  # Replace route_id with route names, considering that prioritisation$routes has multiple route_ids separated by ";"
   route_names = gtfs$routes[, c("route_id", "route_short_name", "route_long_name")]
-  prioritization = prioritization |>
+  prioritisation = prioritisation |>
     mutate(row_n = row_number())
-  prioritization_routes = prioritization |>
+  prioritisation_routes = prioritisation |>
     st_drop_geometry() |>
     tidyr::separate_rows(routes, sep = ";")
-  routes_covered = prioritization_routes |>
+  routes_covered = prioritisation_routes |>
     select(routes) |>
     distinct()
   routes_covered = routes_covered |>
@@ -135,23 +135,23 @@ for(i in 1:nrow(regions)) {
       route_name = ifelse(!is.na(route_short_name) & route_short_name != "", route_short_name, route_long_name)
     ) |>
     select(routes, route_name)
-  prioritization_routes = prioritization_routes |>
+  prioritisation_routes = prioritisation_routes |>
     left_join(routes_covered, by = c("routes" = "routes"))
-  prioritization_routes_grouped = prioritization_routes |>
+  prioritisation_routes_grouped = prioritisation_routes |>
     group_by(row_n) |>
     summarise(
       route_names = paste(unique(route_name), collapse = ";"),
       .groups = "drop"
     )
-  prioritization = prioritization |>
-    left_join(prioritization_routes_grouped, by = c("row_n" = "row_n")) |>
+  prioritisation = prioritisation |>
+    left_join(prioritisation_routes_grouped, by = c("row_n" = "row_n")) |>
     select(-row_n)
 
   # Save outputs
-  write.csv(prioritization |> sf::st_drop_geometry(), sprintf("%s/prioritization_%s_gtfs%s_run%s_extended.csv", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
-  sf::st_write(prioritization, sprintf("%s/prioritization_%s_gtfs%s_run%s_extended.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
-  geojson_file = sprintf("%s/prioritization_%s_gtfs%s_run%s_extended.geojson", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date()))
-  sf::st_write(prioritization, geojson_file, append=FALSE, delete_dsn = TRUE)
+  write.csv(prioritisation |> sf::st_drop_geometry(), sprintf("%s/prioritisation_%s_gtfs%s_run%s_extended.csv", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), row.names = FALSE)
+  sf::st_write(prioritisation, sprintf("%s/prioritisation_%s_gtfs%s_run%s_extended.gpkg", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date())), append=FALSE)
+  geojson_file = sprintf("%s/prioritisation_%s_gtfs%s_run%s_extended.geojson", output_region, region$name, region$gtfs_day, gsub("-", "", Sys.Date()))
+  sf::st_write(prioritisation, geojson_file, append=FALSE, delete_dsn = TRUE)
 
   # Open geojson with jsonlite, to extend with technical metadata
   geojson_data = jsonlite::read_json(geojson_file, digits=NA) # To avoid precision loss in coordinates
@@ -179,8 +179,8 @@ for(i in 1:nrow(regions)) {
   }
   census_frequency_hour = list()
   for(h in 0:23) {
-    prioritization_hour = prioritization |> filter(hour == h)
-    census_frequency_hour[[as.character(h)]] = dataCensus(prioritization_hour$frequency)
+    prioritisation_hour = prioritisation |> filter(hour == h)
+    census_frequency_hour[[as.character(h)]] = dataCensus(prioritisation_hour$frequency)
   }
 
   metadata = list(
@@ -196,16 +196,16 @@ for(i in 1:nrow(regions)) {
         key_exact = if (!is.null(feat$key_exact)) feat$key_exact else FALSE
       )
     }),
-    prioritization = list(
+    prioritisation = list(
       routes_missing = paste(gtfs$routes |> filter(!route_id %in% routes_covered$routes) |> pull(route_short_name), collapse = ";"),
       routes_covered = nrow(routes_covered),
       routes_total = nrow(gtfs$routes)
     ),
     data_census = list(
-      frequency = dataCensus(prioritization$frequency),
+      frequency = dataCensus(prioritisation$frequency),
       frequency_hour = census_frequency_hour,
-      speed_avg = dataCensus(prioritization$speed_avg),
-      lanes = dataCensus(prioritization$n_lanes_direction)
+      speed_avg = dataCensus(prioritisation$speed_avg),
+      lanes = dataCensus(prioritisation$n_lanes_direction)
     ),
     rt = rt_list,
     execution = list(
@@ -234,25 +234,25 @@ for(i in 1:nrow(regions)) {
 
 # Debug
 library(sf)
-prioritization = st_read("releases/web/lisboa/2026-02-04/prioritization_lisboa_rt_gtfs2026-02-04_run20260203_extended.geojson")
-prioritization_0800 = prioritization |> filter(hour==8)
-p50_frequency = quantile(prioritization_0800$frequency, 0.5, na.rm=TRUE)
-p50_speed = quantile(prioritization_0800$speed_avg, 0.5, na.rm=TRUE)
+prioritisation = st_read("releases/web/lisboa/2026-02-04/prioritisation_lisboa_rt_gtfs2026-02-04_run20260203_extended.geojson")
+prioritisation_0800 = prioritisation |> filter(hour==8)
+p50_frequency = quantile(prioritisation_0800$frequency, 0.5, na.rm=TRUE)
+p50_speed = quantile(prioritisation_0800$speed_avg, 0.5, na.rm=TRUE)
 mapview::mapview(
-  prioritization_0800 |> filter(is_bus_lane & (frequency<p50_frequency | (is.na(n_lanes) | n_lanes_direction<=1) | speed_avg<=p50_speed)),
+  prioritisation_0800 |> filter(is_bus_lane & (frequency<p50_frequency | (is.na(n_lanes) | n_lanes_direction<=1) | speed_avg<=p50_speed)),
   layer.name=sprintf("Bus lane with -%d bus/h OR -2 lane/dir OR %.2f km/h or - avg. speed", p50_frequency, p50_speed),
   color="#DAD887",
   homebutton=FALSE,
   lwd=3
 
 ) + mapview::mapview(
-  prioritization_0800 |> filter(is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg>p50_speed),
+  prioritisation_0800 |> filter(is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg>p50_speed),
   layer.name=sprintf("Bus lane with +%d bus/h AND +1 lane/dir AND +%.2f km/h avg.speed", p50_frequency-1, p50_speed),
   color="#3BC1A8",
   homebutton=FALSE,
   lwd=3
 ) + mapview::mapview(
-  prioritization_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg<=p50_speed),
+  prioritisation_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg<=p50_speed),
   layer.name=sprintf("NO bus lane with +%d bus/h AND +1 lane/dir AND %.2f km/h or - avg.speed", p50_frequency-1, p50_speed),
   color="#F63049",
   homebutton=FALSE,

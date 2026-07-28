@@ -12,7 +12,7 @@ navbar:
 
   components:
     dashboard:
-      text: "Bus lane prioritization dashboard"
+      text: "Bus lane prioritisation dashboard"
       href: "https://ushift.pt/apps/gtfshift"
       target: "_blank"
 
@@ -22,11 +22,11 @@ reference:
     contents:
     - load_feed
     - query_mobilitydatabase
-  - title: Prioritize for bus lane implementation
+  - title: Prioritise for bus lane implementation
     contents:
-    - starts_with("prioritize_")
-    - rt_extend_prioritization
-    - get_prioritization_stats
+    - starts_with("prioritise_")
+    - rt_extend_prioritisation
+    - get_prioritisation_stats
   - title: Filter
     contents:
     - starts_with("filter_")
@@ -57,7 +57,7 @@ articles:
   - title: Articles
     navbar: ~
     contents:
-    - prioritize
+    - prioritise
     - download
     - filter
     - unify
