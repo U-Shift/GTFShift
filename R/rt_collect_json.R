@@ -35,8 +35,8 @@
 #'
 #' head(collection |> dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude"))
 #'
-#' @import jsonlite
-#' @import progress
+#' @importFrom jsonlite fromJSON
+#' @importFrom progress progress_bar
 #'
 #' @export
 rt_collect_json <- function(

@@ -109,7 +109,7 @@
 #'
 #' @import sf
 #' @import dplyr
-#' @import purrr
+#' @importFrom purrr map_dfr
 #' @import rlang
 #'
 #' @export

@@ -58,8 +58,8 @@
 #' @import osmdata
 #' @import sf
 #' @import dplyr
-#' @import progress
-#' @import callr
+#' @importFrom progress progress_bar
+#' @importFrom callr r_bg
 #'
 #' @export
 osm_shapes_to_routes <- function(

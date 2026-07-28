@@ -51,8 +51,8 @@
 #' @import tidytransit
 #' @import dplyr
 #' @import sf
-#' @import tidyverse
 #' @import lubridate
+#' @importFrom tidyselect any_of
 #'
 #' @export
 get_way_frequency_hourly <- function(

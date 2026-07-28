@@ -53,9 +53,9 @@
 #'
 #' @seealso \code{stplanr::rnet_join()}
 #'
-#' @import stplanr
 #' @import sf
 #' @import dplyr
+#' @importFrom stplanr line_cast line_segment rnet_join
 #'
 #' @export
 network_overline <- function(
@@ -81,9 +81,9 @@ network_overline <- function(
   }
 
   # 1. Prepare network
-  network_line = stplanr::line_cast(st_transform(target_network, crs = metric_crs))
+  network_line = line_cast(st_transform(target_network, crs = metric_crs))
   if (!is.na(target_network_split)) {
-    network_segmented = stplanr::line_segment(
+    network_segmented = line_segment(
       network_line,
       segment_length=target_network_split
     ) |> mutate(segment=row_number())

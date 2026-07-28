@@ -26,7 +26,7 @@
 #'
 #' @import tidytransit
 #' @import dplyr
-#' @import stringr
+#' @importFrom stringr str_detect regex
 #'
 #' @export
 filter_by_route_name <- function(gtfs, values, short_name=TRUE, exact_match=TRUE) {

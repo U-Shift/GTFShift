@@ -74,7 +74,7 @@
 #'
 #' @import dplyr
 #' @import sf
-#' @import lwgeom
+#' @importFrom lwgeom st_startpoint st_endpoint
 #'
 #' @export
 multiline_to_sorted_linestring <- function(

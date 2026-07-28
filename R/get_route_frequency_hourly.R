@@ -54,9 +54,9 @@
 #' @import tidytransit
 #' @import dplyr
 #' @import sf
-#' @import tidyverse
 #' @import lubridate
-#' @import stplanr
+#' @importFrom stplanr overline2
+#' @importFrom tidyselect any_of
 #'
 #' @export
 get_route_frequency_hourly <- function(
