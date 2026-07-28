@@ -27,6 +27,7 @@
 #' @import tidytransit
 #' @import dplyr
 #' @importFrom stringr str_detect regex
+#' @importFrom rlang .data
 #'
 #' @export
 filter_by_route_name <- function(gtfs, values, short_name=TRUE, exact_match=TRUE) {
@@ -36,15 +37,15 @@ filter_by_route_name <- function(gtfs, values, short_name=TRUE, exact_match=TRUE
 
   routes = gtfs$routes %>%
     filter(
-      if (short_name & exact_match) route_short_name %in% values
-      else if (short_name) str_detect(route_short_name, regex(pattern, ignore_case = TRUE))
-      else if (!short_name & exact_match) route_long_name %in% values
-      else str_detect(route_long_name, regex(pattern, ignore_case = TRUE))
+      if (short_name & exact_match) .data$route_short_name %in% values
+      else if (short_name) str_detect(.data$route_short_name, regex(pattern, ignore_case = TRUE))
+      else if (!short_name & exact_match) .data$route_long_name %in% values
+      else str_detect(.data$route_long_name, regex(pattern, ignore_case = TRUE))
     )
 
   # Get trips that match those routes
   trips = gtfs$trips %>%
-    filter(route_id %in% routes$route_id)
+    filter(.data$route_id %in% routes$route_id)
 
   # Filter feed by trip id
   gtfs_filtered = tidytransit::filter_feed_by_trips(gtfs, trip_ids = trips$trip_id)

@@ -29,6 +29,7 @@
 #'
 #' @import tidytransit
 #' @import dplyr
+#' @importFrom rlang .data
 #'
 #' @export
 filter_by_agency <- function(gtfs, id=NA, name=NA) {
@@ -36,28 +37,28 @@ filter_by_agency <- function(gtfs, id=NA, name=NA) {
   # Get agencies that match query
   agencies = gtfs$agency %>%
       filter(
-        if (!is.na(id) & !is.na(name)) agency_id==id && agency_name==name
-        else if (!is.na(id)) agency_id==id
-        else if (!is.na(name)) agency_name==name
+        if (!is.na(id) & !is.na(name)) .data$agency_id==id && .data$agency_name==name
+        else if (!is.na(id)) .data$agency_id==id
+        else if (!is.na(name)) .data$agency_name==name
         else FALSE
       )
 
   # Get routes that match query
   routes = gtfs$routes %>%
     filter(
-      agency_id %in% agencies$agency_id
+      .data$agency_id %in% agencies$agency_id
     )
 
   # Get trips that match those routes
   trips = gtfs$trips %>%
-    filter(route_id %in% routes$route_id)
+    filter(.data$route_id %in% routes$route_id)
 
   # Filter feed by trip id
   gtfs_filtered = tidytransit::filter_feed_by_trips(gtfs, trip_ids = trips$trip_id)
 
   # Filter agency table
   routes_agencies <- unique(gtfs_filtered$routes$agency_id)
-  gtfs_filtered$agency = gtfs_filtered$agency |> filter(agency_id %in% routes_agencies)
+  gtfs_filtered$agency = gtfs_filtered$agency |> filter(.data$agency_id %in% routes_agencies)
 
   return(gtfs_filtered)
 }

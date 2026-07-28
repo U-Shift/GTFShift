@@ -36,7 +36,7 @@
 #' 
 #' head(feeds |> dplyr::select(id, provider, producer_url))
 #'
-#' @importFrom httr GET POST add_headers content http_error
+#' @importFrom httr GET POST add_headers content http_error http_status
 #' @import dplyr
 #'
 #' @export

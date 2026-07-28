@@ -56,6 +56,7 @@
 #' @import sf
 #' @import dplyr
 #' @importFrom stplanr line_cast line_segment rnet_join
+#' @importFrom rlang .data
 #'
 #' @export
 network_overline <- function(
@@ -100,7 +101,7 @@ network_overline <- function(
   df_network_match = rnet_join(
     rnet_x = df,
     rnet_y = network_segmented |>
-      select(segment),
+      select(.data$segment),
     length_y = FALSE,
     key_column = "df_id",
     dist = join_dist,
@@ -110,20 +111,20 @@ network_overline <- function(
   df_network_attr = df_network_match |>
     left_join(df |>
                 st_drop_geometry() |>
-                select(attr, df_id),
+                select(attr, .data$df_id),
               by = "df_id")
 
   # 3. Group attr by segment
   df_network_segment = df_network_attr |>
-    select(segment, attr) |>
-    group_by(segment) |>
-    summarise(!!attr := fun(frequency))
+    select(.data$segment, attr) |>
+    group_by(.data$segment) |>
+    summarise(!!attr := fun(.data[[attr]]))
 
   # 4. Get geometry back
   result = network_segmented |>
-    filter(segment %in% df_network_segment$segment) |>
+    filter(.data$segment %in% df_network_segment$segment) |>
     left_join(df_network_segment, by="segment") |>
-    select(-segment) |>
+    select(-.data$segment) |>
     st_transform(crs = original_crs)
 
   return(result)

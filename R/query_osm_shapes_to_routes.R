@@ -60,6 +60,7 @@
 #' @import dplyr
 #' @importFrom progress progress_bar
 #' @importFrom callr r_bg
+#' @importFrom rlang .data
 #'
 #' @export
 osm_shapes_to_routes <- function(

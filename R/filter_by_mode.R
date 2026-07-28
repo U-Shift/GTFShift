@@ -28,6 +28,7 @@
 #'
 #' @import tidytransit
 #' @import dplyr
+#' @importFrom rlang .data
 #'
 #' @export
 filter_by_modes <- function(gtfs, modes=list()) {
@@ -35,12 +36,12 @@ filter_by_modes <- function(gtfs, modes=list()) {
   # Get routes that match query
   routes = gtfs$routes %>%
     filter(
-      route_type %in% modes
+      .data$route_type %in% modes
     )
 
   # Get trips that match those routes
   trips = gtfs$trips %>%
-    filter(route_id %in% routes$route_id)
+    filter(.data$route_id %in% routes$route_id)
 
   # Filter feed by trip id
   gtfs_filtered = tidytransit::filter_feed_by_trips(gtfs, trip_ids = trips$trip_id)

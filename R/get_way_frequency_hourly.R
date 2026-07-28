@@ -53,6 +53,7 @@
 #' @import sf
 #' @import lubridate
 #' @importFrom tidyselect any_of
+#' @importFrom rlang .data
 #'
 #' @export
 get_way_frequency_hourly <- function(
@@ -95,11 +96,11 @@ get_way_frequency_hourly <- function(
     )))
 
   stop_times <- stop_times |>
-    arrange(stop_sequence) |>
-    group_by(trip_id) |>
+    arrange(.data$stop_sequence) |>
+    group_by(.data$trip_id) |>
     slice(1) |> # Only departures from origin (first stop)
     ungroup() |>
-    mutate(hour = lubridate::hour(departure_time))
+    mutate(hour = lubridate::hour(.data$departure_time))
 
   freq_data <- stop_times |>
     group_by(across(any_of(c("route_id", "route_short_name", "direction_id", "hour")))) |>
@@ -119,20 +120,20 @@ get_way_frequency_hourly <- function(
 
   # Join with ways
   ways_unique_geometry <- ways |>
-    distinct(way_osm_id, .keep_all = TRUE)
+    distinct(.data$way_osm_id, .keep_all = TRUE)
 
   if (!keep_osm_attributes) {
     ways_unique_geometry <- ways_unique_geometry |>
-      select(way_osm_id, geometry)
+      select(.data$way_osm_id, .data$geometry)
   }
 
   ways_freq <- routes_freq |>
-    inner_join(ways |> sf::st_drop_geometry() |> select(shape_id, way_osm_id), by = "shape_id", relationship = "many-to-many") |>
-    group_by(way_osm_id, hour) |>
+    inner_join(ways |> sf::st_drop_geometry() |> select(.data$shape_id, .data$way_osm_id), by = "shape_id", relationship = "many-to-many") |>
+    group_by(.data$way_osm_id, .data$hour) |>
     summarize(
-      frequency = sum(frequency),
-      routes = list(unique(route_id)),
-      shapes = list(unique(shape_id))
+      frequency = sum(.data$frequency),
+      routes = list(unique(.data$route_id)),
+      shapes = list(unique(.data$shape_id))
     ) |>
     ungroup() |>
     inner_join(ways_unique_geometry, by = "way_osm_id") |>
