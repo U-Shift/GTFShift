@@ -37,6 +37,7 @@
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom progress progress_bar
+#' @importFrom utils write.table
 #'
 #' @export
 rt_collect_json <- function(

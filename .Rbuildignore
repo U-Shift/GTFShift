@@ -10,3 +10,6 @@
 (^|/)venv(/.*)?$
 LICENSE.md
 CITATION.cff
+^doc$
+^Meta$
+^scratch$

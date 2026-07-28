@@ -26,7 +26,6 @@
 #'
 #' @import sf
 #' @importFrom reticulate virtualenv_create use_virtualenv py_install source_python
-#'
 #' @export
 osm_centerlines <- function(bbox=NULL, place=NULL, use_buildings = TRUE, venv=NA) {
 
