@@ -82,20 +82,24 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
+#' # Subset GTFS for one route only, for demo purposes
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 #'
-#' q <- opq("Lisbon") |>
-#'   add_osm_feature(key = "route", value = c("bus")) |>
-#'   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+#' # Build query and prepare osm extract (possible to use API as alternative)
+#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+#'   osmdata::add_osm_feature(key = "route", value = "bus") |>
+#'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+#' osm_file <- system.file("extdata", "osmextract_tcb_network.pbf", package = "GTFShift")
 #'
-#' # To use OSM API:
-#' shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q)
+#' # Get OSM route geometries based on geometrical match
+#' shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
+#'   gtfs, q,
+#'   osm_file = osm_file,
+#'   metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+#' )
 #'
-#' # To use a local OSM file:
-#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-#' shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q, osm_file = osm_file)
-#' }
+#' head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_diff, stops_diff))
 #'
 #' @import osmdata
 #' @import sf
@@ -435,7 +439,7 @@ osm_shapes_match_routes <- function(
     # 2. Match based on initial and final points
     # > Compute osm final and initial points
     geom_col <- sf::st_geometry(osm_route_name |> st_transform(metric_crs)) # To get route length in a projected CRS
-    
+
     osm_route_name <- tryCatch(
       {
         osm_route_name |>
@@ -456,8 +460,8 @@ osm_shapes_match_routes <- function(
               # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
               dplyr::filter(
                 (nr_s > 3 * nr_p & role %in% c("stop_entry_only", "stop")) |
-                (nr_p > 3 * nr_s & role %in% c("platform_entry_only", "platform")) |
-                (nr_s <= 3 * nr_p & nr_p <= 3 * nr_s)
+                  (nr_p > 3 * nr_s & role %in% c("platform_entry_only", "platform")) |
+                  (nr_s <= 3 * nr_p & nr_p <= 3 * nr_s)
               ) |>
               # Use sorting to give priority to entry/exit, when they exist
               dplyr::arrange(
@@ -473,8 +477,8 @@ osm_shapes_match_routes <- function(
               # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
               dplyr::filter(
                 (nr_s > 3 * nr_p & role %in% c("stop_exit_only", "stop")) |
-                (nr_p > 3 * nr_s & role %in% c("platform_exit_only", "platform")) |
-                (nr_s <= 3 * nr_p & nr_p <= 3 * nr_s)
+                  (nr_p > 3 * nr_s & role %in% c("platform_exit_only", "platform")) |
+                  (nr_s <= 3 * nr_p & nr_p <= 3 * nr_s)
               ) |>
               dplyr::mutate(role_group = dplyr::case_when(
                 # When roundtrip (circular), keep normal order
@@ -570,9 +574,9 @@ osm_shapes_match_routes <- function(
       ) |>
       dplyr::rowwise() |>
       dplyr::mutate(
-        distance_diff = abs(route_dist_gtfs - route_dist_osm),
-        points_diff = as.numeric(units::drop_units(sf::st_distance(initial_osm |> st_transform(metric_crs), initial_gtfs |> st_transform(metric_crs)))) + units::drop_units(sf::st_distance(final_osm |> st_transform(metric_crs), final_gtfs |> st_transform(metric_crs))),
-        stops_diff = abs(nr_stops_gtfs - nr_stops_osm)
+        distance_diff = as.numeric(abs(route_dist_gtfs - route_dist_osm)),
+        points_diff = as.numeric(units::drop_units(sf::st_distance(initial_osm |> st_transform(metric_crs), initial_gtfs |> st_transform(metric_crs))) + units::drop_units(sf::st_distance(final_osm |> st_transform(metric_crs), final_gtfs |> st_transform(metric_crs)))),
+        stops_diff = as.numeric(abs(nr_stops_gtfs - nr_stops_osm))
       ) |> # absolute difference
       dplyr::ungroup() |>
       dplyr::select(-initial_gtfs, -final_gtfs) |>

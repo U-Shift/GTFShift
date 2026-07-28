@@ -27,14 +27,14 @@
 #' @returns data.frame with query results
 #'
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf nzchar(Sys.getenv("MOBILITY_DATABASE"))
 #' feeds <- GTFShift::query_mobilitydatabase(
-#'   refresh_token = "myToken",
+#'   refresh_token = Sys.getenv("MOBILITY_DATABASE"),
 #'   country_code = "PT",
 #'   is_official = TRUE
 #' )
-#' }
+#' 
+#' head(feeds |> dplyr::select(id, provider, producer_url))
 #'
 #' @import httr
 #' @import dplyr
@@ -49,9 +49,7 @@ query_mobilitydatabase <- function(access_token = NA,
                                    subdivision_name = NA,
                                    municipality = NA,
                                    bbox = NA,
-                                   is_official = NA
-) {
-
+                                   is_official = NA) {
   # Validate parameters
   if (is.na(access_token) && is.na(refresh_token)) {
     stop("No token provided! At least one of the access or refresh tokens must be provided as an argument.")
@@ -66,7 +64,7 @@ query_mobilitydatabase <- function(access_token = NA,
       body = body
     )
     content <- content(response, as = "parsed")
-    if(http_error(response)) {
+    if (http_error(response)) {
       stop(sprintf("Mobility database bad response: %s", http_status(response)))
     }
     access_token <- content$access_token
@@ -75,17 +73,19 @@ query_mobilitydatabase <- function(access_token = NA,
   # Query mobility database
   url <- "https://api.mobilitydatabase.org/v1/gtfs_feeds"
 
-  params <- list(bounding_filter_method = bounding_filter_method,
-                 limit = limit,
-                 offset = offset)
-  if (!is.na(country_code)) params["country_code"] = country_code
-  if (!is.na(subdivision_name)) params["subdivision_name"] = subdivision_name
-  if (!is.na(municipality)) params["municipality"] = municipality
+  params <- list(
+    bounding_filter_method = bounding_filter_method,
+    limit = limit,
+    offset = offset
+  )
+  if (!is.na(country_code)) params["country_code"] <- country_code
+  if (!is.na(subdivision_name)) params["subdivision_name"] <- subdivision_name
+  if (!is.na(municipality)) params["municipality"] <- municipality
   if (!is.na(bbox)) {
-    params["dataset_latitudes"] = sprintf("%f,%f", bbox$ymin[[1]], bbox$ymax[[1]])
-    params["dataset_longitudes"] = sprintf("%f,%f", bbox$xmin[[1]], bbox$xmax[[1]])
+    params["dataset_latitudes"] <- sprintf("%f,%f", bbox$ymin[[1]], bbox$ymax[[1]])
+    params["dataset_longitudes"] <- sprintf("%f,%f", bbox$xmin[[1]], bbox$xmax[[1]])
   }
-  if (!is.na(is_official)) params["is_official"] = is_official
+  if (!is.na(is_official)) params["is_official"] <- is_official
 
   response <- GET(
     url,
@@ -99,7 +99,7 @@ query_mobilitydatabase <- function(access_token = NA,
   # Convert response to data.frame
   content <- content(response, as = "parsed")
 
-  if(http_error(response)) {
+  if (http_error(response)) {
     stop(sprintf("Mobility database bad response: %s", http_status(response)))
   }
 

@@ -52,10 +52,17 @@ For a detailed example, see the \code{vignette("analyse")}.
 Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
-}
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
+
+# Get frequency
+frequency_analysis <- GTFShift::get_route_frequency_hourly(
+  gtfs,
+  date = gtfs$calendar$start_date[1]
+)
+
+head(frequency_analysis |> sf::st_drop_geometry())
 
 }
 \seealso{

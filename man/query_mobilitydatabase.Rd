@@ -57,12 +57,13 @@ Some useful columns of the returned data.frame (refer to the API documentation f
 }
 }
 \examples{
-\dontrun{
+\dontshow{if (nzchar(Sys.getenv("MOBILITY_DATABASE"))) withAutoprint(\{ # examplesIf}
 feeds <- GTFShift::query_mobilitydatabase(
-  refresh_token = "myToken",
+  refresh_token = Sys.getenv("MOBILITY_DATABASE"),
   country_code = "PT",
   is_official = TRUE
 )
-}
 
+head(feeds |> dplyr::select(id, provider, producer_url))
+\dontshow{\}) # examplesIf}
 }

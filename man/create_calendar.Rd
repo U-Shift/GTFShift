@@ -26,9 +26,12 @@ minimum and maximum dates and setting each week day to true if it has any date t
 might not be 100% accurate, as it captures the whole time span and exceptions in the week days along it are ignored.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-gtfs$calendar <- GTFShift::create_calendar(gtfs)
-}
+gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+
+head(gtfs$calendar_dates |> dplyr::filter(exception_type == 1))
+
+gtfs_calendar <- GTFShift::create_calendar(gtfs)
+
+gtfs_calendar
 
 }

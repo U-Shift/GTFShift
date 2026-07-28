@@ -32,15 +32,26 @@
 #' If \code{points} is empty, returns an empty data.frame with the same columns.
 #'
 #' @examples
-#' \dontrun{
-#' line <- sf::st_sfc(
-#'   sf::st_linestring(matrix(c(0, 0, 100, 0, 200, 100), ncol = 2, byrow = TRUE)),
-#'   crs = 3857
+#' # Get sample points from GTFS-RT collection
+#' rt_collect_file <- system.file("extdata", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift")
+#' points <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::sample_n(5)
+#' 
+#' head(points |> dplyr::select(geometry))
+#' 
+#' # Get route geometry for points
+#' osm_routes <- sf::st_read(system.file("extdata", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
+#'   dplyr::filter(route_id %in% rt_collection$route_id)
+#' 
+#' head(osm_routes)
+#' 
+#' # Project points to geometry
+#' points_projected <- GTFShift::project_points_along_geometry(
+#'   geometry = osm_routes,
+#'   points = points,
+#'   metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
 #' )
-#' pts <- sf::st_sfc(sf::st_point(c(20, 10)), sf::st_point(c(150, 40)), crs = 3857)
-#'
-#' projected <- project_points_along_geometry(line, pts, geometry_sample_meters = 5)
-#' }
+#' 
+#' head(points_projected)
 #'
 #' @export
 project_points_along_geometry <- function(

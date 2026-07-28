@@ -54,16 +54,22 @@ Mind that this method uses \code{GTFShift::get_way_frequency_hourly()} to match 
 OSM relation mapping is well defined for the transit routes. Routes that do not have an OSM match are ignored.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
 
-# To use OSM API:
-lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q)
+# Build query and prepare osm extract (possible to use API as alternative)
+q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
+  osmdata::add_osm_feature(key = "route", value = "bus") |> 
+  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+osm_file <- system.file("extdata", "osmextract_tcb_network.pbf", package = "GTFShift")
 
-# To use a local OSM file:
-osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-lanes_analysis <- GTFShift::prioritize_lanes(gtfs, q, osm_file = osm_file)
-}
+lane_prioritization <- GTFShift::prioritize_lanes(
+  gtfs, q, 
+  osm_file = osm_file, 
+  date = gtfs$calendar$start_date[1]
+)
+
+head(lane_prioritization |> dplyr::select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes))
 
 }

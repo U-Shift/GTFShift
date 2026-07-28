@@ -95,6 +95,13 @@ gtfs_ttsl_filtered <- simplify_gtfs(gtfs_ttsl_filtered)
 names(gtfs_ttsl_filtered)
 summary(gtfs_ttsl_filtered)
 
+# Remove shapes to create sample for load_feed
+gtfs_ttsl_filtered_no_shapes <- gtfs_ttsl_filtered[!names(gtfs_ttsl_filtered) %in% "shapes"]
+gtfs_ttsl_filtered_no_shapes <- tidytransit::as_tidygtfs(gtfs_ttsl_filtered_no_shapes)
+names(gtfs_ttsl_filtered_no_shapes)
+summary(gtfs_ttsl_filtered_no_shapes)
+tidytransit::write_gtfs(gtfs_ttsl_filtered_no_shapes, "inst/extdata/gtfs_ttsl_sample_no_shapes.zip")
+
 # For each table at ttsl, make sure tcb only has the same columns (remove from either when not in both, keeping parent_station if present in either)
 names(gtfs_ttsl_filtered$stops)
 names(gtfs_tcb_filtered$stops)
@@ -122,7 +129,7 @@ tidytransit::write_gtfs(gtfs_merged, "inst/extdata/gtfs_merged_sample.zip")
 
 # Sample OSM -----------------------------------------------
 
-# Filter TCB relations directly from the PBF
+## Filter TCB relations directly from the PBF --------------------------------
 bash = """
 # 1. Filter ALL bus routes
 osmium tags-filter portugal-latest.osm.pbf r/route=bus -o all_buses.pbf --overwrite
@@ -143,25 +150,36 @@ osmium getid -r -t -I tcb_relations.pbf portugal-latest.osm.pbf -o osmextract_tc
 ogr2ogr -f GPKG osmextract_tcb_network.gpkg osmextract_tcb_network.pbf
 """
 
-# Test
-bbox = tidytransit::shapes_as_sf(gtfs_tcb$shapes) |> st_transform(3763) |> st_buffer(1000) |> st_transform(4326) |> st_bbox() 
-# mapview::mapview(bbox)
-osm_file = "/home/goncalo/.local/share/R/osmextract/tcb_complete.pbf"
-q = osmdata::opq(bbox = bbox) |>
-  osmdata::add_osm_feature(key = "route", value = c("bus"), key_exact = TRUE) |>
-  osmdata::add_osm_feature(key = "network", value = c("TCB", "Transportes Coletivos do Barreiro", "Transportes Colectivos do Barreiro"), key_exact = TRUE)
+## Filter TCB relations layers to gpkg --------------------------------
+OSM_EXPORT_GPKG = "~/.local/share/R/osmextract/osmextract_tcb_network.gpkg"
+sf::st_layers(OSM_EXPORT_GPKG)
+ways = sf::st_read(OSM_EXPORT_GPKG, layer="lines")
+mapview::mapview(ways)
+View(ways)
+sf::st_write(ways |> dplyr::select(osm_id), "inst/extdata/osm_ways_tcb.gpkg")
 
-pb <- progress::progress_bar$new( # Track progress
-  format = "Fetching OSM data [:bar] :percent :spin elapsed=:elapsed",
-  clear = FALSE, show_after = 0
-)
-pb$update(0)
-relations_df <- get_osm_relations(osm_file, q, pb)
+routes = sf::st_read(OSM_EXPORT_GPKG, layer="multilinestrings")
+routes$shape_id <- ifelse(grepl('"gtfs:shape_id"=>"', routes$other_tags), sub('.*"gtfs:shape_id"=>"([^"]+)".*', '\\1', routes$other_tags), NA_character_)
+routes$route_id <- ifelse(grepl('"gtfs:route_id"=>"', routes$other_tags), sub('.*"gtfs:route_id"=>"([^"]+)".*', '\\1', routes$other_tags), NA_character_)
+mapview::mapview(routes)
+View(routes |> sf::st_drop_geometry())
+sf::st_write(routes |> dplyr::select(osm_id, shape_id, route_id), "inst/extdata/osm_routes_tcb.gpkg", delete_dns = TRUE)
 
-osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
-mapview::mapview(osm_ways)
+## Filter Lisbon highways --------------------------------
+aml <- sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
+lisboa <- aml |>
+  dplyr::filter(Concelho == "Lisboa")
+mapview::mapview(lisboa)
+sf::st_write(lisboa, "~/.local/share/R/osmextract/lisbon_bbox.geojson")
 
-osm_stops <- osmextract::oe_read(osm_file, layer = "points", boundary = bbox, quiet = TRUE, extra_tags = c("public_transport")) |>
-      dplyr::filter(public_transport == "stop_position" | public_transport == "platform") |>
-      select(osm_id)
-mapview::mapview(osm_stops)
+lisboa_bbox = sf::st_bbox(lisboa)
+lisboa_bbox
+
+"""
+# Option B: Two-step process
+# 1. Clip the full PBF to your GeoJSON boundary
+osmium extract -p lisbon_bbox.geojson portugal-latest.osm.pbf -o lisbon_bbox_clip.pbf --overwrite
+
+# 2. Extract all ways tagged with 'highway' (along with their nodes)
+osmium tags-filter lisbon_bbox_clip.pbf w/highway=primary,secondary,tertiary -o lisbon_highways.pbf --overwrite
+"""

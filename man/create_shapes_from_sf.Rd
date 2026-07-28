@@ -46,16 +46,19 @@ distance along each shape for all generated points and appends this as
 \code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-q <- opq("Lisbon") |>
-    add_osm_feature(key = "route", value = c("bus", "tram")) |>
-    add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+# Load sample GTFS
+gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
 
-shapes_sf <- GTFShift::osm_shapes_to_routes(gtfs, q)
+# Load TCB OSM routes sample linestring
+osm_routes = sf::st_read(system.file("extdata", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
+  dplyr::filter(shape_id \%in\% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
 
-gtfs$shapes <- GTFShift::create_shapes_from_sf(shapes_sf, gtfs)
-}
+head(osm_routes)
+
+# Create shapes.txt for geometries
+shapes_txt <- GTFShift::create_shapes_from_sf(osm_routes, gtfs, metric_crs = 3763, shape_dist_traveled = TRUE)
+
+head(shapes_txt)
 
 }
 \seealso{

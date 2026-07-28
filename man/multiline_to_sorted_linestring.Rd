@@ -75,3 +75,18 @@ unvisited points \eqn{Q} are marked visited when
 The ordered segments are concatenated into a single \code{LINESTRING} and
 transformed back to the original CRS of \code{multilinestring}.
 }
+\examples{
+# Get OSM route geometries (MULTILINESTRING)  
+osm_routes <- sf::st_read(system.file("extdata", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
+  dplyr::sample_n(3)
+
+head(osm_routes)
+
+# Convert geometry to LINESTRING
+osm_routes <- osm_routes |>  dplyr::mutate(
+  geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763)
+)
+
+head(osm_routes)
+
+}

@@ -21,9 +21,18 @@ The resulting shapes are a simplified version of the original ones, as they do n
 This can be useful for some applications that do not require high precision in the shapes, and can be used as a fallback when the original feed does not include shapes.txt file.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-gtfs$shapes <- GTFShift::create_shapes_from_stops(gtfs)
-}
+# Load GTFS without shapes
+gtfs <- tidytransit::read_gtfs(system.file("extdata", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+
+summary(gtfs)
+
+# Create shapes from GTFS stops data
+gtfs_with_shapes <- GTFShift::create_shapes_from_stops(gtfs)
+
+head(gtfs_with_shapes$shapes)
+
+head(gtfs_with_shapes$trips |> dplyr::select(trip_id, shape_id) |> distinct(shape_id, .keep_all = TRUE))
+
+summary(gtfs_with_shapes)
 
 }

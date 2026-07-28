@@ -18,10 +18,17 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
-#' }
+#' # Subset GTFS for one route only, for demo purposes
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
+#' 
+#' # Get frequency
+#' frequency_analysis <- GTFShift::get_stop_frequency_hourly(
+#'   gtfs,
+#'   date = gtfs$calendar$start_date[1]
+#' )
+#' 
+#' head(frequency_analysis)
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #'
@@ -37,9 +44,11 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
-  gtfs_date <- tidytransit::filter_feed_by_date(
-    gtfs, extract_date = date
-  )
+  suppressWarnings({ # Ignore missing transfers warnings
+    gtfs_date <- tidytransit::filter_feed_by_date(
+      gtfs, extract_date = date
+    )
+  })
 
   message(sprintf("> Found %d routes operating %d trips on %d stops...",
     length(gtfs_date$trips$trip_id),

@@ -15,10 +15,13 @@
 #' @returns A data.frame for calendar.txt.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' gtfs$calendar <- GTFShift::create_calendar(gtfs)
-#' }
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+#' 
+#' head(gtfs$calendar_dates |> dplyr::filter(exception_type == 1))
+#' 
+#' gtfs_calendar <- GTFShift::create_calendar(gtfs)
+#' 
+#' gtfs_calendar
 #'
 #' @import dplyr
 #'

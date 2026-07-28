@@ -28,16 +28,19 @@
 #' \code{shape_dist_traveled} if \code{shape_dist_traveled = TRUE}.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' q <- opq("Lisbon") |>
-#'     add_osm_feature(key = "route", value = c("bus", "tram")) |>
-#'     add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
-#'
-#' shapes_sf <- GTFShift::osm_shapes_to_routes(gtfs, q)
-#'
-#' gtfs$shapes <- GTFShift::create_shapes_from_sf(shapes_sf, gtfs)
-#' }
+#' # Load sample GTFS
+#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' 
+#' # Load TCB OSM routes sample linestring
+#' osm_routes = sf::st_read(system.file("extdata", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
+#'   dplyr::filter(shape_id %in% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
+#' 
+#' head(osm_routes)
+#' 
+#' # Create shapes.txt for geometries
+#' shapes_txt <- GTFShift::create_shapes_from_sf(osm_routes, gtfs, metric_crs = 3763, shape_dist_traveled = TRUE)
+#' 
+#' head(shapes_txt)
 #'
 #' @import sf
 #' @import gtfstools

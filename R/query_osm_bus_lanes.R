@@ -11,16 +11,21 @@
 #'
 #'
 #' @examples
-#' \dontrun{
-#' BBOX <- sf::st_bbox(city_limit)
+#' # Create bbox for Lisbon
+#' bbox <- st_as_sfc(st_bbox(c(
+#'   xmin = -9.229836, ymin = 38.691399, 
+#'   xmax = -9.087387, ymax = 38.796760
+#' ), crs = 4326))
 #'
-#' # To use OSM API:
-#' bus_lanes <- GTFShift::osm_bus_lanes(BBOX)
+#' # Use sample osmextract for Lisbon highways
+#' osm_file <- system.file("extdata", "osmextract_lisbon_highways_sample.pbf", package = "GTFShift")
+#' 
+#' # Export bus lanes
+#' bus_lanes <- GTFShift::osm_bus_lanes(bbox, osm_file = osm_file)
 #'
-#' # To use a local OSM file:
-#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-#' bus_lanes <- GTFShift::osm_bus_lanes(BBOX, osm_file = osm_file)
-#' }
+#' names(bus_lanes)
+#' 
+#' head(bus_lanes |> dplyr::select(`osm:id`, name))
 #'
 #' @import osmdata
 #' @import sf
