@@ -15,7 +15,7 @@
 #' @returns A data.frame for calendar.txt.
 #'
 #' @examples
-#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
 #' 
 #' head(gtfs$calendar_dates |> dplyr::filter(exception_type == 1))
 #' 

@@ -23,7 +23,7 @@
 #'
 #' @examples
 #' # Load multiple GTFS files
-#' gtfs_1 <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+#' gtfs_1 <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
 #' 
 #' summary(gtfs_1)
 #' 
@@ -31,7 +31,7 @@
 #' 
 #' head(gtfs_1$trips)
 #' 
-#' gtfs_2 <- GTFShift::load_feed(system.file("extdata", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+#' gtfs_2 <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
 #' 
 #' summary(gtfs_2)
 #' 

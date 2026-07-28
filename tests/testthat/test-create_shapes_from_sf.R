@@ -2,7 +2,7 @@ library(testthat)
 library(sf)
 
 test_that("create_shapes_from_sf generates shapes from sf object", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
@@ -18,7 +18,7 @@ test_that("create_shapes_from_sf generates shapes from sf object", {
 })
 
 test_that("create_shapes_from_sf calculates shape_dist_traveled when shape_dist_traveled = TRUE", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
@@ -46,7 +46,7 @@ test_that("create_shapes_from_sf calculates shape_dist_traveled when shape_dist_
 })
 
 test_that("create_shapes_from_sf issues warning when metric_crs is missing", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
@@ -62,7 +62,7 @@ test_that("create_shapes_from_sf issues warning when metric_crs is missing", {
 })
 
 test_that("create_shapes_from_sf stops when shape_id column is missing", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     sf_line_no_id <- st_sf(

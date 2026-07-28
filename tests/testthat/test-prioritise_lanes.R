@@ -2,7 +2,7 @@ library(testthat)
 library(sf)
 
 test_that("prioritise_lanes analyzes lane prioritisation with mocked dependencies", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     ref_date <- gtfs$calendar$start_date[1]
@@ -58,7 +58,7 @@ test_that("prioritise_lanes analyzes lane prioritisation with mocked dependencie
 })
 
 test_that("prioritise_lanes retains extra OSM attributes when keep_osm_attributes = TRUE", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     ref_date <- gtfs$calendar$start_date[1]

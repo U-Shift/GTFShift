@@ -1,7 +1,7 @@
 library(testthat)
 
 test_that("filter_by_modes filters routes by mode code", {
-    sample_file <- system.file("extdata", "gtfs_merged_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
     # agency_id 8 (TCB) has bus routes (route_type 3) and agency 4 (TTSL) has ferry routes (route_type 4)
     gtfs <- GTFShift::load_feed(sample_file)
 
@@ -25,7 +25,7 @@ test_that("filter_by_modes filters routes by mode code", {
 })
 
 test_that("filter_by_modes returns empty feed when no routes match mode code", {
-    sample_file <- system.file("extdata", "gtfs_merged_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     # Mode 999 does not exist in sample

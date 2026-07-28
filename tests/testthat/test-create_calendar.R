@@ -1,7 +1,7 @@
 library(testthat)
 
 test_that("create_calendar generates calendar table from calendar_dates", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     cal <- GTFShift::create_calendar(gtfs)

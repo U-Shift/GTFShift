@@ -33,13 +33,13 @@
 #'
 #' @examples
 #' # Get sample points from GTFS-RT collection
-#' rt_collect_file <- system.file("extdata", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift")
+#' rt_collect_file <- system.file("extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift")
 #' points <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::sample_n(5)
 #' 
 #' head(points |> dplyr::select(geometry))
 #' 
 #' # Get route geometry for points
-#' osm_routes <- sf::st_read(system.file("extdata", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
+#' osm_routes <- sf::st_read(system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
 #'   dplyr::filter(route_id %in% rt_collection$route_id)
 #' 
 #' head(osm_routes)

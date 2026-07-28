@@ -1,7 +1,7 @@
 library(testthat)
 
 test_that("gtfs simple load", {
-    gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+    gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
     testthat::expect_contains(class(gtfs), "tidygtfs")
     testthat::expect_contains(class(gtfs), "gtfs")
     testthat::expect_contains(class(gtfs), "list")
@@ -17,7 +17,7 @@ test_that("stores file at defined location", {
     tempfolder <- tempdir()
     location <- paste0(tempfolder, "/new_dir/gtfs_tcb_sample.zip")
     gtfs <- GTFShift::load_feed(
-        system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"),
+        system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"),
         store_path = location
     )
     testthat::expect_true(file.exists(location))
@@ -29,13 +29,13 @@ test_that("stores file at defined location", {
 })
 
 test_that("creates transfers", {
-    gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE)
+    gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE)
     testthat::expect_contains(names(gtfs), "transfers")
     testthat::expect_gte(nrow(gtfs$transfers), 1)
 })
 
 test_that("clean empty stop_times", {
-    gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE)
+    gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE)
     random_trip = gtfs$trips |> sample_n(1) |> pull(trip_id)
     gtfs$stop_times[random_trip == gtfs$stop_times$trip_id, ][1, ]$arrival_time <- NA 
     location = tempfile(fileext = ".zip")
@@ -44,7 +44,7 @@ test_that("clean empty stop_times", {
 })
 
 test_that("creates shapes when missing", {
-    gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+    gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
     gtfs_manipulated <- gtfs[!names(gtfs) %in% "shapes"]
     gtfs_manipulated <- tidytransit::as_tidygtfs(gtfs_manipulated)
     gtfs_manipulated$trips <- gtfs_manipulated$trips[, !names(gtfs_manipulated$trips) %in% "shape_id"]

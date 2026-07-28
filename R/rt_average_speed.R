@@ -75,7 +75,7 @@
 #'
 #' @examples
 #' # Get GTFS-RT data collection
-#' rt_collect_file <- system.file("extdata", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift")
+#' rt_collect_file <- system.file("extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift")
 #' rt_collection <- read.csv(rt_collect_file) |> sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::select(-speed)
 #' 
 #' head(rt_collection |> dplyr::select(trip_id, timestamp, geometry))
@@ -83,7 +83,7 @@
 #' nrow(rt_collection)
 #' 
 #' # Get route geometry for data collected
-#' osm_routes <- sf::st_read(system.file("extdata", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
+#' osm_routes <- sf::st_read(system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
 #'   dplyr::filter(route_id %in% rt_collection$route_id) |>
 #'   dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))
 #' 
