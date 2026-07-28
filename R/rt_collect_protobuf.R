@@ -32,9 +32,9 @@
 #'
 #' head(collection |> dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude"))
 #'
-#' @import RProtoBuf
-#' @import jsonlite
-#' @import progress
+#' @importFrom RProtoBuf readProtoFiles read
+#' @importFrom jsonlite write_json
+#' @importFrom progress progress_bar
 #'
 #' @export
 rt_collect_protobuf <- function(
@@ -91,7 +91,7 @@ rt_collect_protobuf <- function(
 
     feed_list <- protobuf_to_list(feed)
     temp_json = tempfile(fileext = ".json")
-    write_json(
+    jsonlite::write_json(
       feed_list,
       temp_json,
       pretty = TRUE,

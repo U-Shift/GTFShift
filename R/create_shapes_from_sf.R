@@ -43,7 +43,7 @@
 #' head(shapes_txt)
 #'
 #' @import sf
-#' @import gtfstools
+#' @importFrom gtfstools convert_sf_to_shapes
 #' @import dplyr
 #'
 #' @seealso \code{gtfstools::convert_sf_to_shapes()}

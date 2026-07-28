@@ -104,12 +104,12 @@
 #' @import osmdata
 #' @import sf
 #' @import dplyr
-#' @import stplanr
-#' @import xml2
-#' @import progress
-#' @import callr
-#' @import stringi
-#' @import parallel
+#' @importFrom stplanr geo_buffer
+#' @importFrom progress progress_bar
+#' @importFrom callr r_bg
+#' @importFrom parallel mclapply
+#' @importFrom stringi stri_trans_general
+#' @importFrom xml2 xml_find_all xml_attr
 #'
 #' @export
 osm_shapes_match_routes <- function(
@@ -264,7 +264,7 @@ osm_shapes_match_routes <- function(
     job <- callr::r_bg(function(osm, osm_multilines_redux) { # update spinner while blocking method call
       return(
         osm$osm_points |>
-          sf::st_crop(sf::st_bbox(stplanr::geo_buffer(osm_multilines_redux, dist = 100))) |>
+          sf::st_crop(sf::st_bbox(geo_buffer(osm_multilines_redux, dist = 100))) |>
           dplyr::filter(public_transport == "stop_position" | public_transport == "platform") |>
           dplyr::select_if(~ !all(is.na(.)))
       )

@@ -36,20 +36,21 @@
 #' 
 #' head(feeds |> dplyr::select(id, provider, producer_url))
 #'
-#' @import httr
+#' @importFrom httr GET POST add_headers content http_error
 #' @import dplyr
 #'
 #' @export
 query_mobilitydatabase <- function(access_token = NA,
-                                   refresh_token = NA,
-                                   bounding_filter_method = "partially_enclosed",
-                                   limit = 10,
-                                   offset = 0,
-                                   country_code = NA,
-                                   subdivision_name = NA,
-                                   municipality = NA,
-                                   bbox = NA,
-                                   is_official = NA) {
+  refresh_token = NA,
+  bounding_filter_method = "partially_enclosed",
+  limit = 10,
+  offset = 0,
+  country_code = NA,
+  subdivision_name = NA,
+  municipality = NA,
+  bbox = NA,
+  is_official = NA
+) {
   # Validate parameters
   if (is.na(access_token) && is.na(refresh_token)) {
     stop("No token provided! At least one of the access or refresh tokens must be provided as an argument.")

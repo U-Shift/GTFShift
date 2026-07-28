@@ -54,9 +54,9 @@
 #'      dplyr::select(way_osm_id, speed_avg, speed_count)
 #' )
 #'
-#' @import progress
+#' @importFrom progress progress_bar
 #' @import dplyr
-#' @import callr
+#' @importFrom callr r_bg
 #'
 #' @export
 rt_extend_prioritisation <- function(

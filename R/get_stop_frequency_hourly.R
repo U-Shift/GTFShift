@@ -33,7 +33,6 @@
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #'
 #' @import sf
-#' @import tidyverse
 #' @import lubridate
 #' @import tidytransit
 #' @import dplyr

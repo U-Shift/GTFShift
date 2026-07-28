@@ -52,8 +52,8 @@ calendar_nextBusinessWednesday = function(
 #'
 #' Get public holidays for Portugal for a given year.
 #' @param year Integer. Year to get holidays for.
-#' @import httr
-#' @import jsonlite
+#' @importFrom httr GET
+#' @importFrom jsonlite fromJSON
 #' @noRd
 calendar_get_pt_holidays = function(year, country_code) {
   url = paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/", country_code)
