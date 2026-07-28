@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' # Load sample feed with multiple agencies
-#' gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_merged_sample.zip", package = "GTFShift"))
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift"))
 #' 
 #' summary(gtfs)
 #' 

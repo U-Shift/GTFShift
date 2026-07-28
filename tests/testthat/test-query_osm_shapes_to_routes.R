@@ -2,7 +2,7 @@ library(testthat)
 library(sf)
 
 test_that("osm_shapes_to_routes matches shapes by gtfs:shape_id using mocks", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
@@ -40,7 +40,7 @@ test_that("osm_shapes_to_routes matches shapes by gtfs:shape_id using mocks", {
 })
 
 test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overpass API)", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
@@ -89,7 +89,7 @@ test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overp
 })
 
 test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts way tags", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
@@ -152,7 +152,7 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
 
 
 test_that("osm_shapes_to_routes with ways = TRUE and osm_file = NULL extracts ways and ways_tags", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]

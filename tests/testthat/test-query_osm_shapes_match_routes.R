@@ -43,7 +43,7 @@ setup_match_fixtures <- function(gtfs) {
 }
 
 test_that("osm_shapes_match_routes validates input parameters and throws errors", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     # Invalid gtfs_match
@@ -70,7 +70,7 @@ test_that("osm_shapes_match_routes validates input parameters and throws errors"
 })
 
 test_that("osm_shapes_match_routes executes matching flow with osm_file provided", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -112,7 +112,7 @@ test_that("osm_shapes_match_routes executes matching flow with osm_file provided
 })
 
 test_that("osm_shapes_match_routes executes matching flow when osm_file is NULL (Overpass API path)", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -173,7 +173,7 @@ test_that("osm_shapes_match_routes executes matching flow when osm_file is NULL 
 })
 
 test_that("osm_shapes_match_routes supports non-exact string matching (gtfs_osm_match_exact = FALSE)", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -206,7 +206,7 @@ test_that("osm_shapes_match_routes supports non-exact string matching (gtfs_osm_
 })
 
 test_that("osm_shapes_match_routes writes logs to log_file when provided", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -241,7 +241,7 @@ test_that("osm_shapes_match_routes writes logs to log_file when provided", {
 })
 
 test_that("osm_shapes_match_routes returns plain data.frame when geometry = FALSE", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -273,7 +273,7 @@ test_that("osm_shapes_match_routes returns plain data.frame when geometry = FALS
 })
 
 test_that("osm_shapes_match_routes issues warnings when routes or stops are missing or unsorted", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     mock_rel_empty <- data.frame(
@@ -334,7 +334,7 @@ test_that("osm_shapes_match_routes issues warnings when routes or stops are miss
 })
 
 test_that("osm_shapes_match_routes issues warning when metric_crs is default / missing", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -371,7 +371,7 @@ test_that("osm_shapes_match_routes issues warning when metric_crs is default / m
 })
 
 test_that("osm_shapes_match_routes handles unsorted stops and osm_stop_order_relaxed parameter", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -437,7 +437,7 @@ test_that("osm_shapes_match_routes handles unsorted stops and osm_stop_order_rel
 })
 
 test_that("osm_shapes_match_routes returns empty result when !osm_stop_order_relaxed and unsorted stops", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -481,7 +481,7 @@ test_that("osm_shapes_match_routes returns empty result when !osm_stop_order_rel
 })
 
 test_that("osm_shapes_match_routes handles empty gtfs_route_name or error in stop evaluation (warn_osm_stops_missing)", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -544,7 +544,7 @@ test_that("osm_shapes_match_routes handles empty gtfs_route_name or error in sto
 })
 
 test_that("osm_shapes_match_routes supports parallel execution (num_cores > 1)", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
@@ -575,7 +575,7 @@ test_that("osm_shapes_match_routes supports parallel execution (num_cores > 1)",
 })
 
 test_that("osm_shapes_match_routes prints warning messages to console when errors occur", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     mock_rel_empty <- data.frame(
@@ -636,7 +636,7 @@ test_that("osm_shapes_match_routes prints warning messages to console when error
 })
 
 test_that("osm_shapes_match_routes handles GTFS route with no trips or shapes (nrow(gtfs_route_name) == 0)", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 

@@ -5,8 +5,6 @@
 inst/doc
 docs
 
-*.gpkg
-
 releases/
 vignettes/*_cache/*
 

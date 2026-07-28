@@ -2,7 +2,7 @@ library(testthat)
 library(sf)
 
 test_that("get_way_frequency_hourly calculates way frequencies with mocked osm_shapes_to_routes", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     ref_date <- gtfs$calendar$start_date[1]

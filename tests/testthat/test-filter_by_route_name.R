@@ -1,7 +1,7 @@
 library(testthat)
 
 test_that("filter_by_route_name filters by short name exact match", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     short_target <- gtfs$routes$route_short_name[1]
@@ -11,7 +11,7 @@ test_that("filter_by_route_name filters by short name exact match", {
 })
 
 test_that("filter_by_route_name filters by short name partial match", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     short_target <- gtfs$routes$route_short_name[1]
@@ -22,7 +22,7 @@ test_that("filter_by_route_name filters by short name partial match", {
 })
 
 test_that("filter_by_route_name filters by long name exact match", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     long_target <- gtfs$routes$route_long_name[1]
@@ -32,7 +32,7 @@ test_that("filter_by_route_name filters by long name exact match", {
 })
 
 test_that("filter_by_route_name filters by long name partial match", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     long_target <- gtfs$routes$route_long_name[1]

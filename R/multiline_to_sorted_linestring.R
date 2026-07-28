@@ -60,7 +60,7 @@
 #' 
 #' @examples
 #' # Get OSM route geometries (MULTILINESTRING)  
-#' osm_routes <- sf::st_read(system.file("extdata", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
+#' osm_routes <- sf::st_read(system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
 #'   dplyr::sample_n(3)
 #' 
 #' head(osm_routes)

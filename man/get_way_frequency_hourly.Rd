@@ -46,14 +46,14 @@ For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
 # Subset GTFS for one route only, for demo purposes
-gtfs <- GTFShift::load_feed(system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift"))
+gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
 gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
 # Build query and prepare osm extract (possible to use API as alternative)
 q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
   osmdata::add_osm_feature(key = "route", value = "bus") |> 
   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-osm_file <- system.file("extdata", "osmextract_tcb_network.pbf", package = "GTFShift")
+osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
 
 # Get frequency
 frequency_analysis <- GTFShift::get_way_frequency_hourly(

@@ -1,7 +1,7 @@
 library(testthat)
 
 test_that("get_route_frequency_hourly calculates route frequencies", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     ref_date <- gtfs$calendar$start_date[1]
@@ -12,7 +12,7 @@ test_that("get_route_frequency_hourly calculates route frequencies", {
 })
 
 test_that("get_route_frequency_hourly supports overline = TRUE", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     ref_date <- gtfs$calendar$start_date[1]
@@ -26,7 +26,7 @@ test_that("get_route_frequency_hourly supports overline = TRUE", {
 })
 
 test_that("get_route_frequency_hourly supports use_osm_routes != NA", {
-    sample_file <- system.file("extdata", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     ref_date <- gtfs$calendar$start_date[1]

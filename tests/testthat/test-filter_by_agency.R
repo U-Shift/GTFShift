@@ -1,7 +1,7 @@
 library(testthat)
 
 test_that("filter_by_agency filters by id and name using merged feed sample", {
-    sample_file <- system.file("extdata", "gtfs_merged_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
     agencies <- gtfs$agency$agency_name
@@ -20,7 +20,7 @@ test_that("filter_by_agency filters by id and name using merged feed sample", {
 
 
 test_that("filter_by_agency returns empty result when query does not match", {
-    sample_file <- system.file("extdata", "gtfs_merged_sample.zip", package = "GTFShift")
+    sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     gtfs_empty <- GTFShift::filter_by_agency(gtfs, id = "non_existent_agency_id_9999")
     testthat::expect_equal(nrow(gtfs_empty$agency), 0)
