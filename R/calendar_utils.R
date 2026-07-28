@@ -52,7 +52,7 @@ calendar_nextBusinessWednesday = function(
 #'
 #' Get public holidays for Portugal for a given year.
 #' @param year Integer. Year to get holidays for.
-#' @importFrom httr GET
+#' @importFrom httr GET status_code
 #' @importFrom jsonlite fromJSON
 #' @noRd
 calendar_get_pt_holidays = function(year, country_code) {

@@ -40,7 +40,7 @@
 #' 
 #' # Get route geometry for points
 #' osm_routes <- sf::st_read(system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift")) |> 
-#'   dplyr::filter(route_id %in% rt_collection$route_id)
+#'   dplyr::filter(route_id %in% points$route_id)
 #' 
 #' head(osm_routes)
 #' 
