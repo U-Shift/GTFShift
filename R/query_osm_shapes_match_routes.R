@@ -290,8 +290,8 @@ osm_shapes_match_routes <- function(
     pb$update(0)
 
     job <- callr::r_bg(function(osm_file) { # update spinner while blocking method call
-      library(xml2)
-      library(dplyr)
+      requireNamespace("xml2", quietly = TRUE)
+      requireNamespace("dplyr", quietly = TRUE)
 
       doc <- read_xml(osm_file)
       relations <- xml_find_all(doc, ".//relation")

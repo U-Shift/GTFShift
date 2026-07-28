@@ -108,7 +108,7 @@ rt_extend_prioritisation <- function(
 
   # 3. Get unique lane segments (to optimize spatial join)
   job <- callr::r_bg(function(lane_prioritisation) { # update spinner while blocking method call
-    library(sf)
+    requireNamespace("sf", quietly = TRUE)
     return(lane_prioritisation |>
       dplyr::distinct(.data$way_osm_id, .keep_all = TRUE) |>
       dplyr::select("way_osm_id"))
@@ -172,7 +172,7 @@ rt_extend_prioritisation <- function(
 
   # 6. Join speed metrics back to lane_prioritisation
   job <- callr::r_bg(function(lane_prioritisation, speed_metrics) { # update spinner while blocking method call
-    library(sf)
+    requireNamespace("sf", quietly = TRUE)
     return(lane_prioritisation |>
       dplyr::left_join(speed_metrics, by = "way_osm_id"))
   }, args = list(lane_prioritisation, speed_metrics))

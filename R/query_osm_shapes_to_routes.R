@@ -147,7 +147,7 @@ osm_shapes_to_routes <- function(
 
     # Query Overpass API
     job <- callr::r_bg(function(query_xml) { # update spinner while blocking method call
-      library(osmdata)
+      requireNamespace("osmdata", quietly = TRUE)
       return(osmdata::osmdata_sf(query_xml))
     }, args = list(query_xml))
     while (job$is_alive()) {
@@ -196,8 +196,8 @@ osm_shapes_to_routes <- function(
     pb$update(0)
 
     job <- callr::r_bg(function(osm_file) { # update spinner while blocking method call
-      library(xml2)
-      library(dplyr)
+      requireNamespace("xml2", quietly = TRUE)
+      requireNamespace("dplyr", quietly = TRUE)
 
       doc <- read_xml(osm_file)
       relations <- xml_find_all(doc, ".//relation")
