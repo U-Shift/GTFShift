@@ -9,3 +9,5 @@ releases/
 vignettes/*_cache/*
 
 scratch/*
+/doc/
+/Meta/

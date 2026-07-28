@@ -94,24 +94,24 @@ osm_shapes_to_routes <- function(
   if (!is.null(osm_file)) {
     # 1.1. Get relations
     relations_df <- get_osm_relations(osm_file, q, pb, osm_route_type, 0.1, 0.2, 0.3, 0.94) |>
-      filter(type == "way") |>
-      rename(way_osm_id = osm_id, osm_id = relation_osm_id)
+      filter(.data$type == "way") |>
+      rename(way_osm_id = .data$osm_id, osm_id = .data$relation_osm_id)
 
     # 1.3. Get geometries and filter by matched relations
     bbox <- st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
     osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
     pb$update(0.95)
     osm_multilines_redux <- relations_df |>
-      select(osm_id, way_osm_id, `gtfs:shape_id`) |>
+      select("osm_id", "way_osm_id", "gtfs:shape_id") |>
       # Join with osm_ways to get geometries back
-      left_join(osm_ways |> select(osm_id), by = c("way_osm_id" = "osm_id")) |>
+      left_join(osm_ways |> select("osm_id"), by = c("way_osm_id" = "osm_id")) |>
       st_as_sf()
 
     if (!ways) {
       # Group by osm_id, gtfs:shape_id, generating multilinestring with geometries
       pb$update(0.99)
       osm_multilines_redux <- osm_multilines_redux |>
-        dplyr::group_by(osm_id, `gtfs:shape_id`) |>
+        dplyr::group_by(.data$osm_id, .data$`gtfs:shape_id`) |>
         dplyr::summarise(do_union = FALSE, .groups = "drop") |>
         sf::st_cast("MULTILINESTRING")
     }
@@ -130,28 +130,48 @@ osm_shapes_to_routes <- function(
     pb$update(0.5)
 
     # 2. Convert to SF and Extract routes
-    job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
-      return(osmdata::osmdata_sf(q, osm_file))
-    }, args = list(q, osm_file))
+    pb <- progress::progress_bar$new( # Track progress
+      format = sprintf("1/%d: Querying OSM for transit routes... [:bar] :percent :spin elapsed=:elapsed", total_steps),
+      clear = FALSE, show_after = 0
+    )
+    pb$update(0)
+
+    # Convert query to XML string for overpass API
+    if ("opq" %in% class(q)) { # opq format
+      query_xml <- osmdata::opq_string(q)
+    } else if ("character" %in% class(q)) { # xml format
+      query_xml <- q
+    } else {
+      stop("Invalid query format. Must be an opq object or a valid XML string.")
+    }
+
+    # Query Overpass API
+    job <- callr::r_bg(function(query_xml) { # update spinner while blocking method call
+      library(osmdata)
+      return(osmdata::osmdata_sf(query_xml))
+    }, args = list(query_xml))
     while (job$is_alive()) {
       pb$tick(0)
       Sys.sleep(0.1)
     }
     osm <- job$get_result()
+    pb$update(0.5)
 
+    # Extract geometries
+    osm_multilines <- osm$osm_multilines
     pb$update(0.75)
 
-    osm_multilines <- osm$osm_multilines
+    # Generate redux multiline (geometry per osm_id)
     osm_multilines_redux <- osm_multilines |>
-      select(any_of(c("osm_id", "gtfs:shape_id")))
+      dplyr::select(any_of(c("osm_id", "name", "ref", "gtfs:shape_id", "geometry"))) |>
+      st_as_sf()
+    pb$update(1)
+    pb$terminate()
   }
-
-  pb$update(1)
-  pb$terminate()
 
   # 3. Merge with GTFS
   shape_ids <- gtfs$trips |>
-    select(shape_id) |>
+    select("shape_id") |>
     distinct()
   pb <- progress::progress_bar$new( # Track progress
     format = sprintf("2/%d: Matching %d shapes with %s routes [:bar] :percent :spin elapsed=:elapsed", total_steps, nrow(shape_ids), nrow(osm_multilines_redux)),
@@ -204,14 +224,14 @@ osm_shapes_to_routes <- function(
     }
     relations_df <- job$get_result()
     ways_relations <- relations_df |>
-      filter(type == "way") |>
-      select(ref, relation_osm_id) # ref is way osm_id
+      filter(.data$type == "way") |>
+      select("ref", "relation_osm_id") # ref is way osm_id
 
     # 4.2. Disaggregate relations in ways
     result <- result |>
       sf::st_drop_geometry() |>
-      left_join(ways_relations |> rename(way_osm_id = ref, osm_id = relation_osm_id), by = "osm_id") |>
-      left_join(as_tibble(osm$osm_lines) |> select(osm_id, contains(ways_tags)), by = c("way_osm_id" = "osm_id"))
+      left_join(ways_relations |> rename(way_osm_id = .data$ref, osm_id = .data$relation_osm_id), by = "osm_id") |>
+      left_join(as_tibble(osm$osm_lines) |> select("osm_id", contains(ways_tags)), by = c("way_osm_id" = "osm_id"))
 
     geom <- osm$osm_lines$geometry
     names(geom) <- NULL
@@ -227,7 +247,7 @@ osm_shapes_to_routes <- function(
     osm_extra_tags <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE, extra_tags = tags_to_extract) |> st_drop_geometry()
     names(osm_extra_tags)[names(osm_extra_tags) != "osm_id"] <- gsub("_", ":", names(osm_extra_tags)[names(osm_extra_tags) != "osm_id"])
     result <- result |>
-      left_join(osm_extra_tags |> select(-`other:tags`), by = c("way_osm_id" = "osm_id"))
+      left_join(osm_extra_tags |> select(-.data$`other:tags`), by = c("way_osm_id" = "osm_id"))
     # Remove columns that only have empty values
     result <- result |>
       dplyr::select(dplyr::where(~ {
@@ -240,22 +260,22 @@ osm_shapes_to_routes <- function(
 
   # 4. Log missing shapes/routes
   routes_shapes <- gtfs$routes |>
-    select(route_id, route_short_name, route_long_name) |>
-    right_join(gtfs$trips |> select(trip_id, route_id, shape_id), by = "route_id") |>
-    distinct(route_id, shape_id, .keep_all = TRUE)
+    select("route_id", "route_short_name", "route_long_name") |>
+    right_join(gtfs$trips |> select("trip_id", "route_id", "shape_id"), by = "route_id") |>
+    distinct(.data$route_id, .data$shape_id, .keep_all = TRUE)
 
   shapes_matched_n <- result |>
-    distinct(shape_id) |>
+    distinct(.data$shape_id) |>
     nrow()
   shapes_gtfs_n <- gtfs$shapes |>
-    distinct(shape_id) |>
+    distinct(.data$shape_id) |>
     nrow()
   routes_matched_n <- routes_shapes |>
-    filter(shape_id %in% result$shape_id) |>
-    distinct(route_id) |>
+    filter(.data$shape_id %in% result$shape_id) |>
+    distinct(.data$route_id) |>
     nrow()
   routes_gtfs_n <- gtfs$routes |>
-    distinct(route_id) |>
+    distinct(.data$route_id) |>
     nrow()
 
   message(sprintf(
@@ -263,9 +283,9 @@ osm_shapes_to_routes <- function(
     shapes_matched_n, shapes_matched_n / shapes_gtfs_n * 100, shapes_gtfs_n,
     routes_matched_n, routes_matched_n / routes_gtfs_n * 100, routes_gtfs_n
   ))
-  routes_shapes_missing <- routes_shapes |> filter(!(shape_id %in% result$shape_id))
+  routes_shapes_missing <- routes_shapes |> filter(!(.data$shape_id %in% result$shape_id))
   if (nrow(routes_shapes_missing) > 0) {
-    row_strings <- with(routes_shapes_missing, sprintf("| %s | %s | %s | %s |", route_id, shape_id, route_short_name, route_long_name))
+    row_strings <- with(routes_shapes_missing, sprintf("| %s | %s | %s | %s |", .data$route_id, .data$shape_id, .data$route_short_name, .data$route_long_name))
     warning(sprintf("Shapes missing (ignored in the result):\n| route_id | shape_id | route_short_name | route_long_name |\n%s", paste(row_strings, collapse = "\n")))
   }
 

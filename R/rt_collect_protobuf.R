@@ -35,7 +35,7 @@
 #' @importFrom RProtoBuf readProtoFiles read
 #' @importFrom jsonlite write_json
 #' @importFrom progress progress_bar
-#'
+#' @importFrom stats setNames
 #' @export
 rt_collect_protobuf <- function(
     gtfs_rt_url, destination_file,

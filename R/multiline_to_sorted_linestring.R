@@ -272,8 +272,8 @@ multiline_to_sorted_linestring <- function(
                 if (nrow(next_unvisited) == 0) {
                     break
                 }
-                next_point_index <- next_unvisited |> pull(order)
-                next_point <- next_unvisited |> pull(geometry)
+                next_point_index <- next_unvisited |> pull(.data$order)
+                next_point <- next_unvisited |> pull(.data$geometry)
                 distance_current_to_next <- as.numeric(st_distance(current_line, next_point))
                 distance_remaining_to_next <- if (nrow(remaining_lines) > 0) {
                     min(as.numeric(st_distance(remaining_lines$geometry, next_point)))

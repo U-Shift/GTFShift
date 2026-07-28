@@ -57,6 +57,7 @@
 #' @importFrom progress progress_bar
 #' @import dplyr
 #' @importFrom callr r_bg
+#' @importFrom rlang .data
 #'
 #' @export
 rt_extend_prioritisation <- function(
@@ -101,7 +102,7 @@ rt_extend_prioritisation <- function(
   # 2. Get only updates IN_TRANSIT
   if (!is.null(rt_current_status) && "current_status" %in% colnames(rt_collection)) {
     rt_collection <- rt_collection %>%
-      dplyr::filter(current_status %in% rt_current_status)
+      dplyr::filter(.data$current_status %in% rt_current_status)
   }
   pb$update(0.166)
 
@@ -109,8 +110,8 @@ rt_extend_prioritisation <- function(
   job <- callr::r_bg(function(lane_prioritisation) { # update spinner while blocking method call
     library(sf)
     return(lane_prioritisation |>
-      dplyr::distinct(way_osm_id, .keep_all = TRUE) |>
-      dplyr::select(way_osm_id))
+      dplyr::distinct(.data$way_osm_id, .keep_all = TRUE) |>
+      dplyr::select("way_osm_id"))
   }, args = list(lane_prioritisation))
   while (job$is_alive()) {
     pb$tick(0)
@@ -137,7 +138,7 @@ rt_extend_prioritisation <- function(
   job <- callr::r_bg(function(rt_collection, lane_buffers) { # update spinner while blocking method call
     return(sf::st_join(
       rt_collection,
-      lane_buffers |> dplyr::select(way_osm_id),
+      lane_buffers |> dplyr::select("way_osm_id"),
       left = FALSE,
       join = sf::st_within
     ) |> sf::st_drop_geometry())
@@ -152,7 +153,7 @@ rt_extend_prioritisation <- function(
   # 5. Aggregate speed metrics by way_osm_id
   job <- callr::r_bg(function(overlap, rt_attr_speed) { # update spinner while blocking method call
     return(overlap |>
-      dplyr::group_by(way_osm_id) |>
+      dplyr::group_by(.data$way_osm_id) |>
       dplyr::summarise(
         speed_avg = mean(.data[[rt_attr_speed]], na.rm = TRUE),
         speed_median = stats::median(.data[[rt_attr_speed]], na.rm = TRUE),
