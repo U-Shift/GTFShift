@@ -1,6 +1,6 @@
-#' Prioritize road network lanes for bus lane implementation
+#' Prioritise road network lanes for bus lane implementation
 #'
-#' For each OSM way with GTFS service, aggregates its characteristics to assist in the bus lane implementation prioritization
+#' For each OSM way with GTFS service, aggregates its characteristics to assist in the bus lane implementation prioritisation
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param q osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.
@@ -10,7 +10,7 @@
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, returning a data.frame with the road segments where transit routes
-#' run and for each, a set of parameters that can be used to prioritize bus lane implementations.
+#' run and for each, a set of parameters that can be used to prioritise bus lane implementations.
 #'
 #' Its functionality is a bundle that encapsulates the logic of several methods from the package,
 #' including \code{GTFShift::get_way_frequency_hourly()} and \code{GTFShift::osm_bus_lanes()}, that can be used separately if needed.
@@ -45,19 +45,19 @@
 #'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
 #' osm_file <- system.file("extdata", "osmextract_tcb_network.pbf", package = "GTFShift")
 #' 
-#' lane_prioritization <- GTFShift::prioritize_lanes(
+#' lane_prioritisation <- GTFShift::prioritise_lanes(
 #'   gtfs, q, 
 #'   osm_file = osm_file, 
 #'   date = gtfs$calendar$start_date[1]
 #' )
 #' 
-#' head(lane_prioritization |> dplyr::select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes))
+#' head(lane_prioritisation |> dplyr::select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes))
 #' 
 #' @import dplyr
 #' @import tidytransit
 #'
 #' @export
-prioritize_lanes <- function(
+prioritise_lanes <- function(
   gtfs,
   q,
   date = GTFShift::calendar_nextBusinessWednesday(),

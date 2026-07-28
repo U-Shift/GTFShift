@@ -10,7 +10,7 @@ q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
-lanes_global <- prioritize_lanes(gtfs, q)
+lanes_global <- prioritise_lanes(gtfs, q)
 nrow(lanes_global)
 
 lanes <- lanes_global |> filter(hour == 8)
@@ -45,7 +45,7 @@ mapview::mapview(lanes, zcol = "n_lanes_direction")
 mapview::mapview(lanes, zcol = "n_lanes_circulation_direction")
 mapview::mapview(lanes |> mutate(n_lanes_parking = as.character(n_lanes_parking)), zcol = "n_lanes_parking")
 
-# Prioritization
+# Prioritisation
 # Color pallete from https://colorhunt.co/palette/f63049d027528a244b111f35
 map_needs <- mapview::mapview(
   lanes |> filter(frequency >= 5 & !is.na(n_lanes) & n_lanes_direction > 1 & !is_bus_lane),

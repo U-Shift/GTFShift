@@ -1,7 +1,7 @@
 library(testthat)
 library(sf)
 
-test_that("rt_extend_prioritization extends lane prioritization with speed metrics for multiple entries", {
+test_that("rt_extend_prioritisation extends lane prioritisation with speed metrics for multiple entries", {
     lanes_sf <- st_sf(
         way_osm_id = c("w1", "w2"),
         geometry = st_sfc(
@@ -23,7 +23,7 @@ test_that("rt_extend_prioritization extends lane prioritization with speed metri
         )
     )
 
-    res <- GTFShift::rt_extend_prioritization(lanes_sf, rt_points, metric_crs = 3857)
+    res <- GTFShift::rt_extend_prioritisation(lanes_sf, rt_points, metric_crs = 3857)
     expect_s3_class(res, "sf")
     expect_contains(names(res), c("speed_avg", "speed_median", "speed_p25", "speed_p75", "speed_count"))
 
@@ -39,7 +39,7 @@ test_that("rt_extend_prioritization extends lane prioritization with speed metri
     expect_equal(res$speed_count[res$way_osm_id == "w2"], 1)
 })
 
-test_that("rt_extend_prioritization raises warning when metric_crs is default", {
+test_that("rt_extend_prioritisation raises warning when metric_crs is default", {
     lanes_sf <- st_sf(
         way_osm_id = "w1",
         geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
@@ -52,12 +52,12 @@ test_that("rt_extend_prioritization raises warning when metric_crs is default", 
     )
 
     expect_warning(
-        GTFShift::rt_extend_prioritization(lanes_sf, rt_points),
+        GTFShift::rt_extend_prioritisation(lanes_sf, rt_points),
         "Using default metric_crs"
     )
 })
 
-test_that("rt_extend_prioritization stops when lane_prioritization is missing way_osm_id column", {
+test_that("rt_extend_prioritisation stops when lane_prioritisation is missing way_osm_id column", {
     invalid_lanes <- st_sf(
         id = "w1",
         geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
@@ -69,12 +69,12 @@ test_that("rt_extend_prioritization stops when lane_prioritization is missing wa
     )
 
     expect_error(
-        GTFShift::rt_extend_prioritization(invalid_lanes, rt_points, metric_crs = 3857),
-        "lane_prioritization is missing required columns: way_osm_id"
+        GTFShift::rt_extend_prioritisation(invalid_lanes, rt_points, metric_crs = 3857),
+        "lane_prioritisation is missing required columns: way_osm_id"
     )
 })
 
-test_that("rt_extend_prioritization stops when rt_collection is missing speed column", {
+test_that("rt_extend_prioritisation stops when rt_collection is missing speed column", {
     lanes_sf <- st_sf(
         way_osm_id = "w1",
         geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
@@ -86,12 +86,12 @@ test_that("rt_extend_prioritization stops when rt_collection is missing speed co
     )
 
     expect_error(
-        GTFShift::rt_extend_prioritization(lanes_sf, invalid_rt, metric_crs = 3857),
+        GTFShift::rt_extend_prioritisation(lanes_sf, invalid_rt, metric_crs = 3857),
         "rt_collection is missing required columns: speed"
     )
 })
 
-test_that("rt_extend_prioritization stops when metric_crs is invalid", {
+test_that("rt_extend_prioritisation stops when metric_crs is invalid", {
     lanes_sf <- st_sf(
         way_osm_id = "w1",
         geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
@@ -103,6 +103,6 @@ test_that("rt_extend_prioritization stops when metric_crs is invalid", {
     )
 
     expect_error(
-        GTFShift::rt_extend_prioritization(lanes_sf, rt_points, metric_crs = NA)
+        GTFShift::rt_extend_prioritisation(lanes_sf, rt_points, metric_crs = NA)
     )
 })

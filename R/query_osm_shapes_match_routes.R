@@ -487,7 +487,7 @@ osm_shapes_match_routes <- function(
                 role == "stop_exit_only" ~ 1, role == "platform_exit_only" ~ 2, role == "stop" ~ 4, role == "platform" ~ 4, TRUE ~ 5
               )) |>
               dplyr::arrange(
-                role_group, # First criteria, to prioritize entry/exit when they exist
+                role_group, # First criteria, to prioritise entry/exit when they exist
                 dplyr::case_when( # Within each role, sort by order on OSM relation, considering roundtrip and role type
                   roundtrip == "yes" ~ dplyr::row_number(), # When roundtrip (circular), keep normal order
                   role == "stop_exit_only" ~ dplyr::desc(dplyr::row_number()), # reverse order
