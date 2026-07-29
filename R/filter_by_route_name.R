@@ -37,7 +37,7 @@ filter_by_route_name <- function(gtfs, values, short_name=TRUE, exact_match=TRUE
   # Get routes that match query
   pattern <- paste(unlist(values), collapse = "|")
 
-  routes = gtfs$routes %>%
+  routes = gtfs$routes |>
     filter(
       if (short_name & exact_match) .data$route_short_name %in% values
       else if (short_name) str_detect(.data$route_short_name, regex(pattern, ignore_case = TRUE))
@@ -46,7 +46,7 @@ filter_by_route_name <- function(gtfs, values, short_name=TRUE, exact_match=TRUE
     )
 
   # Get trips that match those routes
-  trips = gtfs$trips %>%
+  trips = gtfs$trips |>
     filter(.data$route_id %in% routes$route_id)
 
   # Filter feed by trip id

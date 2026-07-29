@@ -115,7 +115,7 @@ rt_extend_prioritisation <- function(
 
   # 2. Get only updates IN_TRANSIT
   if (!is.null(rt_current_status) && "current_status" %in% colnames(rt_collection)) {
-    rt_collection <- rt_collection %>%
+    rt_collection <- rt_collection |>
       dplyr::filter(.data$current_status %in% rt_current_status)
   }
   pb$update(0.166)
