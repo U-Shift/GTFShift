@@ -57,13 +57,13 @@ articles:
   - title: Articles
     navbar: ~
     contents:
-    - prioritise
-    - download
-    - filter
-    - unify
-    - analyse
-    - classify
-    - osm
-    - rt
-    - osm_update
-    - gtfs_from_osm
+    - articles/prioritise
+    - articles/download
+    - articles/filter
+    - articles/unify
+    - articles/analyse
+    - articles/classify
+    - articles/osm
+    - articles/rt
+    - articles/osm_update
+    - articles/gtfs_from_osm
