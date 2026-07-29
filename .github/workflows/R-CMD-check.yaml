@@ -40,6 +40,18 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - name: Install osmium-tool (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y osmium-tool
+
+      - name: Install osmium-tool (macOS)
+        if: runner.os == 'macOS'
+        run: brew install osmium-tool
+
+      - name: Install osmium-tool (Windows)
+        if: runner.os == 'Windows'
+        run: choco install osmium-tool -y
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
