@@ -48,14 +48,21 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install osmium-tool
 
-      - name: Install osmium-tool (Windows)
+      - name: Setup Conda (Windows)
         if: runner.os == 'Windows'
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge
           channel-priority: strict
-          extra-specs: |
-            osmium-tool
+
+      - name: Install osmium-tool (Windows)
+        if: runner.os == 'Windows'
+        shell: bash -el {0}
+        run: |
+          conda install -y osmium-tool
+          echo "$CONDA_PREFIX/Library/bin" >> $GITHUB_PATH
+          echo "$CONDA_PREFIX/Scripts" >> $GITHUB_PATH
+          echo "$CONDA_PREFIX" >> $GITHUB_PATH
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
