@@ -12,20 +12,20 @@ test_that("osm_centerlines reads generated geopkg from python call with mocked r
     testthat::with_mocked_bindings(
         virtualenv_create = function(...) "mock_venv",
         use_virtualenv = function(...) TRUE,
-        source_python = function(...) TRUE,
+        source_python = function(file, envir = parent.frame(), ...) {
+            envir$get_centerline <- function(...) {
+                get_centerline_called <<- TRUE
+                TRUE
+            }
+            TRUE
+        },
         py_install = function(...) TRUE,
         .package = "reticulate",
         code = {
             testthat::with_mocked_bindings(
-                st_read = function(dsn, ...) {
-                    mock_line
-                },
+                st_read = function(dsn, ...) mock_line,
                 .package = "sf",
                 code = {
-                    assign("get_centerline", function(...) {
-                        get_centerline_called <<- TRUE
-                        TRUE
-                    }, envir = .GlobalEnv)
                     res <- GTFShift::osm_centerlines(bbox = NULL, place = "Porto", venv = "mock_env")
                     expect_true(get_centerline_called)
                     expect_s3_class(res, "sf")
@@ -50,20 +50,20 @@ test_that("osm_centerlines creates virtualenv when venv parameter is omitted/NA"
             "mock_created_venv"
         },
         use_virtualenv = function(...) TRUE,
-        source_python = function(...) TRUE,
+        source_python = function(file, envir = parent.frame(), ...) {
+            envir$get_centerline <- function(...) {
+                get_centerline_called <<- TRUE
+                TRUE
+            }
+            TRUE
+        },
         py_install = function(...) TRUE,
         .package = "reticulate",
         code = {
             testthat::with_mocked_bindings(
-                st_read = function(dsn, ...) {
-                    mock_line
-                },
+                st_read = function(dsn, ...) mock_line,
                 .package = "sf",
                 code = {
-                    assign("get_centerline", function(...) {
-                        get_centerline_called <<- TRUE
-                        TRUE
-                    }, envir = .GlobalEnv)
                     res <- GTFShift::osm_centerlines(bbox = NULL, place = "Porto")
                     expect_true(virtualenv_create_called)
                     expect_true(get_centerline_called)

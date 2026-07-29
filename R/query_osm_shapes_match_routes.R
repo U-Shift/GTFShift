@@ -84,8 +84,9 @@
 #' @examples
 #' # Subset GTFS for one route only, for demo purposes
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-#'   "gtfs_tcb_sample.zip", package = "GTFShift")
-#' )
+#'   "gtfs_tcb_sample.zip",
+#'   package = "GTFShift"
+#' ))
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 #'
 #' # Build query and prepare osm extract (possible to use API as alternative)
@@ -454,57 +455,74 @@ osm_shapes_match_routes <- function(
           dplyr::rowwise() |>
           dplyr::left_join(stop_counts, by = c("osm_id" = "relation_osm_id")) |>
           dplyr::mutate(
-            # Geographical data
-            # Other relevant parameters,
-            first_stop_osm_id = relations_df |>
-              dplyr::filter(.data$type == "node") |>
-              dplyr::select(relation_osm_id = "relation_osm_id", stop_osm_id = "osm_id", role = "role") |>
-              # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
-              dplyr::filter(.data$relation_osm_id == .data$osm_id & .data$role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
-              # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
-              dplyr::filter(
-                (.data$nr_s > 3 * .data$nr_p & .data$role %in% c("stop_entry_only", "stop")) |
-                  (.data$nr_p > 3 * .data$nr_s & .data$role %in% c("platform_entry_only", "platform")) |
-                  (.data$nr_s <= 3 * .data$nr_p & .data$nr_p <= 3 * .data$nr_s)
-              ) |>
-              # Use sorting to give priority to entry/exit, when they exist
-              dplyr::arrange(
-                match(.data$role, c("stop_entry_only", "platform_entry_only", "stop", "platform")),
-                .data$role
-              ) |>
-              dplyr::slice(1) |>
-              dplyr::pull(.data$stop_osm_id),
-            last_stop_osm_id = relations_df |>
-              dplyr::filter(.data$type == "node") |>
-              dplyr::select(relation_osm_id = "relation_osm_id", stop_osm_id = "osm_id", role = "role") |>
-              dplyr::filter(.data$relation_osm_id == .data$osm_id & .data$role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
-              # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
-              dplyr::filter(
-                (.data$nr_s > 3 * .data$nr_p & .data$role %in% c("stop_exit_only", "stop")) |
-                  (.data$nr_p > 3 * .data$nr_s & .data$role %in% c("platform_exit_only", "platform")) |
-                  (.data$nr_s <= 3 * .data$nr_p & .data$nr_p <= 3 * .data$nr_s)
-              ) |>
-              dplyr::mutate(role_group = dplyr::case_when(
-                # When roundtrip (circular), keep normal order
-                .data$roundtrip == "yes" ~ 1,
-                # Otherwise, consider last stop_exit_only or stop (if no exit_only)
-                .data$role == "stop_exit_only" ~ 1, .data$role == "platform_exit_only" ~ 2, .data$role == "stop" ~ 4, .data$role == "platform" ~ 4, TRUE ~ 5
-              )) |>
-              dplyr::arrange(
-                .data$role_group, # First criteria, to prioritise entry/exit when they exist
-                dplyr::case_when( # Within each role, sort by order on OSM relation, considering roundtrip and role type
-                  .data$roundtrip == "yes" ~ dplyr::row_number(), # When roundtrip (circular), keep normal order
-                  .data$role == "stop_exit_only" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  .data$role == "platform_exit_only" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  .data$role == "stop" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  .data$role == "platform" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  TRUE ~ dplyr::desc(dplyr::row_number()) # fallback order for others
-                )
-              ) |>
-              dplyr::slice(1) |>
-              dplyr::pull(.data$stop_osm_id),
-            initial = osm_stoppositions |> dplyr::filter(.data$osm_id == .data$first_stop_osm_id) |> dplyr::slice(1) |> dplyr::pull(.data$geometry) |> dplyr::first(default = NA),
-            final = osm_stoppositions |> dplyr::filter(.data$osm_id == .data$last_stop_osm_id) |> dplyr::slice(1) |> dplyr::pull(.data$geometry) |> dplyr::first(default = NA)
+            first_stop_osm_id = {
+              rel_id <- .data$osm_id
+              ns <- .data$nr_s
+              np <- .data$nr_p
+              relations_df |>
+                dplyr::filter(.data$type == "node") |>
+                dplyr::select(relation_osm_id = "relation_osm_id", stop_osm_id = "osm_id", role = "role") |>
+                dplyr::filter(.data$relation_osm_id == rel_id & .data$role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
+                dplyr::filter(
+                  (ns > 3 * np & .data$role %in% c("stop_entry_only", "stop")) |
+                    (np > 3 * ns & .data$role %in% c("platform_entry_only", "platform")) |
+                    (ns <= 3 * np & np <= 3 * ns)
+                ) |>
+                dplyr::arrange(
+                  match(.data$role, c("stop_entry_only", "platform_entry_only", "stop", "platform")),
+                  .data$role
+                ) |>
+                dplyr::slice(1) |>
+                dplyr::pull(.data$stop_osm_id)
+            },
+            last_stop_osm_id = {
+              rel_id <- .data$osm_id
+              ns <- .data$nr_s
+              np <- .data$nr_p
+              rt <- .data$roundtrip
+              relations_df |>
+                dplyr::filter(.data$type == "node") |>
+                dplyr::select(relation_osm_id = "relation_osm_id", stop_osm_id = "osm_id", role = "role") |>
+                dplyr::filter(.data$relation_osm_id == rel_id & .data$role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
+                dplyr::filter(
+                  (ns > 3 * np & .data$role %in% c("stop_exit_only", "stop")) |
+                    (np > 3 * ns & .data$role %in% c("platform_exit_only", "platform")) |
+                    (ns <= 3 * np & np <= 3 * ns)
+                ) |>
+                dplyr::mutate(role_group = dplyr::case_when(
+                  isTRUE(rt == "yes") ~ 1,
+                  .data$role == "stop_exit_only" ~ 1, .data$role == "platform_exit_only" ~ 2, .data$role == "stop" ~ 4, .data$role == "platform" ~ 4, TRUE ~ 5
+                )) |>
+                dplyr::arrange(
+                  .data$role_group,
+                  dplyr::case_when(
+                    isTRUE(rt == "yes") ~ dplyr::row_number(),
+                    .data$role == "stop_exit_only" ~ dplyr::desc(dplyr::row_number()),
+                    .data$role == "platform_exit_only" ~ dplyr::desc(dplyr::row_number()),
+                    .data$role == "stop" ~ dplyr::desc(dplyr::row_number()),
+                    .data$role == "platform" ~ dplyr::desc(dplyr::row_number()),
+                    TRUE ~ dplyr::desc(dplyr::row_number())
+                  )
+                ) |>
+                dplyr::slice(1) |>
+                dplyr::pull(.data$stop_osm_id)
+            },
+            initial = {
+              stop_osm_id <- .data$first_stop_osm_id
+              osm_stoppositions |>
+                dplyr::filter(.data$osm_id == stop_osm_id) |>
+                dplyr::slice(1) |>
+                dplyr::pull(.data$geometry) |>
+                dplyr::first(default = NA)
+            },
+            final = {
+              stop_osm_id <- .data$last_stop_osm_id
+              osm_stoppositions |>
+                dplyr::filter(.data$osm_id == stop_osm_id) |>
+                dplyr::slice(1) |>
+                dplyr::pull(.data$geometry) |>
+                dplyr::first(default = NA)
+            }
           ) |>
           dplyr::ungroup() |>
           dplyr::select("osm_id", "ref", "name", "route_dist", "nr_stops", "first_stop_osm_id", "last_stop_osm_id", "initial", "final", "geometry") |>
@@ -532,23 +550,53 @@ osm_shapes_match_routes <- function(
       dplyr::rowwise() |>
       dplyr::mutate(
         # Geographical data
-        trip_id_copy = .data$trip_id,
-        first_stop_id = gtfs$stop_times |> dplyr::filter(.data$trip_id == .data$trip_id_copy) |> dplyr::arrange(.data$stop_sequence) |> dplyr::slice(1) |> dplyr::pull(.data$stop_id),
-        last_stop_id = gtfs$stop_times |> dplyr::filter(.data$trip_id == .data$trip_id_copy) |> dplyr::arrange(dplyr::desc(.data$stop_sequence)) |> dplyr::slice(1) |> dplyr::pull(.data$stop_id),
-        initial = stops_sf |> dplyr::filter(.data$stop_id == .data$first_stop_id) |> dplyr::slice(1) |> dplyr::pull(.data$geometry),
-        final = stops_sf |> dplyr::filter(.data$stop_id == .data$last_stop_id) |> dplyr::slice(1) |> dplyr::pull(.data$geometry),
-
+        first_stop_id = {
+          route_trip_id <- .data$trip_id
+          gtfs$stop_times |>
+            dplyr::filter(.data$trip_id == route_trip_id) |>
+            dplyr::arrange(.data$stop_sequence) |>
+            dplyr::slice(1) |>
+            dplyr::pull(.data$stop_id)
+        },
+        last_stop_id = {
+          route_trip_id <- .data$trip_id
+          gtfs$stop_times |>
+            dplyr::filter(.data$trip_id == route_trip_id) |>
+            dplyr::arrange(dplyr::desc(.data$stop_sequence)) |>
+            dplyr::slice(1) |>
+            dplyr::pull(.data$stop_id)
+        },
         # Other relevant parameters
-        nr_stops = nrow(gtfs$stop_times |> dplyr::filter(.data$trip_id == .data$trip_id_copy))
+        nr_stops = {
+          route_trip_id <- .data$trip_id
+          nrow(gtfs$stop_times |> dplyr::filter(.data$trip_id == route_trip_id))
+        }
+      ) |>
+      mutate(
+        initial = {
+          init_stop_id <- .data$first_stop_id
+          stops_sf |>
+            dplyr::filter(.data$stop_id == init_stop_id) |>
+            dplyr::slice(1) |>
+            dplyr::pull(.data$geometry)
+        },
+        final = {
+          fin_stop_id <- .data$last_stop_id
+          stops_sf |>
+            dplyr::filter(.data$stop_id == fin_stop_id) |>
+            dplyr::slice(1) |>
+            dplyr::pull(.data$geometry)
+        }
       ) |>
       dplyr::ungroup() |>
-      dplyr::select(-"trip_id_copy") |>
       dplyr::arrange(.data$route_dist, .data$initial, .data$final)
 
     # 3. Match gtfs shapes and osm routes, by choosing the one that share the closest start and end points
     # >  Compute distances between init and final points for both
-    init <- as.numeric(sf::st_distance(osm_route_name$initial |> st_transform(metric_crs), gtfs_route_name$initial |> st_transform(metric_crs)))
-    fin <- as.numeric(sf::st_distance(osm_route_name$final |> st_transform(metric_crs), gtfs_route_name$final |> st_transform(metric_crs)))
+    init_dist <- sf::st_distance(osm_route_name$initial |> st_transform(metric_crs), gtfs_route_name$initial |> st_transform(metric_crs))
+    fin_dist <- sf::st_distance(osm_route_name$final |> st_transform(metric_crs), gtfs_route_name$final |> st_transform(metric_crs))
+    init <- matrix(as.numeric(init_dist), nrow = nrow(init_dist), ncol = ncol(init_dist))
+    fin <- matrix(as.numeric(fin_dist), nrow = nrow(fin_dist), ncol = ncol(fin_dist))
     length_diff <- sapply(gtfs_route_name$route_dist, function(y) abs(osm_route_name$route_dist - y))
     # Proxy for number of stops distance: average distance between stops on GTFS, times the difference between osm and gtfs stops
     stops_diff <- sapply(
@@ -575,7 +623,8 @@ osm_shapes_match_routes <- function(
     gtfs_route_name_result <- gtfs_route_name_minimos |>
       sf::st_drop_geometry() |>
       dplyr::left_join(
-        osm_route_name |> dplyr::select("osm_id", "name", "ref", "route_dist", "nr_stops", "geometry", "initial", "final") |> dplyr::rename(osm_name = .data$name, osm_ref = .data$ref),
+        osm_route_name |> dplyr::select("osm_id", "name", "ref", "route_dist", "nr_stops", "geometry", "initial", "final") |> 
+        dplyr::rename(osm_name = .data$name, osm_ref = .data$ref),
         by = "osm_id",
         suffix = c("_gtfs", "_osm")
       ) |>

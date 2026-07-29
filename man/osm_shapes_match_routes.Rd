@@ -119,8 +119,9 @@ Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the 
 \examples{
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-  "gtfs_tcb_sample.zip", package = "GTFShift")
-)
+  "gtfs_tcb_sample.zip",
+  package = "GTFShift"
+))
 gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
 # Build query and prepare osm extract (possible to use API as alternative)
