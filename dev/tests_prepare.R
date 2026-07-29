@@ -183,3 +183,20 @@ osmium extract -p lisbon_bbox.geojson portugal-latest.osm.pbf -o lisbon_bbox_cli
 # 2. Extract all ways tagged with 'highway' (along with their nodes)
 osmium tags-filter lisbon_bbox_clip.pbf w/highway=primary,secondary,tertiary -o lisbon_highways.pbf --overwrite
 """
+
+## OSM for all elements inside relation 6384187 --------------------------------
+"""
+# 1. Extract relation 6384187 and its member ways to build the boundary polygon
+osmium getid -r -t portugal-latest.osm.pbf r6384187 -o relation_boundary.pbf --overwrite
+
+# 2. Convert relation boundary to GeoJSON polygon
+ogr2ogr -f GeoJSON relation_boundary.geojson relation_boundary.pbf multipolygons
+
+# 3. Clip full PBF to extract ALL objects (roads, buildings, etc.) inside the relation geometry
+osmium extract -p relation_boundary.geojson portugal-latest.osm.pbf -o relation_area_all.pbf --overwrite
+
+# 4. Convert clipped PBF to GPKG for validation / analysis in R/GIS
+ogr2ogr -f GPKG relation_area_all.gpkg relation_area_all.pbf
+"""
+
+

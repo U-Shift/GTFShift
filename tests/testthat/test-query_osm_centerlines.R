@@ -74,3 +74,40 @@ test_that("osm_centerlines creates virtualenv when venv parameter is omitted/NA"
     )
 })
 
+test_that("osm_centerlines passes osm_file parameter to python call", {
+    mock_line <- st_sf(
+        id = 1,
+        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
+    )
+
+    received_osm_file <- NULL
+
+    testthat::with_mocked_bindings(
+        virtualenv_create = function(...) "mock_venv",
+        use_virtualenv = function(...) TRUE,
+        source_python = function(file, envir = parent.frame(), ...) {
+            envir$get_centerline <- function(bbox, study_area, use_buildings, output_path, osm_file = NULL) {
+                received_osm_file <<- osm_file
+                TRUE
+            }
+            TRUE
+        },
+        py_install = function(...) TRUE,
+        .package = "reticulate",
+        code = {
+            testthat::with_mocked_bindings(
+                st_read = function(dsn, ...) mock_line,
+                .package = "sf",
+                code = {
+                    res <- osm_centerlines(osm_file = "path/to/region.osm.pbf", venv = "mock_env")
+                    expect_equal(received_osm_file, "path/to/region.osm.pbf")
+                    expect_s3_class(res, "sf")
+                }
+            )
+        }
+    )
+})
+
+
+
+
