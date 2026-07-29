@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' # Create bbox for Lisbon
-#' bbox <- st_as_sfc(st_bbox(c(
+#' bbox <- sf::st_as_sfc(sf::st_bbox(c(
 #'   xmin = -9.229836, ymin = 38.691399, 
 #'   xmax = -9.087387, ymax = 38.796760
 #' ), crs = 4326))

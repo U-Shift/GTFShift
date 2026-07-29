@@ -3,7 +3,7 @@
 #' Get total extension of GTFS feed routes
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param route_identifier. String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
+#' @param route_identifier String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
 #' @param direction_wise Boolean (Default \code{TRUE}). If TRUE, extension considers sum of both directions. Otherwise, only one direction is considered.
 #' @param unified Boolean (Default \code{FALSE}). If TRUE, overlapping route segments are only counted once in the total extension.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
@@ -20,12 +20,13 @@
 #' @examples
 #' # Load GTFS
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-#'   "gtfs_tcb_sample.zip", package = "GTFShift")
-#' )
-#' 
+#'   "gtfs_tcb_sample.zip",
+#'   package = "GTFShift"
+#' ))
+#'
 #' # Get route extension
 #' GTFShift::get_network_extension(
-#'   gtfs, 
+#'   gtfs,
 #'   metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
 #'   date = gtfs$calendar$start_date[1]
 #' )

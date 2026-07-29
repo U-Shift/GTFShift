@@ -10,7 +10,7 @@
 #' @param subdivision_name String (Optional). List only feeds with the specified value. Can be a partial match.
 #' @param municipality String (Optional). List only feeds with the specified value. Can be a partial match. Case insensitive.
 #' @param bbox bbox (Optional). Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.
-#' @param is_official. Boolean (Optional). If TRUE, only return official feeds.
+#' @param is_official Boolean (Optional). If TRUE, only return official feeds.
 #'
 #' @details
 #' This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform.

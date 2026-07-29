@@ -36,7 +36,7 @@ query_mobilitydatabase(
 
 \item{bbox}{bbox (Optional). Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.}
 
-\item{is_official.}{Boolean (Optional). If TRUE, only return official feeds.}
+\item{is_official}{Boolean (Optional). If TRUE, only return official feeds.}
 }
 \value{
 data.frame with query results

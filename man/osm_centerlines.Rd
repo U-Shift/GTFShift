@@ -32,6 +32,10 @@ the network simplification process.
 }
 \examples{
 # Fetch OSM network and get centerlines
+osmdata::set_overpass_url(
+  "https://overpass.private.coffee/api/interpreter"
+) # Avoid OSM API usage limits
+
 network <- GTFShift::osm_centerlines(place = "Arroios, Lisboa, Portugal")
 
 head(network)
