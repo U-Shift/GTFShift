@@ -4,12 +4,20 @@
 \alias{osm_centerlines}
 \title{Get centerlines for OSM road network}
 \usage{
-osm_centerlines(bbox = NULL, place = NULL, use_buildings = TRUE, venv = NA)
+osm_centerlines(
+  bbox = NULL,
+  place = NULL,
+  osm_file = NULL,
+  use_buildings = TRUE,
+  venv = NA
+)
 }
 \arguments{
 \item{bbox}{bbox (Optional, if place provided). Area from which to export bus lanes.}
 
 \item{place}{String (Optional, if bbox provided). Place from which to export bus lanes.}
+
+\item{osm_file}{String (Optional). Path to a local OpenStreetMap PBF file (`.pbf`).}
 
 \item{use_buildings}{Boolean (Default TRUE). Uses buildings from OSM as exclusion_mask for neatnet.}
 
@@ -25,18 +33,19 @@ Get centerlines for OSM road network
 Exports road network from OpenStreetMaps for given area and uses
 Python \href{https://uscuni.org/neatnet/}{neatnet} package to compute its centerlines.
 
-One of \code{bbox} or \code{place} must be provided. If both, \code{bbox} is considered.
+One of \code{bbox}, \code{place}, or \code{osm_file} must be provided.
 
 Parameter \code{use_buildings} exports building footprints from OSM for better results on
 the network simplification process.
 }
 \examples{
-# Fetch OSM network and get centerlines
-osmdata::set_overpass_url(
-  "https://overpass.private.coffee/api/interpreter"
-) # Avoid OSM API usage limits
+# Get sample OSM extract
+osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
 
-network <- GTFShift::osm_centerlines(place = "Arroios, Lisboa, Portugal")
+network <- GTFShift::osm_centerlines(
+  place = "Arroios, Lisboa, Portugal",
+  osm_file = osm_file
+)
 
 head(network)
 
