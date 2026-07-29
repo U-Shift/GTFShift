@@ -17,7 +17,9 @@ test_that("get_stop_frequency_hourly calculates stop departures per hour", {
         dplyr::filter(stop_id == target_stop_id) |>
         dplyr::arrange(hour)
 
-    gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = ref_date)
+    suppressWarnings({ # tidytransit will warn about no transfers
+        gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = ref_date)
+    })
     pattern_gtfs <- tidytransit::set_servicepattern(gtfs_date)
     service_pattern_ids <- pattern_gtfs$.$dates_servicepatterns |>
         dplyr::filter(date == ref_date)

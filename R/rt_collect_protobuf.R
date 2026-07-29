@@ -66,9 +66,11 @@ rt_collect_protobuf <- function(
     } else {
       f <- file(gtfs_rt_url, "rb")
     }
+    on.exit(close(f), add = TRUE)
     feed_desc <- RProtoBuf::P("transit_realtime.FeedMessage")
     feed <- RProtoBuf::read(feed_desc, f)
     close(f)
+    on.exit(NULL, add = FALSE)
 
     # Convert to R list
     fields <- names(feed)
