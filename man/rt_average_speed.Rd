@@ -106,7 +106,8 @@ nrow(rt_collection)
 
 # Get route geometry for data collected
 osm_routes <- sf::st_read(
-  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift")
+  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  quiet = TRUE
 ) |>  
   dplyr::filter(route_id \%in\% rt_collection$route_id) |>
   dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))

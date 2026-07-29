@@ -52,7 +52,8 @@ gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
 
 # Load OSM network to serve as target network
 target_network = sf::st_read(
-  system.file("extdata/samples", "osm_ways_tcb.gpkg", package = "GTFShift")
+  system.file("extdata/samples", "osm_ways_tcb.gpkg", package = "GTFShift"),
+  quiet = TRUE
 )
 
 head(target_network)

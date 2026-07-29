@@ -35,7 +35,8 @@
 #' 
 #' # Load TCB OSM routes sample linestring
 #' osm_routes = sf::st_read(
-#'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift")
+#'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+#'   quiet = TRUE
 #' ) |> dplyr::filter(shape_id %in% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
 #' 
 #' head(osm_routes)
