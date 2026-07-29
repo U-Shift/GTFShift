@@ -50,7 +50,10 @@ jobs:
 
       - name: Install osmium-tool (Windows)
         if: runner.os == 'Windows'
-        run: choco install osmium-tool -y
+        shell: bash
+        run: |
+          conda install -c conda-forge -y osmium-tool
+          echo "$CONDA/Library/bin" >> $GITHUB_PATH
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
