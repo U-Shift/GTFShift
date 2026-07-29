@@ -36,13 +36,13 @@
 filter_by_modes <- function(gtfs, modes=list()) {
 
   # Get routes that match query
-  routes = gtfs$routes %>%
+  routes = gtfs$routes |>
     filter(
       .data$route_type %in% modes
     )
 
   # Get trips that match those routes
-  trips = gtfs$trips %>%
+  trips = gtfs$trips |>
     filter(.data$route_id %in% routes$route_id)
 
   # Filter feed by trip id

@@ -37,7 +37,7 @@
 filter_by_agency <- function(gtfs, id=NA, name=NA) {
 
   # Get agencies that match query
-  agencies = gtfs$agency %>%
+  agencies = gtfs$agency |>
       filter(
         if (!is.na(id) & !is.na(name)) .data$agency_id==id && .data$agency_name==name
         else if (!is.na(id)) .data$agency_id==id
@@ -46,13 +46,13 @@ filter_by_agency <- function(gtfs, id=NA, name=NA) {
       )
 
   # Get routes that match query
-  routes = gtfs$routes %>%
+  routes = gtfs$routes |>
     filter(
       .data$agency_id %in% agencies$agency_id
     )
 
   # Get trips that match those routes
-  trips = gtfs$trips %>%
+  trips = gtfs$trips |>
     filter(.data$route_id %in% routes$route_id)
 
   # Filter feed by trip id
