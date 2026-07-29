@@ -287,7 +287,7 @@ osm_shapes_to_routes <- function(
   ))
   routes_shapes_missing <- routes_shapes |> filter(!(.data$shape_id %in% result$shape_id))
   if (nrow(routes_shapes_missing) > 0) {
-    row_strings <- with(routes_shapes_missing, sprintf("| %s | %s | %s | %s |", .data$route_id, .data$shape_id, .data$route_short_name, .data$route_long_name))
+    row_strings <- sprintf("| %s | %s | %s | %s |", routes_shapes_missing$route_id, routes_shapes_missing$shape_id, routes_shapes_missing$route_short_name, routes_shapes_missing$route_long_name)
     warning(sprintf("Shapes missing (ignored in the result):\n| route_id | shape_id | route_short_name | route_long_name |\n%s", paste(row_strings, collapse = "\n")))
   }
 

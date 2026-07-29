@@ -7,6 +7,7 @@ test_that("rt_collect_protobuf decodes protobuf and passes to rt_collect_json vi
 
     testthat::with_mocked_bindings(
         readProtoFiles = function(...) TRUE,
+        P = function(...) TRUE,
         read = function(...) structure(list(id = "1"), class = "Message"),
         .package = "RProtoBuf",
         code = {
@@ -62,6 +63,7 @@ test_that("headers are passed and httr is mocked", {
         code = {
             testthat::with_mocked_bindings(
                 readProtoFiles = function(...) TRUE,
+                P = function(...) TRUE,
                 read = function(...) structure(list(id = "1"), class = "Message"),
                 .package = "RProtoBuf",
                 code = {
@@ -97,6 +99,7 @@ test_that("parameter variation: log_file", {
 
     testthat::with_mocked_bindings(
         readProtoFiles = function(...) TRUE,
+        P = function(...) TRUE,
         read = function(...) structure(list(id = "1"), class = "Message"),
         .package = "RProtoBuf",
         code = {
@@ -134,6 +137,7 @@ test_that("test incrementality in response", {
 
     testthat::with_mocked_bindings(
         readProtoFiles = function(...) TRUE,
+        P = function(...) TRUE,
         read = function(...) feed_msg,
         .package = "RProtoBuf",
         code = {
@@ -160,6 +164,7 @@ test_that("scrape_interval performs at least 3 requests", {
 
     testthat::with_mocked_bindings(
         readProtoFiles = function(...) TRUE,
+        P = function(...) TRUE,
         read = function(...) {
             request_count <<- request_count + 1
             if (request_count > 3) {

@@ -19,35 +19,34 @@
 #' @examples
 #' # Fetch OSM network and get centerlines
 #' network <- GTFShift::osm_centerlines(place = "Arroios, Lisboa, Portugal")
-#' 
+#'
 #' head(network)
-#' 
+#'
 #' table(network$X_status)
 #'
 #' @import sf
 #' @importFrom reticulate virtualenv_create use_virtualenv py_install source_python
 #' @export
-osm_centerlines <- function(bbox=NULL, place=NULL, use_buildings = TRUE, venv=NA) {
-
+osm_centerlines <- function(bbox = NULL, place = NULL, use_buildings = TRUE, venv = NA) {
   # Set up Python environment
   if (is.na(venv)) {
-    venv <- virtualenv_create()
+    venv <- reticulate::virtualenv_create()
   }
-  use_virtualenv(venv, required = TRUE)
+  reticulate::use_virtualenv(venv, required = TRUE)
 
   # Ensure dependencies are installed
-  py_install(packages = c("osmnx", "pandas", "geopandas", "shapely", "neatnet"), pip = TRUE, pip_ignore_installed=FALSE)
+  reticulate::py_install(packages = c("osmnx", "pandas", "geopandas", "shapely", "neatnet"), pip = TRUE, pip_ignore_installed = FALSE)
 
   # Define path to script and temp output
   py_script <- system.file("python", "osm_centerline_neatnet.py", package = "GTFShift")
   temp_file <- tempfile(fileext = ".gpkg")
 
   # Call Python script via reticulate
-  source_python(py_script)
-  get_centerline <- get("get_centerline", envir = .GlobalEnv)
-  get_centerline(bbox, place, use_buildings, temp_file)
+  py_env <- new.env()
+  reticulate::source_python(py_script, envir = py_env)
+  py_env$get_centerline(bbox, place, use_buildings, temp_file)
 
   # Read the GPKG file as sf
-  result <- st_read(temp_file, quiet = TRUE)
+  result <- sf::st_read(temp_file, quiet = TRUE)
   return(result)
 }
