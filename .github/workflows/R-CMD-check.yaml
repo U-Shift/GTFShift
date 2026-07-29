@@ -50,10 +50,12 @@ jobs:
 
       - name: Install osmium-tool (Windows)
         if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          conda install -c conda-forge -y osmium-tool
-          echo "$CONDA/Library/bin" >> $GITHUB_PATH
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          channels: conda-forge
+          channel-priority: strict
+          extra-specs: |
+            osmium-tool
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
