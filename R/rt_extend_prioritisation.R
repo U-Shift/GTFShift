@@ -67,8 +67,6 @@
 #'     dplyr::select(way_osm_id, speed_avg, speed_count)
 #' )
 #'
-#' @importFrom progress progress_bar
-#' @import dplyr
 #' @importFrom callr r_bg
 #' @importFrom rlang .data
 #'
@@ -106,6 +104,9 @@ rt_extend_prioritisation <- function(
   rt_collection_crs <- sf::st_crs(rt_collection)
 
   # Display feedback
+  if (!requireNamespace("progress", quietly = TRUE)) {
+    stop("Package 'progress' is required for this function. Install it with: install.packages('progress')")
+  }
   pb <- progress::progress_bar$new( # Track progress
     format = "Extending prioritisation with GTFS-RT metrics [:bar] :percent :spin elapsed=:elapsed",
     clear = FALSE, show_after = 0

@@ -91,6 +91,9 @@ load_feed <- function(path, store_path = NA, create_transfers = FALSE, transfer_
 
   # Generate transfers.txt
   if (create_transfers) {
+    if (!requireNamespace("gtfsrouter", quietly = TRUE)) {
+      stop("Package 'gtfsrouter' is required to generate transfers. Install it with: install.packages('gtfsrouter')")
+    }
     # Store in  temporary file because gtfsrouter can not convert from tidytransit format
     temp_dir <- tempfile()
     dir.create(temp_dir)

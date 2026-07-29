@@ -31,9 +31,11 @@
 #' table(network$X_status)
 #'
 #' @import sf
-#' @importFrom reticulate virtualenv_create use_virtualenv py_install source_python
 #' @export
 osm_centerlines <- function(bbox = NULL, place = NULL, osm_file = NULL, use_buildings = TRUE, venv = NA) {
+  if (!requireNamespace("reticulate", quietly = TRUE)) {
+    stop("Package 'reticulate' is required for this function. Install it with: install.packages('reticulate')")
+  }
   # Set up Python environment
   if (is.na(venv)) {
     venv <- reticulate::virtualenv_create()

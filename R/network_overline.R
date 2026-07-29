@@ -59,7 +59,6 @@
 #'
 #' @import sf
 #' @import dplyr
-#' @importFrom stplanr line_cast line_segment rnet_join
 #' @importFrom rlang .data
 #'
 #' @export
@@ -72,6 +71,9 @@ network_overline <- function(
     join_dist=10,
     metric_crs = 3857
 ) {
+  if (!requireNamespace("stplanr", quietly = TRUE)) {
+    stop("Package 'stplanr' is required for this function. Install it with: install.packages('stplanr')")
+  }
   metric_crs_is_default <- missing(metric_crs)
   original_crs <- st_crs(target_network)
   metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
@@ -86,9 +88,9 @@ network_overline <- function(
   }
 
   # 1. Prepare network
-  network_line = line_cast(st_transform(target_network, crs = metric_crs))
+  network_line = stplanr::line_cast(st_transform(target_network, crs = metric_crs))
   if (!is.na(target_network_split)) {
-    network_segmented = line_segment(
+    network_segmented = stplanr::line_segment(
       network_line,
       segment_length=target_network_split
     ) |> mutate(segment=row_number())
@@ -102,7 +104,7 @@ network_overline <- function(
     mutate(df_id=row_number())
 
   # 2. Overlap df and network segments
-  df_network_match = rnet_join(
+  df_network_match = stplanr::rnet_join(
     rnet_x = df,
     rnet_y = network_segmented |>
       select("segment"),

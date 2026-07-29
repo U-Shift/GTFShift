@@ -107,11 +107,7 @@
 #' @import osmdata
 #' @import sf
 #' @import dplyr
-#' @importFrom stplanr geo_buffer
-#' @importFrom progress progress_bar
 #' @importFrom callr r_bg
-#' @importFrom parallel mclapply
-#' @importFrom stringi stri_trans_general
 #' @importFrom utils head tail
 #' @importFrom xml2 read_xml xml_find_all xml_attr
 #' @importFrom rlang .data
@@ -162,6 +158,9 @@ osm_shapes_match_routes <- function(
   }
 
   # 1. Get geometry for shapes and stops
+  if (!requireNamespace("progress", quietly = TRUE)) {
+    stop("Package 'progress' is required for this function. Install it with: install.packages('progress')")
+  }
   pb <- progress::progress_bar$new( # Track progress
     format = sprintf("1/%d: Preparing GTFS data [:bar] :percent :spin elapsed=:elapsed", total_steps),
     clear = FALSE, show_after = 0
@@ -269,7 +268,7 @@ osm_shapes_match_routes <- function(
     job <- callr::r_bg(function(osm, osm_multilines_redux) { # update spinner while blocking method call
       return(
         osm$osm_points |>
-          sf::st_crop(sf::st_bbox(geo_buffer(osm_multilines_redux, dist = 100))) |>
+          sf::st_crop(sf::st_bbox(stplanr::geo_buffer(osm_multilines_redux, dist = 100))) |>
           dplyr::filter(.data$public_transport == "stop_position" | .data$public_transport == "platform") |>
           dplyr::select_if(~ !all(is.na(.)))
       )
@@ -365,6 +364,9 @@ osm_shapes_match_routes <- function(
         dplyr::filter(.data[[osm_match]] == route_name)
     } else {
       words <- tolower(strsplit(route_name, "\\s+")[[1]])
+      if (!requireNamespace("stringi", quietly = TRUE)) {
+        stop("Package 'stringi' is required for non-exact route matching. Install it with: install.packages('stringi')")
+      }
       words_norm <- stringi::stri_trans_general(words, "Latin-ASCII")
       osm_route_name <- osm_multilines_redux |>
         dplyr::filter(
@@ -685,6 +687,9 @@ osm_shapes_match_routes <- function(
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
+    if (!requireNamespace("parallel", quietly = TRUE)) {
+      stop("Package 'parallel' is required for multi-core processing. Install it with: install.packages('parallel')")
+    }
     results_list <- parallel::mclapply(routes_names, match_route_worker, mc.cores = num_cores)
   } else {
     results_list <- lapply(routes_names, function(route_name) {
