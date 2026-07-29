@@ -4,7 +4,8 @@ Title: Explore and Analyse General Transit Feed Specification (GTFS) Files With 
 Version: 0.11.0
 Authors@R: c(
   person(c("Gonçalo", "F."), "Matos", email = "goncaloafmatos@tecnico.pt", role = c("aut", "cre"), comment = c(ORCID = "0009-0001-3489-1732")),
-  person("Rosa", "Félix", email = "rosamfelix@tecnico.pt", role = c("aut"), comment = c(ORCID = "0000-0002-5642-6006")))
+  person("Rosa", "Félix", email = "rosamfelix@tecnico.pt", role = c("aut"), comment = c(ORCID = "0000-0002-5642-6006")),
+  person("Miguel", "Relvas Pires", email = "miguelpcrpires@tecnico.ulisboa.pt", role = c("ctb")))
 Description: GTFShift emerged from the necessity to perform systematic analysis for academic research
   over General Transit Feed Specification (GTFS) files that were not supported by any R library. It compiles 
   the methods developed for this purpose, aiming to contribute to an open source culture.

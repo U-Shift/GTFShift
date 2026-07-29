@@ -37,6 +37,12 @@ One of \code{bbox}, \code{place}, or \code{osm_file} must be provided.
 
 Parameter \code{use_buildings} exports building footprints from OSM for better results on
 the network simplification process.
+
+This method was adapted from \href{https://uscuni.org/neatnet/intro.html}{uscuni.org/neatnet}
+by \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires} in the scope of
+his \href{https://scholar.tecnico.ulisboa.pt/records/DhKWeFU5YLpMDcOhQbKR4f7ul05HCQnZr7ND}{master's thesis}.
+The full code (Python) of his work is openly available at 
+\href{https://github.com/U-Shift/lp_streets}{GitHub}.
 }
 \examples{
 # Get sample OSM extract
@@ -51,4 +57,7 @@ head(network)
 
 table(network$X_status)
 
+}
+\author{
+\href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires}
 }
