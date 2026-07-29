@@ -15,12 +15,18 @@
 #' Parameter \code{use_buildings} exports building footprints from OSM for better results on
 #' the network simplification process.
 #'
+#' This method was adapted from \href{https://uscuni.org/neatnet/intro.html}{uscuni.org/neatnet}
+#' by \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires} in the scope of
+#' his \href{https://scholar.tecnico.ulisboa.pt/records/DhKWeFU5YLpMDcOhQbKR4f7ul05HCQnZr7ND}{master's thesis}.
+#' The full code (Python) of his work is openly available at 
+#' \href{https://github.com/U-Shift/lp_streets}{GitHub}.
+#'
 #' @returns osm_lines in sf format
 #'
 #' @examples
 #' # Get sample OSM extract
 #' osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
-#' 
+#'
 #' network <- GTFShift::osm_centerlines(
 #'   place = "Arroios, Lisboa, Portugal",
 #'   osm_file = osm_file
@@ -29,6 +35,8 @@
 #' head(network)
 #'
 #' table(network$X_status)
+#'
+#' @author \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires}
 #'
 #' @import sf
 #' @export

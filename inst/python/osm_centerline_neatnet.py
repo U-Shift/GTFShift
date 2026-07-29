@@ -32,7 +32,7 @@ def filter_ground_level(gdf):
 
 
 def get_centerline(bbox, study_area, use_buildings, output_path, osm_file=None):
-    # Code adapted from https://uscuni.org/neatnet/intro.html by https://github.com/miguelpires01
+    # Code adapted from https://uscuni.org/neatnet/intro.html by https://github.com/miguelrelvaspires
 
     if osm_file is not None:
         # pyrefly: ignore [missing-import]
