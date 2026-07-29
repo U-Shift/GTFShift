@@ -57,7 +57,6 @@
 #' @import dplyr
 #' @import sf
 #' @import lubridate
-#' @importFrom stplanr overline2
 #' @importFrom tidyselect any_of
 #' @importFrom rlang .data
 #'
@@ -123,6 +122,9 @@ get_route_frequency_hourly <- function(
 
   # Overline?
   if (overline) {
+    if (!requireNamespace("stplanr", quietly = TRUE)) {
+      stop("Package 'stplanr' is required when overline=TRUE. Install it with: install.packages('stplanr')")
+    }
     routes_freq_all <- data.frame()
     for (h in unique(routes_freq$hour)) { # hours of the day
       routes_freq_h <- routes_freq |>

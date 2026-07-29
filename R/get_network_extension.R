@@ -104,6 +104,9 @@ get_network_extension <- function(
 
   # Compute unified network extension
   if (unified) {
+    if (!requireNamespace("stplanr", quietly = TRUE)) {
+      stop("Package 'stplanr' is required when unified=TRUE. Install it with: install.packages('stplanr')")
+    }
     network_union <- network_redux_shapes |>
       st_union() |>
       stplanr::line_cast() |>

@@ -60,7 +60,6 @@
 #' @import osmdata
 #' @import sf
 #' @import dplyr
-#' @importFrom progress progress_bar
 #' @importFrom callr r_bg
 #' @importFrom rlang .data
 #'
@@ -79,6 +78,9 @@ osm_shapes_to_routes <- function(
   osm_ways <- NULL
 
   # 1. Fetch OSM data as XML
+  if (!requireNamespace("progress", quietly = TRUE)) {
+    stop("Package 'progress' is required for this function. Install it with: install.packages('progress')")
+  }
   pb <- progress::progress_bar$new( # Track progress
     format = sprintf(
       ifelse(

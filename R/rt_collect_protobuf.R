@@ -35,9 +35,7 @@
 #'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 #' )
 #'
-#' @importFrom RProtoBuf readProtoFiles read
 #' @importFrom jsonlite write_json
-#' @importFrom progress progress_bar
 #' @importFrom stats setNames
 #' @export
 rt_collect_protobuf <- function(
@@ -57,6 +55,9 @@ rt_collect_protobuf <- function(
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
     # Load protobuf
+    if (!requireNamespace("RProtoBuf", quietly = TRUE)) {
+      stop("Package 'RProtoBuf' is required for this function. Install it with: install.packages('RProtoBuf')")
+    }
     RProtoBuf::readProtoFiles((system.file("extdata", "gtfs-realtime.proto", package = "GTFShift")))
     if (grepl("^http", gtfs_rt_url) && !is.null(headers)) {
       temp_pb <- tempfile(fileext = ".pb")
@@ -125,6 +126,9 @@ rt_collect_protobuf <- function(
       break
     }
     interval_start <- Sys.time()
+    if (!requireNamespace("progress", quietly = TRUE)) {
+      stop("Package 'progress' is required for this function. Install it with: install.packages('progress')")
+    }
     pb <- progress::progress_bar$new( # Track progress
       format = "Sleeping [:bar] :percent :spin elapsed=:elapsed",
       clear = FALSE, show_after = 0

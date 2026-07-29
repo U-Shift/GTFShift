@@ -75,7 +75,6 @@
 #'
 #' @import dplyr
 #' @import sf
-#' @importFrom lwgeom st_startpoint st_endpoint
 #' @importFrom rlang .data
 #'
 #' @export
@@ -84,6 +83,9 @@ multiline_to_sorted_linestring <- function(
     points = NULL,
     metric_crs = 3857
 ) {
+    if (!requireNamespace("lwgeom", quietly = TRUE)) {
+      stop("Package 'lwgeom' is required for this function. Install it with: install.packages('lwgeom')")
+    }
     metric_crs_is_default <- missing(metric_crs)
     metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
     if (is.na(metric_crs)) {

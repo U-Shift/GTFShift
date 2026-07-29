@@ -20,23 +20,15 @@ Imports:
   tidyselect,
   tidyr,
   lubridate,
-  gtfsrouter (>= 0.1.4),
   httr,
   jsonlite,
   dplyr,
   osmdata,
-  stplanr,
   stringr,
-  reticulate,
-  progress,
   callr,
-  stringi,
-  parallel,
-  lwgeom,
   purrr,
   rlang,
-  xml2,
-  RProtoBuf
+  xml2
 URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
 Suggests: 
     knitr,
@@ -45,7 +37,15 @@ Suggests:
     osmextract,
     rosmium,
     testthat,
-    zip
+    zip,
+    gtfsrouter (>= 0.1.4),
+    reticulate,
+    parallel,
+    RProtoBuf,
+    stplanr,
+    lwgeom,
+    progress,
+    stringi
 VignetteBuilder: knitr
 Config/Needs/website: rmarkdown
 Config/roxygen2/version: 8.0.0

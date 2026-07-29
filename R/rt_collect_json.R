@@ -39,7 +39,6 @@
 #' )
 #'
 #' @importFrom jsonlite fromJSON
-#' @importFrom progress progress_bar
 #' @importFrom utils write.table
 #'
 #' @export
@@ -133,6 +132,9 @@ rt_collect_json <- function(
       break
     }
     interval_start <- Sys.time()
+    if (!requireNamespace("progress", quietly = TRUE)) {
+      stop("Package 'progress' is required for interval sleeping display. Install it with: install.packages('progress')")
+    }
     pb <- progress::progress_bar$new( # Track progress
       format = "Sleeping [:bar] :percent :spin elapsed=:elapsed",
       clear = FALSE, show_after = 0
