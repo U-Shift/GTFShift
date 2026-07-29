@@ -77,7 +77,7 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   shape_lengths <- pattern_gtfs$shapes |>
     as.data.frame() |>
-    select(.data$shape_id, .data$length, -.data$geometry)
+    select("shape_id", "length", -"geometry")
 
   ## Get statistics: for each service pattern, get nr of trips, routes, total and avg distance and number of stops covered
   service_pattern_summary <- pattern_gtfs$trips |> # Join trips
@@ -144,7 +144,7 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   table <- frequency |>
     left_join(gtfs_date$stops |>
-                select(.data$stop_id, .data$stop_lon, .data$stop_lat), by = "stop_id") |>
+                select("stop_id", "stop_lon", "stop_lat"), by = "stop_id") |>
     st_as_sf(crs = 4326, coords = c("stop_lon", "stop_lat"))
 
   message("Finished GTFS analysis!")

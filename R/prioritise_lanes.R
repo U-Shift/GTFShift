@@ -90,7 +90,7 @@ prioritise_lanes <- function(
 
   # > Compute aggregation
   lanes <- way_frequency |>
-    left_join(bus_lanes |> st_drop_geometry() |> select(.data$way_osm_id) |> mutate(is_bus_lane = TRUE), by = "way_osm_id") |>
+    left_join(bus_lanes |> st_drop_geometry() |> select("way_osm_id") |> mutate(is_bus_lane = TRUE), by = "way_osm_id") |>
     mutate(
       is_bus_lane = ifelse(is.na(.data$is_bus_lane), FALSE, .data$is_bus_lane),
       n_lanes_parking = dplyr::case_when(
@@ -139,7 +139,7 @@ prioritise_lanes <- function(
 
   if (!keep_osm_attributes) {
     lanes <- lanes |>
-      select(.data$way_osm_id, .data$hour, .data$frequency, .data$is_bus_lane, .data$n_lanes_parking, .data$n_lanes_circulation, .data$n_directions, .data$n_lanes_circulation_direction, .data$routes, .data$shapes, .data$geometry)
+      select("way_osm_id", "hour", "frequency", "is_bus_lane", "n_lanes_parking", "n_lanes_circulation", "n_directions", "n_lanes_circulation_direction", "routes", "shapes", "geometry")
   }
 
   return(lanes)

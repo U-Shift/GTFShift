@@ -42,9 +42,9 @@ create_shapes_from_stops <- function(gtfs) {
 
   # Get stop_sequence_str for each trip (each will be a different shape)
   shapes_trips <- gtfs$stop_times |>
-    select(.data$trip_id, .data$stop_id, .data$stop_sequence) |>
+    select("trip_id", "stop_id", "stop_sequence") |>
     arrange(.data$trip_id, .data$stop_sequence) |>
-    left_join(gtfs$stops |> select(.data$stop_id, .data$stop_lon, .data$stop_lat), by = "stop_id") |>
+    left_join(gtfs$stops |> select("stop_id", "stop_lon", "stop_lat"), by = "stop_id") |>
     group_by(.data$trip_id) |>
     arrange(.data$stop_sequence) |>
     # Create string with stop_id sequence for each trip, to be used as a key to group trips with the same stop sequence
@@ -53,7 +53,7 @@ create_shapes_from_stops <- function(gtfs) {
 
   # Get unique stop_sequence_str
   shapes_trips_geom <- shapes_trips |>
-    select(.data$stop_sequence_str, .data$stop_id, .data$stop_sequence, .data$stop_lon, .data$stop_lat) |>
+    select("stop_sequence_str", "stop_id", "stop_sequence", "stop_lon", "stop_lat") |>
     distinct()
 
   # Gnerate shape_id
@@ -69,14 +69,14 @@ create_shapes_from_stops <- function(gtfs) {
   # Asssociate trips to shape_id
   gtfs$trips <-
     gtfs$trips |>
-    select(-.data$shape_id) |>
-    left_join(shapes |> tidyr::unnest(cols = "trip_id") |> select(.data$trip_id, .data$shape_id) |> distinct(), by = "trip_id")
+    select(-"shape_id") |>
+    left_join(shapes |> tidyr::unnest(cols = "trip_id") |> select("trip_id", "shape_id") |> distinct(), by = "trip_id")
 
   # Gather shape_id and shape geometry (from shapes_trips_geom)
   gtfs$shapes <- shapes |>
-    select(-.data$trip_id) |>
+    select(-"trip_id") |>
     left_join(shapes_trips_geom, by = "stop_sequence_str") |>
-    select(-.data$stop_sequence_str, -.data$stop_id) |>
+    select(-"stop_sequence_str", -"stop_id") |>
     rename(
       shape_pt_lat = .data$stop_lat,
       shape_pt_lon = .data$stop_lon,

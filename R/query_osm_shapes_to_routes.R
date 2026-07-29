@@ -249,7 +249,7 @@ osm_shapes_to_routes <- function(
     osm_extra_tags <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE, extra_tags = tags_to_extract) |> st_drop_geometry()
     names(osm_extra_tags)[names(osm_extra_tags) != "osm_id"] <- gsub("_", ":", names(osm_extra_tags)[names(osm_extra_tags) != "osm_id"])
     result <- result |>
-      left_join(osm_extra_tags |> select(-.data$`other:tags`), by = c("way_osm_id" = "osm_id"))
+      left_join(osm_extra_tags |> select(-"other:tags"), by = c("way_osm_id" = "osm_id"))
     # Remove columns that only have empty values
     result <- result |>
       dplyr::select(dplyr::where(~ {

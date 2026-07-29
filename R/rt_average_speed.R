@@ -198,7 +198,7 @@ rt_average_speed <- function(
         distance_since_prev_meters = round(.data$distance_since_prev_meters, 2),
         speed_kmh = round(.data$speed_kmh, 2),
         distance_along_geometry = round(.data$distance_along_geometry, 2)
-      ) |> select(-.data$distance_since_prev_meters_normal, -.data$distance_since_prev_meters_reversed)
+      ) |> select(-"distance_since_prev_meters_normal", -"distance_since_prev_meters_reversed")
       # mapview(trip_df, zcol = "distance_along_geometry", layer.name = "Distance along geometry") + mapview(trip_df, zcol = "speed_kmh", layer.name = "Speed (km/h)") +  mapview(trip_geometry, color = "blue", lwd = 3, layer.name = "Trip geometry")
       # |> filter(
       #  !is.na(speed_kmh) &

@@ -123,7 +123,10 @@ speed <- GTFShift::rt_average_speed(
 
 head(speed |> 
   dplyr::filter(!is.na(speed_kmh)) |>
-  dplyr::select(trip_id, timestamp, speed_kmh, distance_along_geometry, distance_to_closest_on_geometry)
+  dplyr::select(
+    trip_id, timestamp, speed_kmh, 
+    distance_along_geometry, distance_to_closest_on_geometry
+  )
 )
 
 nrow(speed)
