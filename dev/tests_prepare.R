@@ -161,19 +161,25 @@ sf::st_write(ways |> dplyr::select(osm_id), "inst/extdata/osm_ways_tcb.gpkg")
 routes = sf::st_read(OSM_EXPORT_GPKG, layer="multilinestrings")
 routes$shape_id <- ifelse(grepl('"gtfs:shape_id"=>"', routes$other_tags), sub('.*"gtfs:shape_id"=>"([^"]+)".*', '\\1', routes$other_tags), NA_character_)
 routes$route_id <- ifelse(grepl('"gtfs:route_id"=>"', routes$other_tags), sub('.*"gtfs:route_id"=>"([^"]+)".*', '\\1', routes$other_tags), NA_character_)
+# route_id starts with 1_, 2_, 3_ or 4_ 
+routes = routes |> filter(grepl("^[1-4]_", route_id))
 mapview::mapview(routes)
 View(routes |> sf::st_drop_geometry())
-sf::st_write(routes |> dplyr::select(osm_id, shape_id, route_id), "inst/extdata/osm_routes_tcb.gpkg", delete_dns = TRUE)
+sf::st_write(routes |> dplyr::select(osm_id, shape_id, route_id), "inst/extdata/samples/osm_routes_tcb.gpkg", delete_dns = TRUE)
 
 ## Filter Lisbon highways --------------------------------
-aml <- sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
-lisboa <- aml |>
-  dplyr::filter(Concelho == "Lisboa")
-mapview::mapview(lisboa)
-sf::st_write(lisboa, "~/.local/share/R/osmextract/lisbon_bbox.geojson")
+census_aml = sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/data/census.gpkg", quiet = TRUE)
+names(census_aml)
+# Filter by those that have UID starting by 
+# 110657 (Avenidas Novas), 110654 (Alvalade) and 110655 (Areeiro)
+census_aml = census_aml |> 
+  mutate(UID = as.character(UID)) |> 
+  filter(grepl("^(110657|110654|110655)", UID)) |>
+  sf::st_union() |>
+  sf::st_transform(4326)
+mapview::mapview(census_aml)
 
-lisboa_bbox = sf::st_bbox(lisboa)
-lisboa_bbox
+sf::st_write(census_aml, "~/.local/share/R/osmextract/lisbon_bbox.geojson", delete_dns = TRUE)
 
 """
 # Option B: Two-step process
@@ -192,11 +198,30 @@ osmium getid -r -t portugal-latest.osm.pbf r6384187 -o relation_boundary.pbf --o
 # 2. Convert relation boundary to GeoJSON polygon
 ogr2ogr -f GeoJSON relation_boundary.geojson relation_boundary.pbf multipolygons
 
-# 3. Clip full PBF to extract ALL objects (roads, buildings, etc.) inside the relation geometry
+# 3. Clip full PBF to the relation geometry boundary (broad extract)
 osmium extract -p relation_boundary.geojson portugal-latest.osm.pbf -o relation_area_all.pbf --overwrite
 
-# 4. Convert clipped PBF to GPKG for validation / analysis in R/GIS
-ogr2ogr -f GPKG relation_area_all.gpkg relation_area_all.pbf
+# 4. Filter to ONLY the OSM elements needed by osm_centerline_neatnet.py:
+#    - Ways: ALL highway=* types (pyrosm needs the full network; Python filters types later)
+#    - Ways/areas: building=* for exclusion mask (Step 2 in Python)
+#    - Ways/areas: landuse=construction|cemetery for exclusion mask
+#    - Ways/areas: amenity=school for exclusion mask
+#    - Ways/areas: leisure=pitch for exclusion mask
+#    Referenced nodes are included automatically by osmium tags-filter
+osmium tags-filter relation_area_all.pbf \
+  "w/highway" \
+  "wa/building" \
+  "wa/landuse=construction,cemetery" \
+  "wa/amenity=school" \
+  "wa/leisure=pitch" \
+  -o relation_6384187_filtered.pbf --overwrite
+
+# 5. Merge filtered elements with the relation boundary to include r6384187
+#    relation_boundary.pbf (from step 1) already contains the relation + its members
+osmium merge relation_6384187_filtered.pbf relation_boundary.pbf -o relation_6384187.pbf --overwrite
+
+# 6. (Optional) Convert to GPKG for validation in R/GIS
+ogr2ogr -f GPKG relation_6384187.gpkg relation_6384187.pbf
 """
 
 
