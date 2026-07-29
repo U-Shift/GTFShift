@@ -22,7 +22,9 @@ This can be useful for some applications that do not require high precision in t
 }
 \examples{
 # Load GTFS without shapes
-gtfs <- tidytransit::read_gtfs(system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift"))
+gtfs <- tidytransit::read_gtfs(
+  system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+)
 
 summary(gtfs)
 

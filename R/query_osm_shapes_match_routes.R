@@ -458,7 +458,7 @@ osm_shapes_match_routes <- function(
             # Other relevant parameters,
             first_stop_osm_id = relations_df |>
               dplyr::filter(.data$type == "node") |>
-              dplyr::select(relation_osm_id = .data$relation_osm_id, stop_osm_id = .data$osm_id, role = .data$role) |>
+              dplyr::select(relation_osm_id = "relation_osm_id", stop_osm_id = "osm_id", role = "role") |>
               # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
               dplyr::filter(.data$relation_osm_id == .data$osm_id & .data$role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
               # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
@@ -476,7 +476,7 @@ osm_shapes_match_routes <- function(
               dplyr::pull(.data$stop_osm_id),
             last_stop_osm_id = relations_df |>
               dplyr::filter(.data$type == "node") |>
-              dplyr::select(relation_osm_id = .data$relation_osm_id, stop_osm_id = .data$osm_id, role = .data$role) |>
+              dplyr::select(relation_osm_id = "relation_osm_id", stop_osm_id = "osm_id", role = "role") |>
               dplyr::filter(.data$relation_osm_id == .data$osm_id & .data$role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
               # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
               dplyr::filter(
@@ -542,7 +542,7 @@ osm_shapes_match_routes <- function(
         nr_stops = nrow(gtfs$stop_times |> dplyr::filter(.data$trip_id == .data$trip_id_copy))
       ) |>
       dplyr::ungroup() |>
-      dplyr::select(-.data$trip_id_copy) |>
+      dplyr::select(-"trip_id_copy") |>
       dplyr::arrange(.data$route_dist, .data$initial, .data$final)
 
     # 3. Match gtfs shapes and osm routes, by choosing the one that share the closest start and end points
@@ -586,7 +586,7 @@ osm_shapes_match_routes <- function(
         stops_diff = as.numeric(abs(.data$nr_stops_gtfs - .data$nr_stops_osm))
       ) |> # absolute difference
       dplyr::ungroup() |>
-      dplyr::select(-.data$initial_gtfs, -.data$final_gtfs) |>
+      dplyr::select(-"initial_gtfs", -"final_gtfs") |>
       sf::st_as_sf(sf_column_name = "geometry")
 
     # When multiple osm_id, return those with min distance_diff + points_diff + then stops_diff
@@ -671,7 +671,7 @@ osm_shapes_match_routes <- function(
       dplyr::left_join(
         osm_multilines_redux |>
           sf::st_drop_geometry() |>
-          dplyr::select(osm_id = .data$osm_id, osm_name = .data$name, osm_ref = .data$ref) |>
+          dplyr::select(osm_id = "osm_id", osm_name = "name", osm_ref = "ref") |>
           dplyr::distinct(.data$osm_id, .keep_all = TRUE),
         by = "osm_id"
       ) |>

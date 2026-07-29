@@ -68,7 +68,7 @@ get_network_extension <- function(
   # Get unique shapes
   shapes_unique <- network |>
     st_drop_geometry() |>
-    select(.data$shape_id) |>
+    select("shape_id") |>
     distinct() |>
     left_join(network, by = "shape_id", multiple = "first")
 

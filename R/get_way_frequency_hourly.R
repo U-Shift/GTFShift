@@ -126,11 +126,11 @@ get_way_frequency_hourly <- function(
 
   if (!keep_osm_attributes) {
     ways_unique_geometry <- ways_unique_geometry |>
-      select(.data$way_osm_id, .data$geometry)
+      select("way_osm_id", "geometry")
   }
 
   ways_freq <- routes_freq |>
-    inner_join(ways |> sf::st_drop_geometry() |> select(.data$shape_id, .data$way_osm_id), by = "shape_id", relationship = "many-to-many") |>
+    inner_join(ways |> sf::st_drop_geometry() |> select("shape_id", "way_osm_id"), by = "shape_id", relationship = "many-to-many") |>
     group_by(.data$way_osm_id, .data$hour) |>
     summarize(
       frequency = sum(.data$frequency),
