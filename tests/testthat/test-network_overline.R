@@ -15,18 +15,20 @@ test_that("network_overline aggregates lines onto target network", {
         )
     )
 
-    res <- GTFShift::network_overline(
-        target_network = target_net,
-        lines = lines_sf,
-        attr = "frequency",
-        target_network_split = NA,
-        metric_crs = 3857
-    )
+    suppressWarnings({ # stplanr will warn "rsgeo not installed, using lwgeom"
+        res <- GTFShift::network_overline(
+            target_network = target_net,
+            lines = lines_sf,
+            attr = "frequency",
+            target_network_split = NA,
+            metric_crs = 3857
+        )
+    })
 
     expect_s3_class(res, "sf")
     expect_contains(names(res), "frequency")
     expect_equal(res$frequency, sum(lines_sf$frequency)) # Expecting the sum of frequencies
-})
+    })
 
 test_that("network_overline raises warning when metric_crs is default", {
     target_net <- st_sf(
@@ -86,15 +88,17 @@ test_that("network_overline handles parameter variations (target_network_split, 
 
 
     # Test with target_network_split = 50 and fun = max
-    res_max <- GTFShift::network_overline(
-        target_network = target_net,
-        lines = lines_sf,
-        attr = "frequency",
-        target_network_split = 50,
-        fun = max,
-        join_dist = 15,
-        metric_crs = 3857
-    )
+    suppressWarnings({ # stplanr will warn "rsgeo not installed, using lwgeom"
+        res_max <- GTFShift::network_overline(
+            target_network = target_net,
+            lines = lines_sf,
+            attr = "frequency",
+            target_network_split = 50,
+            fun = max,
+            join_dist = 15,
+            metric_crs = 3857
+        )
+    })
 
     expect_s3_class(res_max, "sf")
     expect_contains(names(res_max), "frequency")

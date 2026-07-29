@@ -121,7 +121,7 @@ rt_collect_json <- function(
       sep = ",",
       row.names = FALSE,
       col.names = !file.exists(destination_file), # only write header if file is new
-      append = TRUE
+      append = file.exists(destination_file)
     )
 
     m <- sprintf("[%s] Iteration %d completed", timestamp, count)

@@ -30,7 +30,9 @@ test_that("osm_shapes_to_routes matches shapes by gtfs:shape_id using mocks", {
                 oe_read = function(...) mock_ways,
                 .package = "osmextract",
                 code = {
-                    res <- GTFShift::osm_shapes_to_routes(gtfs, q = NA, osm_file = "dummy.pbf")
+                    suppressWarnings({ # There will be warns about gtfs shapes not matched
+                        res <- GTFShift::osm_shapes_to_routes(gtfs, q = NA, osm_file = "dummy.pbf")
+                    })
                     expect_s3_class(res, "sf")
                     expect_contains(names(res), c("shape_id", "osm_id", "geometry"))
                 }
@@ -78,7 +80,9 @@ test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overp
         },
         .package = "callr",
         code = {
-            res <- GTFShift::osm_shapes_to_routes(gtfs, q = "dummy_q", osm_file = NULL)
+            suppressWarnings({ # There will be warns about gtfs shapes not matched
+                res <- GTFShift::osm_shapes_to_routes(gtfs, q = "dummy_q", osm_file = NULL)
+            })
             expect_s3_class(res, "sf")
             expect_contains(names(res), c("shape_id", "osm_id", "geometry"))
             expect_equal(nrow(res), 1)
@@ -133,11 +137,13 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
                 oe_get_keys = function(...) c("lanes", "maxspeed"),
                 .package = "osmextract",
                 code = {
-                    res <- GTFShift::osm_shapes_to_routes(
-                        gtfs, q = NA, ways = TRUE,
-                        ways_tags = c("lanes", "maxspeed"),
-                        osm_file = "dummy.pbf"
-                    )
+                    suppressWarnings({ # There will be warns about gtfs shapes not matched
+                        res <- GTFShift::osm_shapes_to_routes(
+                            gtfs, q = NA, ways = TRUE,
+                            ways_tags = c("lanes", "maxspeed"),
+                            osm_file = "dummy.pbf"
+                        )
+                    })
                     expect_s3_class(res, "sf")
                     expect_contains(names(res), c("shape_id", "osm_id", "way_osm_id", "lanes", "maxspeed", "geometry"))
                     expect_equal(res$way_osm_id, "w1")
@@ -211,11 +217,13 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file = NULL extracts wa
         },
         .package = "callr",
         code = {
-            res <- GTFShift::osm_shapes_to_routes(
-                gtfs, q = "dummy_q", ways = TRUE,
-                ways_tags = c("lanes", "maxspeed"),
-                osm_file = NULL
-            )
+            suppressWarnings({ # There will be warns about gtfs shapes not matched
+                res <- GTFShift::osm_shapes_to_routes(
+                    gtfs, q = "dummy_q", ways = TRUE,
+                    ways_tags = c("lanes", "maxspeed"),
+                    osm_file = NULL
+                )
+            })
             expect_s3_class(res, "sf")
             expect_contains(names(res), c("shape_id", "osm_id", "way_osm_id", "lanes", "maxspeed", "geometry"))
             expect_equal(res$way_osm_id, "w1")
