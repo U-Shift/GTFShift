@@ -1,19 +1,26 @@
-Package: GTFShift
 Type: Package
-Title: Explore and Analyse General Transit Feed Specification (GTFS) Files With a Focus on Urban Mobility 
+Package: GTFShift
+Title: Explore and Analyse General Transit Feed Specification (GTFS) Files
+    With a Focus on Urban Mobility
 Version: 0.11.0
 Authors@R: c(
-  person(c("Gonçalo", "F."), "Matos", email = "goncaloafmatos@tecnico.pt", role = c("aut", "cre"), comment = c(ORCID = "0009-0001-3489-1732")),
-  person("Rosa", "Félix", email = "rosamfelix@tecnico.pt", role = c("aut"), comment = c(ORCID = "0000-0002-5642-6006")),
-  person("Miguel", "Relvas Pires", email = "miguelpcrpires@tecnico.ulisboa.pt", role = c("ctb")))
-Description: GTFShift emerged from the necessity to perform systematic analysis for academic research
-  over General Transit Feed Specification (GTFS) files that were not supported by any R library. It compiles 
-  the methods developed for this purpose, aiming to contribute to an open source culture.
-  Its functionality is built mostly on [tidytransit](https://r-transit.github.io/tidytransit/) package.
+    person(c("Gonçalo", "F."), "Matos", , "goncaloafmatos@tecnico.pt", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0001-3489-1732")),
+    person("Rosa", "Félix", , "rosamfelix@tecnico.pt", role = "aut",
+           comment = c(ORCID = "0000-0002-5642-6006")),
+    person("Miguel", "Relvas Pires", , "miguelpcrpires@tecnico.ulisboa.pt", role = "ctb")
+  )
+Description: GTFShift emerged from the necessity to perform systematic
+    analysis for academic research over General Transit Feed Specification
+    (GTFS) files that were not supported by any R library. It compiles the
+    methods developed for this purpose, aiming to contribute to an open
+    source culture.  Its functionality is built mostly on
+    [tidytransit](https://r-transit.github.io/tidytransit/) package.
 License: GPL
-Encoding: UTF-8
+URL: https://github.com/U-Shift/GTFShift,
+    https://u-shift.github.io/GTFShift/
 Depends:
-  R (>= 4.1.0)
+    R (>= 4.1.0)
 Imports: 
   tidytransit,
   gtfstools,
@@ -30,7 +37,6 @@ Imports:
   purrr,
   rlang,
   xml2
-URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
 Suggests: 
     knitr,
     rmarkdown,
@@ -47,7 +53,9 @@ Suggests:
     lwgeom,
     progress,
     stringi
-VignetteBuilder: knitr
+VignetteBuilder: 
+    knitr
 Config/Needs/website: rmarkdown
 Config/roxygen2/version: 8.0.0
+Encoding: UTF-8
 RoxygenNote: 7.3.3
