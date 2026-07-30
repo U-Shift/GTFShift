@@ -2,7 +2,7 @@ Type: Package
 Package: GTFShift
 Title: Explore and Analyse General Transit Feed Specification (GTFS) Files
     with a Focus on Urban Mobility
-Version: 0.11.0
+Version: 0.12.0
 Authors@R: c(
     person(c("Gonçalo", "F."), "Matos", , "goncaloafmatos@tecnico.pt", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0001-3489-1732")),
