@@ -70,7 +70,6 @@ The full code (Python) of his work is openly available at
 ## Examples
 
 ``` r
-if (FALSE) { # reticulate::py_module_available("neatnet")
 # Get sample OSM extract
 osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
 
@@ -78,9 +77,20 @@ network <- GTFShift::osm_centerlines(
   place = "Arroios, Lisboa, Portugal",
   osm_file = osm_file
 )
+#> Using Python: /usr/bin/python3.12
+#> Creating virtual environment '~/.virtualenvs/r-reticulate' ... 
+#> + /usr/bin/python3.12 -m venv /home/runner/.virtualenvs/r-reticulate
+#> Done!
+#> Installing packages: pip, wheel, setuptools
+#> + /home/runner/.virtualenvs/r-reticulate/bin/python -m pip install --upgrade pip wheel setuptools
+#> Installing packages: numpy
+#> + /home/runner/.virtualenvs/r-reticulate/bin/python -m pip install --upgrade --no-user numpy
+#> Virtual environment '~/.virtualenvs/r-reticulate' successfully created.
+#> Error in use_python(python, required = required): failed to initialize requested version of Python
 
 head(network)
+#> Error: object 'network' not found
 
 table(network$X_status)
-}
+#> Error: object 'network' not found
 ```

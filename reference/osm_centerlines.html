@@ -54,7 +54,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Get centerlines for OSM road network</h1>
-      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/v0.12/R/query_osm_centerlines.R" class="external-link"><code>R/query_osm_centerlines.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/U-Shift/GTFShift/blob/main/R/query_osm_centerlines.R" class="external-link"><code>R/query_osm_centerlines.R</code></a></small>
       <div class="d-none name"><code>osm_centerlines.Rd</code></div>
     </div>
 
@@ -121,19 +121,29 @@ The full code (Python) of his work is openly available at
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># reticulate::py_module_available("neatnet")</span></span></span>
-<span class="r-in"><span><span class="co"># Get sample OSM extract</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Get sample OSM extract</span></span></span>
 <span class="r-in"><span><span class="va">osm_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/samples"</span>, <span class="st">"relation_6384187.pbf"</span>, package <span class="op">=</span> <span class="st">"GTFShift"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">network</span> <span class="op">&lt;-</span> <span class="fu">GTFShift</span><span class="fu">::</span><span class="fu">osm_centerlines</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  place <span class="op">=</span> <span class="st">"Arroios, Lisboa, Portugal"</span>,</span></span>
 <span class="r-in"><span>  osm_file <span class="op">=</span> <span class="va">osm_file</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Using Python: /usr/bin/python3.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Creating virtual environment '~/.virtualenvs/r-reticulate' ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> + /usr/bin/python3.12 -m venv /home/runner/.virtualenvs/r-reticulate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Done!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Installing packages: pip, wheel, setuptools</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> + /home/runner/.virtualenvs/r-reticulate/bin/python -m pip install --upgrade pip wheel setuptools</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Installing packages: numpy</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> + /home/runner/.virtualenvs/r-reticulate/bin/python -m pip install --upgrade --no-user numpy</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Virtual environment '~/.virtualenvs/r-reticulate' successfully created.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in use_python(python, required = required):</span> failed to initialize requested version of Python</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">network</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'network' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">network</span><span class="op">$</span><span class="va">X_status</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'network' not found</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

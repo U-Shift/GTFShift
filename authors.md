@@ -12,7 +12,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/U-Shift/GTFShift/blob/v0.12/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/U-Shift/GTFShift/blob/main/DESCRIPTION)
 
 Matos GF, Félix R (2026). *GTFShift: Explore and Analyse General Transit
 Feed Specification (GTFS) Files with a Focus on Urban Mobility*. R
