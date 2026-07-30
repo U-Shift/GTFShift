@@ -23,7 +23,7 @@
 #' Shapes that do not have a match on OSM are ignored.
 #' If that occurs, a warning is displayed during the method execution, informing about the missing geometries.
 #'
-#' @examples
+#' @examplesIf nzchar(Sys.which("osmium"))
 #' # Subset GTFS for one route only, for demo purposes
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")

@@ -25,7 +25,7 @@
 #'   \item{(if \code{keep_osm_attributes = TRUE})}{All OSM way attributes.}
 #' }
 #'
-#' @examples
+#' @examplesIf nzchar(Sys.which("osmium"))
 #' # Subset GTFS for one route only, for demo purposes
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")

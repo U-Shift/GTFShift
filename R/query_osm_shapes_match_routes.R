@@ -81,7 +81,7 @@
 #'   \item{geometry}{The geometrical data for the OSM route relation.}
 #' }
 #'
-#' @examples
+#' @examplesIf nzchar(Sys.which("osmium"))
 #' # Subset GTFS for one route only, for demo purposes
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip",

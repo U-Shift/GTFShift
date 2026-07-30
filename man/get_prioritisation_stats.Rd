@@ -34,6 +34,7 @@ List. Statistics about lane prioritisation, with the following attributes:
 Get statistics about lane prioritisation
 }
 \examples{
+\dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -57,5 +58,5 @@ lane_prioritisation <- GTFShift::prioritise_lanes(
 stats <- GTFShift::get_prioritisation_stats(lane_prioritisation, metric_crs = 3763)
 
 data.frame(metric = names(stats), value = unlist(stats, use.names = FALSE))
-
+\dontshow{\}) # examplesIf}
 }

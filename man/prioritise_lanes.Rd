@@ -54,6 +54,7 @@ Mind that this method uses \code{GTFShift::get_way_frequency_hourly()} to match 
 OSM relation mapping is well defined for the transit routes. Routes that do not have an OSM match are ignored.
 }
 \examples{
+\dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -76,5 +77,5 @@ head(
   lane_prioritisation |> 
   dplyr::select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes)
 )
-
+\dontshow{\}) # examplesIf}
 }
