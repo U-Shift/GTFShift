@@ -74,7 +74,7 @@ Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
 ## Related packages
 
 -   [`{tidytransit}`](https://github.com/r-transit/tidytransit)
--   [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
+-   [`{gtfstools}`](https://github.com/ipea/gtfstools/)
 -   [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
 -   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 
