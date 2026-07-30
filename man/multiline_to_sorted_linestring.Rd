@@ -80,7 +80,7 @@ transformed back to the original CRS of \code{multilinestring}.
 osm_routes <- sf::st_read(
   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
   quiet = TRUE
-) |> dplyr::sample_n(3)
+) |> dplyr::sample_n(1)
 
 head(osm_routes)
 
