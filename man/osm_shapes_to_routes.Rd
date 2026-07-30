@@ -47,6 +47,7 @@ For each route, matches its trips' shapes with OSM route relations, considering 
 OSM \code{gtfs:shape_id} attribute.
 }
 \examples{
+\dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -79,5 +80,5 @@ shapes_osm_ways <- GTFShift::osm_shapes_to_routes(
 head(shapes_osm_ways |> dplyr::select(way_osm_id, shape_id, osm_id))
 
 nrow(shapes_osm_ways)
-
+\dontshow{\}) # examplesIf}
 }

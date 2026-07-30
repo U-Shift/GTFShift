@@ -45,6 +45,7 @@ This method analyses the GTFS feed for a representative day, finding for each ro
 For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
+\dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -65,7 +66,7 @@ frequency_analysis <- GTFShift::get_way_frequency_hourly(
 )
 
 head(frequency_analysis |> sf::st_drop_geometry())
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{GTFShift::calendar_nextBusinessWednesday()}

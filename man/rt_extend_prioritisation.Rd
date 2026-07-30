@@ -44,6 +44,7 @@ If GTFS-RT data does not provide speed information, it can be inferred from the 
 Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 }
 \examples{
+\dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip",
@@ -84,5 +85,5 @@ head(
     dplyr::filter(!is.na(speed_count)) |>
     dplyr::select(way_osm_id, speed_avg, speed_count)
 )
-
+\dontshow{\}) # examplesIf}
 }

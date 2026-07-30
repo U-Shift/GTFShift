@@ -117,6 +117,7 @@ an OSM one. This might generate wrong results if the topology of routes on OSM d
 Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the results table to validate the results and identify misassociations.
 }
 \examples{
+\dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip",
@@ -138,5 +139,5 @@ shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
 )
 
 head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_diff, stops_diff))
-
+\dontshow{\}) # examplesIf}
 }
