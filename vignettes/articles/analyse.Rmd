@@ -234,7 +234,7 @@ GTFShift offers several methods that allow to get routes geometry from OpenStree
 
 There are several methods to aggregate a transit network. One approach is through the determination of the centerlines of the roads where the vehicles operate. GTFShift provides a method that encapsulates Python [neatnet](https://uscuni.org/neatnet/index.html) package for this purpose. Refer to [vignette("osm")](osm.html#get-centerlines-for-osm-road-network) for more details.
 
-> During the development of this project, no R packages were found suiting this purpose. [Centerline](https://github.com/atsyplenkov/centerline) package has this feature in its roadmap. Currently, there are available solutions for [Python](https://uscuni.org/neatnet/index.html) or [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
+> During the development of this project, no R packages were found suiting this purpose. [Centerline](https://github.com/atsyplenkov/centerline) package has this feature in its roadmap. Currently, there are available solutions for [Python](https://uscuni.org/neatnet/index.html) or [ArcGIS](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 
 
 ## Aggregating frequencies over a target network
@@ -243,7 +243,7 @@ As an alternative to the `GTFShift::get_route_frequency_hourly()` method using t
 
 Given a target network, it identifies the segments corresponding to each route and uses them to aggregate the attribute defined in the parameters.
 
-Below is provided an example, that uses the centerlines for the Carris network as a target network, generated using [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm). GTFShift provides `GTFShift::osm_centerlines()` method to generate this kind of network from OSM data. Refer to [vignette("osm")](osm.html#get-centerlines-for-osm-road-network) for more details.
+Below is provided an example, that uses the centerlines for the Carris network as a target network, generated using [ArcGIS](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm). GTFShift provides `GTFShift::osm_centerlines()` method to generate this kind of network from OSM data. Refer to [vignette("osm")](osm.html#get-centerlines-for-osm-road-network) for more details.
 
 ```{r include=FALSE}
 frequencies_route_overline_improved = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.7.0/analyse_carris_route_frequency_network_overline.gpkg")

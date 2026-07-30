@@ -53,10 +53,12 @@ Suggests:
     stplanr,
     lwgeom,
     progress,
-    stringi
+    stringi,
+    spelling
 VignetteBuilder: 
     knitr
 Config/Needs/website: rmarkdown
 Config/roxygen2/version: 8.0.0
 Encoding: UTF-8
 RoxygenNote: 7.3.3
+Language: en-US
