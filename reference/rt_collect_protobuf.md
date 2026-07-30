@@ -69,9 +69,9 @@ GTFShift::rt_collect_protobuf(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-07-30 15:08:02] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb
-#> [20260730_150802] Iteration 1 completed
-#> [1] "/tmp/RtmpHgQ7D0/file20ee1a37aaca.csv"
+#> [2026-07-30 16:12:59] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb
+#> [20260730_161259] Iteration 1 completed
+#> [1] "/tmp/Rtmpmh4xWj/file1f28c289041.csv"
 
 # Read data
 collection <- read.csv(destination_file)
@@ -89,17 +89,17 @@ head(
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
 #>                   vehicle.trip.trip_id vehicle.position.latitude
-#> 1     [8TCHD][A2L1N]4412_0_2|3000|1545                   38.5215
-#> 2 [07MSC][LA77N]1507_0_2_1500_1529_0_7                   38.7177
-#> 3 [07MSC][LA77N]1717_0_1_1500_1529_0_7                   38.7419
-#> 4     [8TCHD][A2L1N]4512_0_2|3000|1550                   38.6159
-#> 5     [8TCHD][A2L1N]4477_0_3|3000|1600                   38.4821
-#> 6     [8TCHD][A2L1N]4512_0_1|3000|1500                   38.5976
+#> 1 [07MSC][LA77N]1242_0_1_1630_1659_0_7                   38.8496
+#> 2 [07MSC][LA77N]1252_0_3_1700_1729_0_7                   38.7928
+#> 3 [07MSC][LA77N]1601_1_2_1600_1629_0_7                   38.7580
+#> 4 [07MSC][LA77N]1707_0_1_1630_1659_0_7                   38.7742
+#> 5 [07MSC][LA77N]1522_0_1_1700_1729_0_7                   38.7074
+#> 6 [07MSC][LA77N]1117_3_2_1630_1659_0_7                   38.7128
 #>   vehicle.position.longitude
-#> 1                    -8.8502
-#> 2                    -9.2633
-#> 3                    -9.2693
-#> 4                    -8.9130
-#> 5                    -8.9766
-#> 6                    -8.8954
+#> 1                    -9.4395
+#> 2                    -9.3736
+#> 3                    -9.2268
+#> 4                    -9.2305
+#> 5                    -9.2257
+#> 6                    -9.2754
 ```
