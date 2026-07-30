@@ -17,6 +17,8 @@ get_network_extension(
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
+\item{route_identifier}{String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
+
 \item{direction_wise}{Boolean (Default \code{TRUE}). If TRUE, extension considers sum of both directions. Otherwise, only one direction is considered.}
 
 \item{unified}{Boolean (Default \code{FALSE}). If TRUE, overlapping route segments are only counted once in the total extension.}
@@ -26,11 +28,9 @@ get_network_extension(
 \item{use_osm_routes}{osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.}
 
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute route lengths in meters.}
-
-\item{route_identifier.}{String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
 }
 \value{
-The routes extension, in meters.
+Numeric. The routes extension, in meters.
 }
 \description{
 Get total extension of GTFS feed routes
@@ -41,12 +41,20 @@ This method calculates the sum of the GTFS feed routes length, considering, for 
 For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-route_extension <- GTFShift::get_network_extension(gtfs)
-}
+# Load GTFS
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip",
+  package = "GTFShift"
+))
+
+# Get route extension
+GTFShift::get_network_extension(
+  gtfs,
+  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+  date = gtfs$calendar$start_date[1]
+)
 
 }
 \seealso{
-[GTFShift::get_route_frequency_hourly()]
+\code{GTFShift::get_route_frequency_hourly()}
 }

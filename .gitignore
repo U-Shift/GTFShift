@@ -1,15 +1,16 @@
 .Rproj.user
 .Rhistory
 .RData
+.RDataTmp
 .Ruserdata
 inst/doc
 docs
-
-*.csv
-*.gpkg
-*.zip
 
 releases/
 vignettes/*_cache/*
 
 scratch/*
+/doc/
+/Meta/
+*cache*
+revdep/

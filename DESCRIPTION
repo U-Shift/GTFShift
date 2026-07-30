@@ -1,47 +1,63 @@
-Package: GTFShift
 Type: Package
-Title: Explore and Analyse General Transit Feed Specification (GTFS) Files With a Focus on Urban Mobility 
-Version: 0.11.0
+Package: GTFShift
+Title: Explore and Analyse General Transit Feed Specification (GTFS) Files
+    with a Focus on Urban Mobility
+Version: 0.12.0
 Authors@R: c(
-  person(c("Gonçalo", "F."), "Matos", email = "goncaloafmatos@tecnico.pt", role = c("aut", "cre"), comment = c(ORCID = "0009-0001-3489-1732")),
-  person("Rosa", "Félix", email = "rosamfelix@tecnico.pt", role = c("aut"), comment = c(ORCID = "0000-0002-5642-6006")))
-Description: GTFShift emerged from the necessity to perform systematic analysis for academic research
-  over General Transit Feed Specification (GTFS) files that were not supported by any R library. It compiles 
-  the methods developed for this purpose, aiming to contribute to an open source culture.
-  Its functionality is built mostly on [tidytransit](https://r-transit.github.io/tidytransit/) package.
-License: GNU General Public License, Version 3 (GPL-3)
-Encoding: UTF-8
+    person(c("Gonçalo", "F."), "Matos", , "goncaloafmatos@tecnico.pt", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0001-3489-1732")),
+    person("Rosa", "Félix", , "rosamfelix@tecnico.pt", role = "aut",
+           comment = c(ORCID = "0000-0002-5642-6006")),
+    person("Miguel", "Relvas Pires", , "miguelpcrpires@tecnico.ulisboa.pt", role = "ctb")
+  )
+Description: This package encompasses a complete bundle of methods to
+    harmonize GTFS and OSM data, enabling the integration and exploration
+    of different layers of transit data, starting with the planned
+    operations (GTFS), but also the infrastructure topology (OSM) and
+    real-time information (GTFS-RT).
+License: GPL
+URL: https://github.com/U-Shift/GTFShift,
+    https://u-shift.github.io/GTFShift/
 Depends:
-  R (>= 4.1.0)
+    R (>= 4.1.0)
 Imports: 
   tidytransit,
   gtfstools,
-  zip,
   sf,
-  tidyverse,
+  tidyselect,
+  tidyr,
   lubridate,
-  gtfsrouter (>= 0.1.4),
   httr,
   jsonlite,
   dplyr,
   osmdata,
-  stplanr,
   stringr,
-  reticulate,
-  progress,
   callr,
-  stringi,
-  parallel
-URL: https://github.com/U-Shift/GTFShift, https://u-shift.github.io/GTFShift/
+  purrr,
+  rlang,
+  xml2,
+  withr
 Suggests: 
     knitr,
     rmarkdown,
     mapview,
-    xml2,
-    RProtoBuf,
     osmextract,
-    rosmium
-VignetteBuilder: knitr
+    rosmium,
+    testthat,
+    zip,
+    gtfsrouter (>= 0.1.4),
+    reticulate,
+    parallel,
+    RProtoBuf,
+    stplanr,
+    lwgeom,
+    progress,
+    stringi,
+    spelling
+VignetteBuilder: 
+    knitr
 Config/Needs/website: rmarkdown
 Config/roxygen2/version: 8.0.0
+Encoding: UTF-8
+Language: en-US
 RoxygenNote: 7.3.3

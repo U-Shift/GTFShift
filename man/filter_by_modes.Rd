@@ -12,7 +12,7 @@ filter_by_modes(gtfs, modes = list())
 \item{modes}{Integer[]. A list with the ids of modes to consider.}
 }
 \value{
-A tidygtfs object with the filtered feed.
+tidygtfs. The filtered GTFS feed.
 }
 \description{
 Filter GTFS feed by mode
@@ -23,9 +23,21 @@ Refer to \code{routes.txt} \code{route_type} parameter on
 \href{https://gtfs.org/documentation/schedule/reference/#routestxt}{GTFS documentation} for more details.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-gtfs_filtered <- GTFShift::filter_by_modes(gtfs, list(0,1))
-}
+# Load sample feed with multiple modes
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_merged_sample.zip", package = "GTFShift")
+)
+
+gtfs$routes |> dplyr::select(route_id, route_type)
+
+summary(gtfs)
+
+
+# Filter by bus mode (ferry agency should be excluded)
+gtfs_bus <- gtfs |> GTFShift::filter_by_modes(modes = c(3))
+
+gtfs_bus$routes |> dplyr::select(route_id, route_type)
+
+summary(gtfs_bus)
 
 }

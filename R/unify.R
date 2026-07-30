@@ -19,20 +19,43 @@
 #'
 #' For a detailed example, see the \code{vignette("unify")}.
 #'
-#' @returns A tidygtfs object.
+#' @returns tidygtfs. The unified GTFS feed.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs1 <- GTFShift::load_feed("gtfs1.zip")
-#' gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-#' unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers = TRUE)
-#' }
+#' # Load multiple GTFS files
+#' gtfs_1 <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
+#' 
+#' summary(gtfs_1)
+#' 
+#' gtfs_1$agency
+#' 
+#' head(gtfs_1$trips)
+#' 
+#' gtfs_2 <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+#' )
+#' 
+#' summary(gtfs_2)
+#' 
+#' gtfs_2$agency
+#' 
+#' head(gtfs_2$trips)
+#' 
+#' # Unify them
+#' unified <- GTFShift::unify(gtfs_1, gtfs_2, prefix = TRUE)
+#' 
+#' summary(unified)
+#' 
+#' unified$agency
+#' 
+#' head(unified$trips)
 #'
 #' @seealso \code{gtfstools::merge_gtfs()}
 #' @seealso \code{gtfsrouter::gtfs_transfer_table()}
 #'
 #' @importFrom gtfstools merge_gtfs
-#' @importFrom gtfsrouter extract_gtfs gtfs_transfer_table
 #'
 #' @export
 unify <- function(..., prefix = FALSE, store_path = NA, create_transfers = FALSE, transfer_distance = 300, transfer_time = 120, transfer_street_routing = FALSE) {
@@ -52,9 +75,12 @@ unify <- function(..., prefix = FALSE, store_path = NA, create_transfers = FALSE
   if (create_transfers) {
     message(sprintf("2. Generating transfers..."))
 
+    if (!requireNamespace("gtfsrouter", quietly = TRUE)) {
+      stop("Package 'gtfsrouter' is required to generate transfers. Install it with: install.packages('gtfsrouter')")
+    }
+
     # Store in  temporary file because gtfsrouter can only read files
-    temp_dir <- tempfile()
-    dir.create(temp_dir)
+    temp_dir <- withr::local_tempdir()
     gtfs_temp <- file.path(temp_dir, "gtfs.zip")
     tidytransit::write_gtfs(gtfs, gtfs_temp)
 

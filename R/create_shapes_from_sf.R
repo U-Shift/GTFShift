@@ -13,7 +13,7 @@
 #' \code{multiline_to_sorted_linestring}, using a point guide per shape:
 #' all ordered stops when the selected trip is circular (first and last
 #' \code{stop_id} are equal), or the first two stops otherwise.
-#' Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
+#' Then, it converts the LINESTRING geometries to a data.frame representing a GTFS shapes table using
 #' \code{gtfstools::convert_sf_to_shapes}.
 #' 
 #' Coordinates are 4326 (WGS 84) by default, following GTFS specifications.
@@ -24,24 +24,36 @@
 #' \code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
 #' 
 #'
-#' @returns A \code{data.table} representing a GTFS shapes table. Includes
+#' @returns data.frame. A GTFS shapes table. Includes
 #' \code{shape_dist_traveled} if \code{shape_dist_traveled = TRUE}.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' q <- opq("Lisbon") |>
-#'     add_osm_feature(key = "route", value = c("bus", "tram")) |>
-#'     add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
-#'
-#' shapes_sf <- GTFShift::osm_shapes_to_routes(gtfs, q)
-#'
-#' gtfs$shapes <- GTFShift::create_shapes_from_sf(shapes_sf, gtfs)
-#' }
+#' # Load sample GTFS
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
+#' 
+#' # Load TCB OSM routes sample linestring
+#' osm_routes = sf::st_read(
+#'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+#'   quiet = TRUE
+#' ) |> dplyr::filter(shape_id %in% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
+#' 
+#' head(osm_routes)
+#' 
+#' # Create shapes.txt for geometries
+#' shapes_txt <- GTFShift::create_shapes_from_sf(
+#'   osm_routes, gtfs, 
+#'   metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+#'   shape_dist_traveled = TRUE
+#' )
+#' 
+#' head(shapes_txt)
 #'
 #' @import sf
-#' @import gtfstools
+#' @importFrom gtfstools convert_sf_to_shapes
 #' @import dplyr
+#' @importFrom rlang .data
 #'
 #' @seealso \code{gtfstools::convert_sf_to_shapes()}
 #' @seealso \code{GTFShift::multiline_to_sorted_linestring()}
@@ -70,9 +82,9 @@ create_shapes_from_sf <- function(
     # > circular trip: all stops in sequence
     # > non-circular trip: first two stops
     trips_stops_sf <- gtfs$stop_times |>
-        arrange(trip_id, stop_sequence) |>
-        left_join(gtfs$trips |> select(trip_id, shape_id), by = "trip_id") |>
-        left_join(gtfs$stops |> select(stop_id, stop_name, stop_lat, stop_lon), by = "stop_id") |>
+        arrange(.data$trip_id, .data$stop_sequence) |>
+        left_join(gtfs$trips |> select("trip_id", "shape_id"), by = "trip_id") |>
+        left_join(gtfs$stops |> select("stop_id", "stop_name", "stop_lat", "stop_lon"), by = "stop_id") |>
         st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326)
 
     trips_points <- split(trips_stops_sf, trips_stops_sf$trip_id) |>
@@ -91,11 +103,11 @@ create_shapes_from_sf <- function(
         bind_rows()
 
     shapes_points <- trips_points |>
-        arrange(shape_id, desc(is_circular), trip_id) |>
-        group_by(shape_id) |>
+        arrange(.data$shape_id, desc(.data$is_circular), .data$trip_id) |>
+        group_by(.data$shape_id) |>
         slice(1) |>
         ungroup() |>
-        select(shape_id, points)
+        select("shape_id", "points")
 
     # Convert MULTILINESTRING to LINESTRING
     current_geom_col <- attr(sf_shapes, "sf_column")
@@ -104,16 +116,16 @@ create_shapes_from_sf <- function(
             shapes_points,
             by = "shape_id"
         ) |>
-        filter(lengths(points) > 0) |> # Only consider sf_shapes that have a GTFS match
+        filter(lengths(.data$points) > 0) |> # Only consider sf_shapes that have a GTFS match
         # sample_n(10) |> # For debug only
         rowwise() |>
         mutate(!!current_geom_col := multiline_to_sorted_linestring(
             multilinestring = .data[[current_geom_col]],
-            points = points,
+            points = .data$points,
             metric_crs = metric_crs
         )) |>
         ungroup() |>
-        select(shape_id)
+        select("shape_id")
 
     #mapview::mapview(sf_shapes_linestrings |> select(-stop_point), zcol="shape_id")
     #sf_shapes_linestrings_debug = sf_shapes_linestrings|>filter(shape_id=="1-VA-TERM")
@@ -138,7 +150,7 @@ create_shapes_from_sf <- function(
 
         for (shape_id_i in unique(shapes_gtfstools$shape_id)) {
             shape_rows <- which(shapes_gtfstools$shape_id == shape_id_i)
-            shape_geometry <- sf_shapes_linestrings |> filter(shape_id == shape_id_i) |> st_transform(4326)
+            shape_geometry <- sf_shapes_linestrings |> filter(.data$shape_id == shape_id_i) |> st_transform(4326)
 
             if (nrow(shape_geometry) == 0 || length(shape_rows) == 0) {
                 next

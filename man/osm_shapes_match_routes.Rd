@@ -45,7 +45,7 @@ osm_shapes_match_routes(
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute shapes and routes lengths and stop-to-stop distances.}
 }
 \value{
-A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
+data.frame. Matched routes (\code{sf} if \code{geometry=TRUE}) with the following columns:
 \describe{
   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
@@ -117,19 +117,27 @@ an OSM one. This might generate wrong results if the topology of routes on OSM d
 Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the results table to validate the results and identify misassociations.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
+\dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip",
+  package = "GTFShift"
+))
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
-q <- opq("Lisbon") |>
-  add_osm_feature(key = "route", value = c("bus")) |>
-  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+# Build query and prepare osm extract (possible to use API as alternative)
+q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+  osmdata::add_osm_feature(key = "route", value = "bus") |>
+  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
 
-# To use OSM API:
-shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q)
+# Get OSM route geometries based on geometrical match
+shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
+  gtfs, q,
+  osm_file = osm_file,
+  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+)
 
-# To use a local OSM file:
-osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q, osm_file = osm_file)
-}
-
+head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_diff, stops_diff))
+\dontshow{\}) # examplesIf}
 }

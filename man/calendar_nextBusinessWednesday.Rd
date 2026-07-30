@@ -12,7 +12,7 @@ calendar_nextBusinessWednesday(start_date = Sys.Date(), country_code = "PT")
 \item{country_code}{String (Default PT). Country code in the format \code{ISO 3166-1 alpha-2}. When provided, public holidays are considered.}
 }
 \value{
-Date
+Date. The next business Wednesday date.
 }
 \description{
 Get next business Wednesday
@@ -22,8 +22,10 @@ Find the next Wednesday that is not a holiday. When country is given, public hol
 using \href{https://date.nager.at/Api}{Nager.Date} API.
 }
 \examples{
-\dontrun{
-next_wednesday = GTFShift::calendar_nextBusinessWednesday(country_code="PT")
-}
+# Example of Portuguese holiday (10/06/2026) ignored
+GTFShift::calendar_nextBusinessWednesday(start_date = "2026-06-09", country_code="PT")
+
+# Example of Hong Kong holiday (01/07/2026) ignored
+GTFShift::calendar_nextBusinessWednesday(start_date = "2026-06-30", country_code="HK")
 
 }

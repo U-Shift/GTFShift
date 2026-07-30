@@ -21,7 +21,7 @@ get_route_frequency_hourly(
 \item{overline}{Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.}
 }
 \value{
-An \code{sf} \code{data.frame} object with the following columns (the first three are only present if \code{overline=FALSE}):
+sf data.frame. Hourly route frequencies, with the following columns (the first three are only present if \code{overline=FALSE}):
 \describe{
   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
   \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
@@ -49,13 +49,22 @@ By relying on a common road network, such as OSM, it is possible to overcome thi
 
 For a detailed example, see the \code{vignette("analyse")}.
 
-Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
+Adapted from \href{https://web.archive.org/web/20201223060409/https://github.com/Bondify/GTFS_in_R/}{github.com/Bondify/GTFS_in_R}.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
-}
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
+)
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
+
+# Get frequency
+frequency_analysis <- GTFShift::get_route_frequency_hourly(
+  gtfs,
+  date = gtfs$calendar$start_date[1]
+)
+
+head(frequency_analysis |> sf::st_drop_geometry())
 
 }
 \seealso{

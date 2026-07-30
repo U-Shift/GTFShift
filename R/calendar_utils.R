@@ -8,18 +8,22 @@
 #' Find the next Wednesday that is not a holiday. When country is given, public holidays are considered,
 #' using \href{https://date.nager.at/Api}{Nager.Date} API.
 #'
-#' @returns Date
+#' @returns Date. The next business Wednesday date.
 #'
 #' @examples
-#' \dontrun{
-#' next_wednesday = GTFShift::calendar_nextBusinessWednesday(country_code="PT")
-#' }
+#' # Example of Portuguese holiday (10/06/2026) ignored
+#' GTFShift::calendar_nextBusinessWednesday(start_date = "2026-06-09", country_code="PT")
+#' 
+#' # Example of Hong Kong holiday (01/07/2026) ignored
+#' GTFShift::calendar_nextBusinessWednesday(start_date = "2026-06-30", country_code="HK")
 #'
 #' @import lubridate
 #'
 #' @export
-calendar_nextBusinessWednesday = function(start_date = Sys.Date(),
-                                           country_code = "PT") {
+calendar_nextBusinessWednesday = function(
+  start_date = Sys.Date(),
+  country_code = "PT"
+) {
   year = lubridate::year(start_date)
   if (!is.na(country_code)) {
     holidays = calendar_get_pt_holidays(year, country_code)
@@ -28,7 +32,7 @@ calendar_nextBusinessWednesday = function(start_date = Sys.Date(),
   }
 
   # Find the next Wednesday
-  next_wed = start_date + (4 - lubridate::wday(start_date) + 7) %% 7
+  next_wed = lubridate::ymd(start_date) + (4 - lubridate::wday(start_date) + 7) %% 7
 
   # If next Wednesday is a holiday, keep searching
   while (next_wed %in% holidays) {
@@ -48,8 +52,8 @@ calendar_nextBusinessWednesday = function(start_date = Sys.Date(),
 #'
 #' Get public holidays for Portugal for a given year.
 #' @param year Integer. Year to get holidays for.
-#' @import httr
-#' @import jsonlite
+#' @importFrom httr GET status_code
+#' @importFrom jsonlite fromJSON
 #' @noRd
 calendar_get_pt_holidays = function(year, country_code) {
   url = paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/", country_code)

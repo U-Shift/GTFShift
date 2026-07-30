@@ -1,0 +1,130 @@
+---
+title: "3. Aggregate GTFS feeds"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3. Aggregate GTFS feeds}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+.leaflet-container {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+</style>
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE, 
+  message = FALSE,
+  cache = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, cache=FALSE}
+library(GTFShift)
+library(tidytransit)
+library(dplyr)
+library(mapview)
+```
+
+# Introduction 
+
+Public transit analysis takes advantage of the standardized GTFS format. However, its provision by operator makes it difficult for network aggregated analysis, considering connectivity and multimodality. `GTFShift::unify()` proposes a simple solution to this problem, generating an aggregated GTFS file given several instances of these.
+
+> This article uses GTFS feeds from the library GTFS database for Portugal as an example. Refer to the [vignette("download")](./download) for more details.
+
+
+
+```{r eval=FALSE}
+# Get GTFS from library GTFS database for Portugal
+data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+
+gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
+  feed = GTFShift::load_feed(data$URL[data$ID == ID], create_transfers=FALSE)
+  summary(feed)
+  return(feed)
+})
+```
+
+```{r echo=FALSE}
+# FIx for https://github.com/U-Shift/GTFShift/issues/81
+# Get GTFS from library GTFS database for Portugal
+data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+
+gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
+  feed = GTFShift::load_feed(data$URL[data$ID == ID], create_transfers=FALSE)
+   # If feed has columns start_pickup_drop_off_window and end_pickup_drop_off_window, remove them (they are not supported by gtfsrouter)
+  if ("start_pickup_drop_off_window" %in% names(feed$stop_times)) {
+    feed$stop_times <- feed$stop_times |> select(-start_pickup_drop_off_window, -end_pickup_drop_off_window)
+  }
+  summary(feed)
+  return(feed)
+})
+```
+
+
+# Unify GTFS
+
+The unification is performed through `GTFShift::unify()`, producing a single GTFS instance, saved as a ZIP file. Option `create_transfers` enables the generation of `transfers.txt`, aggregating close stops, even if from different GTFS. 
+
+```{r}
+# Perform unification
+gtfs_united = GTFShift::unify(gtfs_list[[1]], gtfs_list[[2]], create_transfers = TRUE)
+
+summary(gtfs_united)
+
+summary(gtfs_united$transfers)
+```
+
+It can be displayed using `mapview`.
+
+<div style="display: flex; gap: 20px; overflow-x: auto;">
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Aggregated routes
+
+```{r}
+shape_agency = gtfs_united$trips |>
+  left_join(gtfs_united$routes, by = "route_id") |>
+  left_join(gtfs_united$agency, by = "agency_id") |>
+  select(shape_id, agency_id, agency_name) |>
+  distinct()
+
+shapes_sf = tidytransit::shapes_as_sf(gtfs_united$shapes) |>
+  left_join(shape_agency, by = "shape_id") |>
+  filter(!is.na(agency_id))
+```
+```{r, cache=FALSE}
+mapview::mapview(shapes_sf, zcol = "agency_name", legend = TRUE, layer.name="Agency")
+```
+
+</div>
+<div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
+
+### Aggregated stops
+
+```{r}
+stop_agency = gtfs_united$stop_times  |>
+  left_join(gtfs_united$trips, by = "trip_id") |>
+  left_join(gtfs_united$routes, by = "route_id") |>
+  left_join(gtfs_united$agency, by = "agency_id") |>
+  select(stop_id, agency_id, agency_name) |>
+  distinct()
+
+stops_sf = tidytransit::stops_as_sf(gtfs_united$stops) |>
+  left_join(stop_agency, by = "stop_id") |>
+  filter(!is.na(agency_id))
+```
+```{r, cache=FALSE}
+mapview::mapview(stops_sf, zcol = "agency_name", legend = TRUE, layer.name="Agency")
+```
+
+</div>
+</div>
+
+

@@ -21,9 +21,9 @@
 #'
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
-#' Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
+#' Adapted from \href{https://web.archive.org/web/20201223060409/https://github.com/Bondify/GTFS_in_R/}{github.com/Bondify/GTFS_in_R}.
 #'
-#' @returns An \code{sf} \code{data.frame} object with the following columns (the first three are only present if \code{overline=FALSE}):
+#' @returns sf data.frame. Hourly route frequencies, with the following columns (the first three are only present if \code{overline=FALSE}):
 #' \describe{
 #'   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
 #'   \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
@@ -35,10 +35,19 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
-#' }
+#' # Subset GTFS for one route only, for demo purposes
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
+#' 
+#' # Get frequency
+#' frequency_analysis <- GTFShift::get_route_frequency_hourly(
+#'   gtfs,
+#'   date = gtfs$calendar$start_date[1]
+#' )
+#' 
+#' head(frequency_analysis |> sf::st_drop_geometry())
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #' @seealso \code{GTFShift::osm_shapes_to_routes()}
@@ -47,9 +56,9 @@
 #' @import tidytransit
 #' @import dplyr
 #' @import sf
-#' @import tidyverse
 #' @import lubridate
-#' @import stplanr
+#' @importFrom tidyselect any_of
+#' @importFrom rlang .data
 #'
 #' @export
 get_route_frequency_hourly <- function(
@@ -62,7 +71,9 @@ get_route_frequency_hourly <- function(
 
   ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
-  gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = date)
+  suppressWarnings({ # Ignore missing transfers warnings
+    gtfs_date <- tidytransit::filter_feed_by_date(gtfs, extract_date = date)
+  })
 
   # PROCESS GTFS, generating table calculating the frequencies per route
   trips <- gtfs_date$trip
@@ -77,8 +88,8 @@ get_route_frequency_hourly <- function(
   stop_times <- gtfs_date$stop_times
 
   stop_times <- stop_times |>
-    left_join(trips) |>
-    left_join(routes) |>
+    left_join(trips, by="trip_id") |>
+    left_join(routes, by="route_id") |>
     select(any_of(c(
       "route_id",
       "route_short_name",
@@ -93,11 +104,11 @@ get_route_frequency_hourly <- function(
     )))
 
   stop_times <- stop_times |>
-    arrange(stop_sequence) |>
-    group_by(trip_id) |>
+    arrange(.data$stop_sequence) |>
+    group_by(.data$trip_id) |>
     slice(1) |> # Only departures from origin (first stop)
     ungroup() |>
-    mutate(hour = lubridate::hour(departure_time))
+    mutate(hour = lubridate::hour(.data$departure_time))
 
   freq_data <- stop_times |>
     group_by(across(any_of(c("route_id", "shape_id", "route_short_name", "direction_id", "hour")))) |>
@@ -106,17 +117,20 @@ get_route_frequency_hourly <- function(
 
   routes_freq <-
     freq_data |>
-    inner_join(shapes) |>
+    inner_join(shapes, by="shape_id") |>
     st_as_sf()
 
   # Overline?
   if (overline) {
+    if (!requireNamespace("stplanr", quietly = TRUE)) {
+      stop("Package 'stplanr' is required when overline=TRUE. Install it with: install.packages('stplanr')")
+    }
     routes_freq_all <- data.frame()
     for (h in unique(routes_freq$hour)) { # hours of the day
       routes_freq_h <- routes_freq |>
-        filter(hour == h) |>
+        filter(.data$hour == h) |>
         stplanr::overline2(attrib = "frequency") |>
-        arrange(frequency) |>
+        arrange(.data$frequency) |>
         mutate(hour = h)
 
       routes_freq_all <- rbind(routes_freq_all, routes_freq_h)

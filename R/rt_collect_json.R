@@ -4,8 +4,8 @@
 #' @param gtfs_rt_url String. URL of the GTFS-RT feed in JSON format.
 #' @param destination_file String. File to save the downloaded GTFS-RT data. Content is appended in each iteration.
 #' @param header_key String (Default "header"). Key in the JSON corresponding to the feed header. Set to NA if not present.
-#' @param entity_key String (Default "entity"). Key in the JSON corresponding to the feed entities. Set to NA if response is a flat list.
-#' @param fields_collect Character vector. Fields to extract from each entity in the feed.
+#' @param entity_key String (Default "entity"). Key in the JSON corresponding to the feed entities. Set to NA if response is a flat list. Use "." for nested keys.
+#' @param fields_collect Character vector. Fields to extract from each entity in the feed. Use "." for nested keys.
 #' @param scrape_interval Integer (Default 60). Interval in seconds between each download. Negative to run only once.
 #' @param log_file String (Optional). Path to a log file to save download logs.
 #' @param headers Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.
@@ -15,43 +15,71 @@
 #'
 #' This function will run indefinitely until manually stopped (CTRL + C).
 #'
+#' @returns String. The location of the file where data was collected.
 #'
 #' @examples
-#' \dontrun{
-#' GTFShift::rt_collect_json("https://api.example.com/gtfs-rt", "gtfs_rt_data.csv")
-#' }
+#' # Create file
+#' destination_file <- withr::local_tempfile(fileext = ".csv")
 #'
-#' @import jsonlite
-#' @import progress
+#' # Collect data
+#' GTFShift::rt_collect_json(
+#'   gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs",
+#'   entity_key = "data.entity",
+#'   destination_file = destination_file,
+#'   scrape_interval = -1 # Negative to run only once
+#' )
+#'
+#' # Read data
+#' collection <- read.csv(destination_file)
+#'
+#' names(collection)
+#'
+#' head(
+#'   collection |>
+#'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
+#' )
+#'
+#' @importFrom jsonlite fromJSON
+#' @importFrom utils write.table
 #'
 #' @export
 rt_collect_json <- function(
-    gtfs_rt_url, destination_file,
-    header_key="header", # Optional
-    entity_key="entity",
-    fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
-    scrape_interval = 60, log_file = NA, headers = NULL
+  gtfs_rt_url, destination_file,
+  header_key = "header", # Optional
+  entity_key = "entity",
+  fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
+  scrape_interval = 60, log_file = NA, headers = NULL
 ) {
   # Log script start
-  m = sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
+  m <- sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
   message(m)
   if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
   # Each scrape_interval seconds, download the GTFS-RT feed and save it to the destination folder
-  count = 0
+  count <- 0
   repeat {
-    count = count + 1
+    count <- count + 1
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
     if (grepl("^http", gtfs_rt_url) && !is.null(headers)) {
       res <- httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers))
       httr::stop_for_status(res)
-      feed <- jsonlite::fromJSON(httr::content(res, as="text", encoding="UTF-8"))
+      feed <- jsonlite::fromJSON(httr::content(res, as = "text", encoding = "UTF-8"))
     } else {
       feed <- jsonlite::fromJSON(gtfs_rt_url)
     }
 
-    if (!is.na(entity_key)) {
-      entities <- as.data.frame(feed[[entity_key]])
+    if (!is.na(entity_key) && entity_key != "") {
+      entity_parts <- unlist(strsplit(entity_key, "\\."))
+      entities_target <- feed
+      for (part in entity_parts) {
+        if (!is.null(entities_target) && part %in% names(entities_target)) {
+          entities_target <- entities_target[[part]]
+        } else {
+          entities_target <- NULL
+          break
+        }
+      }
+      entities <- as.data.frame(entities_target)
     } else {
       entities <- feed
     }
@@ -78,7 +106,7 @@ rt_collect_json <- function(
     }
 
     if (!is.na(header_key)) {
-      header = feed[[header_key]]
+      header <- feed[[header_key]]
       if ("timestamp" %in% names(header)) {
         feed_df$feed_timestamp <- header$timestamp
       }
@@ -93,29 +121,34 @@ rt_collect_json <- function(
       sep = ",",
       row.names = FALSE,
       col.names = !file.exists(destination_file), # only write header if file is new
-      append = TRUE
+      append = file.exists(destination_file)
     )
 
-    m = sprintf("[%s] Iteration %d completed", timestamp, count)
+    m <- sprintf("[%s] Iteration %d completed", timestamp, count)
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
     # Wait for scrape_interval seconds before the next download
-    if (scrape_interval<0) {
+    if (scrape_interval < 0) {
       break
     }
     interval_start <- Sys.time()
+    if (!requireNamespace("progress", quietly = TRUE)) {
+      stop("Package 'progress' is required for interval sleeping display. Install it with: install.packages('progress')")
+    }
     pb <- progress::progress_bar$new( # Track progress
       format = "Sleeping [:bar] :percent :spin elapsed=:elapsed",
-      clear = FALSE, show_after=0
+      clear = FALSE, show_after = 0
     )
     pb$update(0)
     repeat {
-      elapsed_time <- as.numeric(difftime(Sys.time(), interval_start, units="secs"))
-      if (elapsed_time >= scrape_interval) break;
-      pb$update( min(elapsed_time / scrape_interval, 1) );
-      Sys.sleep(0.1);
+      elapsed_time <- as.numeric(difftime(Sys.time(), interval_start, units = "secs"))
+      if (elapsed_time >= scrape_interval) break
+      pb$update(min(elapsed_time / scrape_interval, 1))
+      Sys.sleep(0.1)
     }
     pb$update(1)
   }
+
+  return(destination_file)
 }

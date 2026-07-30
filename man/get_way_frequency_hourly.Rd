@@ -24,7 +24,7 @@ get_way_frequency_hourly(
 \item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
 }
 \value{
-An \code{sf} \code{data.frame} object with the following columns:
+sf data.frame. Hourly way frequencies, with the following columns:
 \describe{
   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
   \item{hour}{The hour for which the frequency applies (24 hour format).}
@@ -45,18 +45,28 @@ This method analyses the GTFS feed for a representative day, finding for each ro
 For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> add_osm_feature(key = "route", value = "bus")
+\dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
+)
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
-# To use OSM API:
-frequency_analysis <- GTFShift::get_way_frequency_hourly(gtfs, q)
+# Build query and prepare osm extract (possible to use API as alternative)
+q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
+  osmdata::add_osm_feature(key = "route", value = "bus") |> 
+  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
 
-# To use a local OSM file:
-osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-frequency_analysis <- GTFShift::get_way_frequency_hourly(gtfs, q, osm_file = osm_file)
-}
+# Get frequency
+frequency_analysis <- GTFShift::get_way_frequency_hourly(
+  gtfs, q, 
+  date = gtfs$calendar$start_date[1],
+  osm_file = osm_file
+)
 
+head(frequency_analysis |> sf::st_drop_geometry())
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{GTFShift::calendar_nextBusinessWednesday()}

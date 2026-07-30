@@ -22,7 +22,7 @@ create_shapes_from_sf(
 \code{shape_dist_traveled} for each generated shape.}
 }
 \value{
-A \code{data.table} representing a GTFS shapes table. Includes
+data.frame. A GTFS shapes table. Includes
 \code{shape_dist_traveled} if \code{shape_dist_traveled = TRUE}.
 }
 \description{
@@ -35,7 +35,7 @@ It first converts any MULTILINESTRING geometries to LINESTRING geometries using 
 \code{multiline_to_sorted_linestring}, using a point guide per shape:
 all ordered stops when the selected trip is circular (first and last
 \code{stop_id} are equal), or the first two stops otherwise.
-Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
+Then, it converts the LINESTRING geometries to a data.frame representing a GTFS shapes table using
 \code{gtfstools::convert_sf_to_shapes}.
 
 Coordinates are 4326 (WGS 84) by default, following GTFS specifications.
@@ -46,16 +46,27 @@ distance along each shape for all generated points and appends this as
 \code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-q <- opq("Lisbon") |>
-    add_osm_feature(key = "route", value = c("bus", "tram")) |>
-    add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+# Load sample GTFS
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
+)
 
-shapes_sf <- GTFShift::osm_shapes_to_routes(gtfs, q)
+# Load TCB OSM routes sample linestring
+osm_routes = sf::st_read(
+  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  quiet = TRUE
+) |> dplyr::filter(shape_id \%in\% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
 
-gtfs$shapes <- GTFShift::create_shapes_from_sf(shapes_sf, gtfs)
-}
+head(osm_routes)
+
+# Create shapes.txt for geometries
+shapes_txt <- GTFShift::create_shapes_from_sf(
+  osm_routes, gtfs, 
+  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+  shape_dist_traveled = TRUE
+)
+
+head(shapes_txt)
 
 }
 \seealso{

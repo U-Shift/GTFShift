@@ -14,7 +14,7 @@ filter_by_agency(gtfs, id = NA, name = NA)
 \item{name}{String (Optional when id). Name of the agency.}
 }
 \value{
-A tidygtfs object with the filtered feed.
+tidygtfs. The filtered GTFS feed.
 }
 \description{
 Filter GTFS feed by agency
@@ -23,10 +23,23 @@ Filter GTFS feed by agency
 Allows to filter a GTFS feed for the agency, using the id, name or both. Returns empty feed it none provided.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-gtfs_filtered_by_id <- GTFShift::filter_by_agency(gtfs, agency_id=2)
-gtfs_filtered_by_name <- GTFShift::filter_by_agency(gtfs, agency_name="City bus company")
-}
+# Load sample feed with multiple agencies
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_merged_sample.zip", package = "GTFShift")
+)
+
+summary(gtfs)
+
+
+# Filter by id
+gtfs_id_8 = gtfs |> GTFShift::filter_by_agency(id = "8")
+
+summary(gtfs_id_8)
+
+
+# Filter by name 
+gtfs_ttsl <- gtfs |> GTFShift::filter_by_agency(name = "TTSL - Transtejo Soflusa") 
+
+summary(gtfs_ttsl)
 
 }

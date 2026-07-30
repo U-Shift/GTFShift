@@ -30,7 +30,7 @@ unify(
 \item{transfer_street_routing}{Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).}
 }
 \value{
-A tidygtfs object.
+tidygtfs. The unified GTFS feed.
 }
 \description{
 Merge multiple GTFS into a single aggregated file
@@ -47,11 +47,35 @@ with the parameters \code{d_limit=transfer_distance}, \code{min_transfer_time=tr
 For a detailed example, see the \code{vignette("unify")}.
 }
 \examples{
-\dontrun{
-gtfs1 <- GTFShift::load_feed("gtfs1.zip")
-gtfs2 <- GTFShift::load_feed("gtfs2.zip")
-unified <- GTFShift::unify(gtfs1, gtfs2, create_transfers = TRUE)
-}
+# Load multiple GTFS files
+gtfs_1 <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
+)
+
+summary(gtfs_1)
+
+gtfs_1$agency
+
+head(gtfs_1$trips)
+
+gtfs_2 <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+)
+
+summary(gtfs_2)
+
+gtfs_2$agency
+
+head(gtfs_2$trips)
+
+# Unify them
+unified <- GTFShift::unify(gtfs_1, gtfs_2, prefix = TRUE)
+
+summary(unified)
+
+unified$agency
+
+head(unified$trips)
 
 }
 \seealso{

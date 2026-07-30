@@ -66,7 +66,7 @@
 #' an OSM one. This might generate wrong results if the topology of routes on OSM does not match the GTFS shapes for that route.
 #' Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the results table to validate the results and identify misassociations.
 #'
-#' @returns A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
+#' @returns data.frame. Matched routes (\code{sf} if \code{geometry=TRUE}) with the following columns:
 #' \describe{
 #'   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
 #'   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
@@ -81,31 +81,36 @@
 #'   \item{geometry}{The geometrical data for the OSM route relation.}
 #' }
 #'
-#' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
+#' @examplesIf nzchar(Sys.which("osmium"))
+#' # Subset GTFS for one route only, for demo purposes
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip",
+#'   package = "GTFShift"
+#' ))
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 #'
-#' q <- opq("Lisbon") |>
-#'   add_osm_feature(key = "route", value = c("bus")) |>
-#'   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+#' # Build query and prepare osm extract (possible to use API as alternative)
+#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+#'   osmdata::add_osm_feature(key = "route", value = "bus") |>
+#'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+#' osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
 #'
-#' # To use OSM API:
-#' shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q)
+#' # Get OSM route geometries based on geometrical match
+#' shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
+#'   gtfs, q,
+#'   osm_file = osm_file,
+#'   metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+#' )
 #'
-#' # To use a local OSM file:
-#' osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-#' shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q, osm_file = osm_file)
-#' }
+#' head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_diff, stops_diff))
 #'
 #' @import osmdata
 #' @import sf
 #' @import dplyr
-#' @import stplanr
-#' @import xml2
-#' @import progress
-#' @import callr
-#' @import stringi
-#' @import parallel
+#' @importFrom callr r_bg
+#' @importFrom utils head tail
+#' @importFrom xml2 read_xml xml_find_all xml_attr
+#' @importFrom rlang .data
 #'
 #' @export
 osm_shapes_match_routes <- function(
@@ -120,19 +125,19 @@ osm_shapes_match_routes <- function(
   metric_crs = 3857
 ) {
   metric_crs_is_default <- missing(metric_crs)
+  initial_osm_file <- osm_file
   total_steps <- 4
   if (!is.null(osm_file)) {
     total_steps <- 3
   }
 
-  if (!is.na(log_file)) {
+  if (!is.null(log_file) && length(log_file) == 1 && !is.na(log_file)) {
     cat(
       sprintf("-----------------------------\n%s: Running osm_shapes_match_routes() for %s...\n\n", Sys.time(), paste(gtfs$agency$agency_name, collapse = ", ")),
       file = log_file, append = TRUE
     )
   }
 
-  # 0. Validations
   if (!(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
     stop("gtfs_match should be one of: route_id, route_short_name or route_long_name")
   }
@@ -144,13 +149,18 @@ osm_shapes_match_routes <- function(
     stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
   }
   if (metric_crs_is_default) {
+    w <- "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations."
     warning(
-      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
+      w,
       call. = FALSE
     )
+    if (!is.null(log_file) && length(log_file) == 1 && !is.na(log_file)) cat(paste("WARNING! ", w, "\n"), file = log_file, append = TRUE)
   }
 
   # 1. Get geometry for shapes and stops
+  if (!requireNamespace("progress", quietly = TRUE)) {
+    stop("Package 'progress' is required for this function. Install it with: install.packages('progress')")
+  }
   pb <- progress::progress_bar$new( # Track progress
     format = sprintf("1/%d: Preparing GTFS data [:bar] :percent :spin elapsed=:elapsed", total_steps),
     clear = FALSE, show_after = 0
@@ -192,33 +202,33 @@ osm_shapes_match_routes <- function(
     osm_ways <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
     pb$update(0.75)
     osm_multilines_redux <- relations_df |>
-      filter(type == "way") |>
-      select(relation_osm_id, osm_id, any_of(c("ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id", "gtfs:shape_id"))) |>
+      filter(.data$type == "way") |>
+      select("relation_osm_id", "osm_id", any_of(c("ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id", "gtfs:shape_id"))) |>
       # Join with osm_ways to get geometries back
-      left_join(osm_ways |> select(osm_id), by = "osm_id") |>
-      filter(!st_is_empty(geometry)) |> # Ignore empty geometries (for instance, platforms on railways)
+      left_join(osm_ways |> select("osm_id"), by = "osm_id") |>
+      filter(!st_is_empty(.data$geometry)) |> # Ignore empty geometries (for instance, platforms on railways)
       st_as_sf() |>
       # Group by osm_id, gtfs:shape_id, generating multilinestring with geometries
       dplyr::group_by(across(any_of(c("relation_osm_id", "ref", "name", "gtfs:shape_id", "gtfs:route_id", "roundtrip")))) |>
       dplyr::summarise(do_union = FALSE, .groups = "drop") |>
       sf::st_cast("MULTILINESTRING") |>
-      rename(osm_id = relation_osm_id)
+      rename(osm_id = .data$relation_osm_id)
 
     # 2.3 Get stop locations
     osm_stops <- osmextract::oe_read(osm_file, layer = "points", boundary = bbox, quiet = TRUE, extra_tags = c("public_transport")) |>
-      dplyr::filter(public_transport == "stop_position" | public_transport == "platform") |>
-      select(osm_id)
+      dplyr::filter(.data$public_transport == "stop_position" | .data$public_transport == "platform") |>
+      select("osm_id")
     pb$update(0.99)
 
     # Remove type==node that has osm_id not in osm_stops
     relations_df <- relations_df |>
-      filter(!(type == "node" & !(osm_id %in% osm_stops$osm_id))) |>
-      filter(relation_osm_id %in% osm_multilines_redux$osm_id)
+      filter(!(.data$type == "node" & !(.data$osm_id %in% osm_stops$osm_id))) |>
+      filter(.data$relation_osm_id %in% osm_multilines_redux$osm_id)
 
     osm_stoppositions <- relations_df |>
-      filter(type == "node") |>
+      filter(.data$type == "node") |>
       # Join with osm_stops to get geometries back
-      left_join(osm_stops |> select(osm_id), by = "osm_id") |>
+      left_join(osm_stops |> select("osm_id"), by = "osm_id") |>
       st_as_sf()
     pb$update(1)
     pb$terminate()
@@ -227,7 +237,7 @@ osm_shapes_match_routes <- function(
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
   } else {
-    osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
+    osm_file <- withr::local_tempfile(fileext = ".osm")
     job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
       osmdata::osmdata_xml(q, filename = osm_file, quiet = FALSE)
     }, args = list(q, osm_file))
@@ -251,7 +261,7 @@ osm_shapes_match_routes <- function(
     osm_multilines <- osm$osm_multilines
     osm_multilines_redux <- osm_multilines |>
       select(any_of(c("osm_id", "ref", "from", "to", "via", "name", "roundtrip", "gtfs:route_id"))) |>
-      distinct(osm_id, .keep_all = TRUE)
+      distinct(.data$osm_id, .keep_all = TRUE)
     pb$update(0.66)
 
     st_agr(osm$osm_points) <- "constant" # https://github.com/r-spatial/sf/issues/406
@@ -259,7 +269,7 @@ osm_shapes_match_routes <- function(
       return(
         osm$osm_points |>
           sf::st_crop(sf::st_bbox(stplanr::geo_buffer(osm_multilines_redux, dist = 100))) |>
-          dplyr::filter(public_transport == "stop_position" | public_transport == "platform") |>
+          dplyr::filter(.data$public_transport == "stop_position" | .data$public_transport == "platform") |>
           dplyr::select_if(~ !all(is.na(.)))
       )
     }, args = list(osm, osm_multilines_redux))
@@ -274,7 +284,7 @@ osm_shapes_match_routes <- function(
 
 
   # 4. Processing OSM relations (already have the file!)
-  if (is.null(osm_file)) {
+  if (is.null(initial_osm_file)) {
     pb <- progress::progress_bar$new(
       format = sprintf("3/%d: Processing OSM relations [:bar] :percent :spin elapsed=:elapsed", total_steps),
       clear = FALSE, show_after = 0
@@ -282,8 +292,8 @@ osm_shapes_match_routes <- function(
     pb$update(0)
 
     job <- callr::r_bg(function(osm_file) { # update spinner while blocking method call
-      library(xml2)
-      library(dplyr)
+      requireNamespace("xml2", quietly = TRUE)
+      requireNamespace("dplyr", quietly = TRUE)
 
       doc <- read_xml(osm_file)
       relations <- xml_find_all(doc, ".//relation")
@@ -331,16 +341,16 @@ osm_shapes_match_routes <- function(
   warning_osm_stops_missing <- list()
 
   stop_counts <- relations_df |>
-    dplyr::filter(grepl("stop|platform", role)) |>
-    dplyr::group_by(relation_osm_id) |>
+    dplyr::filter(grepl("stop|platform", .data$role)) |>
+    dplyr::group_by(.data$relation_osm_id) |>
     dplyr::summarise(
-      nr_s = sum(grepl("stop", role)),
-      nr_p = sum(grepl("platform", role)),
-      nr_stops = max(nr_s, nr_p)
+      nr_s = sum(grepl("stop", .data$role)),
+      nr_p = sum(grepl("platform", .data$role)),
+      nr_stops = max(.data$nr_s, .data$nr_p)
     )
 
   match_route_worker <- function(route_name) {
-    # message("route_name = " %>% paste(route_name))
+    # message("route_name = " |> paste(route_name))
     # Warning records for this specific route
     warn_routes_missing <- list()
     warn_osm_repeated <- list()
@@ -354,6 +364,9 @@ osm_shapes_match_routes <- function(
         dplyr::filter(.data[[osm_match]] == route_name)
     } else {
       words <- tolower(strsplit(route_name, "\\s+")[[1]])
+      if (!requireNamespace("stringi", quietly = TRUE)) {
+        stop("Package 'stringi' is required for non-exact route matching. Install it with: install.packages('stringi')")
+      }
       words_norm <- stringi::stri_trans_general(words, "Latin-ASCII")
       osm_route_name <- osm_multilines_redux |>
         dplyr::filter(
@@ -383,7 +396,7 @@ osm_shapes_match_routes <- function(
     osm_route_error <- FALSE
     for (i in 1:nrow(osm_route_name)) { # Validate that if OSM route has entry/exit stops, they respect the right order
       route <- osm_route_name[i, ]
-      relation_df <- relations_df |> dplyr::filter(type == "node" & relation_osm_id == route$osm_id)
+      relation_df <- relations_df |> dplyr::filter(.data$type == "node" & .data$relation_osm_id == route$osm_id)
       entry_rows <- grep("entry", relation_df$role, ignore.case = TRUE)
       exit_rows <- grep("exit", relation_df$role, ignore.case = TRUE)
       if (length(entry_rows) > 0) { # If entry row exists, validate that is first
@@ -413,12 +426,12 @@ osm_shapes_match_routes <- function(
 
     # > Filter GTFS
     gtfs_route_name <- gtfs$routes |> # Start on routes.txt to match line number with route_name
-      dplyr::select(route_id, route_short_name, route_long_name) |>
+      dplyr::select("route_id", "route_short_name", "route_long_name") |>
       dplyr::filter(.data[[gtfs_match]] == route_name) |>
-      dplyr::left_join(gtfs$trips |> dplyr::select(route_id, trip_id, shape_id, direction_id), by = "route_id") |>
-      dplyr::filter(!is.na(trip_id)) |>
+      dplyr::left_join(gtfs$trips |> dplyr::select("route_id", "trip_id", "shape_id", "direction_id"), by = "route_id") |>
+      dplyr::filter(!is.na(.data$trip_id)) |>
       dplyr::left_join(shapes_sf, by = "shape_id") |>
-      dplyr::distinct(shape_id, .keep_all = TRUE) |>
+      dplyr::distinct(.data$shape_id, .keep_all = TRUE) |>
       sf::st_as_sf()
     if (nrow(gtfs_route_name) == 0) { # In case route does not have trips, nor shapes (no need to log error, as it had no geometries anyway)
       return(list(
@@ -433,72 +446,89 @@ osm_shapes_match_routes <- function(
     # 2. Match based on initial and final points
     # > Compute osm final and initial points
     geom_col <- sf::st_geometry(osm_route_name |> st_transform(metric_crs)) # To get route length in a projected CRS
-    
+
     osm_route_name <- tryCatch(
       {
         osm_route_name |>
           dplyr::mutate(
-            roundtrip = if (!"roundtrip" %in% names(osm_route_name)) NA else roundtrip,
-            route_dist = sf::st_length(geom_col) |> units::drop_units()
+            roundtrip = if (!"roundtrip" %in% names(osm_route_name)) NA else .data$roundtrip,
+            route_dist = as.numeric(sf::st_length(geom_col))
           ) |>
           dplyr::rowwise() |>
           dplyr::left_join(stop_counts, by = c("osm_id" = "relation_osm_id")) |>
           dplyr::mutate(
-            # Geographical data
-            # Other relevant parameters,
-            first_stop_osm_id = relations_df |>
-              dplyr::filter(type == "node") |>
-              dplyr::select(relation_osm_id, stop_osm_id = osm_id, role) |>
-              # Consider both stop_entry/exit_only and stop, because circular lines do not have entry/exit, only stop
-              dplyr::filter(relation_osm_id == osm_id & role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
-              # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
-              dplyr::filter(
-                (nr_s > 3 * nr_p & role %in% c("stop_entry_only", "stop")) |
-                (nr_p > 3 * nr_s & role %in% c("platform_entry_only", "platform")) |
-                (nr_s <= 3 * nr_p & nr_p <= 3 * nr_s)
-              ) |>
-              # Use sorting to give priority to entry/exit, when they exist
-              dplyr::arrange(
-                match(role, c("stop_entry_only", "platform_entry_only", "stop", "platform")),
-                role
-              ) |>
-              dplyr::slice(1) |>
-              dplyr::pull(stop_osm_id),
-            last_stop_osm_id = relations_df |>
-              dplyr::filter(type == "node") |>
-              dplyr::select(relation_osm_id, stop_osm_id = osm_id, role) |>
-              dplyr::filter(relation_osm_id == osm_id & role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
-              # Filter out stops/platforms if that type is underrepresented (if ratio is higher than 3, ignore that type)
-              dplyr::filter(
-                (nr_s > 3 * nr_p & role %in% c("stop_exit_only", "stop")) |
-                (nr_p > 3 * nr_s & role %in% c("platform_exit_only", "platform")) |
-                (nr_s <= 3 * nr_p & nr_p <= 3 * nr_s)
-              ) |>
-              dplyr::mutate(role_group = dplyr::case_when(
-                # When roundtrip (circular), keep normal order
-                roundtrip == "yes" ~ 1,
-                # Otherwise, consider last stop_exit_only or stop (if no exit_only)
-                role == "stop_exit_only" ~ 1, role == "platform_exit_only" ~ 2, role == "stop" ~ 4, role == "platform" ~ 4, TRUE ~ 5
-              )) |>
-              dplyr::arrange(
-                role_group, # First criteria, to prioritize entry/exit when they exist
-                dplyr::case_when( # Within each role, sort by order on OSM relation, considering roundtrip and role type
-                  roundtrip == "yes" ~ dplyr::row_number(), # When roundtrip (circular), keep normal order
-                  role == "stop_exit_only" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  role == "platform_exit_only" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  role == "stop" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  role == "platform" ~ dplyr::desc(dplyr::row_number()), # reverse order
-                  TRUE ~ dplyr::desc(dplyr::row_number()) # fallback order for others
-                )
-              ) |>
-              dplyr::slice(1) |>
-              dplyr::pull(stop_osm_id),
-            initial = osm_stoppositions |> dplyr::filter(osm_id == first_stop_osm_id) |> dplyr::slice(1) |> dplyr::pull(geometry) |> dplyr::first(default = NA),
-            final = osm_stoppositions |> dplyr::filter(osm_id == last_stop_osm_id) |> dplyr::slice(1) |> dplyr::pull(geometry) |> dplyr::first(default = NA)
+            first_stop_osm_id = {
+              rel_id <- .data$osm_id
+              ns <- .data$nr_s
+              np <- .data$nr_p
+              relations_df |>
+                dplyr::filter(.data$type == "node") |>
+                dplyr::select(relation_osm_id = "relation_osm_id", stop_osm_id = "osm_id", role = "role") |>
+                dplyr::filter(.data$relation_osm_id == rel_id & .data$role %in% c("stop_entry_only", "stop", "platform_entry_only", "platform")) |>
+                dplyr::filter(
+                  (ns > 3 * np & .data$role %in% c("stop_entry_only", "stop")) |
+                    (np > 3 * ns & .data$role %in% c("platform_entry_only", "platform")) |
+                    (ns <= 3 * np & np <= 3 * ns)
+                ) |>
+                dplyr::arrange(
+                  match(.data$role, c("stop_entry_only", "platform_entry_only", "stop", "platform")),
+                  .data$role
+                ) |>
+                dplyr::slice(1) |>
+                dplyr::pull(.data$stop_osm_id)
+            },
+            last_stop_osm_id = {
+              rel_id <- .data$osm_id
+              ns <- .data$nr_s
+              np <- .data$nr_p
+              rt <- .data$roundtrip
+              relations_df |>
+                dplyr::filter(.data$type == "node") |>
+                dplyr::select(relation_osm_id = "relation_osm_id", stop_osm_id = "osm_id", role = "role") |>
+                dplyr::filter(.data$relation_osm_id == rel_id & .data$role %in% c("stop_exit_only", "stop", "platform_exit_only", "platform")) |>
+                dplyr::filter(
+                  (ns > 3 * np & .data$role %in% c("stop_exit_only", "stop")) |
+                    (np > 3 * ns & .data$role %in% c("platform_exit_only", "platform")) |
+                    (ns <= 3 * np & np <= 3 * ns)
+                ) |>
+                dplyr::mutate(role_group = dplyr::case_when(
+                  isTRUE(rt == "yes") ~ 1,
+                  .data$role == "stop_exit_only" ~ 1, .data$role == "platform_exit_only" ~ 2, .data$role == "stop" ~ 4, .data$role == "platform" ~ 4, TRUE ~ 5
+                )) |>
+                dplyr::arrange(
+                  .data$role_group,
+                  dplyr::case_when(
+                    isTRUE(rt == "yes") ~ dplyr::row_number(),
+                    .data$role == "stop_exit_only" ~ dplyr::desc(dplyr::row_number()),
+                    .data$role == "platform_exit_only" ~ dplyr::desc(dplyr::row_number()),
+                    .data$role == "stop" ~ dplyr::desc(dplyr::row_number()),
+                    .data$role == "platform" ~ dplyr::desc(dplyr::row_number()),
+                    TRUE ~ dplyr::desc(dplyr::row_number())
+                  )
+                ) |>
+                dplyr::slice(1) |>
+                dplyr::pull(.data$stop_osm_id)
+            },
+            initial = {
+              stop_osm_id <- .data$first_stop_osm_id
+              osm_stoppositions |>
+                dplyr::filter(.data$osm_id == stop_osm_id) |>
+                dplyr::slice(1) |>
+                dplyr::pull(.data$geometry) |>
+                dplyr::first(default = NA)
+            },
+            final = {
+              stop_osm_id <- .data$last_stop_osm_id
+              osm_stoppositions |>
+                dplyr::filter(.data$osm_id == stop_osm_id) |>
+                dplyr::slice(1) |>
+                dplyr::pull(.data$geometry) |>
+                dplyr::first(default = NA)
+            }
           ) |>
           dplyr::ungroup() |>
-          dplyr::select(osm_id, ref, name, route_dist, nr_stops, first_stop_osm_id, last_stop_osm_id, initial, final, geometry) |>
-          dplyr::arrange(route_dist)
+          dplyr::select("osm_id", "ref", "name", "route_dist", "nr_stops", "first_stop_osm_id", "last_stop_osm_id", "initial", "final", "geometry") |>
+          dplyr::arrange(.data$route_dist)
       },
       error = function(e) {
         warn_osm_stops_missing <- append(warn_osm_stops_missing, sprintf("`osm_id` %s (`%s` %s)", paste(osm_route_name$osm_id, collapse = ", "), gtfs_match, route_name))
@@ -518,27 +548,57 @@ osm_shapes_match_routes <- function(
     # > Same for GTFS shapes
     geom_col <- sf::st_geometry(gtfs_route_name |> st_transform(metric_crs)) # To get route length in a projected CRS
     gtfs_route_name <- gtfs_route_name |>
-      dplyr::mutate(route_dist = sf::st_length(geom_col) |> units::drop_units()) |>
+      dplyr::mutate(route_dist = as.numeric(sf::st_length(geom_col))) |>
       dplyr::rowwise() |>
       dplyr::mutate(
         # Geographical data
-        trip_id_copy = trip_id,
-        first_stop_id = gtfs$stop_times |> dplyr::filter(trip_id == trip_id_copy) |> dplyr::arrange(stop_sequence) |> dplyr::slice(1) |> dplyr::pull(stop_id),
-        last_stop_id = gtfs$stop_times |> dplyr::filter(trip_id == trip_id_copy) |> dplyr::arrange(dplyr::desc(stop_sequence)) |> dplyr::slice(1) |> dplyr::pull(stop_id),
-        initial = stops_sf |> dplyr::filter(stop_id == first_stop_id) |> dplyr::slice(1) |> dplyr::pull(geometry),
-        final = stops_sf |> dplyr::filter(stop_id == last_stop_id) |> dplyr::slice(1) |> dplyr::pull(geometry),
-
+        first_stop_id = {
+          route_trip_id <- .data$trip_id
+          gtfs$stop_times |>
+            dplyr::filter(.data$trip_id == route_trip_id) |>
+            dplyr::arrange(.data$stop_sequence) |>
+            dplyr::slice(1) |>
+            dplyr::pull(.data$stop_id)
+        },
+        last_stop_id = {
+          route_trip_id <- .data$trip_id
+          gtfs$stop_times |>
+            dplyr::filter(.data$trip_id == route_trip_id) |>
+            dplyr::arrange(dplyr::desc(.data$stop_sequence)) |>
+            dplyr::slice(1) |>
+            dplyr::pull(.data$stop_id)
+        },
         # Other relevant parameters
-        nr_stops = nrow(gtfs$stop_times |> dplyr::filter(trip_id == trip_id_copy))
+        nr_stops = {
+          route_trip_id <- .data$trip_id
+          nrow(gtfs$stop_times |> dplyr::filter(.data$trip_id == route_trip_id))
+        }
+      ) |>
+      mutate(
+        initial = {
+          init_stop_id <- .data$first_stop_id
+          stops_sf |>
+            dplyr::filter(.data$stop_id == init_stop_id) |>
+            dplyr::slice(1) |>
+            dplyr::pull(.data$geometry)
+        },
+        final = {
+          fin_stop_id <- .data$last_stop_id
+          stops_sf |>
+            dplyr::filter(.data$stop_id == fin_stop_id) |>
+            dplyr::slice(1) |>
+            dplyr::pull(.data$geometry)
+        }
       ) |>
       dplyr::ungroup() |>
-      dplyr::select(-trip_id_copy) |>
-      dplyr::arrange(route_dist, initial, final)
+      dplyr::arrange(.data$route_dist, .data$initial, .data$final)
 
     # 3. Match gtfs shapes and osm routes, by choosing the one that share the closest start and end points
     # >  Compute distances between init and final points for both
-    init <- units::drop_units(sf::st_distance(osm_route_name$initial |> st_transform(metric_crs), gtfs_route_name$initial |> st_transform(metric_crs)))
-    fin <- units::drop_units(sf::st_distance(osm_route_name$final |> st_transform(metric_crs), gtfs_route_name$final |> st_transform(metric_crs)))
+    init_dist <- sf::st_distance(osm_route_name$initial |> st_transform(metric_crs), gtfs_route_name$initial |> st_transform(metric_crs))
+    fin_dist <- sf::st_distance(osm_route_name$final |> st_transform(metric_crs), gtfs_route_name$final |> st_transform(metric_crs))
+    init <- matrix(as.numeric(init_dist), nrow = nrow(init_dist), ncol = ncol(init_dist))
+    fin <- matrix(as.numeric(fin_dist), nrow = nrow(fin_dist), ncol = ncol(fin_dist))
     length_diff <- sapply(gtfs_route_name$route_dist, function(y) abs(osm_route_name$route_dist - y))
     # Proxy for number of stops distance: average distance between stops on GTFS, times the difference between osm and gtfs stops
     stops_diff <- sapply(
@@ -551,36 +611,40 @@ osm_shapes_match_routes <- function(
 
     # > Match OSM network and GTFS shapes considering the match with min aggregated distance (init + fin)
     closeness <- abs(init + fin + length_diff + stops_diff)
+    if (!is.matrix(closeness)) {
+      closeness <- matrix(closeness, nrow = nrow(osm_route_name), ncol = nrow(gtfs_route_name))
+    }
 
     gtfs_route_name_minimos <- gtfs_route_name |>
       dplyr::mutate(osm_id = NA)
 
     for (i in 1:nrow(gtfs_route_name_minimos)) {
-      gtfs_route_name_minimos[i, ]$osm_id <- osm_route_name[which.min(closeness[, i]), ]$osm_id
+      gtfs_route_name_minimos[i, ]$osm_id <- osm_route_name[which.min(closeness[, i, drop = TRUE]), ]$osm_id
     }
 
     gtfs_route_name_result <- gtfs_route_name_minimos |>
       sf::st_drop_geometry() |>
       dplyr::left_join(
-        osm_route_name |> dplyr::select(osm_id, name, ref, route_dist, nr_stops, geometry, initial, final) |> dplyr::rename(osm_name = name, osm_ref = ref),
+        osm_route_name |> dplyr::select("osm_id", "name", "ref", "route_dist", "nr_stops", "geometry", "initial", "final") |> 
+        dplyr::rename(osm_name = .data$name, osm_ref = .data$ref),
         by = "osm_id",
         suffix = c("_gtfs", "_osm")
       ) |>
       dplyr::rowwise() |>
       dplyr::mutate(
-        distance_diff = abs(route_dist_gtfs - route_dist_osm),
-        points_diff = as.numeric(units::drop_units(sf::st_distance(initial_osm |> st_transform(metric_crs), initial_gtfs |> st_transform(metric_crs)))) + units::drop_units(sf::st_distance(final_osm |> st_transform(metric_crs), final_gtfs |> st_transform(metric_crs))),
-        stops_diff = abs(nr_stops_gtfs - nr_stops_osm)
+        distance_diff = as.numeric(abs(.data$route_dist_gtfs - .data$route_dist_osm)),
+        points_diff = as.numeric(sf::st_distance(.data$initial_osm |> st_transform(metric_crs), .data$initial_gtfs |> st_transform(metric_crs))) + as.numeric(sf::st_distance(.data$final_osm |> st_transform(metric_crs), .data$final_gtfs |> st_transform(metric_crs))),
+        stops_diff = as.numeric(abs(.data$nr_stops_gtfs - .data$nr_stops_osm))
       ) |> # absolute difference
       dplyr::ungroup() |>
-      dplyr::select(-initial_gtfs, -final_gtfs) |>
+      dplyr::select(-"initial_gtfs", -"final_gtfs") |>
       sf::st_as_sf(sf_column_name = "geometry")
 
     # When multiple osm_id, return those with min distance_diff + points_diff + then stops_diff
     if (length(unique(gtfs_route_name_result$osm_id)) < nrow(gtfs_route_name_result)) {
       gtfs_route_name_result_unique <- gtfs_route_name_result |>
-        dplyr::group_by(osm_id) |>
-        dplyr::slice_min(order_by = distance_diff + points_diff + stops_diff, with_ties = FALSE) |>
+        dplyr::group_by(.data$osm_id) |>
+        dplyr::slice_min(order_by = .data$distance_diff + .data$points_diff + .data$stops_diff, with_ties = FALSE) |>
         dplyr::ungroup()
 
       warn_osm_repeated <- append(warn_osm_repeated, sprintf(
@@ -623,6 +687,9 @@ osm_shapes_match_routes <- function(
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
+    if (!requireNamespace("parallel", quietly = TRUE)) {
+      stop("Package 'parallel' is required for multi-core processing. Install it with: install.packages('parallel')")
+    }
     results_list <- parallel::mclapply(routes_names, match_route_worker, mc.cores = num_cores)
   } else {
     results_list <- lapply(routes_names, function(route_name) {
@@ -658,12 +725,12 @@ osm_shapes_match_routes <- function(
       dplyr::left_join(
         osm_multilines_redux |>
           sf::st_drop_geometry() |>
-          dplyr::select(osm_id, osm_name = name, osm_ref = ref) |>
-          dplyr::distinct(osm_id, .keep_all = TRUE),
+          dplyr::select(osm_id = "osm_id", osm_name = "name", osm_ref = "ref") |>
+          dplyr::distinct(.data$osm_id, .keep_all = TRUE),
         by = "osm_id"
       ) |>
       dplyr::left_join(
-        osm_multilines_redux |> dplyr::select(osm_id, geometry),
+        osm_multilines_redux |> dplyr::select("osm_id", "geometry"),
         by = "osm_id"
       ) |>
       sf::st_as_sf()
@@ -686,7 +753,7 @@ osm_shapes_match_routes <- function(
   # > Output success message
   if (nrow(result_success) > 0) {
     result_success <- result_success |> left_join(route_shapes |> select(
-      -any_of(names(result_success)), shape_id # Avoid duplicate columns
+      -any_of(names(result_success)), "shape_id" # Avoid duplicate columns
     ), by = "shape_id")
     m <- sprintf(
       "> Associated %d shapes (%.2f%% of %d total) of %d routes (%.2f%% of %d total) with OSM routes, corresponding to %d trips (%.2f%% of %d total), with a mean distance of %.2f meters for points, %.2f meters for route length and a mean difference of %.2f stops\n",
@@ -695,8 +762,8 @@ osm_shapes_match_routes <- function(
       nrow(result_success) / nrow(shapes_sf) * 100,
       nrow(shapes_sf),
       # routes
-      nrow(result_success |> distinct(route_id)),
-      nrow(result_success |> distinct(route_id)) / length(unique(gtfs$routes$route_id)) * 100,
+      nrow(result_success |> distinct(.data$route_id)),
+      nrow(result_success |> distinct(.data$route_id)) / length(unique(gtfs$routes$route_id)) * 100,
       length(unique(gtfs$routes$route_id)),
       # trips
       sum(result_success$n_trips),
@@ -712,8 +779,8 @@ osm_shapes_match_routes <- function(
 
     m <- sprintf(
       "> Of those, %d shapes (%.2f%% of %d matched) have a distance difference below 1000 meters AND a points difference below 500 meters\n",
-      nrow(result_success |> filter(distance_diff < 1000 & points_diff < 500)),
-      nrow(result_success |> filter(distance_diff < 1000 & points_diff < 500)) / nrow(result_success) * 100,
+      nrow(result_success |> filter(.data$distance_diff < 1000 & .data$points_diff < 500)),
+      nrow(result_success |> filter(.data$distance_diff < 1000 & .data$points_diff < 500)) / nrow(result_success) * 100,
       nrow(result_success)
     )
     message(m)
@@ -723,11 +790,11 @@ osm_shapes_match_routes <- function(
   # > Output error messages
   not_found <- bind_rows(result[lengths(result) <= 1])
   routes_shapes_n <- gtfs$routes |> # Start on routes.txt to match line number with route_name
-    select(route_id, !!gtfs_match) |>
-    left_join(gtfs$trips |> select(route_id, trip_id, shape_id, direction_id), by = "route_id") |>
-    filter(!is.na(trip_id)) |> # Ignore routes without trips, because they do not have shapes, so they are not expected to be matched with OSM routes (and thus, not expected to be in the results, so no need to log them as errors)
+    select("route_id", !!gtfs_match) |>
+    left_join(gtfs$trips |> select("route_id", "trip_id", "shape_id", "direction_id"), by = "route_id") |>
+    filter(!is.na(.data$trip_id)) |> # Ignore routes without trips, because they do not have shapes, so they are not expected to be matched with OSM routes (and thus, not expected to be in the results, so no need to log them as errors)
     left_join(shapes_sf, by = "shape_id") |>
-    distinct(.data[[gtfs_match]], shape_id) |>
+    distinct(.data[[gtfs_match]], .data$shape_id) |>
     group_by(.data[[gtfs_match]]) |>
     summarise(shapes_n = n())
   partial_match <- result_success |>
@@ -737,8 +804,8 @@ osm_shapes_match_routes <- function(
       group_by(.data[[gtfs_match]]) |>
       summarise(shapes_n = n()) |>
       left_join(routes_shapes_n, by = gtfs_match) |>
-      rename(matched = shapes_n.x, gtfs = shapes_n.y) |>
-      filter(matched < gtfs)
+      rename(matched = .data$shapes_n.x, gtfs = .data$shapes_n.y) |>
+      filter(.data$matched < .data$gtfs)
   }
 
   warning_osm_unsorted_stops <- unique(warning_osm_unsorted_stops) # This warning list can have duplicates, ignore
