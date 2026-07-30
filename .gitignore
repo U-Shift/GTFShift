@@ -13,3 +13,4 @@ scratch/*
 /doc/
 /Meta/
 *cache*
+revdep/

@@ -1,7 +1,7 @@
 Type: Package
 Package: GTFShift
 Title: Explore and Analyse General Transit Feed Specification (GTFS) Files
-    With a Focus on Urban Mobility
+    with a Focus on Urban Mobility
 Version: 0.11.0
 Authors@R: c(
     person(c("Gonçalo", "F."), "Matos", , "goncaloafmatos@tecnico.pt", role = c("aut", "cre"),
@@ -10,12 +10,11 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-5642-6006")),
     person("Miguel", "Relvas Pires", , "miguelpcrpires@tecnico.ulisboa.pt", role = "ctb")
   )
-Description: GTFShift emerged from the necessity to perform systematic
-    analysis for academic research over General Transit Feed Specification
-    (GTFS) files that were not supported by any R library. It compiles the
-    methods developed for this purpose, aiming to contribute to an open
-    source culture.  Its functionality is built mostly on
-    [tidytransit](https://r-transit.github.io/tidytransit/) package.
+Description: This package encompasses a complete bundle of methods to
+    harmonize GTFS and OSM data, enabling the integration and exploration
+    of different layers of transit data, starting with the planned
+    operations (GTFS), but also the infrastructure topology (OSM) and
+    real-time information (GTFS-RT).
 License: GPL
 URL: https://github.com/U-Shift/GTFShift,
     https://u-shift.github.io/GTFShift/
@@ -60,5 +59,5 @@ VignetteBuilder:
 Config/Needs/website: rmarkdown
 Config/roxygen2/version: 8.0.0
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Language: en-US
+RoxygenNote: 7.3.3

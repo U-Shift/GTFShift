@@ -17,3 +17,5 @@ cache
 (^|/)[^/]*cache[^/]*(/.*)?$
 ^\.RDataTmp$
 ^\.RData$
+^revdep$
+^cran-comments\.md$
