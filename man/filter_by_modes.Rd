@@ -12,7 +12,7 @@ filter_by_modes(gtfs, modes = list())
 \item{modes}{Integer[]. A list with the ids of modes to consider.}
 }
 \value{
-A tidygtfs object with the filtered feed.
+tidygtfs. The filtered GTFS feed.
 }
 \description{
 Filter GTFS feed by mode

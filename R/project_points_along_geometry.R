@@ -21,7 +21,7 @@
 #' Distances are always computed in \code{metric_crs} units. The returned
 #' projected points are transformed back to the original \code{geometry} CRS.
 #'
-#' @returns A data.frame with one row per input point and four columns:
+#' @returns data.frame. Input points projected along geometry with four columns:
 #' \describe{
 #'   \item{closest_on_geometry}{An \code{sfc_POINT} column with the projected location on the line.}
 #'   \item{distance_to_closest_on_geometry}{Numeric distance from each input point to its projected location on the line.}

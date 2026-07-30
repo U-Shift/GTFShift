@@ -66,7 +66,7 @@
 #' an OSM one. This might generate wrong results if the topology of routes on OSM does not match the GTFS shapes for that route.
 #' Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the results table to validate the results and identify misassociations.
 #'
-#' @returns A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
+#' @returns data.frame. Matched routes (\code{sf} if \code{geometry=TRUE}) with the following columns:
 #' \describe{
 #'   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
 #'   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}

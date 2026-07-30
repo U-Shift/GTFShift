@@ -24,7 +24,7 @@ osm_centerlines(
 \item{venv}{String (Default creates a new one). Python environment where neatnet will run.}
 }
 \value{
-osm_lines in sf format
+sf data.frame. OSM centerlines.
 }
 \description{
 Get centerlines for OSM road network

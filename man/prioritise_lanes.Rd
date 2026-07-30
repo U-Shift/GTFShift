@@ -24,7 +24,7 @@ prioritise_lanes(
 \item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
 }
 \value{
-An \code{sf} \code{data.frame} object with the following columns:
+sf data.frame. Prioritised lanes with the following columns:
 \describe{
   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
   \item{hour}{The hour for which the frequency applies (24 hour format).}

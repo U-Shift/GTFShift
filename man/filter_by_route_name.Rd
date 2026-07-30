@@ -16,7 +16,7 @@ filter_by_route_name(gtfs, values, short_name = TRUE, exact_match = TRUE)
 \item{exact_match}{Boolean. If TRUE, route name is queried for an exact match, otherwise, partial match is considered.}
 }
 \value{
-A tidygtfs object with the filtered feed.
+tidygtfs. The filtered GTFS feed.
 }
 \description{
 Filter GTFS feed by route name

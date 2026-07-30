@@ -30,7 +30,7 @@ load_feed(
 \item{headers}{Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS zip file URL.}
 }
 \value{
-A tidygtfs object.
+tidygtfs. The loaded GTFS feed.
 }
 \description{
 Read GTFS feed, fixing integrity errors

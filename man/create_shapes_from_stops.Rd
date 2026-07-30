@@ -10,7 +10,7 @@ create_shapes_from_stops(gtfs)
 \item{gtfs}{tidygtfs. GTFS feed.}
 }
 \value{
-The gtfs feed with the shapes table defined and the trips table updated with the matching shape_id.
+tidygtfs. The GTFS feed with the shapes table defined and the trips table updated with the matching shape_id.
 }
 \description{
 Build shapes from GTFS stops data

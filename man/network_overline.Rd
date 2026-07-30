@@ -30,7 +30,7 @@ network_overline(
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute segment lengths and join distances in meters.}
 }
 \value{
-A spatial object of the target network, extended with the aggregated values.
+sf. Spatial network object extended with aggregated values.
 }
 \description{
 Aggregate lines based on overlap with target network

@@ -12,7 +12,7 @@
 #' minimum and maximum dates and setting each week day to true if it has any date that matches that date. The results
 #' might not be 100% accurate, as it captures the whole time span and exceptions in the week days along it are ignored.
 #'
-#' @returns A data.frame for calendar.txt.
+#' @returns data.frame. Table for calendar.txt.
 #'
 #' @examples
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",

@@ -12,7 +12,7 @@ calendar_nextBusinessWednesday(start_date = Sys.Date(), country_code = "PT")
 \item{country_code}{String (Default PT). Country code in the format \code{ISO 3166-1 alpha-2}. When provided, public holidays are considered.}
 }
 \value{
-Date
+Date. The next business Wednesday date.
 }
 \description{
 Get next business Wednesday

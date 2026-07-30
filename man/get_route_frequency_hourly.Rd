@@ -21,7 +21,7 @@ get_route_frequency_hourly(
 \item{overline}{Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.}
 }
 \value{
-An \code{sf} \code{data.frame} object with the following columns (the first three are only present if \code{overline=FALSE}):
+sf data.frame. Hourly route frequencies, with the following columns (the first three are only present if \code{overline=FALSE}):
 \describe{
   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
   \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}

@@ -17,7 +17,7 @@
 #' segment, the overlapping lines and aggregates their \code{attr} values, using \code{fun}.
 #'
 #'
-#' @returns A spatial object of the target network, extended with the aggregated values.
+#' @returns sf. Spatial network object extended with aggregated values.
 #'
 #' @examples
 #' # Subset GTFS for one route only, for demo purposes

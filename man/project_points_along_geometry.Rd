@@ -24,7 +24,7 @@ discretize the line when estimating cumulative distance along geometry.}
 compute nearest points, line sampling, and cumulative distances.}
 }
 \value{
-A data.frame with one row per input point and four columns:
+data.frame. Input points projected along geometry with four columns:
 \describe{
   \item{closest_on_geometry}{An \code{sfc_POINT} column with the projected location on the line.}
   \item{distance_to_closest_on_geometry}{Numeric distance from each input point to its projected location on the line.}

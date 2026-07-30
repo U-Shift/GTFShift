@@ -8,7 +8,7 @@
 #' Refer to \code{routes.txt} \code{route_type} parameter on
 #' \href{https://gtfs.org/documentation/schedule/reference/#routestxt}{GTFS documentation} for more details.
 #'
-#' @returns A tidygtfs object with the filtered feed.
+#' @returns tidygtfs. The filtered GTFS feed.
 #'
 #' @examples
 #' # Load sample feed with multiple modes

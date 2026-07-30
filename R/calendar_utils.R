@@ -8,7 +8,7 @@
 #' Find the next Wednesday that is not a holiday. When country is given, public holidays are considered,
 #' using \href{https://date.nager.at/Api}{Nager.Date} API.
 #'
-#' @returns Date
+#' @returns Date. The next business Wednesday date.
 #'
 #' @examples
 #' # Example of Portuguese holiday (10/06/2026) ignored

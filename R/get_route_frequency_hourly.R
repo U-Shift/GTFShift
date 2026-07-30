@@ -23,7 +23,7 @@
 #'
 #' Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
 #'
-#' @returns An \code{sf} \code{data.frame} object with the following columns (the first three are only present if \code{overline=FALSE}):
+#' @returns sf data.frame. Hourly route frequencies, with the following columns (the first three are only present if \code{overline=FALSE}):
 #' \describe{
 #'   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
 #'   \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}

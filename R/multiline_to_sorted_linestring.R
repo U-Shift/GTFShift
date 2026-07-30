@@ -56,7 +56,7 @@
 #' The ordered segments are concatenated into a single \code{LINESTRING} and
 #' transformed back to the original CRS of \code{multilinestring}.
 #'
-#' @returns A \code{sfc} object with LINESTRING geometry.
+#' @returns sfc. LINESTRING geometry object.
 #' 
 #' @examples
 #' # Get OSM route geometries (MULTILINESTRING)  

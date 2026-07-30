@@ -7,7 +7,7 @@
 #' @details
 #' Exports roads tagged as designated bus lanes on OpenStreetMaps for given area.
 #'
-#' @returns osm_lines in sf format
+#' @returns sf data.frame. OSM bus lanes.
 #'
 #'
 #' @examples

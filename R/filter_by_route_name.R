@@ -10,7 +10,7 @@
 #' letters, words or combinations of both.
 #' This method allows to filter the feed for the route short or long name, with a partial or exact match.
 #'
-#' @returns A tidygtfs object with the filtered feed.
+#' @returns tidygtfs. The filtered GTFS feed.
 #'
 #' @examples
 #' # Load GTFS

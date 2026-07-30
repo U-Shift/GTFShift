@@ -39,7 +39,7 @@ query_mobilitydatabase(
 \item{is_official}{Boolean (Optional). If TRUE, only return official feeds.}
 }
 \value{
-data.frame with query results
+data.frame. Query results from Mobility Database.
 }
 \description{
 Query Mobility Database API for GTFS feeds

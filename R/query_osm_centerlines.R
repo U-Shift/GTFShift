@@ -21,7 +21,7 @@
 #' The full code (Python) of his work is openly available at 
 #' \href{https://github.com/U-Shift/lp_streets}{GitHub}.
 #'
-#' @returns osm_lines in sf format
+#' @returns sf data.frame. OSM centerlines.
 #'
 #' @examples
 #' # Get sample OSM extract

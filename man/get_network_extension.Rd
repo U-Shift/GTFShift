@@ -30,7 +30,7 @@ get_network_extension(
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute route lengths in meters.}
 }
 \value{
-The routes extension, in meters.
+Numeric. The routes extension, in meters.
 }
 \description{
 Get total extension of GTFS feed routes

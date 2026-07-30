@@ -18,7 +18,7 @@
 #' Mind that this method uses \code{GTFShift::get_way_frequency_hourly()} to match routes with OSM ways, which requires that the
 #' OSM relation mapping is well defined for the transit routes. Routes that do not have an OSM match are ignored.
 #'
-#' @returns An \code{sf} \code{data.frame} object with the following columns:
+#' @returns sf data.frame. Prioritised lanes with the following columns:
 #' \describe{
 #'   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
 #'   \item{hour}{The hour for which the frequency applies (24 hour format).}

@@ -15,7 +15,7 @@ get_stop_frequency_hourly(
 \item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
 }
 \value{
-An \code{sf} \code{data.frame} object with the following columns:
+sf data.frame. Hourly stop frequencies, with the following columns:
 \describe{
   \item{stop_id}{The \code{stop_id} attribute from \code{stops.txt} file.}
   \item{hour}{The hour for which the frequency applies (24 hour format).}

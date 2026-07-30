@@ -45,7 +45,7 @@ osm_shapes_match_routes(
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute shapes and routes lengths and stop-to-stop distances.}
 }
 \value{
-A \code{data.frame} (\code{sf} if \code{geometry=TRUE}) with the following columns:
+data.frame. Matched routes (\code{sf} if \code{geometry=TRUE}) with the following columns:
 \describe{
   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}

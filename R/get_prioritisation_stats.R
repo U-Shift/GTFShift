@@ -6,7 +6,7 @@
 #' @param weight Character. Weight to use for weighted mean. Accepted values: "length", "frequency".
 #' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute lengths in meters.
 #'
-#' @returns List with statistics about lane prioritisation, with the following attributes:
+#' @returns List. Statistics about lane prioritisation, with the following attributes:
 #' \describe{
 #'   \item{extension}{Total length of the prioritised network, in meters.}
 #'   \item{extension_bus_lane}{Total length of the bus lane segments, in meters.}
