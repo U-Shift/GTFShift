@@ -25,7 +25,7 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     )
 
     expect_warning(
-        res <- GTFShift::rt_average_speed(rt_updates, trip_geom, metric_crs = 3857),
+        res <- GTFShift::rt_average_speed(rt_updates, trip_geom, metric_crs = 3857, geometry_sample_meters = 1),
         "Trip UNMATCHED_TRIP has less than 2 updates. Ignoring it."
     )
     expect_s3_class(res, "sf")
@@ -60,23 +60,25 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     r_t1_2 <- res[res$trip_id == "T1" & res$timestamp == 1060, ]
     expect_equal(nrow(r_t1_2), 1)
     expect_equal(r_t1_2$time_since_prev_sec, 60)
-    expect_equal(r_t1_2$distance_along_geometry, 494.95, tolerance = 1e-2)
-    expect_equal(r_t1_2$distance_along_geometry_reversed, 505.05, tolerance = 1e-2)
+    expect_equal(r_t1_2$distance_along_geometry, 500, tolerance = 1e-2)
+    expect_equal(r_t1_2$distance_along_geometry_reversed, 500, tolerance = 1e-2)
     expect_equal(r_t1_2$distance_to_closest_on_geometry, 10, tolerance = 1e-2)
-    expect_equal(r_t1_2$distance_since_prev_meters, 494.95, tolerance = 1e-2)
-    expect_equal(r_t1_2$speed_kmh, 29.7, tolerance = 0.5)
+    expect_equal(r_t1_2$distance_since_prev_meters, 500, tolerance = 1e-2)
+    expect_equal(r_t1_2$speed_kmh, 30, tolerance = 0.5)
 
     # Validate trip T2 (timestamp == 1080: first update, speed is NA)
     r_t2_1 <- res[res$trip_id == "T2" & res$timestamp == 1080, ]
     expect_equal(nrow(r_t2_1), 1)
     expect_true(is.na(r_t2_1$speed_kmh))
 
-    # Validate trip T2 (timestamp == 1140: second update, distance ~404m over 60s -> ~24.2 km/h)
+    # Validate trip T2 (timestamp == 1140: second update, distance 400m over 60s -> 24 km/h)
     r_t2_2 <- res[res$trip_id == "T2" & res$timestamp == 1140, ]
     expect_equal(nrow(r_t2_2), 1)
     expect_equal(r_t2_2$time_since_prev_sec, 60)
-    expect_equal(r_t2_2$distance_since_prev_meters, 404.04, tolerance = 1e-2)
-    expect_equal(r_t2_2$speed_kmh, 24.24, tolerance = 0.5)
+    expect_equal(r_t2_2$distance_since_prev_meters, 400, tolerance = 1e-2)
+    expect_equal(r_t2_2$distance_along_geometry, 400, tolerance = 1e-2)
+    expect_equal(r_t2_2$distance_along_geometry_reversed, 600, tolerance = 1e-2)
+    expect_equal(r_t2_2$speed_kmh, 24, tolerance = 0.5)
 })
 
 test_that("rt_average_speed issues warning and ignores trips with less than 2 updates", {
