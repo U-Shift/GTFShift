@@ -2,18 +2,18 @@ pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
-  analyse: analyse.html
-  classify: classify.html
-  download: download.html
-  filter: filter.html
-  gtfs_from_osm: gtfs_from_osm.html
+  articles/analyse: analyse.html
+  articles/classify: classify.html
+  articles/download: download.html
+  articles/filter: filter.html
+  articles/gtfs_from_osm: gtfs_from_osm.html
   articles/GTFShift: GTFShift.html
-  osm_update: osm_update.html
-  osm: osm.html
-  prioritize: prioritize.html
-  rt: rt.html
-  unify: unify.html
-last_built: 2026-07-10T14:16Z
+  articles/osm_update: osm_update.html
+  articles/osm: osm.html
+  articles/prioritise: prioritise.html
+  articles/rt: rt.html
+  articles/unify: unify.html
+last_built: 2026-07-30T14:29Z
 urls:
   reference: https://u-shift.github.io/GTFShift/reference
   article: https://u-shift.github.io/GTFShift/articles

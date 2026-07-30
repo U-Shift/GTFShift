@@ -37,24 +37,24 @@ rt_collect_file <- "gtfs_rt_data.csv"
 GTFShift::rt_collect_protobuf(data$URL.RT[data$ID == gtfs_id], rt_collect_file) # Run until manually stopped (CTRL+C)
 ```
 
-## Extend prioritization with speed from GTFS-RT data
+## Extend prioritisation with speed from GTFS-RT data
 
 Once GTFS-RT data is collected, it can be used to extend lane
-prioritization analysis.
-[`GTFShift::rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
-takes a lane prioritization data frame and a GTFS-RT collection (as an
-`sf` object) and enriches the prioritization with real-time metrics.
+prioritisation analysis.
+[`GTFShift::rt_extend_prioritisation()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritisation.md)
+takes a lane prioritisation data frame and a GTFS-RT collection (as an
+`sf` object) and enriches the prioritisation with real-time metrics.
 Refer to the method documentation for the full details.
 
 ``` r
 
-# Prioritization based on static GTFS data and infrastructure characteristics
+# Prioritisation based on static GTFS data and infrastructure characteristics
 gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
 osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
-lane_prioritization <- GTFShift::prioritize_lanes(gtfs, osm_query)
+lane_prioritisation <- GTFShift::prioritise_lanes(gtfs, osm_query)
 
 # GTFS-RT data preparation
 rt_collection = read.csv("rt_collect_file.csv") |> 
@@ -69,24 +69,24 @@ within_distance = st_is_within_distance(
 )
 rt_collection_filtered = rt_collection[lengths(within_distance) == 0, ]
 
-# Prioritization extended with real-time data to add traffic conditions
-lane_prioritization_extended <- GTFShift::rt_extend_prioritization(
-  lane_prioritization = lane_prioritization,
+# Prioritisation extended with real-time data to add traffic conditions
+lane_prioritisation_extended <- GTFShift::rt_extend_prioritisation(
+  lane_prioritisation = lane_prioritisation,
   rt_collection = rt_collection_filtered
 )
 ```
 
-The resulting `lane_prioritization_extended` data frame includes
+The resulting `lane_prioritisation_extended` data frame includes
 additional columns with speed metrics, such as average speed, median
 speed, and speed percentiles, providing a more comprehensive view of
 lane performance based on real-time data.
 
 ``` r
 
-lane_prioritization_0800 = lane_prioritization_extended |> filter(hour==8)
+lane_prioritisation_0800 = lane_prioritisation_extended |> filter(hour==8)
 
 mapview::mapview(
-  lane_prioritization_0800,
+  lane_prioritisation_0800,
   zcol = "speed_avg",
   layer.name = "Average speed per lane"
 )
@@ -95,23 +95,23 @@ mapview::mapview(
 ``` r
 
 
-p50_frequency = quantile(lane_prioritization_0800$frequency, 0.5, na.rm=TRUE)
-p50_speed = quantile(lane_prioritization_0800$speed_avg, 0.5, na.rm=TRUE)
+p50_frequency = quantile(lane_prioritisation_0800$frequency, 0.5, na.rm=TRUE)
+p50_speed = quantile(lane_prioritisation_0800$speed_avg, 0.5, na.rm=TRUE)
 mapview::mapview(
-  lane_prioritization_0800 |> filter(is_bus_lane & (frequency<p50_frequency | (is.na(n_lanes) | n_lanes_direction<=1) | speed_avg<=p50_speed)),
+  lane_prioritisation_0800 |> filter(is_bus_lane & (frequency<p50_frequency | (is.na(n_lanes) | n_lanes_direction<=1) | speed_avg<=p50_speed)),
   layer.name=sprintf("Bus lane with -%d bus/h OR -2 lane/dir OR %.2f km/h or - avg. speed", p50_frequency, p50_speed),
   color="#DAD887",
   homebutton=FALSE,
   lwd=3
 
 ) + mapview::mapview(
-  lane_prioritization_0800 |> filter(is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg>p50_speed),
+  lane_prioritisation_0800 |> filter(is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg>p50_speed),
   layer.name=sprintf("Bus lane with +%d bus/h AND +1 lane/dir AND +%.2f km/h avg.speed", p50_frequency-1, p50_speed),
   color="#3BC1A8",
   homebutton=FALSE,
   lwd=3
 ) + mapview::mapview(
-  lane_prioritization_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg<=p50_speed),
+  lane_prioritisation_0800 |> filter(!is_bus_lane & frequency>=p50_frequency & !is.na(n_lanes) & n_lanes_direction>1 & speed_avg<=p50_speed),
   layer.name=sprintf("NO bus lane with +%d bus/h AND +1 lane/dir AND %.2f km/h or - avg.speed", p50_frequency-1, p50_speed),
   color="#F63049",
   homebutton=FALSE,
@@ -130,5 +130,5 @@ speed based on the distance between the current and previous position
 between the two updates.
 
 For more details, refer to the method documentation. The resulting speed
-can then be used to extend the prioritization analysis as described
+can then be used to extend the prioritisation analysis as described
 above.

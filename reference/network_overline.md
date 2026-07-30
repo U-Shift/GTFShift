@@ -52,8 +52,7 @@ network_overline(
 
 ## Value
 
-A spatial object of the target network, extended with the aggregated
-values.
+sf. Spatial network object extended with aggregated values.
 
 ## Details
 
@@ -77,14 +76,72 @@ their `attr` values, using `fun`.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
-target_network = st_read("network_centerlines.gpkg")
-frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs, overline=FALSE)
-GTFShift::network_overline(
-  target_network,
-  frequency_analysis |> filter(arrival_hour==8),
-  attr = "frequency"
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
 )
-} # }
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
+
+# Load OSM network to serve as target network
+target_network = sf::st_read(
+  system.file("extdata/samples", "osm_ways_tcb.gpkg", package = "GTFShift"),
+  quiet = TRUE
+)
+
+head(target_network)
+#> Simple feature collection with 6 features and 1 field
+#> Geometry type: LINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -9.047385 ymin: 38.64837 xmax: -9.046362 ymax: 38.65368
+#> Geodetic CRS:  WGS 84
+#>    osm_id                           geom
+#> 1 8493048 LINESTRING (-9.046362 38.64...
+#> 2 8493052 LINESTRING (-9.046538 38.64...
+#> 3 8493056 LINESTRING (-9.046362 38.64...
+#> 4 8493060 LINESTRING (-9.04706 38.648...
+#> 5 8493094 LINESTRING (-9.046603 38.64...
+#> 6 8494673 LINESTRING (-9.046743 38.65...
+
+# Get route frequency (and geometry)
+frequency_analysis <- GTFShift::get_route_frequency_hourly(
+  gtfs, 
+  date = gtfs$calendar$start_date[1]
+) |> 
+dplyr::group_by(shape_id) |>
+dplyr::summarize(frequency = max(frequency))
+#> Analysing GTFS for 2026-06-08...
+#> > Filtering by reference date 2026-06-08...
+
+head(frequency_analysis)
+#> Simple feature collection with 3 features and 2 fields
+#> Geometry type: GEOMETRY
+#> Dimension:     XY
+#> Bounding box:  xmin: -9.08136 ymin: 38.6307 xmax: -9.0277 ymax: 38.66246
+#> Geodetic CRS:  WGS 84
+#> # A tibble: 3 × 3
+#>   shape_id    frequency                                                 geometry
+#>   <chr>           <int>                                           <GEOMETRY [°]>
+#> 1 1-QVBB-TERM         1 LINESTRING (-9.050235 38.66111, -9.050147 38.66114, -9.…
+#> 2 1-TERM              1 MULTILINESTRING ((-9.078167 38.65241, -9.07825 38.65243…
+#> 3 4-CS-TERM           1 LINESTRING (-9.032607 38.63507, -9.032527 38.63508, -9.…
+
+# Aggregate frequencies based on geometry overlap using GTFShift::network_overline
+suppressWarnings({ 
+  overline <- GTFShift::network_overline(
+    target_network = target_network, 
+    lines = frequency_analysis, 
+    attr = "frequency",
+    metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+  )
+})
+
+head(overline |> st_drop_geometry())
+#>      osm_id frequency
+#>      <char>     <int>
+#> 1:  8493048         2
+#> 2:  8493094         2
+#> 3: 23806682         2
+#> 4: 40685608         1
+#> 5: 40685608         1
+#> 6: 40685608         1
 ```

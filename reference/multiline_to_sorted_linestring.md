@@ -33,7 +33,7 @@ multiline_to_sorted_linestring(
 
 ## Value
 
-A `sfc` object with LINESTRING geometry.
+sfc. LINESTRING geometry object.
 
 ## Details
 
@@ -55,7 +55,7 @@ segment is chosen as \$\$L^{(1)} = \operatorname\*{argmin}\_{L \in
 Euclidean distance. If no points are provided, \\L^{(1)} = L_1\\
 (assuming the input MULTILINESTRING is ordered).
 
-Additionaly, the orientation of \\L^{(1)}\\ is determined by comparing
+Additionally, the orientation of \\L^{(1)}\\ is determined by comparing
 the distances from its edges to the remaining segments in \\\mathcal{L}
 \setminus \\L^{(1)}\\\\. The edge that is closest to any remaining
 segment is designated as the end of \\L^{(1)}\\.
@@ -93,3 +93,36 @@ visited when \$\$d\\\left(L^{(k+1)}, Q\right) \leq \min\_{J \in
 
 The ordered segments are concatenated into a single `LINESTRING` and
 transformed back to the original CRS of `multilinestring`.
+
+## Examples
+
+``` r
+# Get OSM route geometries (MULTILINESTRING)  
+osm_routes <- sf::st_read(
+  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  quiet = TRUE
+) |> dplyr::sample_n(1)
+
+head(osm_routes)
+#> Simple feature collection with 1 feature and 3 fields
+#> Geometry type: MULTILINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -9.078345 ymin: 38.64127 xmax: -9.025695 ymax: 38.66195
+#> Geodetic CRS:  WGS 84
+#>     osm_id    shape_id      route_id                           geom
+#> 1 18957690 2-TERM-QVBB 2_2-TERM-QVBB MULTILINESTRING ((-9.078345...
+
+# Convert geometry to LINESTRING
+osm_routes <- osm_routes |>  dplyr::mutate(
+  geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763)
+)
+
+head(osm_routes)
+#> Simple feature collection with 1 feature and 3 fields
+#> Geometry type: LINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -9.078345 ymin: 38.64127 xmax: -9.025695 ymax: 38.66195
+#> Geodetic CRS:  WGS 84
+#>     osm_id    shape_id      route_id                           geom
+#> 1 18957690 2-TERM-QVBB 2_2-TERM-QVBB LINESTRING (-9.078345 38.65...
+```

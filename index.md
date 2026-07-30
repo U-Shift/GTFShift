@@ -52,10 +52,10 @@ for more details.
 > Example of GTFS original shapes (salmon) and harmonized GTFS shapes
 > with OSM data (blue) for TCB, Barreiro, Portugal
 
-### Bus Lane Prioritization
+### Bus Lane Prioritisation
 
 **GTFShift** emerged from the necessity to understand how to get an
-overview of where bus lanes should be prioritized for a given territory,
+overview of where bus lanes should be prioritised for a given territory,
 using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM)
 data.
 
@@ -72,9 +72,9 @@ Together, these can be used to identify road segments where bus lanes
 should be implemented, enabling for a transparent and data-driven
 decision-making process, suitable to different contexts and criteria.
 
-![](reference/figures/prioritization.png)
+![](reference/figures/prioritisation.png)
 
-> Example of bus lane prioritization analysis for Lisbon city,
+> Example of bus lane prioritisation analysis for Lisbon city,
 > considering road segments with a minimum frequency of 10 buses/hour,
 > average speed below 9.7 km/h and more than 1 lane per direction.
 
@@ -92,7 +92,7 @@ Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
 ## Related packages
 
 - [`{tidytransit}`](https://github.com/r-transit/tidytransit)
-- [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
+- [`{gtfstools}`](https://github.com/ipea/gtfstools/)
 - [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
 - [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 

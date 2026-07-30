@@ -89,7 +89,8 @@ osm_shapes_match_routes(
 
 ## Value
 
-A `data.frame` (`sf` if `geometry=TRUE`) with the following columns:
+data.frame. Matched routes (`sf` if `geometry=TRUE`) with the following
+columns:
 
 - route_id:
 
@@ -220,18 +221,47 @@ results and identify misassociations.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip",
+  package = "GTFShift"
+))
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
-q <- opq("Lisbon") |>
-  add_osm_feature(key = "route", value = c("bus")) |>
-  add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
+# Build query and prepare osm extract (possible to use API as alternative)
+q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+  osmdata::add_osm_feature(key = "route", value = "bus") |>
+  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
+osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
 
-# To use OSM API:
-shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q)
+# Get OSM route geometries based on geometrical match
+shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
+  gtfs, q,
+  osm_file = osm_file,
+  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+)
+#> > Found 12 GTFS shapes and 101 stops
+#> > Found 75 OSM route relations and 233 stops/platforms
+#> > Unpacking results
+#> > Combining results
+#> > Re-attaching OSM metadata and geometries
+#> > Getting route metadata
+#> > Associated 12 shapes (100.00% of 12 total) of 12 routes (100.00% of 12 total) with OSM routes, corresponding to 16 trips (100.00% of 16 total), with a mean distance of 41.02 meters for points, 83.69 meters for route length and a mean difference of 0.17 stops
+#> > Of those, 12 shapes (100.00% of 12 matched) have a distance difference below 1000 meters AND a points difference below 500 meters
 
-# To use a local OSM file:
-osm_file <- oe_download("https://download.geofabrik.de/europe/portugal-latest.osm.pbf")
-shapes_match_routes <- GTFShift::osm_shapes_match_routes(gtfs, q, osm_file = osm_file)
-} # }
+head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_diff, stops_diff))
+#> Simple feature collection with 6 features and 5 fields
+#> Geometry type: MULTILINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -9.081368 ymin: 38.62453 xmax: -9.025695 ymax: 38.66264
+#> Geodetic CRS:  WGS 84
+#> # A tibble: 6 × 6
+#>   shape_id osm_id distance_diff points_diff stops_diff                  geometry
+#>   <chr>    <chr>          <dbl>       <dbl>      <dbl>     <MULTILINESTRING [°]>
+#> 1 1-QVBB-… 18957…         133.       409.            1 ((-9.050197 38.66117, -9…
+#> 2 1-TERM   94486…          60.1       11.9           1 ((-9.078279 38.65236, -9…
+#> 3 2-TERM   94486…          38.9       16.2           0 ((-9.078345 38.65221, -9…
+#> 4 3-SA-TE… 18958…          74.5        6.83          0 ((-9.031332 38.62453, -9…
+#> 5 3-SA-TE… 18958…          99.4        6.83          0 ((-9.031332 38.62453, -9…
+#> 6 3-TERM-… 11728…         133.         5.06          0 ((-9.078088 38.65212, -9…
 ```

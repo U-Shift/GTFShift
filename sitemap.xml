@@ -10,7 +10,7 @@
 <url><loc>https://u-shift.github.io/GTFShift/articles/index.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/osm.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/osm_update.html</loc></url>
-<url><loc>https://u-shift.github.io/GTFShift/articles/prioritize.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/articles/prioritise.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/rt.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/articles/unify.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/authors.html</loc></url>
@@ -24,7 +24,7 @@
 <url><loc>https://u-shift.github.io/GTFShift/reference/filter_by_modes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/filter_by_route_name.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/get_network_extension.html</loc></url>
-<url><loc>https://u-shift.github.io/GTFShift/reference/get_prioritization_stats.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/get_prioritisation_stats.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/get_way_frequency_hourly.html</loc></url>
@@ -36,13 +36,13 @@
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_centerlines.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.html</loc></url>
-<url><loc>https://u-shift.github.io/GTFShift/reference/prioritize_lanes.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/prioritise_lanes.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/project_points_along_geometry.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/rt_average_speed.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/rt_collect_json.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.html</loc></url>
-<url><loc>https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.html</loc></url>
+<url><loc>https://u-shift.github.io/GTFShift/reference/rt_extend_prioritisation.html</loc></url>
 <url><loc>https://u-shift.github.io/GTFShift/reference/unify.html</loc></url>
 </urlset>
 

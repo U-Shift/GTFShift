@@ -22,7 +22,7 @@ calendar_nextBusinessWednesday(start_date = Sys.Date(), country_code = "PT")
 
 ## Value
 
-Date
+Date. The next business Wednesday date.
 
 ## Details
 
@@ -33,7 +33,11 @@ public holidays are considered, using
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-next_wednesday = GTFShift::calendar_nextBusinessWednesday(country_code="PT")
-} # }
+# Example of Portuguese holiday (10/06/2026) ignored
+GTFShift::calendar_nextBusinessWednesday(start_date = "2026-06-09", country_code="PT")
+#> [1] "2026-06-17"
+
+# Example of Hong Kong holiday (01/07/2026) ignored
+GTFShift::calendar_nextBusinessWednesday(start_date = "2026-06-30", country_code="HK")
+#> [1] "2026-07-08"
 ```

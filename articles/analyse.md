@@ -206,7 +206,7 @@ The `overline` parameter allows for an even more aggregated screening of
 the operation, clustering routes that overlap and converting them into a
 single route network. This allows for a better visualization of the
 volumes of frequencies per each segment of the network and can help
-prioritizing interventions in the network.
+prioritising interventions in the network.
 
 ``` r
 
@@ -301,7 +301,7 @@ for more details.
 > [Centerline](https://github.com/atsyplenkov/centerline) package has
 > this feature in its roadmap. Currently, there are available solutions
 > for [Python](https://uscuni.org/neatnet/index.html) or
-> [ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
+> [ArcGIS](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 
 ### Aggregating frequencies over a target network
 
@@ -317,7 +317,7 @@ parameters.
 
 Below is provided an example, that uses the centerlines for the Carris
 network as a target network, generated using
-[ArcGis](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
+[ArcGIS](https://pro.arcgis.com/en/pro-app/latest/tool-reference/cartography/merge-divided-roads.htm).
 GTFShift provides
 [`GTFShift::osm_centerlines()`](https://u-shift.github.io/GTFShift/reference/osm_centerlines.md)
 method to generate this kind of network from OSM data. Refer to

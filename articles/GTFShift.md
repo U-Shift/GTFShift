@@ -20,15 +20,15 @@ library(GTFShift)
 ## Key functions
 
 **GTFShift** provides methods for the entire workflow of bus lane
-implementation prioritization, but also other useful functions for GTFS
+implementation prioritisation, but also other useful functions for GTFS
 and OSM data gathering and manipulation. For detailed examples on their
 functionality, refer to the
 [articles](https://u-shift.github.io/GTFShift/articles/index.md).
 
-#### [Prioritize](https://u-shift.github.io/GTFShift/articles/prioritize.md)
+#### [Prioritise](https://u-shift.github.io/GTFShift/articles/prioritise.md)
 
 The main purpose of **GTFShift** is to support the decision-making
-process for bus lane implementation prioritization. This article
+process for bus lane implementation prioritisation. This article
 presents a step-by-step guide on how to use the package to achieve this
 goal, from data gathering to analysis and visualization.
 

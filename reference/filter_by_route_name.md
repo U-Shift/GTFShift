@@ -30,7 +30,7 @@ filter_by_route_name(gtfs, values, short_name = TRUE, exact_match = TRUE)
 
 ## Value
 
-A tidygtfs object with the filtered feed.
+tidygtfs. The filtered GTFS feed.
 
 ## Details
 
@@ -42,8 +42,36 @@ name, with a partial or exact match.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-gtfs_filtered <- GTFShift::filter_by_route_name(gtfs, list("Blue line", "Red line"))
-} # }
+# Load GTFS
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
+)
+
+summary(gtfs)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> agency       Transportes Colectivos do Barreiro
+#> service      from 2026-06-08 to 2026-12-31
+#> uses         stop_times (no frequencies)
+#> # routes      27
+#> # trips       40
+#> # stop_ids   228
+#> # stop_names 153
+#> # shapes      27
+
+
+# Filter by route
+gtfs_route <- GTFShift::filter_by_route_name(gtfs, c("4"))
+
+summary(gtfs_route)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> agency       Transportes Colectivos do Barreiro
+#> service      from 2026-06-08 to 2026-12-11
+#> uses         stop_times (no frequencies)
+#> # routes     1
+#> # trips      1
+#> # stop_ids   10
+#> # stop_names 10
+#> # shapes     1
 ```

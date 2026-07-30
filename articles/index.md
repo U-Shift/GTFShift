@@ -2,8 +2,8 @@
 
 ### Articles
 
-- [Prioritize bus lane
-  implementation](https://u-shift.github.io/GTFShift/articles/prioritize.md):
+- [Prioritise bus lane
+  implementation](https://u-shift.github.io/GTFShift/articles/prioritise.md):
 - [1. Getting transit
   data](https://u-shift.github.io/GTFShift/articles/download.md):
 - [2. Filter GTFS

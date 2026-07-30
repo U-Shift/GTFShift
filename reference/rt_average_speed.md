@@ -1,7 +1,7 @@
 # Estimate average speed for GTFS-RT trip updates
 
 Projects each real-time vehicle position to its corresponding trip
-geometry, computes cumulative distance along the shape, and derives
+geometry, computes cumulative distance along the geometry, and derives
 segment speed between consecutive updates.
 
 ## Usage
@@ -45,7 +45,7 @@ rt_average_speed(
 
 ## Value
 
-An `sf` object based on `rt_collection`, with added columns:
+sf data.frame. Object based on `rt_collection`, with added columns:
 
 - closest_on_shape:
 
@@ -85,9 +85,9 @@ the vehicle position and \\t_i\\ the corresponding timestamp, with \\t_1
 geometry using
 [`GTFShift::project_points_along_geometry()`](https://u-shift.github.io/GTFShift/reference/project_points_along_geometry.md),
 yielding a projected point \\\hat{x}\_i\\ and two cumulative distances:
-\$\$d_i = \text{distance_along_geometry}(\hat{x}\_i)\$\$
+\$\$d_i = \text{distance\\along\\geometry}(\hat{x}\_i)\$\$
 \$\$d_i^{\mathrm{rev}} =
-\text{distance_along_geometry_reversed}(\hat{x}\_i)\$\$
+\text{distance\\along\\geometry\\reversed}(\hat{x}\_i)\$\$
 
 For each pair of consecutive observations \\(i-1, i)\\, the elapsed time
 is computed as \$\$\Delta t_i = t_i - t\_{i-1}.\$\$
@@ -136,9 +136,81 @@ needed.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-rt_collection <- read.csv("rt_collection.csv") # sf object with GTFS-RT updates (trip_id, timestamp, geometry)
-trips_geometries <- sf::st_read("osm_geometries.gpkg") # sf object with LINESTRING geometry per trip
-speeds <- GTFShift::rt_average_speed(rt_collection, trips_geometries)
-} # }
+# Get GTFS-RT data collection
+rt_collect_file <- system.file(
+  "extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift"
+)
+rt_collection <- read.csv(rt_collect_file) |> 
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::select(-speed)
+
+head(rt_collection |> dplyr::select(trip_id, timestamp, geometry))
+#> Simple feature collection with 6 features and 2 fields
+#> Geometry type: POINT
+#> Dimension:     XY
+#> Bounding box:  xmin: -9.07846 ymin: 38.63614 xmax: -9.0315 ymax: 38.65217
+#> Geodetic CRS:  WGS 84
+#>                                  trip_id  timestamp                  geometry
+#> 1 20260515_DUPE_4-CS-TERM_0_DUPE_18_0650 1778825942  POINT (-9.04843 38.6428)
+#> 2 20260514_DUPE_4-CS-TERM_0_DUPE_18_0640 1778738341 POINT (-9.07846 38.65217)
+#> 3 20260515_DUPE_4-CS-TERM_0_DUPE_18_0650 1778823962 POINT (-9.03222 38.63645)
+#> 4 20260514_DUPE_4-CS-TERM_0_DUPE_18_0640 1778737742 POINT (-9.05829 38.64186)
+#> 5 20260515_DUPE_4-CS-TERM_0_DUPE_18_0810 1778832003 POINT (-9.07844 38.65209)
+#> 6 20260515_DUPE_4-CS-TERM_0_DUPE_18_0650 1778827442  POINT (-9.0315 38.63614)
+
+nrow(rt_collection)
+#> [1] 10
+
+# Get route geometry for data collected
+osm_routes <- sf::st_read(
+  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  quiet = TRUE
+) |>  
+  dplyr::filter(route_id %in% rt_collection$route_id) |>
+  dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))
+
+head(osm_routes)
+#> Simple feature collection with 1 feature and 3 fields
+#> Geometry type: LINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -9.078595 ymin: 38.6307 xmax: -9.03216 ymax: 38.65478
+#> Geodetic CRS:  WGS 84
+#>     osm_id  shape_id    route_id                           geom
+#> 1 18957507 4-CS-TERM 4_4-CS-TERM LINESTRING (-9.032493 38.63...
+
+# Compute average speed (aggregated at route level) based on cumulative distance along the geometry
+speed <- GTFShift::rt_average_speed(
+  rt_collection = rt_collection, 
+  trips_geometries = osm_routes,
+  rt_collection_trips_geometries_match_col = "route_id",
+  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+)
+#> Warning: Trip 4_4-CS-TERM has less than 2 updates. Ignoring it.
+
+head(speed |> 
+  dplyr::filter(!is.na(speed_kmh)) |>
+  dplyr::select(
+    trip_id, timestamp, speed_kmh, 
+    distance_along_geometry, distance_to_closest_on_geometry
+  )
+)
+#> Simple feature collection with 6 features and 5 fields
+#> Geometry type: POINT
+#> Dimension:     XY
+#> Bounding box:  xmin: -82292.68 ymin: -114578.7 xmax: -78322.61 ymax: -112380.6
+#> Projected CRS: ETRS89 / Portugal TM06
+#> # A tibble: 6 × 6
+#>   trip_id      timestamp speed_kmh distance_along_geome…¹ distance_to_closest_…²
+#>   <chr>            <int>     <dbl>                  <dbl>                  <dbl>
+#> 1 20260514_DU…    1.78e9      18.1                  6465.                  8.75 
+#> 2 20260514_DU…    1.78e9      20.4                  2385.                  8.70 
+#> 3 20260514_DU…    1.78e9      61.9                   321.                  1.16 
+#> 4 20260515_DU…    1.78e9      14.2                  3388.                  6.87 
+#> 5 20260515_DU…    1.78e9      16.8                     0                  13.1  
+#> 6 20260515_DU…    1.78e9      17                    2546.                  0.120
+#> # ℹ abbreviated names: ¹​distance_along_geometry,
+#> #   ²​distance_to_closest_on_geometry
+#> # ℹ 1 more variable: geometry <POINT [m]>
+
+nrow(speed)
+#> [1] 9
 ```

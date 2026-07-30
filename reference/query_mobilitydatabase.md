@@ -61,13 +61,13 @@ query_mobilitydatabase(
   bbox (Optional). Area from which to get GTFS feeds. Converted to API
   dataset_latitudes and dataset_longitudes URL parameters.
 
-- is_official.:
+- is_official:
 
   Boolean (Optional). If TRUE, only return official feeds.
 
 ## Value
 
-data.frame with query results
+data.frame. Query results from Mobility Database.
 
 ## Details
 
@@ -97,11 +97,25 @@ documentation for a full list) are:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 feeds <- GTFShift::query_mobilitydatabase(
-  refresh_token = "myToken",
+  refresh_token = Sys.getenv("MOBILITY_DATABASE"),
   country_code = "PT",
   is_official = TRUE
 )
-} # }
+
+head(feeds |> dplyr::select(id, provider, producer_url))
+#>          id                         provider
+#> 1  tld-4316       A Onda - Mobilidade Urbana
+#> 2  tld-4318 Apanha-me! - Transportes Urbanos
+#> 3  tld-4257                         AUTNA SL
+#> 4 tdg-52605                    BlaBlaCar Bus
+#> 5  mdb-2929                           Carris
+#> 6  mdb-2027             Carris Metropolitana
+#>                                                                       producer_url
+#> 1 https://drive.google.com/uc?export=download&id=1aPfsxHqopxxcjV8HlRzImzxh_a6zRxGp
+#> 2 https://drive.google.com/uc?export=download&id=1w92h129CWNSoImBRZQOWT6KRPzSFwJ42
+#> 3 https://drive.google.com/uc?export=download&id=1gah1x10RyFu7gJPweBcCXPd9vcFJFQ7c
+#> 4   https://www.data.gouv.fr/api/1/datasets/r/fd54f81f-4389-4e73-be75-491133d011c3
+#> 5                            https://gateway.carris.pt/gateway/gtfs/api/v2.11/GTFS
+#> 6                                          https://api.carrismetropolitana.pt/gtfs
 ```

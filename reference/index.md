@@ -7,14 +7,14 @@
 - [`query_mobilitydatabase()`](https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.md)
   : Query Mobility Database API for GTFS feeds
 
-## Prioritize for bus lane implementation
+## Prioritise for bus lane implementation
 
-- [`prioritize_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritize_lanes.md)
-  : Prioritize road network lanes for bus lane implementation
-- [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
-  : Extend prioritization with GTFS-RT based speed metrics
-- [`get_prioritization_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritization_stats.md)
-  : Get prioritization stats
+- [`prioritise_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritise_lanes.md)
+  : Prioritise road network lanes for bus lane implementation
+- [`rt_extend_prioritisation()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritisation.md)
+  : Extend prioritisation with GTFS-RT based speed metrics
+- [`get_prioritisation_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritisation_stats.md)
+  : Get prioritisation stats
 
 ## Filter
 
@@ -29,8 +29,8 @@
 
 - [`get_network_extension()`](https://u-shift.github.io/GTFShift/reference/get_network_extension.md)
   : Get network routes extension
-- [`get_prioritization_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritization_stats.md)
-  : Get prioritization stats
+- [`get_prioritisation_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritisation_stats.md)
+  : Get prioritisation stats
 - [`get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
   : Get aggregated frequency per hour for each bus route
 - [`get_stop_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.md)
@@ -76,8 +76,8 @@
 - [`rt_collect_protobuf()`](https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.md)
   : Collect GTFS-RT data from a Protocol Buffers feed at regular
   intervals
-- [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
-  : Extend prioritization with GTFS-RT based speed metrics
+- [`rt_extend_prioritisation()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritisation.md)
+  : Extend prioritisation with GTFS-RT based speed metrics
 
 ## Utils
 

@@ -5,7 +5,13 @@ Get centerlines for OSM road network
 ## Usage
 
 ``` r
-osm_centerlines(bbox = NULL, place = NULL, use_buildings = TRUE, venv = NA)
+osm_centerlines(
+  bbox = NULL,
+  place = NULL,
+  osm_file = NULL,
+  use_buildings = TRUE,
+  venv = NA
+)
 ```
 
 ## Arguments
@@ -20,6 +26,10 @@ osm_centerlines(bbox = NULL, place = NULL, use_buildings = TRUE, venv = NA)
   String (Optional, if bbox provided). Place from which to export bus
   lanes.
 
+- osm_file:
+
+  String (Optional). Path to a local OpenStreetMap PBF file (\`.pbf\`).
+
 - use_buildings:
 
   Boolean (Default TRUE). Uses buildings from OSM as exclusion_mask for
@@ -32,7 +42,7 @@ osm_centerlines(bbox = NULL, place = NULL, use_buildings = TRUE, venv = NA)
 
 ## Value
 
-osm_lines in sf format
+sf data.frame. OSM centerlines.
 
 ## Details
 
@@ -40,17 +50,37 @@ Exports road network from OpenStreetMaps for given area and uses Python
 [neatnet](https://uscuni.org/neatnet/) package to compute its
 centerlines.
 
-One of `bbox` or `place` must be provided. If both, `bbox` is
-considered.
+One of `bbox`, `place`, or `osm_file` must be provided.
 
 Parameter `use_buildings` exports building footprints from OSM for
 better results on the network simplification process.
 
+This method was adapted from
+[uscuni.org/neatnet](https://uscuni.org/neatnet/intro.html) by [Miguel
+Relvas Pires](https://github.com/miguelrelvaspires) in the scope of his
+[master's
+thesis](https://scholar.tecnico.ulisboa.pt/records/DhKWeFU5YLpMDcOhQbKR4f7ul05HCQnZr7ND).
+The full code (Python) of his work is openly available at
+[GitHub](https://github.com/U-Shift/lp_streets).
+
+## Author
+
+[Miguel Relvas Pires](https://github.com/miguelrelvaspires)
+
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-BBOX = sf::st_bbox(city_limit)
-network <- GTFShift::osm_centerlines(BBOX)
-} # }
+if (FALSE) { # reticulate::py_module_available("neatnet")
+# Get sample OSM extract
+osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
+
+network <- GTFShift::osm_centerlines(
+  place = "Arroios, Lisboa, Portugal",
+  osm_file = osm_file
+)
+
+head(network)
+
+table(network$X_status)
+}
 ```

@@ -24,7 +24,7 @@ filter_by_agency(gtfs, id = NA, name = NA)
 
 ## Value
 
-A tidygtfs object with the filtered feed.
+tidygtfs. The filtered GTFS feed.
 
 ## Details
 
@@ -34,9 +34,52 @@ Returns empty feed it none provided.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-gtfs_filtered_by_id <- GTFShift::filter_by_agency(gtfs, agency_id=2)
-gtfs_filtered_by_name <- GTFShift::filter_by_agency(gtfs, agency_name="City bus company")
-} # }
+# Load sample feed with multiple agencies
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_merged_sample.zip", package = "GTFShift")
+)
+
+summary(gtfs)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> agencies     Transportes Colectivos do Barreiro, TTSL - Transtejo Soflusa
+#> service      from 2020-12-19 to 2028-12-31
+#> uses         stop_times (no frequencies)
+#> # routes       2
+#> # trips      101
+#> # stop_ids    34
+#> # stop_names  34
+#> # shapes       6
+
+
+# Filter by id
+gtfs_id_8 = gtfs |> GTFShift::filter_by_agency(id = "8")
+
+summary(gtfs_id_8)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> agency       Transportes Colectivos do Barreiro
+#> service      from 2026-08-03 to 2026-08-28
+#> uses         stop_times (no frequencies)
+#> # routes      1
+#> # trips       1
+#> # stop_ids   31
+#> # stop_names 31
+#> # shapes      1
+
+
+# Filter by name 
+gtfs_ttsl <- gtfs |> GTFShift::filter_by_agency(name = "TTSL - Transtejo Soflusa") 
+
+summary(gtfs_ttsl)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> agency       TTSL - Transtejo Soflusa
+#> service      from 2020-12-19 to 2028-12-31
+#> uses         stop_times (no frequencies)
+#> # routes      1
+#> # trips      100
+#> # stop_ids    3
+#> # stop_names  3
+#> # shapes      5
 ```

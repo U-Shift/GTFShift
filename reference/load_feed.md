@@ -57,7 +57,7 @@ load_feed(
 
 ## Value
 
-A tidygtfs object.
+tidygtfs. The loaded GTFS feed.
 
 ## Details
 
@@ -91,7 +91,64 @@ applied the library default values.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-gtfs <- GTFShift::load_feed("https://operator.com/gtfs.zip")
-} # }
+# Simple call
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
+)
+
+summary(gtfs)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> agency       Transportes Colectivos do Barreiro
+#> service      from 2026-06-08 to 2026-12-31
+#> uses         stop_times (no frequencies)
+#> # routes      27
+#> # trips       40
+#> # stop_ids   228
+#> # stop_names 153
+#> # shapes      27
+
+
+# Simple call with missing shapes (triggering shapes creation because missing on GTFS file)
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+)
+#> Warning: > CREATED shapes.txt, the file was missing!
+
+summary(gtfs)
+#> tidygtfs object
+#> files        agency, routes, stop_times, trips, calendar, calendar_dates, stops
+#> agency       TTSL - Transtejo Soflusa
+#> service      from 2020-12-19 to 2028-12-31
+#> uses         stop_times (no frequencies)
+#> # routes      1
+#> # trips      100
+#> # stop_ids    3
+#> # stop_names  3
+#> # shapes      5
+
+
+# With some parameters to build transfers and store to given location
+store_path <- withr::local_tempfile(fileext = ".zip")
+
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE, store_path
+)
+#> Registered S3 method overwritten by 'gtfsrouter':
+#>   method       from  
+#>   summary.gtfs gtfsio
+
+head(gtfs$transfers)
+#> # A tibble: 6 × 4
+#>   from_stop_id to_stop_id transfer_type min_transfer_time
+#>   <chr>        <chr>              <dbl>             <int>
+#> 1 000012       000143                 2               170
+#> 2 000012       000159                 2               243
+#> 3 000012       000041                 2               164
+#> 4 000013       000014                 2               319
+#> 5 000013       000039                 2               394
+#> 6 000013       000040                 2               120
+
+file.exists(store_path)
+#> [1] TRUE
 ```

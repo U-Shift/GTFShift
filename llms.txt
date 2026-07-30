@@ -52,10 +52,10 @@ for more details.
 > Example of GTFS original shapes (salmon) and harmonized GTFS shapes
 > with OSM data (blue) for TCB, Barreiro, Portugal
 
-### Bus Lane Prioritization
+### Bus Lane Prioritisation
 
 **GTFShift** emerged from the necessity to understand how to get an
-overview of where bus lanes should be prioritized for a given territory,
+overview of where bus lanes should be prioritised for a given territory,
 using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM)
 data.
 
@@ -72,9 +72,9 @@ Together, these can be used to identify road segments where bus lanes
 should be implemented, enabling for a transparent and data-driven
 decision-making process, suitable to different contexts and criteria.
 
-![](reference/figures/prioritization.png)
+![](reference/figures/prioritisation.png)
 
-> Example of bus lane prioritization analysis for Lisbon city,
+> Example of bus lane prioritisation analysis for Lisbon city,
 > considering road segments with a minimum frequency of 10 buses/hour,
 > average speed below 9.7 km/h and more than 1 lane per direction.
 
@@ -92,7 +92,7 @@ Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
 ## Related packages
 
 - [`{tidytransit}`](https://github.com/r-transit/tidytransit)
-- [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
+- [`{gtfstools}`](https://github.com/ipea/gtfstools/)
 - [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
 - [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 
@@ -116,14 +116,14 @@ Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
 - [`query_mobilitydatabase()`](https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.md)
   : Query Mobility Database API for GTFS feeds
 
-## Prioritize for bus lane implementation
+## Prioritise for bus lane implementation
 
-- [`prioritize_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritize_lanes.md)
-  : Prioritize road network lanes for bus lane implementation
-- [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
-  : Extend prioritization with GTFS-RT based speed metrics
-- [`get_prioritization_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritization_stats.md)
-  : Get prioritization stats
+- [`prioritise_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritise_lanes.md)
+  : Prioritise road network lanes for bus lane implementation
+- [`rt_extend_prioritisation()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritisation.md)
+  : Extend prioritisation with GTFS-RT based speed metrics
+- [`get_prioritisation_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritisation_stats.md)
+  : Get prioritisation stats
 
 ## Filter
 
@@ -138,8 +138,8 @@ Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
 
 - [`get_network_extension()`](https://u-shift.github.io/GTFShift/reference/get_network_extension.md)
   : Get network routes extension
-- [`get_prioritization_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritization_stats.md)
-  : Get prioritization stats
+- [`get_prioritisation_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritisation_stats.md)
+  : Get prioritisation stats
 - [`get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
   : Get aggregated frequency per hour for each bus route
 - [`get_stop_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.md)
@@ -185,8 +185,8 @@ Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
 - [`rt_collect_protobuf()`](https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.md)
   : Collect GTFS-RT data from a Protocol Buffers feed at regular
   intervals
-- [`rt_extend_prioritization()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritization.md)
-  : Extend prioritization with GTFS-RT based speed metrics
+- [`rt_extend_prioritisation()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritisation.md)
+  : Extend prioritisation with GTFS-RT based speed metrics
 
 ## Utils
 
@@ -201,8 +201,8 @@ Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
 
 ### Articles
 
-- [Prioritize bus lane
-  implementation](https://u-shift.github.io/GTFShift/articles/prioritize.md):
+- [Prioritise bus lane
+  implementation](https://u-shift.github.io/GTFShift/articles/prioritise.md):
 - [1. Getting transit
   data](https://u-shift.github.io/GTFShift/articles/download.md):
 - [2. Filter GTFS
