@@ -47,7 +47,7 @@ This function will run indefinitely until manually stopped (CTRL + C).
 }
 \examples{
 # Create file
-destination_file <- tempfile(fileext = ".csv")
+destination_file <- withr::local_tempfile(fileext = ".csv")
 
 # Collect data
 GTFShift::rt_collect_json(

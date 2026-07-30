@@ -43,7 +43,7 @@
 #'
 #' 
 #' # With some parameters to build transfers and store to given location
-#' store_path <- tempfile(fileext = ".zip")
+#' store_path <- withr::local_tempfile(fileext = ".zip")
 #' 
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE, store_path
@@ -59,7 +59,7 @@
 load_feed <- function(path, store_path = NA, create_transfers = FALSE, transfer_distance = 300, transfer_time = 120, transfer_street_routing = FALSE, headers = NULL) {
   # If path is a URL and headers are provided, download first
   if (grepl("^http", path) && !is.null(headers)) {
-    temp_zip <- tempfile(fileext = ".zip")
+    temp_zip <- withr::local_tempfile(fileext = ".zip")
     res <- httr::GET(path, httr::add_headers(.headers = headers), httr::write_disk(temp_zip, overwrite = TRUE))
     httr::stop_for_status(res)
     path <- temp_zip
@@ -95,8 +95,7 @@ load_feed <- function(path, store_path = NA, create_transfers = FALSE, transfer_
       stop("Package 'gtfsrouter' is required to generate transfers. Install it with: install.packages('gtfsrouter')")
     }
     # Store in  temporary file because gtfsrouter can not convert from tidytransit format
-    temp_dir <- tempfile()
-    dir.create(temp_dir)
+    temp_dir <- withr::local_tempdir()
     gtfs_temp <- file.path(temp_dir, "gtfs.zip")
     tidytransit::write_gtfs(gtfs, gtfs_temp)
 

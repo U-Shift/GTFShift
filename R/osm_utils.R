@@ -39,7 +39,7 @@ filter_osm_bus_lanes <- function(road_osm) {
 #'
 #' @noRd
 get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update_1 = 0.25, pb_update_2 = 0.5, pb_update_3 = 0.75, pb_update_4 = 1) {
-  relations_pbf <- tempfile(fileext = ".osm.pbf")
+  relations_pbf <- withr::local_tempfile(fileext = ".osm.pbf")
 
   job <- callr::r_bg(function(relations_pbf, osm_file, osm_route_type) { # update spinner while blocking method call
     return(rosmium::tags_filter(

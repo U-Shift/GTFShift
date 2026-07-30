@@ -19,7 +19,7 @@ test_that("filter_osm_bus_lanes correctly filters bus lane features", {
     expect_equal(filtered$osm_id, c("1", "3"))
 })
 
-setup_mock_xml <- function() {
+setup_mock_xml <- function(env = parent.frame()) {
     mock_xml <- '<?xml version="1.0" encoding="UTF-8"?>
     <osm version="0.6">
       <relation id="100">
@@ -63,7 +63,7 @@ setup_mock_xml <- function() {
       </relation>
     </osm>'
 
-    mock_xml_file <- tempfile(fileext = ".xml")
+    mock_xml_file <- withr::local_tempfile(fileext = ".xml", .local_envir = env)
     writeLines(mock_xml, mock_xml_file)
     return(mock_xml_file)
 }

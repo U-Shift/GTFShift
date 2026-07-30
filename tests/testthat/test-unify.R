@@ -72,7 +72,7 @@ test_that("unify stores feed to store_path", {
     gtfs1 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(8)
     gtfs2 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(4)
 
-    tmp_dir <- tempfile()
+    tmp_dir <- withr::local_tempfile()
     tmp_zip <- file.path(tmp_dir, "nested", "unified_out.zip")
 
     unified <- GTFShift::unify(gtfs1, gtfs2, store_path = tmp_zip)

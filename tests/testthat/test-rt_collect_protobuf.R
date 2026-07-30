@@ -1,8 +1,8 @@
 library(testthat)
 
 test_that("rt_collect_protobuf decodes protobuf and passes to rt_collect_json via mocks", {
-    dest_file <- tempfile(fileext = ".csv")
-    pb_file <- tempfile(fileext = ".pb")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
+    pb_file <- withr::local_tempfile(fileext = ".pb")
     file.create(pb_file)
 
     testthat::with_mocked_bindings(
@@ -31,7 +31,7 @@ test_that("rt_collect_protobuf decodes protobuf and passes to rt_collect_json vi
 })
 
 test_that("headers are passed and httr is mocked", {
-    dest_file <- tempfile(fileext = ".csv")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
     URL <- "http://example.com/rt.pb"
     headers <- c("Authorization" = "Bearer token123")
 
@@ -92,10 +92,10 @@ test_that("headers are passed and httr is mocked", {
 })
 
 test_that("parameter variation: log_file", {
-    dest_file <- tempfile(fileext = ".csv")
-    pb_file <- tempfile(fileext = ".pb")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
+    pb_file <- withr::local_tempfile(fileext = ".pb")
     file.create(pb_file)
-    log_file <- tempfile(fileext = ".log")
+    log_file <- withr::local_tempfile(fileext = ".log")
 
     testthat::with_mocked_bindings(
         readProtoFiles = function(...) TRUE,
@@ -127,8 +127,8 @@ test_that("parameter variation: log_file", {
 })
 
 test_that("test incrementality in response", {
-    dest_file <- tempfile(fileext = ".csv")
-    pb_file <- tempfile(fileext = ".pb")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
+    pb_file <- withr::local_tempfile(fileext = ".pb")
     file.create(pb_file)
 
     msg_header <- structure(list(timestamp = 1700000000, incrementality = "FULL_DATASET"), class = "Message")
@@ -155,8 +155,8 @@ test_that("test incrementality in response", {
 })
 
 test_that("scrape_interval performs at least 3 requests", {
-    dest_file <- tempfile(fileext = ".csv")
-    pb_file <- tempfile(fileext = ".pb")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
+    pb_file <- withr::local_tempfile(fileext = ".pb")
     file.create(pb_file)
 
     request_count <- 0

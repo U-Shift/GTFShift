@@ -80,8 +80,7 @@ unify <- function(..., prefix = FALSE, store_path = NA, create_transfers = FALSE
     }
 
     # Store in  temporary file because gtfsrouter can only read files
-    temp_dir <- tempfile()
-    dir.create(temp_dir)
+    temp_dir <- withr::local_tempdir()
     gtfs_temp <- file.path(temp_dir, "gtfs.zip")
     tidytransit::write_gtfs(gtfs, gtfs_temp)
 

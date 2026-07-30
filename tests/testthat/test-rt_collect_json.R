@@ -1,7 +1,7 @@
 library(testthat)
 
 test_that("rt_collect_json extracts JSON feed data and appends to CSV destination", {
-    dest_file <- tempfile(fileext = ".csv")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
     parsed_json <- list(
         header = list(timestamp = 1700000000),
         entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
@@ -25,7 +25,7 @@ test_that("rt_collect_json extracts JSON feed data and appends to CSV destinatio
 })
 
 test_that("headers are passed and httr is mocked", {
-    dest_file <- tempfile(fileext = ".csv")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
     URL <- "http://example.com/rt.json"
     headers <- c("Authorization" = "Bearer token123")
 
@@ -74,8 +74,8 @@ test_that("headers are passed and httr is mocked", {
 })
 
 test_that("parameter variation: log_file", {
-    dest_file <- tempfile(fileext = ".csv")
-    log_file <- tempfile(fileext = ".log")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
+    log_file <- withr::local_tempfile(fileext = ".log")
     parsed_json <- list(
         header = list(timestamp = 1700000000),
         entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
@@ -102,7 +102,7 @@ test_that("parameter variation: log_file", {
 
 test_that("parameter variation: entity_key custom and NA", {
     # Custom entity key
-    dest_file1 <- tempfile(fileext = ".csv")
+    dest_file1 <- withr::local_tempfile(fileext = ".csv")
     parsed_json_custom <- list(
         header = list(timestamp = 1700000000),
         custom_entities = list(list(id = "99", vehicle = list(trip = list(trip_id = "t99"), position = list(latitude = 40.0, longitude = -8.0))))
@@ -126,7 +126,7 @@ test_that("parameter variation: entity_key custom and NA", {
     expect_equal(res_df1$id, 99)
 
     # NA entity key (flat list)
-    dest_file2 <- tempfile(fileext = ".csv")
+    dest_file2 <- withr::local_tempfile(fileext = ".csv")
     parsed_json_flat <- data.frame(id = "100", vehicle.trip.trip_id = "t100", vehicle.position.latitude = 42.0, vehicle.position.longitude = -8.5)
 
     testthat::with_mocked_bindings(
@@ -149,7 +149,7 @@ test_that("parameter variation: entity_key custom and NA", {
 })
 
 test_that("test incrementality in response", {
-    dest_file <- tempfile(fileext = ".csv")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
     parsed_json <- list(
         header = list(timestamp = 1700000000, incrementality = "FULL_DATASET"),
         entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
@@ -173,7 +173,7 @@ test_that("test incrementality in response", {
 })
 
 test_that("scrape_interval performs at least 3 requests", {
-    dest_file <- tempfile(fileext = ".csv")
+    dest_file <- withr::local_tempfile(fileext = ".csv")
     parsed_json <- list(
         header = list(timestamp = 1700000000),
         entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))

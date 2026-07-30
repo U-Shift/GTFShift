@@ -74,7 +74,7 @@ test_that("osm_shapes_match_routes executes matching flow with osm_file provided
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
-    log_tmp <- tempfile(fileext = ".log")
+    log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     testthat::with_mocked_bindings(
@@ -135,7 +135,7 @@ test_that("osm_shapes_match_routes executes matching flow when osm_file is NULL 
 
     r_bg_call_count <- 0
 
-    log_tmp <- tempfile(fileext = ".log")
+    log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     testthat::with_mocked_bindings(
@@ -210,7 +210,7 @@ test_that("osm_shapes_match_routes writes logs to log_file when provided", {
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
-    log_tmp <- tempfile(fileext = ".log")
+    log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     testthat::with_mocked_bindings(
@@ -300,7 +300,7 @@ test_that("osm_shapes_match_routes issues warnings when routes or stops are miss
         geometry = st_sfc(st_point(c(-8.6, 41.1)), crs = 4326)
     )
 
-    log_tmp <- tempfile(fileext = ".log")
+    log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     testthat::with_mocked_bindings(
@@ -338,7 +338,7 @@ test_that("osm_shapes_match_routes issues warning when metric_crs is default / m
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
-    log_tmp <- tempfile(fileext = ".log")
+    log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     warn_pattern <- "Using default metric_crs"
@@ -390,7 +390,7 @@ test_that("osm_shapes_match_routes handles unsorted stops and osm_stop_order_rel
         check.names = FALSE
     )
 
-    log_tmp <- tempfile(fileext = ".log")
+    log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     # With osm_stop_order_relaxed = FALSE (default), unsorted stops trigger warning and result in no match
@@ -499,7 +499,7 @@ test_that("osm_shapes_match_routes handles empty gtfs_route_name or error in sto
         check.names = FALSE
     )
 
-    log_tmp <- tempfile(fileext = ".log")
+    log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     testthat::with_mocked_bindings(
@@ -602,7 +602,7 @@ test_that("osm_shapes_match_routes prints warning messages to console when error
         geometry = st_sfc(st_point(c(-8.6, 41.1)), crs = 4326)
     )
 
-    log_tmp <- tempfile(fileext = ".log")
+    log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     testthat::with_mocked_bindings(
