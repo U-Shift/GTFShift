@@ -36,7 +36,8 @@ Imports:
   callr,
   purrr,
   rlang,
-  xml2
+  xml2,
+  withr
 Suggests: 
     knitr,
     rmarkdown,

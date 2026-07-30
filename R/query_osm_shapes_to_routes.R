@@ -120,7 +120,7 @@ osm_shapes_to_routes <- function(
         sf::st_cast("MULTILINESTRING")
     }
   } else {
-    osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
+    osm_file <- withr::local_tempfile(fileext = ".osm")
 
     job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
       osmdata::osmdata_xml(q, filename = osm_file, quiet = FALSE)

@@ -237,7 +237,7 @@ osm_shapes_match_routes <- function(
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
   } else {
-    osm_file <- tempfile(fileext = ".osm", tmpdir = tempdir(check = TRUE))
+    osm_file <- withr::local_tempfile(fileext = ".osm")
     job <- callr::r_bg(function(q, osm_file) { # update spinner while blocking method call
       osmdata::osmdata_xml(q, filename = osm_file, quiet = FALSE)
     }, args = list(q, osm_file))

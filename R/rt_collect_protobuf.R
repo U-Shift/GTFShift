@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' # Create file
-#' destination_file <- tempfile(fileext = ".csv")
+#' destination_file <- withr::local_tempfile(fileext = ".csv")
 #'
 #' # Collect data
 #' GTFShift::rt_collect_protobuf(
@@ -61,7 +61,7 @@ rt_collect_protobuf <- function(
     }
     RProtoBuf::readProtoFiles((system.file("extdata", "gtfs-realtime.proto", package = "GTFShift")))
     if (grepl("^http", gtfs_rt_url) && !is.null(headers)) {
-      temp_pb <- tempfile(fileext = ".pb")
+      temp_pb <- withr::local_tempfile(fileext = ".pb")
       res <- httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers), httr::write_disk(temp_pb, overwrite = TRUE))
       httr::stop_for_status(res)
       f <- file(temp_pb, "rb")
@@ -100,7 +100,7 @@ rt_collect_protobuf <- function(
     }
 
     feed_list <- protobuf_to_list(feed)
-    temp_json <- tempfile(fileext = ".json")
+    temp_json <- withr::local_tempfile(fileext = ".json")
     jsonlite::write_json(
       feed_list,
       temp_json,

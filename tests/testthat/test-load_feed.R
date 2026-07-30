@@ -14,7 +14,7 @@ test_that("gtfs simple load", {
 })
 
 test_that("stores file at defined location", {
-    tempfolder <- tempdir()
+    tempfolder <- withr::local_tempdir()
     location <- paste0(tempfolder, "/new_dir/gtfs_tcb_sample.zip")
     gtfs <- GTFShift::load_feed(
         system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"),
@@ -38,7 +38,7 @@ test_that("clean empty stop_times", {
     gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE)
     random_trip = gtfs$trips |> sample_n(1) |> pull(trip_id)
     gtfs$stop_times[random_trip == gtfs$stop_times$trip_id, ][1, ]$arrival_time <- NA 
-    location = tempfile(fileext = ".zip")
+    location = withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs, location)
     testthat::expect_warning(gtfs_new <- GTFShift::load_feed(location), "without arrival time")
 })
@@ -48,7 +48,7 @@ test_that("creates shapes when missing", {
     gtfs_manipulated <- gtfs[!names(gtfs) %in% "shapes"]
     gtfs_manipulated <- tidytransit::as_tidygtfs(gtfs_manipulated)
     gtfs_manipulated$trips <- gtfs_manipulated$trips[, !names(gtfs_manipulated$trips) %in% "shape_id"]
-    location <- tempfile(fileext = ".zip")
+    location <- withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs_manipulated, location)
     testthat::expect_warning(gtfs_new <- GTFShift::load_feed(location), "CREATED shapes.txt")
     testthat::expect_contains(names(gtfs_new), "shapes")

@@ -55,7 +55,7 @@ osm_centerlines <- function(bbox = NULL, place = NULL, osm_file = NULL, use_buil
 
   # Define path to script and temp output
   py_script <- system.file("python", "osm_centerline_neatnet.py", package = "GTFShift")
-  temp_file <- tempfile(fileext = ".gpkg")
+  temp_file <- withr::local_tempfile(fileext = ".gpkg")
 
   # Call Python script via reticulate
   py_env <- new.env()
