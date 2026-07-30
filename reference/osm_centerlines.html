@@ -128,22 +128,25 @@ The full code (Python) of his work is openly available at
 <span class="r-in"><span>  place <span class="op">=</span> <span class="st">"Arroios, Lisboa, Portugal"</span>,</span></span>
 <span class="r-in"><span>  osm_file <span class="op">=</span> <span class="va">osm_file</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Using Python: /usr/bin/python3.12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creating virtual environment '~/.virtualenvs/r-reticulate' ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> + /usr/bin/python3.12 -m venv /home/runner/.virtualenvs/r-reticulate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Done!</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Installing packages: pip, wheel, setuptools</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> + /home/runner/.virtualenvs/r-reticulate/bin/python -m pip install --upgrade pip wheel setuptools</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Installing packages: numpy</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> + /home/runner/.virtualenvs/r-reticulate/bin/python -m pip install --upgrade --no-user numpy</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Virtual environment '~/.virtualenvs/r-reticulate' successfully created.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in use_python(python, required = required):</span> failed to initialize requested version of Python</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">network</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'network' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 1 field</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: LINESTRING</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -9.148239 ymin: 38.72801 xmax: -9.143884 ymax: 38.73345</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  WGS 84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   X_status                           geom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  changed LINESTRING (-9.148239 38.72...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  changed LINESTRING (-9.145421 38.73...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  changed LINESTRING (-9.144909 38.73...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  changed LINESTRING (-9.144937 38.73...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  changed LINESTRING (-9.145914 38.72...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  changed LINESTRING (-9.144386 38.73...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">network</span><span class="op">$</span><span class="va">X_status</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'network' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  changed      new original </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       65       36      374 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

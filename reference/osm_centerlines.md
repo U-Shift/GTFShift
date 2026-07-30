@@ -77,20 +77,23 @@ network <- GTFShift::osm_centerlines(
   place = "Arroios, Lisboa, Portugal",
   osm_file = osm_file
 )
-#> Using Python: /usr/bin/python3.12
-#> Creating virtual environment '~/.virtualenvs/r-reticulate' ... 
-#> + /usr/bin/python3.12 -m venv /home/runner/.virtualenvs/r-reticulate
-#> Done!
-#> Installing packages: pip, wheel, setuptools
-#> + /home/runner/.virtualenvs/r-reticulate/bin/python -m pip install --upgrade pip wheel setuptools
-#> Installing packages: numpy
-#> + /home/runner/.virtualenvs/r-reticulate/bin/python -m pip install --upgrade --no-user numpy
-#> Virtual environment '~/.virtualenvs/r-reticulate' successfully created.
-#> Error in use_python(python, required = required): failed to initialize requested version of Python
 
 head(network)
-#> Error: object 'network' not found
+#> Simple feature collection with 6 features and 1 field
+#> Geometry type: LINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -9.148239 ymin: 38.72801 xmax: -9.143884 ymax: 38.73345
+#> Geodetic CRS:  WGS 84
+#>   X_status                           geom
+#> 1  changed LINESTRING (-9.148239 38.72...
+#> 2  changed LINESTRING (-9.145421 38.73...
+#> 3  changed LINESTRING (-9.144909 38.73...
+#> 4  changed LINESTRING (-9.144937 38.73...
+#> 5  changed LINESTRING (-9.145914 38.72...
+#> 6  changed LINESTRING (-9.144386 38.73...
 
 table(network$X_status)
-#> Error: object 'network' not found
+#> 
+#>  changed      new original 
+#>       65       36      374 
 ```
