@@ -24,8 +24,8 @@
 #' \eqn{t_1 \le t_2 \le \dots \le t_n}. Each observation is projected onto the
 #' trip geometry using \code{GTFShift::project_points_along_geometry()}, yielding
 #' a projected point \eqn{\hat{x}_i} and two cumulative distances:
-#' \deqn{d_i = \text{distance_along_geometry}(\hat{x}_i)}
-#' \deqn{d_i^{\mathrm{rev}} = \text{distance_along_geometry_reversed}(\hat{x}_i)}
+#' \deqn{d_i = \text{distance\_along\_geometry}(\hat{x}_i)}
+#' \deqn{d_i^{\mathrm{rev}} = \text{distance\_along\_geometry\_reversed}(\hat{x}_i)}
 #'
 #' For each pair of consecutive observations \eqn{(i-1, i)}, the elapsed time is
 #' computed as
