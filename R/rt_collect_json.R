@@ -15,6 +15,7 @@
 #'
 #' This function will run indefinitely until manually stopped (CTRL + C).
 #'
+#' @returns String. The location of the file where data was collected.
 #'
 #' @examples
 #' # Create file
@@ -34,7 +35,7 @@
 #' names(collection)
 #'
 #' head(
-#'   collection |> 
+#'   collection |>
 #'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 #' )
 #'
@@ -148,4 +149,6 @@ rt_collect_json <- function(
     }
     pb$update(1)
   }
+
+  return(destination_file)
 }

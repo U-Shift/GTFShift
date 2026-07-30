@@ -34,6 +34,9 @@ rt_collect_json(
 
 \item{headers}{Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.}
 }
+\value{
+String. The location of the file where data was collected.
+}
 \description{
 Collect GTFS-RT data from a JSON feed at regular intervals
 }
@@ -60,7 +63,7 @@ collection <- read.csv(destination_file)
 names(collection)
 
 head(
-  collection |> 
+  collection |>
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
 

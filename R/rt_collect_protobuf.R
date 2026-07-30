@@ -13,6 +13,7 @@
 #'
 #' This function will run indefinitely until manually stopped (CTRL + C).
 #'
+#' @returns String. The location of the file where data was collected.
 #'
 #' @examples
 #' # Create file
@@ -142,4 +143,6 @@ rt_collect_protobuf <- function(
     }
     pb$update(1)
   }
+
+  return(destination_file)
 }
