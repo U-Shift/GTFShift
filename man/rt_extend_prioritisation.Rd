@@ -24,7 +24,7 @@ rt_extend_prioritisation(
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to apply lane buffer distances in meters.}
 }
 \value{
-The \code{lane_prioritisation} \code{sf} \code{data.frame}, extended with the following columns:
+sf data.frame. Extended lane prioritisation with the following columns:
 \describe{
   \item{speed_avg}{The average speed of the vehicles on the way.}
   \item{speed_median}{The median speed of the vehicles on the way.}

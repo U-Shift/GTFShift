@@ -30,7 +30,7 @@ unify(
 \item{transfer_street_routing}{Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).}
 }
 \value{
-A tidygtfs object.
+tidygtfs. The unified GTFS feed.
 }
 \description{
 Merge multiple GTFS into a single aggregated file

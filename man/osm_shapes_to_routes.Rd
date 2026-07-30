@@ -27,7 +27,7 @@ osm_shapes_to_routes(
 \item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
 }
 \value{
-A \code{sf} \code{data.frame} with the following columns:
+sf data.frame. Matched shape to route geometries with the following columns:
 \describe{
   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
   \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}

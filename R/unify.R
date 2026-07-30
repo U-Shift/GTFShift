@@ -19,7 +19,7 @@
 #'
 #' For a detailed example, see the \code{vignette("unify")}.
 #'
-#' @returns A tidygtfs object.
+#' @returns tidygtfs. The unified GTFS feed.
 #'
 #' @examples
 #' # Load multiple GTFS files

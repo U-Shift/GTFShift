@@ -14,7 +14,7 @@
 #'
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
-#' @returns An \code{sf} \code{data.frame} object with the following columns:
+#' @returns sf data.frame. Hourly way frequencies, with the following columns:
 #' \describe{
 #'   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
 #'   \item{hour}{The hour for which the frequency applies (24 hour format).}

@@ -15,7 +15,7 @@
 #' (using \code{GTFShift::get_route_frequency_hourly()}).
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
-#' @returns The routes extension, in meters.
+#' @returns Numeric. The routes extension, in meters.
 #'
 #' @examples
 #' # Load GTFS

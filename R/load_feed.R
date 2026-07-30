@@ -19,7 +19,7 @@
 #' the parameters \code{d_limit=transfer_distance}, \code{min_transfer_time=transfer_time} and \code{network_times=transfer_street_routing}.
 #' The other parameters are applied the library default values.
 #'
-#' @returns A tidygtfs object.
+#' @returns tidygtfs. The loaded GTFS feed.
 #'
 #' @seealso \code{GTFShift::create_shapes_from_stops()}
 #' @seealso \code{tidytransit::read_gtfs()}

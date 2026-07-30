@@ -24,7 +24,7 @@
 #'   \item{producer_url}{The GTFS feed URL. Can be used to download.}
 #' }
 #'
-#' @returns data.frame with query results
+#' @returns data.frame. Query results from Mobility Database.
 #'
 #'
 #' @examplesIf nzchar(Sys.getenv("MOBILITY_DATABASE"))

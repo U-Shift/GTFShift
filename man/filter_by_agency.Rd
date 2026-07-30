@@ -14,7 +14,7 @@ filter_by_agency(gtfs, id = NA, name = NA)
 \item{name}{String (Optional when id). Name of the agency.}
 }
 \value{
-A tidygtfs object with the filtered feed.
+tidygtfs. The filtered GTFS feed.
 }
 \description{
 Filter GTFS feed by agency

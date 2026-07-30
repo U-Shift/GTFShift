@@ -11,7 +11,7 @@
 #' For each route, matches its trips' shapes with OSM route relations, considering the
 #' OSM \code{gtfs:shape_id} attribute.
 #'
-#' @returns A \code{sf} \code{data.frame} with the following columns:
+#' @returns sf data.frame. Matched shape to route geometries with the following columns:
 #' \describe{
 #'   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
 #'   \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}

@@ -10,7 +10,7 @@ create_calendar(gtfs)
 \item{gtfs}{tidygtfs. GTFS feed.}
 }
 \value{
-A data.frame for calendar.txt.
+data.frame. Table for calendar.txt.
 }
 \description{
 Create calendar.txt from calendar_dates.txt

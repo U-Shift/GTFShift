@@ -16,7 +16,7 @@
 #' Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
 #'
 #'
-#' @returns The \code{lane_prioritisation} \code{sf} \code{data.frame}, extended with the following columns:
+#' @returns sf data.frame. Extended lane prioritisation with the following columns:
 #' \describe{
 #'   \item{speed_avg}{The average speed of the vehicles on the way.}
 #'   \item{speed_median}{The median speed of the vehicles on the way.}

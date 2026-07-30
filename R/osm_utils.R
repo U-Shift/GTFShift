@@ -2,7 +2,7 @@
 #'
 #' @param road_osm sf object. Road OSM data.
 #'
-#' @return sf object. Filtered road OSM data.
+#' @returns sf data.frame. Filtered road OSM data.
 #'
 #' @import dplyr
 #'
@@ -35,7 +35,7 @@ filter_osm_bus_lanes <- function(road_osm) {
 #' @param pb_update_3 numeric. Value to add to progress bar when progress at 3/4.
 #' @param pb_update_4 numeric. Value to add to progress bar when progress at 4/4.
 #'
-#' @return data frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
+#' @returns data.frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
 #'
 #' @noRd
 get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update_1 = 0.25, pb_update_2 = 0.5, pb_update_3 = 0.75, pb_update_4 = 1) {

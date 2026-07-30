@@ -18,7 +18,7 @@ get_prioritisation_stats(
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute lengths in meters.}
 }
 \value{
-List with statistics about lane prioritisation, with the following attributes:
+List. Statistics about lane prioritisation, with the following attributes:
 \describe{
   \item{extension}{Total length of the prioritised network, in meters.}
   \item{extension_bus_lane}{Total length of the bus lane segments, in meters.}

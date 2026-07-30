@@ -21,7 +21,7 @@ used as iterative tie-break guidance.}
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.}
 }
 \value{
-A \code{sfc} object with LINESTRING geometry.
+sfc. LINESTRING geometry object.
 }
 \description{
 Convert a MULTILINESTRING to a sorted LINESTRING

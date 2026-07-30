@@ -7,7 +7,7 @@
 #' @details
 #' Allows to filter a GTFS feed for the agency, using the id, name or both. Returns empty feed it none provided.
 #'
-#' @returns A tidygtfs object with the filtered feed.
+#' @returns tidygtfs. The filtered GTFS feed.
 #'
 #' @examples
 #' # Load sample feed with multiple agencies

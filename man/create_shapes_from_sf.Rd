@@ -22,7 +22,7 @@ create_shapes_from_sf(
 \code{shape_dist_traveled} for each generated shape.}
 }
 \value{
-A \code{data.table} representing a GTFS shapes table. Includes
+data.frame. A GTFS shapes table. Includes
 \code{shape_dist_traveled} if \code{shape_dist_traveled = TRUE}.
 }
 \description{
@@ -35,7 +35,7 @@ It first converts any MULTILINESTRING geometries to LINESTRING geometries using 
 \code{multiline_to_sorted_linestring}, using a point guide per shape:
 all ordered stops when the selected trip is circular (first and last
 \code{stop_id} are equal), or the first two stops otherwise.
-Then, it converts the LINESTRING geometries to a data.table representing a GTFS shapes table using
+Then, it converts the LINESTRING geometries to a data.frame representing a GTFS shapes table using
 \code{gtfstools::convert_sf_to_shapes}.
 
 Coordinates are 4326 (WGS 84) by default, following GTFS specifications.

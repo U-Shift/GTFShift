@@ -62,7 +62,7 @@
 #' Method \code{GTFShift::multiline_to_sorted_linestring()} can be used to convert MULTILINESTRING 
 #' geometries to LINESTRING if needed.
 #'
-#' @returns An \code{sf} object based on \code{rt_collection}, with added columns:
+#' @returns sf data.frame. Object based on \code{rt_collection}, with added columns:
 #' \describe{
 #'   \item{closest_on_shape}{Projected point on trip geometry.}
 #'   \item{distance_to_closest_on_geometry}{Distance from each update point to its projected location on the shape (meters).}

@@ -12,7 +12,7 @@ osm_bus_lanes(bbox, osm_file = NULL)
 \item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
 }
 \value{
-osm_lines in sf format
+sf data.frame. OSM bus lanes.
 }
 \description{
 Export designated bus lanes from OpenStreetMaps
