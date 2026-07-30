@@ -21,7 +21,7 @@
 #'
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
-#' Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
+#' Adapted from \href{https://web.archive.org/web/20201223060409/https://github.com/Bondify/GTFS_in_R/}{github.com/Bondify/GTFS_in_R}.
 #'
 #' @returns sf data.frame. Hourly route frequencies, with the following columns (the first three are only present if \code{overline=FALSE}):
 #' \describe{

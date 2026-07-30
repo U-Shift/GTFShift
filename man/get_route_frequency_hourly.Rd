@@ -49,7 +49,7 @@ By relying on a common road network, such as OSM, it is possible to overcome thi
 
 For a detailed example, see the \code{vignette("analyse")}.
 
-Adapted from \url{https://github.com/Bondify/GTFS_in_R/}.
+Adapted from \href{https://web.archive.org/web/20201223060409/https://github.com/Bondify/GTFS_in_R/}{github.com/Bondify/GTFS_in_R}.
 }
 \examples{
 # Subset GTFS for one route only, for demo purposes
