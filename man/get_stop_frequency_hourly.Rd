@@ -15,7 +15,7 @@ get_stop_frequency_hourly(
 \item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
 }
 \value{
-An \code{sf} \code{data.frame} object with the following columns:
+sf data.frame. Hourly stop frequencies, with the following columns:
 \describe{
   \item{stop_id}{The \code{stop_id} attribute from \code{stops.txt} file.}
   \item{hour}{The hour for which the frequency applies (24 hour format).}
@@ -31,10 +31,19 @@ This method analyses the GTFS feed for a representative day, generating for each
 For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{
-\dontrun{
-gtfs <- GTFShift::load_feed("gtfs.zip")
-frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
-}
+# Subset GTFS for one route only, for demo purposes
+gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+  "gtfs_tcb_sample.zip", package = "GTFShift")
+)
+gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
+
+# Get frequency
+frequency_analysis <- GTFShift::get_stop_frequency_hourly(
+  gtfs,
+  date = gtfs$calendar$start_date[1]
+)
+
+head(frequency_analysis)
 
 }
 \seealso{

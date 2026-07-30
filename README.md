@@ -1,7 +1,7 @@
 # GTFShift <img align="right" src="man/figures/logo.png" alt="logo" width="180">
 
 <!-- badges: start -->
-[![](https://github.com/U-Shift/GTFShift/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/pkgdown.yaml) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21292010.svg)](https://doi.org/10.5281/zenodo.21292010)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21292010.svg)](https://doi.org/10.5281/zenodo.21292010) [![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml) [![codecov](https://codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://codecov.io/gh/U-Shift/GTFShift)
 <!-- badges: end -->
 
 **GTFShift** encompasses a complete bundle of methods to harmonize GTFS and OSM data, enabling the integration and exploration of different layers of transit data, starting with the planned operations (GTFS), but also the infrastructure topology (OSM) and real-time information (GTFS-RT).
@@ -39,10 +39,10 @@ To solve this problem, **GTFShift** provides a bundle of methods to harmonize GT
 
 > Example of GTFS original shapes (salmon) and harmonized GTFS shapes with OSM data (blue) for TCB, Barreiro, Portugal
 
-### Bus Lane Prioritization
+### Bus Lane Prioritisation
 
 **GTFShift** emerged from the necessity to understand how to get an
-overview of where bus lanes should be prioritized for a given territory,
+overview of where bus lanes should be prioritised for a given territory,
 using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM) data.
 
 It provides a comprehensive bundle of methods that cover several dimensions of this 
@@ -57,9 +57,9 @@ Together, these can be used to identify road segments where bus lanes should be 
 enabling for a transparent and data-driven decision-making process, suitable to different contexts
 and criteria. 
 
-![](man/figures/prioritization.png)
+![](man/figures/prioritisation.png)
 
-> Example of bus lane prioritization analysis for Lisbon city, considering road segments with
+> Example of bus lane prioritisation analysis for Lisbon city, considering road segments with
 a minimum frequency of 10 buses/hour, average speed below 9.7 km/h and more than 1 lane per direction. 
 
 #### Dashboard 
@@ -74,7 +74,7 @@ Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
 ## Related packages
 
 -   [`{tidytransit}`](https://github.com/r-transit/tidytransit)
--   [`{gtfstools}`](https://github.com/ipeaGIT/gtfstools/)
+-   [`{gtfstools}`](https://github.com/ipea/gtfstools/)
 -   [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
 -   [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
 

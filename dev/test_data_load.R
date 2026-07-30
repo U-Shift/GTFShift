@@ -54,9 +54,9 @@ stcp_data <- read.csv("releases/gtfs_rt_data/stcp.csv")
 summary(stcp_data)
 
 
-# Extend prioritization with rt data
-# lane_prioritization <- readRDS("releases/lane_prioritization/lisbon_lane_prioritization.rds")
-lane_prioritization <- lanes_global
+# Extend prioritisation with rt data
+# lane_prioritisation <- readRDS("releases/lane_prioritisation/lisbon_lane_prioritisation.rds")
+lane_prioritisation <- lanes_global
 rt_collection_cm <- sf::st_read("releases/gtfs_rt_data/carris_updates_more15MBusStop.csv") |>
   mutate(
     lon = str_replace(lon, "c\\(", ""),
@@ -68,17 +68,17 @@ rt_collection_cm <- sf::st_read("releases/gtfs_rt_data/carris_updates_more15MBus
 View(rt_collection_cm |> sf::st_drop_geometry())
 mapview::mapview(rt_collection_cm[sample(nrow(rt_collection_cm), 1000), ], zcol = "speed", layer.title = "RT points sample")
 
-lane_prioritization_extended <- rt_extend_prioritization(
-  lane_prioritization = lane_prioritization,
+lane_prioritisation_extended <- rt_extend_prioritisation(
+  lane_prioritisation = lane_prioritisation,
   rt_collection = rt_collection_cm
 )
 
-summary(lane_prioritization_extended$speed_avg)
-summary(lane_prioritization_extended$speed_count)
+summary(lane_prioritisation_extended$speed_avg)
+summary(lane_prioritisation_extended$speed_count)
 
-mapview::mapview(lane_prioritization_extended, zcol = "speed_avg", layer.title = "Avg speed")
+mapview::mapview(lane_prioritisation_extended, zcol = "speed_avg", layer.title = "Avg speed")
 
-lanes_extended <- lane_prioritization_extended |> filter(hour == 8)
+lanes_extended <- lane_prioritisation_extended |> filter(hour == 8)
 
 map_aggregated_simplified_extended <- mapview::mapview(
   lanes_extended |> filter((frequency < 5 | (is.na(n_lanes) | n_lanes_direction <= 1)) & is_bus_lane),
@@ -99,6 +99,6 @@ output <- "releases/web"
 library(mapview)
 mapshot(
   map_aggregated_simplified_extended,
-  file = file.path(output, "map_rt_extended_prioritization.html"),
+  file = file.path(output, "map_rt_extended_prioritisation.html"),
   selfcontained = TRUE
 )

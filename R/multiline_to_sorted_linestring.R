@@ -22,7 +22,7 @@
 #' \deqn{L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}} d(\mathrm{start\_point}, L).}
 #' where \eqn{d(\cdot)} is the Euclidean distance. If no points are provided, \eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
 #' 
-#' Additionaly, the orientation of \eqn{L^{(1)}} is determined by comparing the distances 
+#' Additionally, the orientation of \eqn{L^{(1)}} is determined by comparing the distances 
 #' from its edges to the remaining segments in \eqn{\mathcal{L} \setminus \{L^{(1)}\}}. 
 #' The edge that is closest to any remaining segment is designated as the end of \eqn{L^{(1)}}. 
 #' 
@@ -56,11 +56,27 @@
 #' The ordered segments are concatenated into a single \code{LINESTRING} and
 #' transformed back to the original CRS of \code{multilinestring}.
 #'
-#' @returns A \code{sfc} object with LINESTRING geometry.
+#' @returns sfc. LINESTRING geometry object.
+#' 
+#' @examples
+#' # Get OSM route geometries (MULTILINESTRING)  
+#' osm_routes <- sf::st_read(
+#'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+#'   quiet = TRUE
+#' ) |> dplyr::sample_n(1)
+#' 
+#' head(osm_routes)
+#' 
+#' # Convert geometry to LINESTRING
+#' osm_routes <- osm_routes |>  dplyr::mutate(
+#'   geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763)
+#' )
+#' 
+#' head(osm_routes)
 #'
 #' @import dplyr
 #' @import sf
-#' @import lwgeom
+#' @importFrom rlang .data
 #'
 #' @export
 multiline_to_sorted_linestring <- function(
@@ -68,6 +84,9 @@ multiline_to_sorted_linestring <- function(
     points = NULL,
     metric_crs = 3857
 ) {
+    if (!requireNamespace("lwgeom", quietly = TRUE)) {
+      stop("Package 'lwgeom' is required for this function. Install it with: install.packages('lwgeom')")
+    }
     metric_crs_is_default <- missing(metric_crs)
     metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
     if (is.na(metric_crs)) {
@@ -89,8 +108,8 @@ multiline_to_sorted_linestring <- function(
         st_set_geometry("geometry") |>
         st_transform(metric_crs) |>
         mutate(
-            start = lwgeom::st_startpoint(geometry),
-            end = lwgeom::st_endpoint(geometry)
+            start = lwgeom::st_startpoint(.data$geometry),
+            end = lwgeom::st_endpoint(.data$geometry)
         )
 
     # 2. Reorder the linestrings by finding the best sequence
@@ -106,9 +125,9 @@ multiline_to_sorted_linestring <- function(
         )) |>
             mutate(order = row_number()) |>
             st_transform(metric_crs)
-        start_point <- points_df |> slice(1) |> pull(geometry)
+        start_point <- points_df |> slice(1) |> pull(.data$geometry)
         if (length(points) > 1) {
-            second_point <- points_df |> slice(2) |> pull(geometry)
+            second_point <- points_df |> slice(2) |> pull(.data$geometry)
         }
         # Mark the first point as visited
         points_df$visited[1] <- TRUE
@@ -124,6 +143,8 @@ multiline_to_sorted_linestring <- function(
         remaining_lines <- linestrings[-nearest_idx, ]        
     } else {
         current_line <- linestrings[1, ] # Start with the first line
+        current_start <- lwgeom::st_startpoint(current_line$geometry)
+        current_end <- lwgeom::st_endpoint(current_line$geometry)
         remaining_lines <- linestrings[-1, ] 
     }
     # Validate start segment orientation
@@ -151,8 +172,10 @@ multiline_to_sorted_linestring <- function(
             if (st_distance(second_point, current_start) < st_distance(second_point, current_end)) {
                 current_line$geometry <- st_reverse(current_line$geometry)
             }
-        } else if (st_distance(start_point, current_start) > st_distance(start_point, current_end)) {
-            current_line$geometry <- st_reverse(current_line$geometry)
+        } else if (!is.null(start_point)) {
+            if (st_distance(start_point, current_start) > st_distance(start_point, current_end)) {
+                current_line$geometry <- st_reverse(current_line$geometry)
+            }
         }
     }
 
@@ -164,12 +187,12 @@ multiline_to_sorted_linestring <- function(
     while (nrow(remaining_lines) > 0) { 
         if (!is.null(points_df)) {
             # Get index of the next point in points_df that has not been visited yet
-            next_point_index <- points_df |> filter(!visited) |> slice(1) |> pull(order)
+            next_point_index <- points_df |> filter(!.data$visited) |> slice(1) |> pull(.data$order)
             if (length(next_point_index) == 0) {
                 next_point_index <- NULL
                 next_point <- NULL
             } else {
-                next_point <- points_df |> filter(order == next_point_index) |> pull(geometry)
+                next_point <- points_df |> filter(.data$order == next_point_index) |> pull(.data$geometry)
                 distance_to_next_point <- st_distance(current_line, next_point)
             }
         }
@@ -249,12 +272,12 @@ multiline_to_sorted_linestring <- function(
         if (!is.null(points_df)) {
             # Mark consecutive next points as visited while current_line stays at least as close as any remaining line for the next unvisited point
             repeat {
-                next_unvisited <- points_df |> filter(!visited) |> slice(1)
+                next_unvisited <- points_df |> filter(!.data$visited) |> slice(1)
                 if (nrow(next_unvisited) == 0) {
                     break
                 }
-                next_point_index <- next_unvisited |> pull(order)
-                next_point <- next_unvisited |> pull(geometry)
+                next_point_index <- next_unvisited |> pull(.data$order)
+                next_point <- next_unvisited |> pull(.data$geometry)
                 distance_current_to_next <- as.numeric(st_distance(current_line, next_point))
                 distance_remaining_to_next <- if (nrow(remaining_lines) > 0) {
                     min(as.numeric(st_distance(remaining_lines$geometry, next_point)))

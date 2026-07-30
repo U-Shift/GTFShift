@@ -1,0 +1,105 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  pull_request:
+    branches: [main, master]
+
+name: test-coverage.yaml
+
+permissions: read-all
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      MOBILITY_DATABASE: ${{ secrets.MOBILITY_DATABASE }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          # testthat and rosmium are Suggests (optional) in DESCRIPTION so they
+          # are not guaranteed to be installed automatically — list them explicitly.
+          extra-packages: any::covr, any::xml2, any::testthat, any::rosmium, local::.
+          needs: coverage
+
+      - name: Run tests and compute coverage
+        run: |
+          install_path <- file.path(
+            normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package"
+          )
+
+          # Helper: print the .Rout.fail file so the actual test error is visible
+          # in the CI log instead of just a path reference.
+          dump_rout_fail <- function() {
+            fail_files <- list.files(install_path, pattern = "\\.Rout\\.fail$",
+                                     recursive = TRUE, full.names = TRUE)
+            if (length(fail_files) == 0) {
+              message("No .Rout.fail file found.")
+              return(invisible(NULL))
+            }
+            for (f in fail_files) {
+              message("\n========== ", basename(f), " ==========")
+              cat(readLines(f, warn = FALSE), sep = "\n")
+              message("============================================\n")
+            }
+          }
+
+          cov <- tryCatch(
+            covr::package_coverage(
+              quiet = FALSE,
+              clean = FALSE,
+              install_path = install_path
+            ),
+            error = function(e) {
+              message("\n--- Test suite failed. Dumping .Rout.fail for diagnosis ---\n")
+              dump_rout_fail()
+              stop(e)   # re-throw so the job still fails
+            }
+          )
+
+          # Print summary to the log
+          print(cov)
+
+          # Generate Cobertura XML report for Codecov upload
+          covr::to_cobertura(cov, filename = "coverage.xml")
+
+          # Compute total coverage percentage and write to GITHUB_ENV
+          pct <- covr::percent_coverage(cov)
+          message("Total coverage: ", round(pct, 2), "%")
+          writeLines(paste0("COVERAGE_PCT=", round(pct, 2)), Sys.getenv("GITHUB_ENV"))
+        shell: Rscript {0}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false   # don't fail the PR if Codecov is unreachable
+
+      - name: Upload Cobertura XML as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+      - name: Enforce minimum coverage threshold
+        run: |
+          pct <- as.numeric(Sys.getenv("COVERAGE_PCT"))
+          threshold <- 0   # Set your desired minimum coverage % here (e.g. 60)
+          if (!is.na(pct) && pct < threshold) {
+            stop(paste0(
+              "Coverage (", round(pct, 2), "%) is below the required threshold of ",
+              threshold, "%."
+            ))
+          } else {
+            message("Coverage check passed: ", round(pct, 2), "%")
+          }
+        shell: Rscript {0}

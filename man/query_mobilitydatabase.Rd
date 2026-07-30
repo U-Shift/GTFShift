@@ -36,10 +36,10 @@ query_mobilitydatabase(
 
 \item{bbox}{bbox (Optional). Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.}
 
-\item{is_official.}{Boolean (Optional). If TRUE, only return official feeds.}
+\item{is_official}{Boolean (Optional). If TRUE, only return official feeds.}
 }
 \value{
-data.frame with query results
+data.frame. Query results from Mobility Database.
 }
 \description{
 Query Mobility Database API for GTFS feeds
@@ -57,12 +57,13 @@ Some useful columns of the returned data.frame (refer to the API documentation f
 }
 }
 \examples{
-\dontrun{
+\dontshow{if (nzchar(Sys.getenv("MOBILITY_DATABASE"))) withAutoprint(\{ # examplesIf}
 feeds <- GTFShift::query_mobilitydatabase(
-  refresh_token = "myToken",
+  refresh_token = Sys.getenv("MOBILITY_DATABASE"),
   country_code = "PT",
   is_official = TRUE
 )
-}
 
+head(feeds |> dplyr::select(id, provider, producer_url))
+\dontshow{\}) # examplesIf}
 }

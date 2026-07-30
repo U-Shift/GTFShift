@@ -2,7 +2,7 @@
 #'
 #' @param road_osm sf object. Road OSM data.
 #'
-#' @return sf object. Filtered road OSM data.
+#' @returns sf data.frame. Filtered road OSM data.
 #'
 #' @import dplyr
 #'
@@ -16,7 +16,10 @@ filter_osm_bus_lanes <- function(road_osm) {
     if_any(any_of("psv"), ~ .x == "designated") |
       if_any(any_of("highway"), ~ .x == "busway") |
       if_any(any_of(cols_to_check_access), ~ grepl("designated", .x)) |
-      if_any(any_of(cols_to_check_count), ~ {v <- suppressWarnings(as.numeric(sub(";.*$", "", .x))); !is.na(v) & v >= 1})
+      if_any(any_of(cols_to_check_count), ~ {
+        v <- suppressWarnings(as.numeric(sub(";.*$", "", .x)))
+        !is.na(v) & v >= 1
+      })
   )
 
   return(osm_lanes)
@@ -32,11 +35,11 @@ filter_osm_bus_lanes <- function(road_osm) {
 #' @param pb_update_3 numeric. Value to add to progress bar when progress at 3/4.
 #' @param pb_update_4 numeric. Value to add to progress bar when progress at 4/4.
 #'
-#' @return data frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
+#' @returns data.frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
 #'
 #' @noRd
 get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update_1 = 0.25, pb_update_2 = 0.5, pb_update_3 = 0.75, pb_update_4 = 1) {
-  relations_pbf <- tempfile(fileext = ".osm.pbf")
+  relations_pbf <- withr::local_tempfile(fileext = ".osm.pbf")
 
   job <- callr::r_bg(function(relations_pbf, osm_file, osm_route_type) { # update spinner while blocking method call
     return(rosmium::tags_filter(
@@ -81,7 +84,10 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
   rel_n <- 0
   relations_data <- lapply(relations, function(rel) {
     rel_n <<- rel_n + 1
-    pb$update(min(round(pb_update_3 + ((pb_update_4 - pb_update_3) * rel_n / length(relations)), digits = 2), 1))
+    pb$update(min(
+      round(pb_update_3 + ((pb_update_4 - pb_update_3) * rel_n / length(relations)), digits = 2),
+      ifelse(rel_n < length(relations), 0.99, 1) # Prevent 0.9999 rounding to 1 before reaching last
+    ))
     tags <- xml2::xml_find_all(rel, ".//tag")
     tag_keys <- xml2::xml_attr(tags, "k")
     tag_vals <- xml2::xml_attr(tags, "v")
@@ -112,22 +118,21 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
       return(NULL)
     }
 
-    data.frame(
-      # <relation>
-      relation_osm_id = xml2::xml_attr(rel, "id"),
+    members <- data.frame(
       # <member>
       type = xml2::xml_attr(members, "type"),
       osm_id = xml2::xml_attr(members, "ref"),
-      role = xml2::xml_attr(members, "role"),
-      # <tag>
-      `gtfs:shape_id` = tag_vals["gtfs:shape_id"],
-      `gtfs:route_id` = tag_vals["gtfs:route_id"],
-      name = tag_vals["name"],
-      ref = tag_vals["ref"],
-      roundtrip = tag_vals["roundtrip"],
-      stringsAsFactors = FALSE,
-      check.names = FALSE
+      role = xml2::xml_attr(members, "role")
     )
+    # <relation>
+    members["relation_osm_id"] <- xml2::xml_attr(rel, "id")
+    # <tag>
+    members["gtfs:shape_id"] <- tag_vals["gtfs:shape_id"]
+    members["gtfs:route_id"] <- tag_vals["gtfs:route_id"]
+    members["name"] <- tag_vals["name"]
+    members["ref"] <- tag_vals["ref"]
+    members["roundtrip"] <- tag_vals["roundtrip"]
+    return(members)
   })
   relations_df <- dplyr::bind_rows(relations_data)
 

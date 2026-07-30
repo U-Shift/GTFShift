@@ -10,7 +10,7 @@
 #' @param subdivision_name String (Optional). List only feeds with the specified value. Can be a partial match.
 #' @param municipality String (Optional). List only feeds with the specified value. Can be a partial match. Case insensitive.
 #' @param bbox bbox (Optional). Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.
-#' @param is_official. Boolean (Optional). If TRUE, only return official feeds.
+#' @param is_official Boolean (Optional). If TRUE, only return official feeds.
 #'
 #' @details
 #' This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform.
@@ -24,34 +24,33 @@
 #'   \item{producer_url}{The GTFS feed URL. Can be used to download.}
 #' }
 #'
-#' @returns data.frame with query results
+#' @returns data.frame. Query results from Mobility Database.
 #'
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf nzchar(Sys.getenv("MOBILITY_DATABASE"))
 #' feeds <- GTFShift::query_mobilitydatabase(
-#'   refresh_token = "myToken",
+#'   refresh_token = Sys.getenv("MOBILITY_DATABASE"),
 #'   country_code = "PT",
 #'   is_official = TRUE
 #' )
-#' }
+#' 
+#' head(feeds |> dplyr::select(id, provider, producer_url))
 #'
-#' @import httr
+#' @importFrom httr GET POST add_headers content http_error http_status
 #' @import dplyr
 #'
 #' @export
 query_mobilitydatabase <- function(access_token = NA,
-                                   refresh_token = NA,
-                                   bounding_filter_method = "partially_enclosed",
-                                   limit = 10,
-                                   offset = 0,
-                                   country_code = NA,
-                                   subdivision_name = NA,
-                                   municipality = NA,
-                                   bbox = NA,
-                                   is_official = NA
+  refresh_token = NA,
+  bounding_filter_method = "partially_enclosed",
+  limit = 10,
+  offset = 0,
+  country_code = NA,
+  subdivision_name = NA,
+  municipality = NA,
+  bbox = NA,
+  is_official = NA
 ) {
-
   # Validate parameters
   if (is.na(access_token) && is.na(refresh_token)) {
     stop("No token provided! At least one of the access or refresh tokens must be provided as an argument.")
@@ -66,7 +65,7 @@ query_mobilitydatabase <- function(access_token = NA,
       body = body
     )
     content <- content(response, as = "parsed")
-    if(http_error(response)) {
+    if (http_error(response)) {
       stop(sprintf("Mobility database bad response: %s", http_status(response)))
     }
     access_token <- content$access_token
@@ -75,17 +74,19 @@ query_mobilitydatabase <- function(access_token = NA,
   # Query mobility database
   url <- "https://api.mobilitydatabase.org/v1/gtfs_feeds"
 
-  params <- list(bounding_filter_method = bounding_filter_method,
-                 limit = limit,
-                 offset = offset)
-  if (!is.na(country_code)) params["country_code"] = country_code
-  if (!is.na(subdivision_name)) params["subdivision_name"] = subdivision_name
-  if (!is.na(municipality)) params["municipality"] = municipality
+  params <- list(
+    bounding_filter_method = bounding_filter_method,
+    limit = limit,
+    offset = offset
+  )
+  if (!is.na(country_code)) params["country_code"] <- country_code
+  if (!is.na(subdivision_name)) params["subdivision_name"] <- subdivision_name
+  if (!is.na(municipality)) params["municipality"] <- municipality
   if (!is.na(bbox)) {
-    params["dataset_latitudes"] = sprintf("%f,%f", bbox$ymin[[1]], bbox$ymax[[1]])
-    params["dataset_longitudes"] = sprintf("%f,%f", bbox$xmin[[1]], bbox$xmax[[1]])
+    params["dataset_latitudes"] <- sprintf("%f,%f", bbox$ymin[[1]], bbox$ymax[[1]])
+    params["dataset_longitudes"] <- sprintf("%f,%f", bbox$xmin[[1]], bbox$xmax[[1]])
   }
-  if (!is.na(is_official)) params["is_official"] = is_official
+  if (!is.na(is_official)) params["is_official"] <- is_official
 
   response <- GET(
     url,
@@ -99,7 +100,7 @@ query_mobilitydatabase <- function(access_token = NA,
   # Convert response to data.frame
   content <- content(response, as = "parsed")
 
-  if(http_error(response)) {
+  if (http_error(response)) {
     stop(sprintf("Mobility database bad response: %s", http_status(response)))
   }
 

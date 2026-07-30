@@ -21,7 +21,7 @@ used as iterative tie-break guidance.}
 \item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.}
 }
 \value{
-A \code{sfc} object with LINESTRING geometry.
+sfc. LINESTRING geometry object.
 }
 \description{
 Convert a MULTILINESTRING to a sorted LINESTRING
@@ -41,7 +41,7 @@ If guiding points are provided, let \eqn{\mathrm{start\_point}=P_1} be the first
 \deqn{L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}} d(\mathrm{start\_point}, L).}
 where \eqn{d(\cdot)} is the Euclidean distance. If no points are provided, \eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
 
-Additionaly, the orientation of \eqn{L^{(1)}} is determined by comparing the distances 
+Additionally, the orientation of \eqn{L^{(1)}} is determined by comparing the distances 
 from its edges to the remaining segments in \eqn{\mathcal{L} \setminus \{L^{(1)}\}}. 
 The edge that is closest to any remaining segment is designated as the end of \eqn{L^{(1)}}. 
 
@@ -74,4 +74,21 @@ unvisited points \eqn{Q} are marked visited when
 
 The ordered segments are concatenated into a single \code{LINESTRING} and
 transformed back to the original CRS of \code{multilinestring}.
+}
+\examples{
+# Get OSM route geometries (MULTILINESTRING)  
+osm_routes <- sf::st_read(
+  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  quiet = TRUE
+) |> dplyr::sample_n(1)
+
+head(osm_routes)
+
+# Convert geometry to LINESTRING
+osm_routes <- osm_routes |>  dplyr::mutate(
+  geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763)
+)
+
+head(osm_routes)
+
 }

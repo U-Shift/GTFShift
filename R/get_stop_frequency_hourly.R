@@ -9,7 +9,7 @@
 #' This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
-#' @returns An \code{sf} \code{data.frame} object with the following columns:
+#' @returns sf data.frame. Hourly stop frequencies, with the following columns:
 #' \describe{
 #'   \item{stop_id}{The \code{stop_id} attribute from \code{stops.txt} file.}
 #'   \item{hour}{The hour for which the frequency applies (24 hour format).}
@@ -18,18 +18,27 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' frequency_analysis <- GTFShift::get_stop_frequency_hourly(gtfs)
-#' }
+#' # Subset GTFS for one route only, for demo purposes
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip", package = "GTFShift")
+#' )
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
+#' 
+#' # Get frequency
+#' frequency_analysis <- GTFShift::get_stop_frequency_hourly(
+#'   gtfs,
+#'   date = gtfs$calendar$start_date[1]
+#' )
+#' 
+#' head(frequency_analysis)
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #'
 #' @import sf
-#' @import tidyverse
 #' @import lubridate
 #' @import tidytransit
 #' @import dplyr
+#' @importFrom rlang .data
 #'
 #' @export
 get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusinessWednesday()) {
@@ -37,9 +46,11 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   ## Consider transit data for one day only
   message(sprintf("> Filtering by reference date %s...", date))
-  gtfs_date <- tidytransit::filter_feed_by_date(
-    gtfs, extract_date = date
-  )
+  suppressWarnings({ # Ignore missing transfers warnings
+    gtfs_date <- tidytransit::filter_feed_by_date(
+      gtfs, extract_date = date
+    )
+  })
 
   message(sprintf("> Found %d routes operating %d trips on %d stops...",
     length(gtfs_date$trips$trip_id),
@@ -66,35 +77,35 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   shape_lengths <- pattern_gtfs$shapes |>
     as.data.frame() |>
-    select(shape_id, length, -geometry)
+    select("shape_id", "length", -"geometry")
 
   ## Get statistics: for each service pattern, get nr of trips, routes, total and avg distance and number of stops covered
   service_pattern_summary <- pattern_gtfs$trips |> # Join trips
     left_join(pattern_gtfs$.$servicepatterns, by="service_id") |> # with service pattern
     left_join(shape_lengths, by="shape_id") |> # with shape length
     left_join(pattern_gtfs$stop_times, by="trip_id") |> # with planned route (stops and times)
-    group_by(servicepattern_id) |> # group by service pattern
+    group_by(.data$servicepattern_id) |> # group by service pattern
     summarise(
       trips = n(),
-      routes = n_distinct(route_id),
-      total_distance_per_day_km = sum(as.numeric(length), na.rm=TRUE)/1e3, # divide by 1e3 to convert meters to kms
-      route_avg_distance_km = (sum(as.numeric(length), na.rm=TRUE)/1e3)/(trips*routes),
-      stops=(n_distinct(stop_id)/2) # divided by two because usually there is one stop per direction
+      routes = n_distinct(.data$route_id),
+      total_distance_per_day_km = sum(as.numeric(.data$length), na.rm=TRUE)/1e3, # divide by 1e3 to convert meters to kms
+      route_avg_distance_km = (sum(as.numeric(.data$length), na.rm=TRUE)/1e3)/(.data$trips*.data$routes),
+      stops=(n_distinct(.data$stop_id)/2) # divided by two because usually there is one stop per direction
     )
 
   ## Add the number of days that each service is in operation (by join with $.$dates_servicepatterns)
   service_pattern_summary <- pattern_gtfs$.$dates_servicepatterns |>
-    group_by(servicepattern_id) |>
+    group_by(.data$servicepattern_id) |>
     summarise(days_in_service = n()) |>
     left_join(service_pattern_summary, by = "servicepattern_id")
 
   ## Get service patterns that run on the date selected
   service_pattern_ids = pattern_gtfs$.$dates_servicepatterns |>
-    filter(date==date)
+    filter(.data$date==date)
 
   service_ids = pattern_gtfs$.$servicepattern |>
-    filter(servicepattern_id %in% service_pattern_ids$servicepattern_id) |>
-    pull(service_id)
+    filter(.data$servicepattern_id %in% service_pattern_ids$servicepattern_id) |>
+    pull(.data$service_id)
 
   #### Filter by date
 
@@ -102,7 +113,7 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   frame = data.frame()
 
-  stop_times = gtfs_date$stop_times |> mutate(hour = lubridate::hour(departure_time))
+  stop_times = gtfs_date$stop_times |> mutate(hour = lubridate::hour(.data$departure_time))
   min_hour = min(stop_times$hour, na.rm=TRUE)
   max_hour = max(stop_times$hour, na.rm=TRUE)
 
@@ -118,8 +129,8 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
     )
 
     stop_frequency <- stop_frequency |>
-      group_by(stop_id) |>
-      summarise(frequency = sum(n_departures)) |>
+      group_by(.data$stop_id) |>
+      summarise(frequency = sum(.data$n_departures)) |>
       mutate(hour = i)
 
     frame <- rbind(frame, stop_frequency)
@@ -127,13 +138,13 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   frequency <- frame |>
     ungroup() |>
-    group_by(stop_id, hour) |>
-    summarise(frequency = sum(frequency)) |>
+    group_by(.data$stop_id, .data$hour) |>
+    summarise(frequency = sum(.data$frequency)) |>
     ungroup()
 
   table <- frequency |>
     left_join(gtfs_date$stops |>
-                select(stop_id, stop_lon, stop_lat), by = "stop_id") |>
+                select("stop_id", "stop_lon", "stop_lat"), by = "stop_id") |>
     st_as_sf(crs = 4326, coords = c("stop_lon", "stop_lat"))
 
   message("Finished GTFS analysis!")

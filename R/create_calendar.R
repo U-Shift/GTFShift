@@ -12,36 +12,42 @@
 #' minimum and maximum dates and setting each week day to true if it has any date that matches that date. The results
 #' might not be 100% accurate, as it captures the whole time span and exceptions in the week days along it are ignored.
 #'
-#' @returns A data.frame for calendar.txt.
+#' @returns data.frame. Table for calendar.txt.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' gtfs$calendar <- GTFShift::create_calendar(gtfs)
-#' }
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+#' )
+#' 
+#' head(gtfs$calendar_dates |> dplyr::filter(exception_type == 1))
+#' 
+#' gtfs_calendar <- GTFShift::create_calendar(gtfs)
+#' 
+#' gtfs_calendar
 #'
 #' @import dplyr
+#' @importFrom rlang .data
 #'
 #' @export
 create_calendar <- function(gtfs) {
 
-  dates = gtfs$calendar_dates %>%
-    filter(exception_type==1)  %>% # Get dates for service inclusion (not removal, which corresponds to exception_type 2)
-    mutate(weekday = tolower(weekdays(date))) # Get week day from date
+  dates = gtfs$calendar_dates |>
+    filter(.data$exception_type==1)  |> # Get dates for service inclusion (not removal, which corresponds to exception_type 2)
+    mutate(weekday = tolower(weekdays(.data$date))) # Get week day from date
 
   # Aggregate values in calendar.txt structure
-  calendar = dates %>%
-    group_by(service_id) %>%
+  calendar = dates |>
+    group_by(.data$service_id) |>
     summarise(
-      monday = as.integer(any(weekday == "monday")),
-      tuesday = as.integer(any(weekday == "tuesday")),
-      wednesday = as.integer(any(weekday == "wednesday")),
-      thursday = as.integer(any(weekday == "thursday")),
-      friday = as.integer(any(weekday == "friday")),
-      saturday = as.integer(any(weekday == "saturday")),
-      sunday = as.integer(any(weekday == "sunday")),
-      start_date = min(date),
-      end_date = max(date)
+      monday = as.integer(any(.data$weekday == "monday")),
+      tuesday = as.integer(any(.data$weekday == "tuesday")),
+      wednesday = as.integer(any(.data$weekday == "wednesday")),
+      thursday = as.integer(any(.data$weekday == "thursday")),
+      friday = as.integer(any(.data$weekday == "friday")),
+      saturday = as.integer(any(.data$weekday == "saturday")),
+      sunday = as.integer(any(.data$weekday == "sunday")),
+      start_date = min(.data$date),
+      end_date = max(.data$date)
     )
 
   return(calendar)

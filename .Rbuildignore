@@ -6,3 +6,16 @@
 ^\.github$
 ^vignettes/articles$
 ^dev$
+^releases$
+(^|/)venv(/.*)?$
+LICENSE.md
+CITATION.cff
+^doc$
+^Meta$
+^scratch$
+cache
+(^|/)[^/]*cache[^/]*(/.*)?$
+^\.RDataTmp$
+^\.RData$
+^revdep$
+^cran-comments\.md$

@@ -13,51 +13,74 @@
 #'
 #' This function will run indefinitely until manually stopped (CTRL + C).
 #'
+#' @returns String. The location of the file where data was collected.
 #'
 #' @examples
-#' \dontrun{
-#' GTFShift::rt_collect_protobuf("https://api.example.com/gtfs-rt-protobuf", "gtfs_rt_data.csv")
-#' }
+#' # Create file
+#' destination_file <- withr::local_tempfile(fileext = ".csv")
 #'
-#' @import RProtoBuf
-#' @import jsonlite
-#' @import progress
+#' # Collect data
+#' GTFShift::rt_collect_protobuf(
+#'   gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb",
+#'   destination_file = destination_file,
+#'   scrape_interval = -1 # Negative to run only once
+#' )
 #'
+#' # Read data
+#' collection <- read.csv(destination_file)
+#'
+#' names(collection)
+#'
+#' head(
+#'   collection |>
+#'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
+#' )
+#'
+#' @importFrom jsonlite write_json
+#' @importFrom stats setNames
 #' @export
 rt_collect_protobuf <- function(
-    gtfs_rt_url, destination_file,
-    fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
-    scrape_interval = 60, log_file = NA, headers = NULL
+  gtfs_rt_url, destination_file,
+  fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
+  scrape_interval = 60, log_file = NA, headers = NULL
 ) {
   # Log script start
-  m = sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
+  m <- sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
   message(m)
   if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
   # Each scrape_interval seconds, download the GTFS-RT feed and save it to the destination folder
-  count = 0
+  count <- 0
   repeat {
-    count = count + 1
+    count <- count + 1
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
     # Load protobuf
+    if (!requireNamespace("RProtoBuf", quietly = TRUE)) {
+      stop("Package 'RProtoBuf' is required for this function. Install it with: install.packages('RProtoBuf')")
+    }
     RProtoBuf::readProtoFiles((system.file("extdata", "gtfs-realtime.proto", package = "GTFShift")))
     if (grepl("^http", gtfs_rt_url) && !is.null(headers)) {
-      temp_pb <- tempfile(fileext = ".pb")
+      temp_pb <- withr::local_tempfile(fileext = ".pb")
       res <- httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers), httr::write_disk(temp_pb, overwrite = TRUE))
       httr::stop_for_status(res)
       f <- file(temp_pb, "rb")
     } else {
       f <- file(gtfs_rt_url, "rb")
     }
-    feed <- RProtoBuf::read(`transit_realtime.FeedMessage`, f)
+    on.exit(close(f), add = TRUE)
+    feed_desc <- RProtoBuf::P("transit_realtime.FeedMessage")
+    feed <- RProtoBuf::read(feed_desc, f)
     close(f)
+    on.exit(NULL, add = FALSE)
 
     # Convert to R list
     fields <- names(feed)
 
     protobuf_to_list <- function(msg) {
-      if (!inherits(msg, "Message")) return(msg)
+      if (!inherits(msg, "Message")) {
+        return(msg)
+      }
 
       # get all fields
       fields <- names(msg)
@@ -77,8 +100,8 @@ rt_collect_protobuf <- function(
     }
 
     feed_list <- protobuf_to_list(feed)
-    temp_json = tempfile(fileext = ".json")
-    write_json(
+    temp_json <- withr::local_tempfile(fileext = ".json")
+    jsonlite::write_json(
       feed_list,
       temp_json,
       pretty = TRUE,
@@ -95,26 +118,31 @@ rt_collect_protobuf <- function(
       )
     })
 
-    m = sprintf("[%s] Iteration %d completed", timestamp, count)
+    m <- sprintf("[%s] Iteration %d completed", timestamp, count)
     message(m)
     if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
     # Wait for scrape_interval seconds before the next download
-    if (scrape_interval<0) {
+    if (scrape_interval < 0) {
       break
     }
     interval_start <- Sys.time()
+    if (!requireNamespace("progress", quietly = TRUE)) {
+      stop("Package 'progress' is required for this function. Install it with: install.packages('progress')")
+    }
     pb <- progress::progress_bar$new( # Track progress
       format = "Sleeping [:bar] :percent :spin elapsed=:elapsed",
-      clear = FALSE, show_after=0
+      clear = FALSE, show_after = 0
     )
     pb$update(0)
     repeat {
-      elapsed_time <- as.numeric(difftime(Sys.time(), interval_start, units="secs"))
-      if (elapsed_time >= scrape_interval) break;
-      pb$update( min(elapsed_time / scrape_interval, 1) );
-      Sys.sleep(0.1);
+      elapsed_time <- as.numeric(difftime(Sys.time(), interval_start, units = "secs"))
+      if (elapsed_time >= scrape_interval) break
+      pb$update(min(elapsed_time / scrape_interval, 1))
+      Sys.sleep(0.1)
     }
     pb$update(1)
   }
+
+  return(destination_file)
 }

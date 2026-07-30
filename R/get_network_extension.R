@@ -3,7 +3,7 @@
 #' Get total extension of GTFS feed routes
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param route_identifier. String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
+#' @param route_identifier String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
 #' @param direction_wise Boolean (Default \code{TRUE}). If TRUE, extension considers sum of both directions. Otherwise, only one direction is considered.
 #' @param unified Boolean (Default \code{FALSE}). If TRUE, overlapping route segments are only counted once in the total extension.
 #' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
@@ -15,18 +15,27 @@
 #' (using \code{GTFShift::get_route_frequency_hourly()}).
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
-#' @returns The routes extension, in meters.
+#' @returns Numeric. The routes extension, in meters.
 #'
 #' @examples
-#' \dontrun{
-#' gtfs <- GTFShift::load_feed("gtfs.zip")
-#' route_extension <- GTFShift::get_network_extension(gtfs)
-#' }
+#' # Load GTFS
+#' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
+#'   "gtfs_tcb_sample.zip",
+#'   package = "GTFShift"
+#' ))
 #'
-#' @seealso [GTFShift::get_route_frequency_hourly()]
+#' # Get route extension
+#' GTFShift::get_network_extension(
+#'   gtfs,
+#'   metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+#'   date = gtfs$calendar$start_date[1]
+#' )
+#'
+#' @seealso \code{GTFShift::get_route_frequency_hourly()}
 #'
 #' @import dplyr
 #' @import sf
+#' @importFrom rlang .data
 #'
 #' @export
 get_network_extension <- function(
@@ -60,28 +69,28 @@ get_network_extension <- function(
   # Get unique shapes
   shapes_unique <- network |>
     st_drop_geometry() |>
-    select(shape_id) |>
+    select("shape_id") |>
     distinct() |>
     left_join(network, by = "shape_id", multiple = "first")
 
   # Compute daily frequencies per route shape
   network_redux <- network |>
     st_drop_geometry() |>
-    group_by(.data[[route_identifier]], direction_id, shape_id) |>
-    summarise(frequency_day = sum(frequency)) |>
+    group_by(.data[[route_identifier]], .data$direction_id, .data$shape_id) |>
+    summarise(frequency_day = sum(.data$frequency)) |>
     ungroup()
 
   # Get shape with max frequencies per route
   network_redux_max <- network_redux |>
     # Get max frequency shape per route (and direction, if direction_wise=TRUE)
-    group_by(.data[[route_identifier]], shape_id, !!!if (direction_wise) rlang::syms("direction_id")) |>
-    summarise(frequency_max = max(frequency_day)) |>
+    group_by(.data[[route_identifier]], .data$shape_id, !!!if (direction_wise) rlang::syms("direction_id")) |>
+    summarise(frequency_max = max(.data$frequency_day)) |>
     # Get shape with max frequency per route (and direction, if direction_wise=TRUE)
     group_by(
       .data[[route_identifier]],
       !!!if (direction_wise) rlang::syms("direction_id")
     ) |>
-    slice_max(order_by = frequency_max, n = 1, with_ties = FALSE) |>
+    slice_max(order_by = .data$frequency_max, n = 1, with_ties = FALSE) |>
     ungroup()
 
   # Join with the original network to get the shapes and compute its distance
@@ -95,12 +104,14 @@ get_network_extension <- function(
 
   # Compute unified network extension
   if (unified) {
+    if (!requireNamespace("stplanr", quietly = TRUE)) {
+      stop("Package 'stplanr' is required when unified=TRUE. Install it with: install.packages('stplanr')")
+    }
     network_union <- network_redux_shapes |>
       st_union() |>
       stplanr::line_cast() |>
-      st_as_sf() |>
-      mutate(length = st_length(geom_col))
-    return(sum(network_union$length))
+      st_as_sf()
+    return(sum(st_length(st_geometry(network_union))))
   }
 
   return(sum(network_redux_shapes$length))

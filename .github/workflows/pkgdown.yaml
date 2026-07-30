@@ -32,9 +32,21 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install osmium-tool (Linux)
+        run: sudo apt-get install -y osmium-tool
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies for neatnet (osm_centerlines)
+        run: |
+          python -m pip install --upgrade pip
+          pip install osmnx pandas geopandas shapely neatnet pyrosm
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          extra-packages: any::pkgdown, any::rosmium, any::reticulate, local::.
           needs: website
 
       - name: Build site

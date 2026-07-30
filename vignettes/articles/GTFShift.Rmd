@@ -27,14 +27,14 @@ library(GTFShift)
 # Key functions
 
 **GTFShift** provides methods for the entire workflow of bus lane implementation
-prioritization, but also other useful functions for GTFS and OSM data gathering
+prioritisation, but also other useful functions for GTFS and OSM data gathering
 and manipulation. For detailed examples on their functionality, refer to
 the [articles](./index.html).
 
-### [Prioritize](./prioritize.html)
+### [Prioritise](./prioritise.html)
 
 The main purpose of **GTFShift** is to support the decision-making process for 
-bus lane implementation prioritization. This article presents a step-by-step guide
+bus lane implementation prioritisation. This article presents a step-by-step guide
 on how to use the package to achieve this goal, from data gathering to analysis and visualization.
 
 ### [Getting transit data](./download.html)

@@ -28,6 +28,9 @@ rt_collect_protobuf(
 
 \item{headers}{Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.}
 }
+\value{
+String. The location of the file where data was collected.
+}
 \description{
 Collect GTFS-RT data from a Protocol Buffers feed at regular intervals
 }
@@ -37,8 +40,24 @@ Downloads GTFS-RT data from the specified URL at regular intervals and saves the
 This function will run indefinitely until manually stopped (CTRL + C).
 }
 \examples{
-\dontrun{
-GTFShift::rt_collect_protobuf("https://api.example.com/gtfs-rt-protobuf", "gtfs_rt_data.csv")
-}
+# Create file
+destination_file <- withr::local_tempfile(fileext = ".csv")
+
+# Collect data
+GTFShift::rt_collect_protobuf(
+  gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb",
+  destination_file = destination_file,
+  scrape_interval = -1 # Negative to run only once
+)
+
+# Read data
+collection <- read.csv(destination_file)
+
+names(collection)
+
+head(
+  collection |>
+    dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
+)
 
 }

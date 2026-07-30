@@ -24,7 +24,7 @@ discretize the line when estimating cumulative distance along geometry.}
 compute nearest points, line sampling, and cumulative distances.}
 }
 \value{
-A data.frame with one row per input point and four columns:
+data.frame. Input points projected along geometry with four columns:
 \describe{
   \item{closest_on_geometry}{An \code{sfc_POINT} column with the projected location on the line.}
   \item{distance_to_closest_on_geometry}{Numeric distance from each input point to its projected location on the line.}
@@ -49,14 +49,30 @@ Distances are always computed in \code{metric_crs} units. The returned
 projected points are transformed back to the original \code{geometry} CRS.
 }
 \examples{
-\dontrun{
-line <- sf::st_sfc(
-  sf::st_linestring(matrix(c(0, 0, 100, 0, 200, 100), ncol = 2, byrow = TRUE)),
-  crs = 3857
+# Get sample points from GTFS-RT collection
+rt_collect_file <- system.file(
+  "extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift"
 )
-pts <- sf::st_sfc(sf::st_point(c(20, 10)), sf::st_point(c(150, 40)), crs = 3857)
+points <- read.csv(rt_collect_file) |> 
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::sample_n(5)
 
-projected <- project_points_along_geometry(line, pts, geometry_sample_meters = 5)
-}
+head(points |> dplyr::select(geometry))
+
+# Get route geometry for points
+osm_routes <- sf::st_read(
+  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  quiet = TRUE
+) |> dplyr::filter(route_id \%in\% points$route_id)
+
+head(osm_routes)
+
+# Project points to geometry
+points_projected <- GTFShift::project_points_along_geometry(
+  geometry = osm_routes,
+  points = points,
+  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+)
+
+head(points_projected)
 
 }

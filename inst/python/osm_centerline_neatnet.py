@@ -31,28 +31,53 @@ def filter_ground_level(gdf):
     return gdf
 
 
-def get_centerline(bbox, study_area, use_buildings, output_path):
-    # Code adapted from https://uscuni.org/neatnet/intro.html by https://github.com/miguelpires01
+def get_centerline(bbox, study_area, use_buildings, output_path, osm_file=None):
+    # Code adapted from https://uscuni.org/neatnet/intro.html by https://github.com/miguelrelvaspires
 
-    # --------------------------------------------------------------------------
-    # 1 Retrieving "highway" network (and cleaning for processing)
-    ## 1.1 Defining custom filter for specific "highway" features
-    cf = (
-        '["highway"~"motorway|trunk|primary|'
-        "secondary|tertiary|residential|"
-        'unclassified|living_street"]'
-    )
-    cf = cf + '["area"!~"yes"]'  # Exclude areas
-    ## 1.2 Calling OSM for the network data
-    network = (ox.graph_from_bbox if bbox else ox.graph_from_place)(
-        bbox if bbox else study_area,
-        network_type="all",
-        custom_filter=cf,
-        retain_all=False,
-    )
+    if osm_file is not None:
+        # pyrefly: ignore [missing-import]
+        import pyrosm
 
-    ## 1.3 Converting the network to GeoDataFrame (edges only)
-    network_gdf = ox.graph_to_gdfs(network, nodes=False, edges=True)
+        # Initialize pyrosm with local PBF file
+        osm = pyrosm.OSM(osm_file, bounding_box=bbox if bbox else None)
+
+        # --------------------------------------------------------------------------
+        # 1 Retrieving "highway" network
+        network_gdf = osm.get_network(network_type="all")
+
+        if network_gdf is not None and not network_gdf.empty:
+            highway_types = [
+                "motorway",
+                "trunk",
+                "primary",
+                "secondary",
+                "tertiary",
+                "residential",
+                "unclassified",
+                "living_street",
+            ]
+            if "highway" in network_gdf.columns:
+                network_gdf = network_gdf[network_gdf["highway"].isin(highway_types)]
+    else:
+        # --------------------------------------------------------------------------
+        # 1 Retrieving "highway" network (and cleaning for processing)
+        ## 1.1 Defining custom filter for specific "highway" features
+        cf = (
+            '["highway"~"motorway|trunk|primary|'
+            "secondary|tertiary|residential|"
+            'unclassified|living_street"]'
+        )
+        cf = cf + '["area"!~"yes"]'  # Exclude areas
+        ## 1.2 Calling OSM for the network data
+        network = (ox.graph_from_bbox if bbox else ox.graph_from_place)(
+            bbox if bbox else study_area,
+            network_type="all",
+            custom_filter=cf,
+            retain_all=False,
+        )
+
+        ## 1.3 Converting the network to GeoDataFrame (edges only)
+        network_gdf = ox.graph_to_gdfs(network, nodes=False, edges=True)
 
     ## 1.4 Drop None geometries (if any)
     network_gdf = network_gdf[network_gdf.geometry.notnull()]
@@ -78,10 +103,25 @@ def get_centerline(bbox, study_area, use_buildings, output_path):
     # --------------------------------------------------------------------------
     # 2 Creating "exclusion_mask" with OSM building footprints
     if use_buildings:
-        ## 2.1 Retrieving buildings
-        buildings = safe_features(bbox, study_area, {"building": True})
+        if osm_file is not None:
+            buildings = osm.get_buildings()
+            construction = osm.get_landuse(custom_filter={"landuse": ["construction"]})
+            schools = osm.get_pois(custom_filter={"amenity": ["school"]})
+            pitches = osm.get_pois(custom_filter={"leisure": ["pitch"]})
+            cemeteries = osm.get_landuse(custom_filter={"landuse": ["cemetery"]})
+        else:
+            ## 2.1 Retrieving buildings
+            buildings = safe_features(bbox, study_area, {"building": True})
+            ## 2.2 Retrieving construction areas
+            construction = safe_features(bbox, study_area, {"landuse": "construction"})
+            ## 2.3 Retrieving schools
+            schools = safe_features(bbox, study_area, {"amenity": "school"})
+            ## 2.4 Retrieving pitches
+            pitches = safe_features(bbox, study_area, {"leisure": "pitch"})
+            ## 2.5 Retrieving cemeteries
+            cemeteries = safe_features(bbox, study_area, {"landuse": "cemetery"})
 
-        if buildings is not None:
+        if buildings is not None and not buildings.empty:
             # Apply filters only if the columns exist
             if "building" in buildings.columns:
                 buildings = buildings[buildings["building"] != "roof"]
@@ -115,46 +155,54 @@ def get_centerline(bbox, study_area, use_buildings, output_path):
 
             buildings = filter_ground_level(buildings)
 
-        ## 2.2 Retrieving construction areas
-        construction = safe_features(bbox, study_area, {"landuse": "construction"})
-        construction = filter_ground_level(construction)
-        ## 2.3 Retrieving schools
-        schools = safe_features(bbox, study_area, {"amenity": "school"})
-        schools = filter_ground_level(schools)
-        ## 2.4 Retrieving pitches
-        pitches = safe_features(bbox, study_area, {"leisure": "pitch"})
-        pitches = filter_ground_level(pitches)
-        ## 2.5 Retrieving cemeteries
-        cemeteries = safe_features(bbox, study_area, {"landuse": "cemetery"})
-        cemeteries = filter_ground_level(cemeteries)
+        if construction is not None and not construction.empty:
+            construction = filter_ground_level(construction)
+        if schools is not None and not schools.empty:
+            schools = filter_ground_level(schools)
+        if pitches is not None and not pitches.empty:
+            pitches = filter_ground_level(pitches)
+        if cemeteries is not None and not cemeteries.empty:
+            cemeteries = filter_ground_level(cemeteries)
+
         ## 2.6 Reprojecting all features to EPSG:3857
         for gdf in [buildings, construction, schools, pitches, cemeteries]:
-            if gdf is not None:
+            if gdf is not None and not gdf.empty:
                 gdf.to_crs(network_gdf_3857.crs, inplace=True)
+
         ## 2.7 Combining all "exclusion_mask" geometries
-        all_exclusions = pd.concat(
-            [
-                gdf[["geometry"]]
-                for gdf in [buildings, construction, schools, pitches, cemeteries]
-                if gdf is not None
-            ],
-            ignore_index=True,
-        )
+        valid_exclusions = [
+            gdf[["geometry"]]
+            for gdf in [buildings, construction, schools, pitches, cemeteries]
+            if gdf is not None and not gdf.empty
+        ]
+        if valid_exclusions:
+            all_exclusions = pd.concat(valid_exclusions, ignore_index=True)
+        else:
+            all_exclusions = pd.DataFrame()
+
+
         ## 2.8 Dissolving to a single geometry mask
-        exclusion_mask = gpd.GeoSeries(
-            unary_union(all_exclusions.geometry), crs=network_gdf_3857.crs
-        )
+        if not all_exclusions.empty:
+            exclusion_mask = gpd.GeoSeries(
+                unary_union(all_exclusions.geometry), crs=network_gdf_3857.crs
+            )
+        else:
+            exclusion_mask = None
+    else:
+        exclusion_mask = None
 
     # --------------------------------------------------------------------------
     # 3 Deriving the street centerlines with "neatnet"
     street_lines = neatnet.neatify(
         network_gdf_3857,
-        exclusion_mask=exclusion_mask.geometry if use_buildings else None,
+        exclusion_mask=exclusion_mask if (use_buildings and exclusion_mask is not None) else None,
     )
+
 
     # --------------------------------------------------------------------------
     # 4 Reprojecting layers to EPSG:4326 and storing to output path provided
     street_lines_4326 = street_lines.to_crs(epsg=4326)
     street_lines_4326.to_file(output_path, layer="street_lines", driver="GPKG")
-    
+
     return street_lines_4326
+
