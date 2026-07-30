@@ -23,7 +23,7 @@
 #'
 #' @returns sf data.frame. OSM centerlines.
 #'
-#' @examples
+#' @examplesIf reticulate::py_module_available("neatnet")
 #' # Get sample OSM extract
 #' osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
 #'
