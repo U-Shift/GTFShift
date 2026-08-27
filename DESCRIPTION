@@ -10,7 +10,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-5642-6006")),
     person("Miguel", "Relvas Pires", , "miguelpcrpires@tecnico.ulisboa.pt", role = "ctb")
   )
-Description: This package encompasses a complete bundle of methods to
+Description: A bundle of methods to
     harmonize GTFS and OSM data, enabling the integration and exploration
     of different layers of transit data, starting with the planned
     operations (GTFS), but also the infrastructure topology (OSM) and
