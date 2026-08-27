@@ -84,9 +84,9 @@ GTFShift::rt_collect_json(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-08-27 13:37:08] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
-#> [20260827_133708] Iteration 1 completed
-#> [1] "/tmp/RtmpUUOPCE/file7c4c6061cd86.csv"
+#> [2026-08-27 14:40:35] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
+#> [20260827_144035] Iteration 1 completed
+#> [1] "/tmp/RtmpIOJuU6/file1f4a45210c30.csv"
 
 # Read data
 collection <- read.csv(destination_file)
@@ -103,17 +103,17 @@ head(
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
 #>               vehicle.trip.trip_id vehicle.position.latitude
-#> 1 [F1M13][A2L1N]4602_0_2|2700|1425                  38.65892
-#> 2 [F1M13][A2L1N]4620_0_2|2700|1400                  38.65579
-#> 3 [F1M13][A2L1N]4463_0_3|2700|1430                  38.52152
-#> 4 [F1M13][A2L1N]4543_0_1|2700|1430                  38.55574
-#> 5 [F1M13][A2L1N]4435_0_2|2700|1440                  38.51278
-#> 6 [F1M13][A2L1N]4621_0_2|2700|1345                  38.65652
+#> 1  [0277F][BNA17]2714_0_2|1|3|1530                  38.80131
+#> 2      [76XA2][N18KL]4424_20251214                  39.04020
+#> 3 [F1M13][A2L1N]4701_0_2|2700|1500                  38.68588
+#> 4     [76XA2][N18KL]16438_20251214                  38.74543
+#> 5  [0277F][BNA17]2610_0_2|1|3|1530                  38.78644
+#> 6  [0277F][BNA17]2781_0_2|1|3|1515                  38.79710
 #>   vehicle.position.longitude
-#> 1                  -9.049452
-#> 2                  -9.034304
-#> 3                  -9.016070
-#> 4                  -8.840643
-#> 5                  -8.843933
-#> 6                  -8.991232
+#> 1                  -9.122298
+#> 2                  -8.921500
+#> 3                  -8.939689
+#> 4                  -9.140616
+#> 5                  -9.182842
+#> 6                  -9.176847
 ```
