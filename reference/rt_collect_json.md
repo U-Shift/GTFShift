@@ -84,9 +84,9 @@ GTFShift::rt_collect_json(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-08-27 14:40:35] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
-#> [20260827_144035] Iteration 1 completed
-#> [1] "/tmp/RtmpIOJuU6/file1f4a45210c30.csv"
+#> [2026-08-27 16:21:06] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
+#> [20260827_162106] Iteration 1 completed
+#> [1] "/tmp/RtmpItbvF6/file1f2f778276d6.csv"
 
 # Read data
 collection <- read.csv(destination_file)
@@ -103,17 +103,17 @@ head(
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
 #>               vehicle.trip.trip_id vehicle.position.latitude
-#> 1  [0277F][BNA17]2714_0_2|1|3|1530                  38.80131
-#> 2      [76XA2][N18KL]4424_20251214                  39.04020
-#> 3 [F1M13][A2L1N]4701_0_2|2700|1500                  38.68588
-#> 4     [76XA2][N18KL]16438_20251214                  38.74543
-#> 5  [0277F][BNA17]2610_0_2|1|3|1530                  38.78644
-#> 6  [0277F][BNA17]2781_0_2|1|3|1515                  38.79710
+#> 1 [F1M13][A2L1N]4410_0_1|2700|1700                  38.53940
+#> 2 [F1M13][A2L1N]4710_0_1|2700|1700                  38.66915
+#> 3 [F1M13][A2L1N]4512_0_2|2700|1610                  38.74909
+#> 4 [F1M13][A2L1N]4437_0_1|2700|1650                  38.52766
+#> 5 [F1M13][A2L1N]4441_0_1|2700|1700                  38.53248
+#> 6  [0277F][BNA17]2632_0_1|1|3|1700                  38.78885
 #>   vehicle.position.longitude
-#> 1                  -9.122298
-#> 2                  -8.921500
-#> 3                  -8.939689
-#> 4                  -9.140616
-#> 5                  -9.182842
-#> 6                  -9.176847
+#> 1                  -8.866821
+#> 2                  -8.894595
+#> 3                  -8.965754
+#> 4                  -8.883163
+#> 5                  -8.862663
+#> 6                  -9.191285
 ```
