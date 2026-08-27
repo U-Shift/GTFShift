@@ -136,9 +136,9 @@
 <span class="r-in"><span>  destination_file <span class="op">=</span> <span class="va">destination_file</span>,</span></span>
 <span class="r-in"><span>  scrape_interval <span class="op">=</span> <span class="op">-</span><span class="fl">1</span> <span class="co"># Negative to run only once</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [2026-08-27 16:21:06] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [20260827_162106] Iteration 1 completed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/tmp/RtmpItbvF6/file1f2f778276d6.csv"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [2026-08-27 16:43:55] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [20260827_164355] Iteration 1 completed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/tmp/RtmpGgUISp/file1f216996f225.csv"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Read data</span></span></span>
 <span class="r-in"><span><span class="va">collection</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">destination_file</span><span class="op">)</span></span></span>
@@ -155,19 +155,19 @@
 <span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="st">"vehicle.trip.trip_id"</span>, <span class="st">"vehicle.position.latitude"</span>, <span class="st">"vehicle.position.longitude"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               vehicle.trip.trip_id vehicle.position.latitude</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 [F1M13][A2L1N]4410_0_1|2700|1700                  38.53940</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 [F1M13][A2L1N]4710_0_1|2700|1700                  38.66915</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 [F1M13][A2L1N]4512_0_2|2700|1610                  38.74909</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 [F1M13][A2L1N]4437_0_1|2700|1650                  38.52766</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 [F1M13][A2L1N]4441_0_1|2700|1700                  38.53248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  [0277F][BNA17]2632_0_1|1|3|1700                  38.78885</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 [F1M13][A2L1N]4704_0_2|2700|1735                  38.78615</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 [F1M13][A2L1N]4600_0_1|2700|1700                  38.69729</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  [0277F][BNA17]2537_0_1|1|3|1740                  38.86569</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 [F1M13][A2L1N]4432_0_1|2700|1740                  38.52625</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 [F1M13][A2L1N]4704_0_2|2700|1720                  38.70693</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 [F1M13][A2L1N]4102_0_2|2700|1740                  38.68089</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   vehicle.position.longitude</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  -8.866821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                  -8.894595</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                  -8.965754</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                  -8.883163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                  -8.862663</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                  -9.191285</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  -9.091165</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                  -8.944952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                  -9.060261</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                  -8.891690</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                  -8.960492</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                  -8.985577</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

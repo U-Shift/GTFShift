@@ -5,7 +5,6 @@
 library(GTFShift)
 library(tidytransit)
 library(mapview)
-mapviewOptions(basemaps = c("Esri.WorldGrayCanvas", "CartoDB.Positron", "OpenStreetMap")) # Avoid Carto API Key
 library(dplyr)
 library(osmdata)
 ```
