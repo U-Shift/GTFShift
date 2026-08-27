@@ -1,1 +1,1 @@
-options("mapviewBasemaps" = c("Esri.WorldGrayCanvas", "CartoDB.Positron", "OpenStreetMap"))
+options("mapviewBasemaps" = c("Esri.WorldGrayCanvas", "Jawg.Dark", "OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap"))
