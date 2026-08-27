@@ -1,8 +1,4 @@
 library(mapview)
-mapviewOptions(
-  fgb = FALSE, ## see https://stackoverflow.com/a/65614281
-  basemaps = c("CartoDB.Positron", "OpenStreetMap")
-)
 
 # Get GTFS from library GTFS database for Portugal
 data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))

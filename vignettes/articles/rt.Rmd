@@ -29,7 +29,6 @@ knitr::opts_chunk$set(
 library(GTFShift)
 library(dplyr)
 library(mapview)
-mapviewOptions(basemaps = c("Esri.WorldGrayCanvas", "CartoDB.Positron", "OpenStreetMap")) # Avoid Carto API Key
 ```
 
 # Introduction
@@ -88,13 +87,6 @@ lane_prioritisation_extended <- GTFShift::rt_extend_prioritisation(
 ```{r include=FALSE}
 lane_prioritisation_extended = sf::st_read("https://github.com/U-Shift/GTFShift/releases/download/v0.8.1/prioritization_lisboa_rt_gtfs2026-02-04_run20260226_extended.gpkg")
 ```
-
-```{r cache=FALSE, include=FALSE}
-mapviewOptions(
-  basemaps = c("CartoDB.Positron")
-)
-```
-
 
 The resulting `lane_prioritisation_extended` data frame includes additional columns with speed metrics, such as average speed, median speed, and speed percentiles, providing a more comprehensive view of lane performance based on real-time data.
 

@@ -29,7 +29,6 @@ knitr::opts_chunk$set(
 library(GTFShift)
 library(tidytransit)
 library(mapview)
-mapviewOptions(basemaps = c("Esri.WorldGrayCanvas", "CartoDB.Positron", "OpenStreetMap")) # Avoid Carto API Key
 library(dplyr)
 library(osmdata)
 ```
@@ -129,12 +128,6 @@ stats_736
 ## Visualize results
 
 The aggregated data can then be manipulated according to the prioritisation criteria defined by the user. For instance, the following code highlights (in red) the road segments as high priority for bus lane implementation if they have more than 1 lane per direction and a frequency above the median number of buses per hour registered at 8:00.
-
-```{r cache=FALSE, include=FALSE}
-mapviewOptions(
-  basemaps = c("CartoDB.Positron")
-)
-```
 
 
 ```{r}
