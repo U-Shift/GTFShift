@@ -5,6 +5,7 @@
 library(GTFShift)
 library(tidytransit)
 library(mapview)
+mapviewOptions(basemaps = c("Esri.WorldGrayCanvas", "CartoDB.Positron", "OpenStreetMap")) # Avoid Carto API Key
 library(sf)
 library(dplyr)
 ```
@@ -69,12 +70,12 @@ frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
 frequency_los = GTFShift::classify_frequency_los(frequency_analysis)
 
 frequency_los
-#> Simple feature collection with 372 features and 7 fields
+#> Simple feature collection with 425 features and 7 fields
 #> Geometry type: LINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -9.083842 ymin: 38.57161 xmax: -9.01185 ymax: 38.67369
+#> Bounding box:  xmin: -9.084467 ymin: 38.57161 xmax: -9.01185 ymax: 38.67369
 #> Geodetic CRS:  WGS 84
-#> # A tibble: 372 × 8
+#> # A tibble: 425 × 8
 #>    route_id       shape_id    route_short_name direction_id  hour frequency
 #>  * <chr>          <chr>       <chr>                   <int> <int>     <int>
 #>  1 10_10-COINA-FT 10-COINA-FT 10                          0     7         1
@@ -87,13 +88,13 @@ frequency_los
 #>  8 10_10-COINA-FT 10-COINA-FT 10                          0    14         2
 #>  9 10_10-COINA-FT 10-COINA-FT 10                          0    15         1
 #> 10 10_10-COINA-FT 10-COINA-FT 10                          0    16         2
-#> # ℹ 362 more rows
+#> # ℹ 415 more rows
 #> # ℹ 2 more variables: geometry <LINESTRING [°]>, frequency_los <chr>
 
 table(frequency_los$frequency_los)
 #> 
 #>   A   B   C   D   E 
-#>   2  30  74  97 169
+#>   3  25  89 110 198
 ```
 
 ``` r

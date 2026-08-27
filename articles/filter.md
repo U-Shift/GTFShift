@@ -6,6 +6,7 @@ library(GTFShift)
 library(tidytransit)
 library(dplyr)
 library(mapview)
+mapviewOptions(basemaps = c("Esri.WorldGrayCanvas", "CartoDB.Positron", "OpenStreetMap")) # Avoid Carto API Key
 ```
 
 ## Introduction
@@ -31,14 +32,14 @@ gtfs = load_feed("https://download.gtfs.de/germany/fv_free/latest.zip")
 summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
-#> agencies     MAV, Ceske Drahy, Dänische Staatsbahnen ... 9 more
-#> service      from 2026-07-29 to 2026-08-28
+#> agencies     SNCF, DB Fernverkehr (Codesharing), PKP Intercity ... 10 more
+#> service      from 2026-08-22 to 2026-09-21
 #> uses         stop_times (no frequencies)
-#> # routes       97
-#> # trips      4701
-#> # stop_ids   1231
-#> # stop_names  752
-#> # shapes     1466
+#> # routes       95
+#> # trips      5589
+#> # stop_ids   1198
+#> # stop_names  751
+#> # shapes     1947
 ```
 
 Multimodal feeds aggregate several agencies.
@@ -53,14 +54,14 @@ gtfs_5 = GTFShift::filter_by_agency(gtfs, id = 5)
 summary(gtfs_5)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
-#> agency       SNCF
-#> service      from 2026-07-29 to 2026-08-28
+#> agency       HZZP
+#> service      from 2026-08-22 to 2026-09-21
 #> uses         stop_times (no frequencies)
 #> # routes      2
-#> # trips      47
-#> # stop_ids    8
-#> # stop_names  7
-#> # shapes      7
+#> # trips       5
+#> # stop_ids   16
+#> # stop_names 16
+#> # shapes      3
 
 # Filter by agency name
 gtfs_sncf = GTFShift::filter_by_agency(gtfs, name = "SNCF")
@@ -68,10 +69,10 @@ summary(gtfs_sncf)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
 #> agency       SNCF
-#> service      from 2026-07-29 to 2026-08-28
+#> service      from 2026-08-22 to 2026-09-21
 #> uses         stop_times (no frequencies)
 #> # routes      2
-#> # trips      47
+#> # trips      46
 #> # stop_ids    8
 #> # stop_names  7
 #> # shapes      7
@@ -151,10 +152,10 @@ summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Metro - Los Angeles
-#> service      from 2026-07-30 to 2026-08-13
+#> service      from 2026-08-27 to 2026-09-10
 #> uses         stop_times (no frequencies)
 #> # routes        6
-#> # trips      6699
+#> # trips      7275
 #> # stop_ids    463
 #> # stop_names  357
 #> # shapes       18
@@ -174,10 +175,10 @@ summary(gtfs_tram)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Metro - Los Angeles
-#> service      from 2026-07-30 to 2026-08-13
+#> service      from 2026-08-27 to 2026-09-10
 #> uses         stop_times (no frequencies)
 #> # routes        4
-#> # trips      4320
+#> # trips      4896
 #> # stop_ids     95
 #> # stop_names   95
 #> # shapes        8
@@ -238,7 +239,7 @@ summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Próximo - Transportes Urbanos de Faro
-#> service      from 2024-01-01 to 2026-12-31
+#> service      from 2024-04-26 to 2027-12-31
 #> uses         stop_times (no frequencies)
 #> # routes      14
 #> # trips      745
@@ -265,7 +266,7 @@ summary(gtfs_1)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Próximo - Transportes Urbanos de Faro
-#> service      from 2024-01-02 to 2026-12-31
+#> service      from 2025-01-02 to 2027-12-31
 #> uses         stop_times (no frequencies)
 #> # routes      1
 #> # trips      82
@@ -284,7 +285,7 @@ summary(gtfs_terminal)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
 #> agency       Próximo - Transportes Urbanos de Faro
-#> service      from 2024-01-01 to 2026-12-31
+#> service      from 2025-01-01 to 2027-12-31
 #> uses         stop_times (no frequencies)
 #> # routes       6
 #> # trips      406

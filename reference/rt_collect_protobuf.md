@@ -69,9 +69,9 @@ GTFShift::rt_collect_protobuf(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-07-30 16:12:59] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb
-#> [20260730_161259] Iteration 1 completed
-#> [1] "/tmp/Rtmpmh4xWj/file1f28c289041.csv"
+#> [2026-08-27 13:05:12] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb
+#> [20260827_130512] Iteration 1 completed
+#> [1] "/tmp/Rtmphw9iD2/file20654b08f918.csv"
 
 # Read data
 collection <- read.csv(destination_file)
@@ -88,18 +88,18 @@ head(
   collection |>
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
-#>                   vehicle.trip.trip_id vehicle.position.latitude
-#> 1 [07MSC][LA77N]1242_0_1_1630_1659_0_7                   38.8496
-#> 2 [07MSC][LA77N]1252_0_3_1700_1729_0_7                   38.7928
-#> 3 [07MSC][LA77N]1601_1_2_1600_1629_0_7                   38.7580
-#> 4 [07MSC][LA77N]1707_0_1_1630_1659_0_7                   38.7742
-#> 5 [07MSC][LA77N]1522_0_1_1700_1729_0_7                   38.7074
-#> 6 [07MSC][LA77N]1117_3_2_1630_1659_0_7                   38.7128
+#>               vehicle.trip.trip_id vehicle.position.latitude
+#> 1 [F1M13][A2L1N]4426_0_1|2700|1400                   38.5269
+#> 2 [F1M13][A2L1N]4701_0_2|2700|1400                   38.6527
+#> 3 [F1M13][A2L1N]4562_0_1|2700|1315                   38.5670
+#> 4 [F1M13][A2L1N]4512_1_2|2700|1350                   38.5924
+#> 5 [F1M13][A2L1N]4610_0_2|2700|1345                   38.6186
+#> 6               [2XUL7][7NTB1]3147                   38.7376
 #>   vehicle.position.longitude
-#> 1                    -9.4395
-#> 2                    -9.3736
-#> 3                    -9.2268
-#> 4                    -9.2305
-#> 5                    -9.2257
-#> 6                    -9.2754
+#> 1                    -8.9002
+#> 2                    -9.0351
+#> 3                    -8.9272
+#> 4                    -8.8938
+#> 5                    -9.0269
+#> 6                    -9.1696
 ```
