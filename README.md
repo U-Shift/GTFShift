@@ -1,7 +1,7 @@
 # GTFShift <img align="right" src="man/figures/logo.png" alt="logo" width="180">
 
 <!-- badges: start -->
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21292010.svg)](https://doi.org/10.5281/zenodo.21292010) [![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml) [![codecov](https://codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://codecov.io/gh/U-Shift/GTFShift)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21292010.svg)](https://doi.org/10.5281/zenodo.21292010) [![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml) [![codecov](https://app.codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://app.codecov.io/gh/U-Shift/GTFShift)
 <!-- badges: end -->
 
 **GTFShift** encompasses a complete bundle of methods to harmonize GTFS and OSM data, enabling the integration and exploration of different layers of transit data, starting with the planned operations (GTFS), but also the infrastructure topology (OSM) and real-time information (GTFS-RT).
@@ -33,7 +33,7 @@ For more details on the package and how to get started, please visit the [Get st
 
 The lack of standardization on GTFS shape geometries hampers aggregated analysis of different feeds and the association of planned service information with other urban dimensions such as the infrastructure topology.
 
-To solve this problem, **GTFShift** provides a bundle of methods to harmonize GTFS shapes with OSM road network geometries. Refer to [Get OSM data for bus routes](articles/osm.html#get-osm-data-for-bus-routes) and [Generate GTFS with OSM geometries](articles/gtfs_from_osm.html) for more details.
+To solve this problem, **GTFShift** provides a bundle of methods to harmonize GTFS shapes with OSM road network geometries. Refer to [Get OSM data for bus routes](https://u-shift.github.io/GTFShift/articles/osm.html#get-osm-data-for-bus-routes) and [Generate GTFS with OSM geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.html) for more details.
 
 ![](man/figures/geometry_harmonization_barreiro.png)
 
