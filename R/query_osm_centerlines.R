@@ -24,6 +24,7 @@
 #' @returns sf data.frame. OSM centerlines.
 #'
 #' @examplesIf reticulate::py_module_available("neatnet")
+#' \dontrun{
 #' # Get sample OSM extract
 #' osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
 #'
@@ -35,6 +36,8 @@
 #' head(network)
 #'
 #' table(network$X_status)
+#' }
+#'
 #'
 #' @author \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires}
 #'

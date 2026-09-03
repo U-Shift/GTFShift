@@ -46,6 +46,7 @@ The full code (Python) of his work is openly available at
 }
 \examples{
 \dontshow{if (reticulate::py_module_available("neatnet")) withAutoprint(\{ # examplesIf}
+\dontrun{
 # Get sample OSM extract
 osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
 
@@ -57,6 +58,8 @@ network <- GTFShift::osm_centerlines(
 head(network)
 
 table(network$X_status)
+}
+
 \dontshow{\}) # examplesIf}
 }
 \author{

@@ -20,6 +20,7 @@
 #' @returns sf. Spatial network object extended with aggregated values.
 #'
 #' @examples
+#' \donttest{
 #' # Subset GTFS for one route only, for demo purposes
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -55,6 +56,7 @@
 #' })
 #' 
 #' head(overline |> st_drop_geometry())
+#' }
 #'
 #' @seealso \code{stplanr::rnet_join()}
 #'
