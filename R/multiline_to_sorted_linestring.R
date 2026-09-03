@@ -59,6 +59,7 @@
 #' @returns sfc. LINESTRING geometry object.
 #' 
 #' @examples
+#' \donttest{
 #' # Get OSM route geometries (MULTILINESTRING)  
 #' osm_routes <- sf::st_read(
 #'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
@@ -73,6 +74,7 @@
 #' )
 #' 
 #' head(osm_routes)
+#' }
 #'
 #' @import dplyr
 #' @import sf

@@ -46,6 +46,7 @@ distance along each shape for all generated points and appends this as
 \code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
 }
 \examples{
+\donttest{
 # Load sample GTFS
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -67,6 +68,7 @@ shapes_txt <- GTFShift::create_shapes_from_sf(
 )
 
 head(shapes_txt)
+}
 
 }
 \seealso{

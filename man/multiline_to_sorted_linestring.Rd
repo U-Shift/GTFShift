@@ -76,6 +76,7 @@ The ordered segments are concatenated into a single \code{LINESTRING} and
 transformed back to the original CRS of \code{multilinestring}.
 }
 \examples{
+\donttest{
 # Get OSM route geometries (MULTILINESTRING)  
 osm_routes <- sf::st_read(
   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
@@ -90,5 +91,6 @@ osm_routes <- osm_routes |>  dplyr::mutate(
 )
 
 head(osm_routes)
+}
 
 }
