@@ -45,8 +45,7 @@ The full code (Python) of his work is openly available at
 \href{https://github.com/U-Shift/lp_streets}{GitHub}.
 }
 \examples{
-\dontshow{if (reticulate::py_module_available("neatnet")) withAutoprint(\{ # examplesIf}
-\donttest{
+\dontrun{
 # Get sample OSM extract
 osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
 
@@ -59,7 +58,7 @@ head(network)
 
 table(network$X_status)
 }
-\dontshow{\}) # examplesIf}
+
 }
 \author{
 \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires}
