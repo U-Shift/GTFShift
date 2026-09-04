@@ -67,9 +67,9 @@ a minimum frequency of 10 buses/hour, average speed below 9.7 km/h and more than
 **GTFShift** provides an interactive dashboard that allows users to explore and visualize results for real case studies, 
 aiming to illustrate its potential and capabilities to a non-technical audience, while disseminating the outputs of these real world scenarios.
 
-Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
+Visit it at [ushift.pt/apps/gtfshift](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/).
 
-[![](man/figures/web.png)](https://ushift.pt/apps/gtfshift)
+[![](man/figures/web.png)](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/)
 
 ## Related packages
 

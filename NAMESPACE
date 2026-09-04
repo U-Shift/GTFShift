@@ -35,28 +35,42 @@ import(rlang)
 import(sf)
 import(tidytransit)
 importFrom(callr,r_bg)
-importFrom(gtfstools,convert_sf_to_shapes)
-importFrom(gtfstools,merge_gtfs)
-importFrom(httr,GET)
-importFrom(httr,POST)
-importFrom(httr,add_headers)
-importFrom(httr,content)
-importFrom(httr,http_error)
-importFrom(httr,http_status)
-importFrom(httr,status_code)
-importFrom(jsonlite,fromJSON)
-importFrom(jsonlite,write_json)
+importFrom(gtfstools,
+  convert_sf_to_shapes,
+  merge_gtfs
+)
+importFrom(httr,
+  GET,
+  POST,
+  add_headers,
+  content,
+  http_error,
+  http_status,
+  status_code
+)
+importFrom(jsonlite,
+  fromJSON,
+  write_json
+)
 importFrom(purrr,map_dfr)
 importFrom(rlang,.data)
-importFrom(stats,setNames)
-importFrom(stats,weighted.mean)
-importFrom(stringr,regex)
-importFrom(stringr,str_detect)
+importFrom(stats,
+  setNames,
+  weighted.mean
+)
+importFrom(stringr,
+  regex,
+  str_detect
+)
 importFrom(tidyr,unnest)
 importFrom(tidyselect,any_of)
-importFrom(utils,head)
-importFrom(utils,tail)
-importFrom(utils,write.table)
-importFrom(xml2,read_xml)
-importFrom(xml2,xml_attr)
-importFrom(xml2,xml_find_all)
+importFrom(utils,
+  head,
+  tail,
+  write.table
+)
+importFrom(xml2,
+  read_xml,
+  xml_attr,
+  xml_find_all
+)
