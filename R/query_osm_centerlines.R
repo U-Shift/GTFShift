@@ -18,12 +18,12 @@
 #' This method was adapted from \href{https://uscuni.org/neatnet/intro.html}{uscuni.org/neatnet}
 #' by \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires} in the scope of
 #' his \href{https://scholar.tecnico.ulisboa.pt/records/DhKWeFU5YLpMDcOhQbKR4f7ul05HCQnZr7ND}{master's thesis}.
-#' The full code (Python) of his work is openly available at 
+#' The full code (Python) of his work is openly available at
 #' \href{https://github.com/U-Shift/lp_streets}{GitHub}.
 #'
 #' @returns sf data.frame. OSM centerlines.
 #'
-#' @examplesIf reticulate::py_module_available("neatnet")
+#' @examples
 #' \dontrun{
 #' # Get sample OSM extract
 #' osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
@@ -37,7 +37,6 @@
 #'
 #' table(network$X_status)
 #' }
-#'
 #'
 #' @author \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires}
 #'
