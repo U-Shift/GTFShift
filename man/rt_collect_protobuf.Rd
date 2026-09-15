@@ -40,6 +40,7 @@ Downloads GTFS-RT data from the specified URL at regular intervals and saves the
 This function will run indefinitely until manually stopped (CTRL + C).
 }
 \examples{
+\dontrun{
 # Create file
 destination_file <- withr::local_tempfile(fileext = ".csv")
 
@@ -59,5 +60,5 @@ head(
   collection |>
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
-
+}
 }
