@@ -47,6 +47,10 @@
 #' \strong{Measures of centrality and spread} are calculated from all valid (non-NA, finite)
 #' speed observations in \code{speed_kmh} for each group:
 #' \describe{
+#'   \item{timestamp_min}{Earliest timestamp in the trip/group.}
+#'   \item{timestamp_max}{Latest timestamp in the trip/group.}
+#'   \item{commercial_speed}{Commercial speed between first and last update (km/h).}
+#'   \item{commercial_speed_alt}{Alternative commercial speed between 2nd and penultimate update (km/h).}
 #'   \item{speed_avg}{Arithmetic mean speed (km/h).}
 #'   \item{speed_median}{Median speed (km/h).}
 #'   \item{speed_sd}{Standard deviation of speeds (km/h).}
@@ -215,6 +219,10 @@ get_trip_speed_profile <- function(
     group_df <- group_df[order(group_df[[time_col]]), , drop = FALSE]
     n <- nrow(group_df)
 
+    # Time boundaries to locate trip/group in time
+    timestamp_min <- if (n > 0) group_df[[time_col]][1] else NA
+    timestamp_max <- if (n > 0) group_df[[time_col]][n] else NA
+
     # Commercial speed calculations
     if ("trip_id" %in% colnames(group_df) && length(unique(group_df$trip_id)) > 1) {
       # If group contains multiple trips (e.g. grouped by route_id/day without trip_id),
@@ -270,6 +278,8 @@ get_trip_speed_profile <- function(
     }
 
     data.frame(
+      timestamp_min = timestamp_min,
+      timestamp_max = timestamp_max,
       commercial_speed = commercial_speed,
       commercial_speed_alt = commercial_speed_alt,
       speed_avg = speed_avg,

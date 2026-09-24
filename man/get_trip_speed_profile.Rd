@@ -68,6 +68,10 @@ across trips within each group.
 \strong{Measures of centrality and spread} are calculated from all valid (non-NA, finite)
 speed observations in \code{speed_kmh} for each group:
 \describe{
+  \item{timestamp_min}{Earliest timestamp in the trip/group.}
+  \item{timestamp_max}{Latest timestamp in the trip/group.}
+  \item{commercial_speed}{Commercial speed between first and last update (km/h).}
+  \item{commercial_speed_alt}{Alternative commercial speed between 2nd and penultimate update (km/h).}
   \item{speed_avg}{Arithmetic mean speed (km/h).}
   \item{speed_median}{Median speed (km/h).}
   \item{speed_sd}{Standard deviation of speeds (km/h).}
