@@ -20,8 +20,10 @@
 #' \describe{
 #'   \item{speed_avg}{The average speed of the vehicles on the way.}
 #'   \item{speed_median}{The median speed of the vehicles on the way.}
+#'   \item{speed_p15}{The 15th percentile speed of the vehicles on the way.}
 #'   \item{speed_p25}{The 25th percentile speed of the vehicles on the way.}
 #'   \item{speed_p75}{The 75th percentile speed of the vehicles on the way.}
+#'   \item{speed_p85}{The 85th percentile speed of the vehicles on the way.}
 #'   \item{speed_count}{The number of speed observations on the way.}
 #' }
 #'
@@ -172,8 +174,10 @@ rt_extend_prioritisation <- function(
       dplyr::summarise(
         speed_avg = mean(.data[[rt_attr_speed]], na.rm = TRUE),
         speed_median = stats::median(.data[[rt_attr_speed]], na.rm = TRUE),
+        speed_p15 = stats::quantile(.data[[rt_attr_speed]], probs = 0.15, na.rm = TRUE),
         speed_p25 = stats::quantile(.data[[rt_attr_speed]], probs = 0.25, na.rm = TRUE),
         speed_p75 = stats::quantile(.data[[rt_attr_speed]], probs = 0.75, na.rm = TRUE),
+        speed_p85 = stats::quantile(.data[[rt_attr_speed]], probs = 0.85, na.rm = TRUE),
         speed_count = dplyr::n()
       ) |>
       dplyr::ungroup())

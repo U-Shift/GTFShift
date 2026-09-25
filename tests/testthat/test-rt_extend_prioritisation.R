@@ -25,13 +25,15 @@ test_that("rt_extend_prioritisation extends lane prioritisation with speed metri
 
     res <- GTFShift::rt_extend_prioritisation(lanes_sf, rt_points, metric_crs = 3857)
     expect_s3_class(res, "sf")
-    expect_contains(names(res), c("speed_avg", "speed_median", "speed_p25", "speed_p75", "speed_count"))
+    expect_contains(names(res), c("speed_avg", "speed_median", "speed_p15", "speed_p25", "speed_p75", "speed_p85", "speed_count"))
 
     # For w1: speeds 10 and 20 (point 3 at 80 is STOPPED_AT so filtered out)
     expect_equal(res$speed_avg[res$way_osm_id == "w1"], 15)
     expect_equal(res$speed_median[res$way_osm_id == "w1"], 15)
+    expect_equal(unname(res$speed_p15[res$way_osm_id == "w1"]), 11.5)
     expect_equal(unname(res$speed_p25[res$way_osm_id == "w1"]), 12.5)
     expect_equal(unname(res$speed_p75[res$way_osm_id == "w1"]), 17.5)
+    expect_equal(unname(res$speed_p85[res$way_osm_id == "w1"]), 18.5)
     expect_equal(res$speed_count[res$way_osm_id == "w1"], 2)
 
     # For w2: speed 40
