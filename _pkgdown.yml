@@ -13,7 +13,7 @@ navbar:
   components:
     dashboard:
       text: "Bus lane prioritisation dashboard"
-      href: "https://ushift.pt/apps/gtfshift"
+      href: "https://ushift.tecnico.ulisboa.pt/apps/gtfshift/"
       target: "_blank"
 
 

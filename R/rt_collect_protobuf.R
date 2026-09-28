@@ -16,6 +16,7 @@
 #' @returns String. The location of the file where data was collected.
 #'
 #' @examples
+#' \dontrun{
 #' # Create file
 #' destination_file <- withr::local_tempfile(fileext = ".csv")
 #'
@@ -35,6 +36,7 @@
 #'   collection |>
 #'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 #' )
+#' }
 #'
 #' @importFrom jsonlite write_json
 #' @importFrom stats setNames

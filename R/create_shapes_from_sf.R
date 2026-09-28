@@ -28,6 +28,7 @@
 #' \code{shape_dist_traveled} if \code{shape_dist_traveled = TRUE}.
 #'
 #' @examples
+#' \donttest{
 #' # Load sample GTFS
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -49,6 +50,7 @@
 #' )
 #' 
 #' head(shapes_txt)
+#' }
 #'
 #' @import sf
 #' @importFrom gtfstools convert_sf_to_shapes

@@ -44,6 +44,7 @@ creates an aggregated network based on the lines overlap. Instead, \code{GTFShif
 segment, the overlapping lines and aggregates their \code{attr} values, using \code{fun}.
 }
 \examples{
+\donttest{
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -79,6 +80,7 @@ suppressWarnings({
 })
 
 head(overline |> st_drop_geometry())
+}
 
 }
 \seealso{
