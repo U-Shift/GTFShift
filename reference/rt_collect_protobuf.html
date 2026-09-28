@@ -125,39 +125,23 @@
 <span class="r-in"><span>  destination_file <span class="op">=</span> <span class="va">destination_file</span>,</span></span>
 <span class="r-in"><span>  scrape_interval <span class="op">=</span> <span class="op">-</span><span class="fl">1</span> <span class="co"># Negative to run only once</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [2026-09-28 11:23:00] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [20260928_112300] Iteration 1 completed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/tmp/Rtmp4IRZre/file1ec52944fbfb.csv"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [2026-09-28 13:13:19] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open URL 'https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb': HTTP status was '504 Gateway Timeout'</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(gtfs_rt_url, "rb"):</span> cannot open the connection to 'https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb'</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Read data</span></span></span>
 <span class="r-in"><span><span class="va">collection</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">destination_file</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/tmp/RtmpehivHH/file1ebb1ad75075.csv': No such file or directory</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(file, "rt"):</span> cannot open the connection</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">collection</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "id"                            "vehicle.trip.trip_id"         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] "vehicle.position.latitude"     "vehicle.position.longitude"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "vehicle.position.speed"        "vehicle.timestamp"            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "vehicle.current_status"        "vehicle.current_stop_sequence"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "vehicle.stop_id"               "feed_timestamp"               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11] "feed_incrementality"          </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'collection' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">collection</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="st">"vehicle.trip.trip_id"</span>, <span class="st">"vehicle.position.latitude"</span>, <span class="st">"vehicle.position.longitude"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        vehicle.trip.trip_id vehicle.position.latitude</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      [VNWG3][LA77N]1619_0_2_1130_1159_0_1                   38.7494</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 [ZN3JG][YA15B]3108_0_2_1200_1229_0_ESC_DU                   38.6220</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 [ZN3JG][YA15B]3215_0_2_1200_1229_0_ESC_DU                   38.4690</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 [ZN3JG][YA15B]3601_0_2_1130_1159_0_ESC_DU                   38.5939</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5      [VNWG3][LA77N]1230_0_2_1130_1159_0_1                   38.7593</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6      [VNWG3][LA77N]1125_0_3_1200_1229_0_1                   38.7224</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   vehicle.position.longitude</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                    -9.3431</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                    -9.1117</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                    -9.1470</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                    -9.0448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                    -9.2538</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                    -9.3077</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'collection' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

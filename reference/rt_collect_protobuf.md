@@ -69,37 +69,21 @@ GTFShift::rt_collect_protobuf(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-09-28 11:23:00] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb
-#> [20260928_112300] Iteration 1 completed
-#> [1] "/tmp/Rtmp4IRZre/file1ec52944fbfb.csv"
+#> [2026-09-28 13:13:19] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb
+#> Warning: cannot open URL 'https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb': HTTP status was '504 Gateway Timeout'
+#> Error in file(gtfs_rt_url, "rb"): cannot open the connection to 'https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb'
 
 # Read data
 collection <- read.csv(destination_file)
+#> Warning: cannot open file '/tmp/RtmpehivHH/file1ebb1ad75075.csv': No such file or directory
+#> Error in file(file, "rt"): cannot open the connection
 
 names(collection)
-#>  [1] "id"                            "vehicle.trip.trip_id"         
-#>  [3] "vehicle.position.latitude"     "vehicle.position.longitude"   
-#>  [5] "vehicle.position.speed"        "vehicle.timestamp"            
-#>  [7] "vehicle.current_status"        "vehicle.current_stop_sequence"
-#>  [9] "vehicle.stop_id"               "feed_timestamp"               
-#> [11] "feed_incrementality"          
+#> Error: object 'collection' not found
 
 head(
   collection |>
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
-#>                        vehicle.trip.trip_id vehicle.position.latitude
-#> 1      [VNWG3][LA77N]1619_0_2_1130_1159_0_1                   38.7494
-#> 2 [ZN3JG][YA15B]3108_0_2_1200_1229_0_ESC_DU                   38.6220
-#> 3 [ZN3JG][YA15B]3215_0_2_1200_1229_0_ESC_DU                   38.4690
-#> 4 [ZN3JG][YA15B]3601_0_2_1130_1159_0_ESC_DU                   38.5939
-#> 5      [VNWG3][LA77N]1230_0_2_1130_1159_0_1                   38.7593
-#> 6      [VNWG3][LA77N]1125_0_3_1200_1229_0_1                   38.7224
-#>   vehicle.position.longitude
-#> 1                    -9.3431
-#> 2                    -9.1117
-#> 3                    -9.1470
-#> 4                    -9.0448
-#> 5                    -9.2538
-#> 6                    -9.3077
+#> Error: object 'collection' not found
 ```
