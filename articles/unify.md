@@ -37,17 +37,17 @@ gtfs_list = lapply(c("barreiro", "fertagus"), function(ID) {
     #> tidygtfs object
     #> files        agency, routes, stop_times, trips, shapes, dead_runs, layover, blocks, calendar, calendar_dates, feed_info, stops
     #> agency       Transportes Colectivos do Barreiro
-    #> service      from 2026-06-08 to 2026-12-31
+    #> service      from 2026-09-18 to 2026-12-31
     #> uses         stop_times (no frequencies)
-    #> # routes       76
-    #> # trips      3247
+    #> # routes       75
+    #> # trips      2465
     #> # stop_ids    279
     #> # stop_names  162
-    #> # shapes       76
+    #> # shapes       75
     #> tidygtfs object
     #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops
     #> agency       Fertagus
-    #> service      from 2026-07-07 to 2027-01-07
+    #> service      from 2026-09-14 to 2027-03-14
     #> uses         stop_times (no frequencies)
     #> # routes       3
     #> # trips      260
@@ -72,17 +72,17 @@ summary(gtfs_united)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, transfers, dead_runs, layover, blocks, vehicles, ., calendar, calendar_dates, feed_info, stops
 #> agencies     Transportes Colectivos do Barreiro, Fertagus
-#> service      from 2026-06-08 to 2027-01-07
+#> service      from 2026-09-14 to 2027-03-14
 #> uses         stop_times (no frequencies)
-#> # routes       79
-#> # trips      3507
+#> # routes       78
+#> # trips      2725
 #> # stop_ids    293
 #> # stop_names  176
-#> # shapes       82
+#> # shapes       81
 
 summary(gtfs_united$transfers)
 #>     from_stop_id      to_stop_id   transfer_type min_transfer_time
-#>  Length   :1150   Length   :1150   Min.   :2     Min.   :120.0    
+#>  Length   :1158   Length   :1158   Min.   :2     Min.   :120.0    
 #>  N.unique : 277   N.unique : 277   1st Qu.:2     1st Qu.:120.0    
 #>  N.blank  :   0   N.blank  :   0   Median :2     Median :247.0    
 #>  Min.nchar:   6   Min.nchar:   6   Mean   :2     Mean   :245.0    

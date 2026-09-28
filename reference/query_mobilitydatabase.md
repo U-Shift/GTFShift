@@ -109,13 +109,13 @@ head(feeds |> dplyr::select(id, provider, producer_url))
 #> 2  tld-4318 Apanha-me! - Transportes Urbanos
 #> 3  tld-4257                         AUTNA SL
 #> 4 tdg-52605                    BlaBlaCar Bus
-#> 5  mdb-2929                           Carris
-#> 6  mdb-2027             Carris Metropolitana
+#> 5  mdb-1028       Câmara Municipal de Águeda
+#> 6  mdb-2929                           Carris
 #>                                                                       producer_url
 #> 1 https://drive.google.com/uc?export=download&id=1aPfsxHqopxxcjV8HlRzImzxh_a6zRxGp
 #> 2 https://drive.google.com/uc?export=download&id=1w92h129CWNSoImBRZQOWT6KRPzSFwJ42
 #> 3 https://drive.google.com/uc?export=download&id=1gah1x10RyFu7gJPweBcCXPd9vcFJFQ7c
 #> 4   https://www.data.gouv.fr/api/1/datasets/r/fd54f81f-4389-4e73-be75-491133d011c3
-#> 5                            https://gateway.carris.pt/gateway/gtfs/api/v2.11/GTFS
-#> 6                                          https://api.carrismetropolitana.pt/gtfs
+#> 5          https://dados.gov.pt/en/datasets/r/1ef6b3b7-0726-4c5a-978c-bf6b780c7472
+#> 6                            https://gateway.carris.pt/gateway/gtfs/api/v2.11/GTFS
 ```
