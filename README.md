@@ -1,15 +1,24 @@
 # GTFShift <img align="right" src="man/figures/logo.png" alt="logo" width="180">
 
 <!-- badges: start -->
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21292010.svg)](https://doi.org/10.5281/zenodo.21292010) [![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml) [![codecov](https://app.codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://app.codecov.io/gh/U-Shift/GTFShift)
+[![CRAN status](https://www.r-pkg.org/badges/version/GTFShift)](https://cran.r-project.org/package=GTFShift/)
+[![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) 
+[![CRAN downloads total](https://cranlogs.r-pkg.org/badges/grand-total/GTFShift?color=lightgrey)](https://cran.r-project.org/package=GTFShift)
+[![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://codecov.io/gh/U-Shift/GTFShift)
 <!-- badges: end -->
 
 **GTFShift** encompasses a complete bundle of methods to harmonize GTFS and OSM data, enabling the integration and exploration of different layers of transit data, starting with the planned operations (GTFS), but also the infrastructure topology (OSM) and real-time information (GTFS-RT).
 
 ## Installation
 
-You can install the development version of **GTFShift** from
-[GitHub](https://github.com/) with:
+You can install the stable version of **GTFShift** from CRAN:
+
+``` r
+install.packages('GTFShift')
+```
+
+For the development version, fetch from GitHub:
 
 ``` r
 # install.packages("remotes")
