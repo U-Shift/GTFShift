@@ -8,8 +8,14 @@ also the infrastructure topology (OSM) and real-time information
 
 ## Installation
 
-You can install the development version of **GTFShift** from
-[GitHub](https://github.com/) with:
+You can install the stable version of **GTFShift** from CRAN:
+
+``` r
+
+install.packages('GTFShift')
+```
+
+For the development version, fetch from GitHub:
 
 ``` r
 
@@ -44,7 +50,7 @@ harmonize GTFS shapes with OSM road network geometries. Refer to [Get
 OSM data for bus
 routes](https://u-shift.github.io/GTFShift/articles/osm.html#get-osm-data-for-bus-routes)
 and [Generate GTFS with OSM
-geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.md)
+geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.html)
 for more details.
 
 ![](reference/figures/geometry_harmonization_barreiro.png)
@@ -85,9 +91,10 @@ explore and visualize results for real case studies, aiming to
 illustrate its potential and capabilities to a non-technical audience,
 while disseminating the outputs of these real world scenarios.
 
-Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
+Visit it at
+[ushift.pt/apps/gtfshift](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/).
 
-[![](reference/figures/web.png)](https://ushift.pt/apps/gtfshift)
+[![](reference/figures/web.png)](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/)
 
 ## Related packages
 

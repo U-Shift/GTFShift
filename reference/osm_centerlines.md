@@ -70,6 +70,7 @@ The full code (Python) of his work is openly available at
 ## Examples
 
 ``` r
+if (FALSE) { # \dontrun{
 # Get sample OSM extract
 osm_file <- system.file("extdata/samples", "relation_6384187.pbf", package = "GTFShift")
 
@@ -79,21 +80,7 @@ network <- GTFShift::osm_centerlines(
 )
 
 head(network)
-#> Simple feature collection with 6 features and 1 field
-#> Geometry type: LINESTRING
-#> Dimension:     XY
-#> Bounding box:  xmin: -9.148239 ymin: 38.72801 xmax: -9.143884 ymax: 38.73345
-#> Geodetic CRS:  WGS 84
-#>   X_status                           geom
-#> 1  changed LINESTRING (-9.148239 38.72...
-#> 2  changed LINESTRING (-9.145421 38.73...
-#> 3  changed LINESTRING (-9.144909 38.73...
-#> 4  changed LINESTRING (-9.144937 38.73...
-#> 5  changed LINESTRING (-9.145914 38.72...
-#> 6  changed LINESTRING (-9.144386 38.73...
 
 table(network$X_status)
-#> 
-#>  changed      new original 
-#>       65       36      374 
+} # }
 ```

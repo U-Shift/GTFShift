@@ -2,7 +2,14 @@
 
 ## Installation
 
-You can install the development version of `GTFShift` from GitHub with:
+You can install the stable version of **GTFShift** from CRAN:
+
+``` r
+
+install.packages('GTFShift')
+```
+
+For the development version, fetch from GitHub:
 
 ``` r
 
@@ -23,16 +30,16 @@ library(GTFShift)
 implementation prioritisation, but also other useful functions for GTFS
 and OSM data gathering and manipulation. For detailed examples on their
 functionality, refer to the
-[articles](https://u-shift.github.io/GTFShift/articles/index.md).
+[articles](https://u-shift.github.io/GTFShift/articles/index.html).
 
-#### [Prioritise](https://u-shift.github.io/GTFShift/articles/prioritise.md)
+#### [Prioritise](https://u-shift.github.io/GTFShift/articles/prioritise.html)
 
 The main purpose of **GTFShift** is to support the decision-making
 process for bus lane implementation prioritisation. This article
 presents a step-by-step guide on how to use the package to achieve this
 goal, from data gathering to analysis and visualization.
 
-#### [Getting transit data](https://u-shift.github.io/GTFShift/articles/download.md)
+#### [Getting transit data](https://u-shift.github.io/GTFShift/articles/download.html)
 
 Starting with a valid GTFS feed is the key for a successful analysis.
 **GTFShift** includes a method to load feeds that simultaneously scans
@@ -42,7 +49,7 @@ If the feed location is unknown, it also provides a database listing
 GTFS for Portugal and a method to query worldwide open catalogues by
 city or country names or even a bounding box.
 
-#### [Filter](https://u-shift.github.io/GTFShift/articles/filter.md)
+#### [Filter](https://u-shift.github.io/GTFShift/articles/filter.html)
 
 GTFS feeds do not have a defined scope regarding its coverage of the
 transportation system. Some can be bounded to one agency, whereas others
@@ -52,7 +59,7 @@ From the simpler to the most complex feeds, some analysis require to
 narrow the perspective. **GTFShift** provides some to help in this
 process.
 
-#### [Aggregate](https://u-shift.github.io/GTFShift/articles/unify.md)
+#### [Aggregate](https://u-shift.github.io/GTFShift/articles/unify.html)
 
 Public transit analysis takes advantage of the standardized GTFS format.
 However, its provision by operator makes it difficult for network
@@ -66,7 +73,7 @@ file given several instances.
 > Aggregated GTFS for Fertagus and Transportes Coletivos do Barreiro
 > operators
 
-#### [Analyse](https://u-shift.github.io/GTFShift/articles/analyse.md)
+#### [Analyse](https://u-shift.github.io/GTFShift/articles/analyse.html)
 
 Analyzing public transit feeds is important to understand its
 territorial coverage and dynamics, both on its spatial and temporal
@@ -80,7 +87,7 @@ stop, route or road segment.
 
 > Aggregated route frequency for Carris Lisboa operator, at 8:00
 
-#### [OSM Data](https://u-shift.github.io/GTFShift/articles/osm.md)
+#### [OSM Data](https://u-shift.github.io/GTFShift/articles/osm.html)
 
 OpenStreetMaps (OSM) is an important data source for transit analysis,
 due to its rich, open, and detailed geographic data.
@@ -93,7 +100,7 @@ network and export the OSM transit routes.
 
 > OSM exported bus lanes for Lisbon
 
-#### [Real Time transit data](https://u-shift.github.io/GTFShift/articles/rt.md)
+#### [Real Time transit data](https://u-shift.github.io/GTFShift/articles/rt.html)
 
 Real time operational data provides valuable insights about how planned
 operation performs in practice and how it interacts with the urban
@@ -102,7 +109,7 @@ traffic conditions.
 **GTFShift** provides several methods to enable this data collection and
 analysis.
 
-#### [Contribute to OSM](https://u-shift.github.io/GTFShift/articles/osm_update.md)
+#### [Contribute to OSM](https://u-shift.github.io/GTFShift/articles/osm_update.html)
 
 OpenStreetMap (OSM) is a collaborative project that relies on community
 contributions.
@@ -111,7 +118,7 @@ contributions.
 to OSM, specifically for updating bus lane information based on the
 analysis results.
 
-#### [Generate GTFS with OSM geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.md)
+#### [Generate GTFS with OSM geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.html)
 
 The lack of standardization on GTFS shape geometries hampers aggregated
 analysis of different feeds and the association of planned service

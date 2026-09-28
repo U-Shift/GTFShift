@@ -60,6 +60,7 @@ This function will run indefinitely until manually stopped (CTRL + C).
 ## Examples
 
 ``` r
+if (FALSE) { # \dontrun{
 # Create file
 destination_file <- withr::local_tempfile(fileext = ".csv")
 
@@ -69,21 +70,15 @@ GTFShift::rt_collect_protobuf(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-09-28 13:13:19] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb
-#> Warning: cannot open URL 'https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb': HTTP status was '504 Gateway Timeout'
-#> Error in file(gtfs_rt_url, "rb"): cannot open the connection to 'https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb'
 
 # Read data
 collection <- read.csv(destination_file)
-#> Warning: cannot open file '/tmp/RtmpehivHH/file1ebb1ad75075.csv': No such file or directory
-#> Error in file(file, "rt"): cannot open the connection
 
 names(collection)
-#> Error: object 'collection' not found
 
 head(
   collection |>
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
-#> Error: object 'collection' not found
+} # }
 ```

@@ -136,6 +136,7 @@ needed.
 ## Examples
 
 ``` r
+# \donttest{
 # Get GTFS-RT data collection
 rt_collect_file <- system.file(
   "extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift"
@@ -213,4 +214,6 @@ head(speed |>
 
 nrow(speed)
 #> [1] 9
+# }
+
 ```

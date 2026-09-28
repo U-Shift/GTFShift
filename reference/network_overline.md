@@ -76,6 +76,7 @@ their `attr` values, using `fun`.
 ## Examples
 
 ``` r
+# \donttest{
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -144,4 +145,5 @@ head(overline |> st_drop_geometry())
 #> 4: 40685608         1
 #> 5: 40685608         1
 #> 6: 40685608         1
+# }
 ```

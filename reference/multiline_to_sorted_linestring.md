@@ -97,6 +97,7 @@ transformed back to the original CRS of `multilinestring`.
 ## Examples
 
 ``` r
+# \donttest{
 # Get OSM route geometries (MULTILINESTRING)  
 osm_routes <- sf::st_read(
   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
@@ -125,4 +126,5 @@ head(osm_routes)
 #> Geodetic CRS:  WGS 84
 #>     osm_id    shape_id      route_id                           geom
 #> 1 18957690 2-TERM-QVBB 2_2-TERM-QVBB LINESTRING (-9.078345 38.65...
+# }
 ```

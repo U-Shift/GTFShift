@@ -70,6 +70,7 @@ distance along each shape for all generated points and appends this as
 ## Examples
 
 ``` r
+# \donttest{
 # Load sample GTFS
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
@@ -107,4 +108,5 @@ head(shapes_txt)
 #> 4: 3-SA-TERM_R2    -9.031686     38.62495                 4            50.05256
 #> 5: 3-SA-TERM_R2    -9.031714     38.62498                 5            60.06307
 #> 6: 3-SA-TERM_R2    -9.031745     38.62501                 6            60.06307
+# }
 ```
