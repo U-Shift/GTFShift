@@ -1,15 +1,24 @@
 # GTFShift <img align="right" src="man/figures/logo.png" alt="logo" width="180">
 
 <!-- badges: start -->
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21292010.svg)](https://doi.org/10.5281/zenodo.21292010) [![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml) [![codecov](https://codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://codecov.io/gh/U-Shift/GTFShift)
+[![CRAN status](https://www.r-pkg.org/badges/version/GTFShift)](https://cran.r-project.org/package=GTFShift/)
+[![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) 
+[![CRAN downloads total](https://cranlogs.r-pkg.org/badges/grand-total/GTFShift?color=lightgrey)](https://cran.r-project.org/package=GTFShift)
+[![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://codecov.io/gh/U-Shift/GTFShift)
 <!-- badges: end -->
 
 **GTFShift** encompasses a complete bundle of methods to harmonize GTFS and OSM data, enabling the integration and exploration of different layers of transit data, starting with the planned operations (GTFS), but also the infrastructure topology (OSM) and real-time information (GTFS-RT).
 
 ## Installation
 
-You can install the development version of **GTFShift** from
-[GitHub](https://github.com/) with:
+You can install the stable version of **GTFShift** from CRAN:
+
+``` r
+install.packages('GTFShift')
+```
+
+For the development version, fetch from GitHub:
 
 ``` r
 # install.packages("remotes")
@@ -33,7 +42,7 @@ For more details on the package and how to get started, please visit the [Get st
 
 The lack of standardization on GTFS shape geometries hampers aggregated analysis of different feeds and the association of planned service information with other urban dimensions such as the infrastructure topology.
 
-To solve this problem, **GTFShift** provides a bundle of methods to harmonize GTFS shapes with OSM road network geometries. Refer to [Get OSM data for bus routes](articles/osm.html#get-osm-data-for-bus-routes) and [Generate GTFS with OSM geometries](articles/gtfs_from_osm.html) for more details.
+To solve this problem, **GTFShift** provides a bundle of methods to harmonize GTFS shapes with OSM road network geometries. Refer to [Get OSM data for bus routes](https://u-shift.github.io/GTFShift/articles/osm.html#get-osm-data-for-bus-routes) and [Generate GTFS with OSM geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.html) for more details.
 
 ![](man/figures/geometry_harmonization_barreiro.png)
 
@@ -67,9 +76,9 @@ a minimum frequency of 10 buses/hour, average speed below 9.7 km/h and more than
 **GTFShift** provides an interactive dashboard that allows users to explore and visualize results for real case studies, 
 aiming to illustrate its potential and capabilities to a non-technical audience, while disseminating the outputs of these real world scenarios.
 
-Visit it at [ushift.pt/apps/gtfshift](https://ushift.pt/apps/gtfshift).
+Visit it at [ushift.pt/apps/gtfshift](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/).
 
-[![](man/figures/web.png)](https://ushift.pt/apps/gtfshift)
+[![](man/figures/web.png)](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/)
 
 ## Related packages
 
