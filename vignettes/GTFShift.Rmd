@@ -17,8 +17,15 @@ knitr::opts_chunk$set(
 
 # Installation
 
-You can install the development version of `GTFShift` from GitHub with:
-```{r}
+You can install the stable version of **GTFShift** from CRAN:
+
+```{r, eval=FALSE}
+install.packages('GTFShift')
+```
+
+For the development version, fetch from GitHub:
+
+```{r, eval=FALSE}
 # install.packages("remotes")
 remotes::install_github("U-Shift/GTFShift")
 ```

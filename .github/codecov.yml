@@ -1,0 +1,20 @@
+# Codecov configuration
+# Reference: https://docs.codecov.com/docs/codecov-yaml
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        # Allow up to 1% drop in overall project coverage without failing the status check
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+        # Allow up to 5% tolerance on diff coverage so small uncovered edges don't block PRs
+        threshold: 5%
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: false
