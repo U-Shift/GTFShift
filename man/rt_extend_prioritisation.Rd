@@ -28,8 +28,10 @@ sf data.frame. Extended lane prioritisation with the following columns:
 \describe{
   \item{speed_avg}{The average speed of the vehicles on the way.}
   \item{speed_median}{The median speed of the vehicles on the way.}
+  \item{speed_p15}{The 15th percentile speed of the vehicles on the way.}
   \item{speed_p25}{The 25th percentile speed of the vehicles on the way.}
   \item{speed_p75}{The 75th percentile speed of the vehicles on the way.}
+  \item{speed_p85}{The 85th percentile speed of the vehicles on the way.}
   \item{speed_count}{The number of speed observations on the way.}
 }
 }

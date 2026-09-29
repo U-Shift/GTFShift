@@ -12,6 +12,7 @@ export(get_network_extension)
 export(get_prioritisation_stats)
 export(get_route_frequency_hourly)
 export(get_stop_frequency_hourly)
+export(get_trip_speed_profile)
 export(get_way_frequency_hourly)
 export(load_feed)
 export(multiline_to_sorted_linestring)
@@ -55,7 +56,12 @@ importFrom(jsonlite,
 importFrom(purrr,map_dfr)
 importFrom(rlang,.data)
 importFrom(stats,
+  IQR,
+  median,
+  quantile,
+  sd,
   setNames,
+  var,
   weighted.mean
 )
 importFrom(stringr,
