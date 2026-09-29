@@ -54,6 +54,10 @@ sf data.frame. Extended lane prioritisation with the following columns:
 
   The median speed of the vehicles on the way.
 
+- speed_p15:
+
+  The 15th percentile speed of the vehicles on the way.
+
 - speed_p25:
 
   The 25th percentile speed of the vehicles on the way.
@@ -61,6 +65,10 @@ sf data.frame. Extended lane prioritisation with the following columns:
 - speed_p75:
 
   The 75th percentile speed of the vehicles on the way.
+
+- speed_p85:
+
+  The 85th percentile speed of the vehicles on the way.
 
 - speed_count:
 

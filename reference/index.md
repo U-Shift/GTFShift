@@ -35,6 +35,8 @@
   : Get aggregated frequency per hour for each bus route
 - [`get_stop_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.md)
   : Get aggregated frequency per hour for each bus stop
+- [`get_trip_speed_profile()`](https://u-shift.github.io/GTFShift/reference/get_trip_speed_profile.md)
+  : Get trip speed profile from GTFS-RT speed estimates
 - [`get_way_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_way_frequency_hourly.md)
   : Get aggregated frequency per hour for each OSM way
 - [`network_overline()`](https://u-shift.github.io/GTFShift/reference/network_overline.md)

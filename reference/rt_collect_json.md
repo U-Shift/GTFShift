@@ -84,9 +84,9 @@ GTFShift::rt_collect_json(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-09-28 14:14:47] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
-#> [20260928_141447] Iteration 1 completed
-#> [1] "/tmp/Rtmpm7nf9A/file1da75d5a51e5.csv"
+#> [2026-09-29 08:36:51] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
+#> [20260929_083651] Iteration 1 completed
+#> [1] "/tmp/Rtmpw3LxDF/file1e9024a3eb03.csv"
 
 # Read data
 collection <- read.csv(destination_file)
@@ -102,18 +102,11 @@ head(
   collection |>
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
-#>                        vehicle.trip.trip_id vehicle.position.latitude
-#> 1 [ZN3JG][YA15B]3111_0_2_1430_1459_0_ESC_DU                  38.61521
-#> 2      [VNWG3][LA77N]1614_0_1_1430_1459_0_1                  38.73076
-#> 3           [PCN1R][BNA17]2327_0_3|1|1|1445                  38.86561
-#> 4          [K56AM][A2L1N]4725_0_2|1800|1430                  38.70673
-#> 5          [K56AM][A2L1N]4725_0_1|1800|1500                  38.70874
-#> 6          [K56AM][A2L1N]4410_0_2|1800|1445                  38.52238
-#>   vehicle.position.longitude
-#> 1                  -9.086147
-#> 2                  -9.336619
-#> 3                  -9.060348
-#> 4                  -9.173748
-#> 5                  -9.177970
-#> 6                  -8.868207
+#>   vehicle.trip.trip_id vehicle.position.latitude vehicle.position.longitude
+#> 1   [2XUL7][7NTB1]3132                  38.74314                  -9.151006
+#> 2   [2XUL7][7NTB1]3057                  38.62995                  -8.913456
+#> 3   [2XUL7][7NTB1]3130                  38.63604                  -9.151048
+#> 4   [2XUL7][7NTB1]3056                  38.59306                  -9.067192
+#> 5   [2XUL7][7NTB1]3128                  38.62998                  -8.921685
+#> 6   [2XUL7][7NTB1]3054                  38.71952                  -9.173984
 ```
