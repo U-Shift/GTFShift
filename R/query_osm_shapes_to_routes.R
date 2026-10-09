@@ -70,6 +70,7 @@ osm_shapes_to_routes <- function(
   osm_file = NULL,
   osm_route_type = "bus"
 ) {
+  osm_file <- prepare_osm_file(osm_file)
   total_steps <- 2 + ways
   if (!is.null(osm_file)) {
     total_steps <- total_steps - 1

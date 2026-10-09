@@ -12,6 +12,7 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
         route_id = "R1",
         timestamp = c(1000, 1060, 1120, 1180, 1240, 2000, 2050, 2100, 2150, 2200),
         distance_along_geometry = c(0, 300, 700, 1200, 1500, 0, 400, 800, 1300, 1800),
+        distance_along_geometry_reversed = c(1500, 1200, 800, 300, 0, 1800, 1400, 1000, 500, 0),
         speed_kmh = c(NA, 18, 24, 30, 18, NA, 28.8, 28.8, 36, 36)
     )
 
@@ -89,6 +90,7 @@ test_that("get_trip_speed_profile supports custom aggregation columns in 'by'", 
         route_id = "R1",
         timestamp = c(1000, 1060, 1120, 1180, 1240, 2000, 2050, 2100, 2150, 2200),
         distance_along_geometry = c(0, 300, 700, 1200, 1500, 0, 400, 800, 1300, 1800),
+        distance_along_geometry_reversed = c(1500, 1200, 800, 300, 0, 1800, 1400, 1000, 500, 0),
         speed_kmh = c(NA, 18, 24, 30, 18, NA, 28.8, 28.8, 36, 36)
     )
 
@@ -121,7 +123,7 @@ test_that("get_trip_speed_profile supports custom aggregation columns in 'by'", 
     expect_equal(res_char0$commercial_speed, 27.45)
 
     # 5. Default by when route_id is missing: keeps available columns (trip_id and derived day)
-    df_no_route <- df[, c("trip_id", "timestamp", "distance_along_geometry", "speed_kmh")]
+    df_no_route <- df[, c("trip_id", "timestamp", "distance_along_geometry", "distance_along_geometry_reversed", "speed_kmh")]
     res_default_partial <- GTFShift::get_trip_speed_profile(df_no_route)
     expect_equal(nrow(res_default_partial), 2)
     expect_contains(names(res_default_partial), c("trip_id", "day"))
@@ -136,6 +138,7 @@ test_that("get_trip_speed_profile derives day column from different timestamp ty
         route_id = "R1",
         timestamp = t_posix,
         distance_along_geometry = c(0, 500, 1000, 1500),
+        distance_along_geometry_reversed = c(1500, 1000, 500, 0),
         speed_kmh = c(NA, 15, 15, 15)
     )
     res_posix <- GTFShift::get_trip_speed_profile(df_posix)
@@ -149,6 +152,7 @@ test_that("get_trip_speed_profile derives day column from different timestamp ty
         route_id = "R1",
         timestamp = as.Date(c("2024-06-01", "2024-06-02", "2024-06-03", "2024-06-04")),
         distance_along_geometry = c(0, 100000, 200000, 300000),
+        distance_along_geometry_reversed = c(300000, 200000, 100000, 0),
         speed_kmh = c(NA, 4.17, 4.17, 4.17)
     )
     res_date <- GTFShift::get_trip_speed_profile(df_date)
@@ -170,6 +174,7 @@ test_that("get_trip_speed_profile drops geometry from sf objects", {
         route_id = "R1",
         timestamp = c(1000, 1060, 1120, 1180, 1240),
         distance_along_geometry = c(0, 300, 700, 1200, 1500),
+        distance_along_geometry_reversed = c(1500, 1200, 800, 300, 0),
         speed_kmh = c(NA, 18, 24, 30, 18),
         geometry = sf::st_sfc(lapply(1:5, function(i) sf::st_point(c(i, i))))
     )
@@ -186,6 +191,7 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
         trip_id = "T1",
         timestamp = 1000,
         distance_along_geometry = 0,
+        distance_along_geometry_reversed = 1500,
         speed_kmh = 25
     )
     res_n1 <- GTFShift::get_trip_speed_profile(df_n1, by = "trip_id")
@@ -202,6 +208,7 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
         trip_id = "T1",
         timestamp = c(1000, 1060),
         distance_along_geometry = c(0, 500),
+        distance_along_geometry_reversed = c(500, 0),
         speed_kmh = c(NA, 30)
     )
     res_n2 <- GTFShift::get_trip_speed_profile(df_n2, by = "trip_id")
@@ -213,6 +220,7 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
         trip_id = "T1",
         timestamp = c(1000, 1060, 1120),
         distance_along_geometry = c(0, 500, 1000),
+        distance_along_geometry_reversed = c(1000, 500, 0),
         speed_kmh = c(NA, 30, 30)
     )
     res_n3 <- GTFShift::get_trip_speed_profile(df_n3, by = "trip_id")
@@ -224,6 +232,7 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
         trip_id = "T1",
         timestamp = c(1000, 1060, 1120, 1180),
         distance_along_geometry = c(0, 500, 1000, 1500),
+        distance_along_geometry_reversed = c(1500, 1000, 500, 0),
         speed_kmh = c(NA, 30, 30, 30)
     )
     res_n4 <- GTFShift::get_trip_speed_profile(df_n4, by = "trip_id")
@@ -236,6 +245,7 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
         trip_id = c("T1", "T2"),
         timestamp = c(1000, 2000),
         distance_along_geometry = c(0, 0),
+        distance_along_geometry_reversed = c(1000, 1000),
         speed_kmh = c(20, 30)
     )
     res_multi_n1 <- GTFShift::get_trip_speed_profile(df_multi_n1, by = "route_id")
@@ -248,6 +258,7 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
         trip_id = c("T1", "T1", "T2", "T2"),
         timestamp = c(1000, 1060, 2000, 2060),
         distance_along_geometry = c(0, 500, 0, 600),
+        distance_along_geometry_reversed = c(500, 0, 600, 0),
         speed_kmh = c(NA, 30, NA, 36)
     )
     res_multi_n2 <- GTFShift::get_trip_speed_profile(df_multi_n2, by = "route_id")
@@ -260,6 +271,7 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
         trip_id = c("T1", "T1", "T1", "T1", "T2"),
         timestamp = c(1000, 1060, 1120, 1180, 2000),
         distance_along_geometry = c(0, 500, 1000, 1500, 0),
+        distance_along_geometry_reversed = c(1500, 1000, 500, 0, 1000),
         speed_kmh = c(NA, 30, 30, 30, 20)
     )
     res_multi_mixed <- GTFShift::get_trip_speed_profile(df_multi_mixed, by = "route_id")
@@ -273,6 +285,7 @@ test_that("get_trip_speed_profile handles unordered updates, zero/negative elaps
         trip_id = "T1",
         timestamp = c(1000, 1060, 1120, 1180),
         distance_along_geometry = c(0, 500, 1000, 1500),
+        distance_along_geometry_reversed = c(1500, 1000, 500, 0),
         speed_kmh = c(NA, 30, 30, 30)
     )
     df_scrambled <- df_sorted[c(3, 1, 4, 2), ]
@@ -289,6 +302,7 @@ test_that("get_trip_speed_profile handles unordered updates, zero/negative elaps
         trip_id = "T1",
         timestamp = c(1000, 1000),
         distance_along_geometry = c(0, 500),
+        distance_along_geometry_reversed = c(500, 0),
         speed_kmh = c(NA, 30)
     )
     res_zero <- GTFShift::get_trip_speed_profile(df_zero_time, by = "trip_id")
@@ -299,6 +313,7 @@ test_that("get_trip_speed_profile handles unordered updates, zero/negative elaps
         trip_id = "T1",
         timestamp = c(NA, 1060),
         distance_along_geometry = c(0, 500),
+        distance_along_geometry_reversed = c(500, 0),
         speed_kmh = c(NA, 30)
     )
     res_na_time <- GTFShift::get_trip_speed_profile(df_na_time, by = "trip_id")
@@ -308,6 +323,7 @@ test_that("get_trip_speed_profile handles unordered updates, zero/negative elaps
         trip_id = "T1",
         timestamp = c(1000, 1060),
         distance_along_geometry = c(NA, 500),
+        distance_along_geometry_reversed = c(NA, 0),
         speed_kmh = c(NA, 30)
     )
     res_na_dist <- GTFShift::get_trip_speed_profile(df_na_dist, by = "trip_id")
@@ -318,6 +334,7 @@ test_that("get_trip_speed_profile handles unordered updates, zero/negative elaps
         trip_id = "T1",
         timestamp = c(1000, 1060, 1120, 1180),
         distance_along_geometry = c(1500, 1000, 500, 0),
+        distance_along_geometry_reversed = c(0, 500, 1000, 1500),
         speed_kmh = c(NA, 30, 30, 30)
     )
     res_backward <- GTFShift::get_trip_speed_profile(df_backward, by = "trip_id")
@@ -329,6 +346,7 @@ test_that("get_trip_speed_profile handles unordered updates, zero/negative elaps
         trip_id = "T1",
         timestamp = c("2024-05-01 10:00:00", "2024-05-01 10:02:00", "2024-05-01 10:04:00", "2024-05-01 10:06:00"),
         distance_along_geometry = c(0, 500, 1000, 1500),
+        distance_along_geometry_reversed = c(1500, 1000, 500, 0),
         speed_kmh = c(NA, 15, 15, 15)
     )
     res_char <- GTFShift::get_trip_speed_profile(df_char, by = "trip_id")
@@ -342,6 +360,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
         trip_id = "T1",
         timestamp = c(1000, 1060, 1120, 1180),
         distance_along_geometry = c(0, 500, 1000, 1500),
+        distance_along_geometry_reversed = c(1500, 1000, 500, 0),
         speed_kmh = c(20, Inf, -Inf, 40)
     )
     res_inf <- GTFShift::get_trip_speed_profile(df_inf, by = "trip_id")
@@ -355,6 +374,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
         trip_id = "T1",
         timestamp = c(1000, 1060),
         distance_along_geometry = c(0, 500),
+        distance_along_geometry_reversed = c(500, 0),
         speed_kmh = c(NA_real_, NA_real_)
     )
     res_all_na <- GTFShift::get_trip_speed_profile(df_all_na, by = "trip_id")
@@ -376,7 +396,8 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
     df_no_speed <- data.frame(
         trip_id = "T1",
         timestamp = c(1000, 1060),
-        distance_along_geometry = c(0, 500)
+        distance_along_geometry = c(0, 500),
+        distance_along_geometry_reversed = c(500, 0)
     )
     res_no_speed <- GTFShift::get_trip_speed_profile(df_no_speed, by = "trip_id")
     expect_equal(res_no_speed$speed_count, 0)
@@ -387,13 +408,13 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
     df_custom <- data.frame(
         my_trip = "T1",
         my_time = c(1000, 1060, 1120, 1180),
-        my_dist = c(0, 500, 1000, 1500),
+        distance_along_geometry = c(0, 500, 1000, 1500),
+        distance_along_geometry_reversed = c(1500, 1000, 500, 0),
         my_spd = c(NA, 30, 30, 30)
     )
     res_custom <- GTFShift::get_trip_speed_profile(
         df_custom,
         by = "my_trip",
-        dist_col = "my_dist",
         speed_col = "my_spd",
         time_col = "my_time"
     )
@@ -421,22 +442,22 @@ test_that("get_trip_speed_profile stops with informative error on invalid inputs
     # 2. Missing required columns
     expect_error(
         GTFShift::get_trip_speed_profile(data.frame(x = 1)),
-        "rt_speed is missing required column\\(s\\): distance_along_geometry, timestamp"
+        "rt_speed is missing required column\\(s\\): distance_along_geometry, distance_along_geometry_reversed, timestamp"
     )
     expect_error(
         GTFShift::get_trip_speed_profile(
-            data.frame(x = 1),
-            dist_col = "my_dist",
+            data.frame(distance_along_geometry = 1),
             time_col = "my_time"
         ),
-        "rt_speed is missing required column\\(s\\): my_dist, my_time"
+        "rt_speed is missing required column\\(s\\): distance_along_geometry_reversed, my_time"
     )
 
     # 3. Specified grouping column in by is missing
     df_valid <- data.frame(
         trip_id = "T1",
         timestamp = 1000,
-        distance_along_geometry = 0
+        distance_along_geometry = 0,
+        distance_along_geometry_reversed = 1000
     )
     expect_error(
         GTFShift::get_trip_speed_profile(df_valid, by = c("non_existent_col")),
@@ -490,4 +511,30 @@ test_that("get_trip_speed_profile integrates seamlessly with rt_average_speed ou
     expect_s3_class(global_summary, "data.frame")
     expect_equal(nrow(global_summary), 1)
     expect_equal(global_summary$n_updates, 8)
+})
+
+test_that("get_trip_speed_profile accommodates circular geometries by taking max of normal and reversed distances", {
+    # On a circular loop of 1000 meters, suppose a vehicle completes a loop and the final update
+    # snaps to the beginning (distance_along_geometry = 10, distance_along_geometry_reversed = 990).
+    # Update 1: at meter 20 (distance_along_geometry = 20, distance_along_geometry_reversed = 980)
+    # Update 2: at meter 250 (distance_along_geometry = 250, distance_along_geometry_reversed = 750)
+    # Update 3: at meter 750 (distance_along_geometry = 750, distance_along_geometry_reversed = 250)
+    # Update 4: at meter 990, snapped to 10 (distance_along_geometry = 10, distance_along_geometry_reversed = 990)
+    # Forward distance: |10 - 20| = 10 m
+    # Reversed distance: |10 - 980| = 970 m
+    # Max distance: 970 m over (1120 - 1000) = 120 seconds -> 29.1 km/h
+    # Alt updates (updates 2 and 3):
+    # Forward: |750 - 250| = 500 m
+    # Reversed: |750 - 750| = 0 m
+    # Max distance: 500 m over (1080 - 1040) = 40 seconds -> 45.0 km/h
+    df_circ <- data.frame(
+        trip_id = "T_circ",
+        timestamp = c(1000, 1040, 1080, 1120),
+        distance_along_geometry = c(20, 250, 750, 10),
+        distance_along_geometry_reversed = c(980, 750, 250, 990),
+        speed_kmh = c(NA, 20.7, 45.0, 19.8)
+    )
+    res_circ <- GTFShift::get_trip_speed_profile(df_circ, by = "trip_id")
+    expect_equal(res_circ$commercial_speed, 29.1)
+    expect_equal(res_circ$commercial_speed_alt, 45.0)
 })

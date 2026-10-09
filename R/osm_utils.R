@@ -138,3 +138,29 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
 
   return(relations_df)
 }
+
+#' Ensure OSM file is in a writable location for osmextract
+#'
+#' @param osm_file character. Path to OSM extract file.
+#' @return character. Path to the (potentially copied) OSM extract file.
+#' @noRd
+prepare_osm_file <- function(osm_file) {
+  if (is.null(osm_file) || !file.exists(osm_file)) {
+    return(osm_file)
+  }
+
+  dir_writable <- file.access(dirname(osm_file), 2) == 0
+  lib_paths <- normalizePath(.libPaths(), winslash = "/", mustWork = FALSE)
+  norm_path <- normalizePath(osm_file, winslash = "/", mustWork = FALSE)
+  in_lib <- any(vapply(lib_paths, function(lp) startsWith(norm_path, lp), logical(1)))
+
+  if (!dir_writable || in_lib) {
+    temp_file <- file.path(tempdir(), basename(osm_file))
+    if (!file.exists(temp_file) || file.info(osm_file)$mtime > file.info(temp_file)$mtime) {
+      file.copy(osm_file, temp_file, overwrite = TRUE)
+    }
+    return(temp_file)
+  }
+
+  osm_file
+}
