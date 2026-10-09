@@ -34,14 +34,14 @@ library(dplyr)
 
 # Introduction
 
-OpenStreetMaps (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
+OpenStreetMap (OSM) is an important data source for transit analysis, due to its rich, open, and detailed geographic data.
 GTFShift includes some methods that allow to access its information directly.
 
 > Mind that despite this tutorial is mostly focused on the bus mode, GTFShift supports other transit modes, through the parameter `osm_route_type`, available in most methods that deal with OSM data. Refer to each method's documentation for more details.
 
 ## Using OSM API vs. local OSM extract
 
-By default, GTFShift methods use OSM API to access OpenStreetMaps data ([osmdata::osmdata_sf](https://docs.ropensci.org/osmdata/reference/osmdata_sf.html)). 
+By default, GTFShift methods use OSM API to access OpenStreetMap data ([osmdata::osmdata_sf](https://docs.ropensci.org/osmdata/reference/osmdata_sf.html)). 
 However, the API rate is limited, making it hard to download large datasets. 
 In these cases, it is recommended to use a local OSM extract file.
 For this purpose, most of the methods support the optional parameter `osm_file`. Check each method documentation
@@ -88,13 +88,13 @@ get_overpass_url() # You will see the default API instance
 set_overpass_url("https://overpass.private.coffee/api/interpreter") # Changin the instance to Private.coffee
 get_overpass_url() # You should see the new instance now
 
-# Now you can call any method on osmdata and the new API instance will be used 
+# Now you can call any method on osmdata and the new API instance will be used
 ```
 
 # Download bus lanes 
 
 Dedicated bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics.
-`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMaps for a given area.
+`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMap for a given area.
 
 ```{r, eval=FALSE}
 aml <- sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE)
@@ -116,7 +116,7 @@ mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 
 # Get OSM data for transit routes
 
-OpenStreetMaps defines transit routes as a [relation](https://wiki.openstreetmap.org/wiki/Public_transport#Service_routes) of ways (roads or railways, for instance) and nodes (stops and platforms). GTFShift provides methods to use them in the GTFS analysis.
+OpenStreetMap defines transit routes as a [relation](https://wiki.openstreetmap.org/wiki/Public_transport#Service_routes) of ways (roads or railways, for instance) and nodes (stops and platforms). GTFShift provides methods to use them in the GTFS analysis.
 
 > For demonstration purposes, the next snippets will use the Lisbon urban bus network.
 
@@ -259,7 +259,7 @@ mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.na
 
 ### Updating OSM routes with shape_id
 
-The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMaps data. Refer to [Update OSM data](./osm_update.html) for more details.
+The association between OSM route relations id and the GTFS shapes_id returned by `GTFShift::osm_shapes_match_routes()` can be used to update OpenStreetMap data. Refer to [Update OSM data](./osm_update.html) for more details.
 
 ### Validating OSM routes
 
@@ -270,7 +270,7 @@ The warning logs displayed by `GTFShift::osm_shapes_match_routes()` can be used 
 
 Performing an aggregated analysis for the spatial distribution of the route frequencies might be easier if the routes are projected over a simplified road network (refer to [vignette("analyse")](./analyse.html#improve-visualization-with-network_overline) for more details).
 
-`GTFShift::osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from OpenStreetMaps, using Python [neatnet](https://uscuni.org/neatnet/) package.
+`GTFShift::osm_centerlines()` allows to generate this simplification by creating the centerlines for the road network exported from OpenStreetMap, using Python [neatnet](https://uscuni.org/neatnet/) package.
 
 <div style="display: flex; gap: 20px; overflow-x: auto;">
 <div style="flex: 1 1 0; min-width: 288px; max-width: 100%;">

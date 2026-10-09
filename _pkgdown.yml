@@ -42,7 +42,7 @@ reference:
     - unify
     - starts_with("create_")
     - starts_with("build_")
-  - title: OpenStreetMaps
+  - title: OpenStreetMap
     contents:
     - starts_with("osm_")
   - title: Realtime
