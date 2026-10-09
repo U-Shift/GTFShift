@@ -36,6 +36,7 @@
 #' @export
 osm_bus_lanes <- function(bbox, osm_file = NULL) {
   if (!is.null(osm_file)) {
+    osm_file <- prepare_osm_file(osm_file)
     highways_base <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
     highways_cols <- osmextract::oe_get_keys(highways_base)
     cols_to_check <- c(
