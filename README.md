@@ -5,7 +5,7 @@
 [![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) 
 [![CRAN downloads total](https://cranlogs.r-pkg.org/badges/grand-total/GTFShift?color=lightgrey)](https://cran.r-project.org/package=GTFShift)
 [![](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/U-Shift/GTFShift/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://codecov.io/gh/U-Shift/GTFShift)
+[![codecov](https://codecov.io/gh/U-Shift/GTFShift/graph/badge.svg?token=RWVWEGGOF8)](https://app.codecov.io/gh/U-Shift/GTFShift)
 <!-- badges: end -->
 
 **GTFShift** encompasses a complete bundle of methods to harmonize GTFS and OSM data, enabling the integration and exploration of different layers of transit data, starting with the planned operations (GTFS), but also the infrastructure topology (OSM) and real-time information (GTFS-RT).
