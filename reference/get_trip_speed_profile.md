@@ -15,7 +15,6 @@ observations.
 get_trip_speed_profile(
   rt_speed,
   by = c("trip_id", "route_id", "day"),
-  dist_col = "distance_along_geometry",
   speed_col = "speed_kmh",
   time_col = "timestamp"
 )
@@ -27,8 +26,8 @@ get_trip_speed_profile(
 
   data.frame or sf data.frame. The result of
   [`GTFShift::rt_average_speed()`](https://u-shift.github.io/GTFShift/reference/rt_average_speed.md).
-  Must contain at least the columns `distance_along_geometry` and
-  `timestamp`.
+  Must contain at least the columns `distance_along_geometry`,
+  `distance_along_geometry_reversed`, and `timestamp`.
 
 - by:
 
@@ -37,12 +36,6 @@ get_trip_speed_profile(
   `rt_speed`, it is automatically derived from the `timestamp` column.
   Set to `NULL` or `character(0)` to compute metrics across the entire
   dataset.
-
-- dist_col:
-
-  Character (Default `"distance_along_geometry"`). Column name present
-  in `rt_speed` representing cumulative distance along geometry (in
-  meters).
 
 - speed_col:
 
@@ -64,20 +57,30 @@ For each group defined by `by` (by default, each unique combination of
 `trip_id`, `route_id`, and `day`), observations are ordered
 chronologically by `timestamp`.
 
-Let \\\\(d_i, t_i)\\\_{i=1}^n\\ denote the ordered sequence of updates,
-where \\d_i\\ is the distance along geometry (meters) and \\t_i\\ is the
-timestamp (seconds).
+Let \\\\(d_i, d_i^{\mathrm{rev}}, t_i)\\\_{i=1}^n\\ denote the ordered
+sequence of updates, where \\d_i\\ is the distance along geometry
+(meters), \\d_i^{\mathrm{rev}}\\ is the reversed distance along geometry
+(meters), and \\t_i\\ is the timestamp (seconds).
+
+To accommodate circular geometries (where starting and terminal
+positions may map to the same location on the shape), the distance
+traveled between two observations \\i\\ and \\j\\ (\\j \> i\\) is
+calculated by considering both the normal and reversed distances and
+taking the maximum: \$\$\Delta d\_{i, j}^{\mathrm{fwd}} = \left\| d_j -
+d_i \right\|\$\$ \$\$\Delta d\_{i, j}^{\mathrm{circ}} = \left\| d_j -
+d_i^{\mathrm{rev}} \right\|\$\$ \$\$\Delta d\_{i, j} = \max\left(\Delta
+d\_{i, j}^{\mathrm{fwd}}, \Delta d\_{i, j}^{\mathrm{circ}}\right)\$\$
 
 **Commercial speed** is calculated as the total distance traveled
 between the first and last updates divided by the elapsed time:
-\$\$v\_{\mathrm{commercial}} = \frac{\|d_n - d_1\|}{1000} \div
+\$\$v\_{\mathrm{commercial}} = \frac{\Delta d\_{1, n}}{1000} \div
 \frac{t_n - t_1}{3600}\$\$ If \\n \< 2\\ or \\t_n \le t_1\\,
 `commercial_speed` is `NA`.
 
 **Alternative commercial speed** (`commercial_speed_alt`) uses the 2nd
 and penultimate (\\n-1\\) observations to eliminate potential dwell
 times or layovers at the terminal stops:
-\$\$v\_{\mathrm{commercial\\alt}} = \frac{\|d\_{n-1} - d_2\|}{1000} \div
+\$\$v\_{\mathrm{commercial\\alt}} = \frac{\Delta d\_{2, n-1}}{1000} \div
 \frac{t\_{n-1} - t_2}{3600}\$\$ If \\n \< 4\\ or \\t\_{n-1} \le t_2\\,
 `commercial_speed_alt` is `NA`.
 
@@ -200,7 +203,7 @@ head(profile)
 #>   trip_id       route_id day        timestamp_min timestamp_max commercial_speed
 #>   <chr>         <chr>    <date>             <int>         <int>            <dbl>
 #> 1 20260514_DUP… 4_4-CS-… 2026-05-14    1778737742    1778738882             9.91
-#> 2 20260515_DUP… 4_4-CS-… 2026-05-15    1778823962    1778827442             0   
+#> 2 20260515_DUP… 4_4-CS-… 2026-05-15    1778823962    1778827442             6.69
 #> # ℹ 14 more variables: commercial_speed_alt <dbl>, speed_avg <dbl>,
 #> #   speed_median <dbl>, speed_sd <dbl>, speed_var <dbl>, speed_min <dbl>,
 #> #   speed_max <dbl>, speed_p15 <dbl>, speed_p25 <dbl>, speed_p75 <dbl>,
@@ -213,7 +216,7 @@ head(route_profile)
 #>   route_id    day        timestamp_min timestamp_max commercial_speed
 #>   <chr>       <date>             <int>         <int>            <dbl>
 #> 1 4_4-CS-TERM 2026-05-14    1778737742    1778738882             9.91
-#> 2 4_4-CS-TERM 2026-05-15    1778823962    1778827442             0   
+#> 2 4_4-CS-TERM 2026-05-15    1778823962    1778827442             6.69
 #> # ℹ 14 more variables: commercial_speed_alt <dbl>, speed_avg <dbl>,
 #> #   speed_median <dbl>, speed_sd <dbl>, speed_var <dbl>, speed_min <dbl>,
 #> #   speed_max <dbl>, speed_p15 <dbl>, speed_p25 <dbl>, speed_p75 <dbl>,

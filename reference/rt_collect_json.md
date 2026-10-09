@@ -84,9 +84,9 @@ GTFShift::rt_collect_json(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-09-29 08:36:51] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
-#> [20260929_083651] Iteration 1 completed
-#> [1] "/tmp/Rtmpw3LxDF/file1e9024a3eb03.csv"
+#> [2026-10-09 10:18:59] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
+#> [20261009_101859] Iteration 1 completed
+#> [1] "/tmp/RtmpSgFQck/file7b9a7f809f4e.csv"
 
 # Read data
 collection <- read.csv(destination_file)
@@ -102,11 +102,18 @@ head(
   collection |>
     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
 )
-#>   vehicle.trip.trip_id vehicle.position.latitude vehicle.position.longitude
-#> 1   [2XUL7][7NTB1]3132                  38.74314                  -9.151006
-#> 2   [2XUL7][7NTB1]3057                  38.62995                  -8.913456
-#> 3   [2XUL7][7NTB1]3130                  38.63604                  -9.151048
-#> 4   [2XUL7][7NTB1]3056                  38.59306                  -9.067192
-#> 5   [2XUL7][7NTB1]3128                  38.62998                  -8.921685
-#> 6   [2XUL7][7NTB1]3054                  38.71952                  -9.173984
+#>                   vehicle.trip.trip_id vehicle.position.latitude
+#> 1      [0HN8A][KJTOU]A-U:5001:0:1:1015                  41.18312
+#> 2 [VNWG3][LA77N]1623_0_1_1030_1059_0_1                  38.80047
+#> 3 [VNWG3][LA77N]1615_0_1_1100_1129_0_1                  38.68279
+#> 4 [VNWG3][LA77N]1608_0_1_1030_1059_0_1                  38.71872
+#> 5 [VNWG3][LA77N]1512_0_2_1030_1059_0_1                  38.82493
+#> 6 [VNWG3][LA77N]1724_0_1_1030_1059_0_1                  38.72568
+#>   vehicle.position.longitude
+#> 1                  -8.653025
+#> 2                  -9.379179
+#> 3                  -9.323185
+#> 4                  -9.326430
+#> 5                  -9.296203
+#> 6                  -9.152255
 ```

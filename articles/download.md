@@ -165,9 +165,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      174
-#> # trips      1744
+#> # routes      173
+#> # trips      1699
 #> # stop_ids    454
 #> # stop_names  454
-#> # shapes      242
+#> # shapes      240
 ```
