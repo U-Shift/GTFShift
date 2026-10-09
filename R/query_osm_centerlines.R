@@ -7,7 +7,7 @@
 #' @param venv String (Default creates a new one). Python environment where neatnet will run.
 #'
 #' @details
-#' Exports road network from OpenStreetMaps for given area and uses
+#' Exports road network from OpenStreetMap for given area and uses
 #' Python \href{https://uscuni.org/neatnet/}{neatnet} package to compute its centerlines.
 #'
 #' One of \code{bbox}, \code{place}, or \code{osm_file} must be provided.

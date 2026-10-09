@@ -1,11 +1,11 @@
-#' Export designated bus lanes from OpenStreetMaps
+#' Export designated bus lanes from OpenStreetMap
 #
 #'
 #' @param bbox bbox. Area from which to export bus lanes.
 #' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
 #'
 #' @details
-#' Exports roads tagged as designated bus lanes on OpenStreetMaps for given area.
+#' Exports roads tagged as designated bus lanes on OpenStreetMap for given area.
 #'
 #' @returns sf data.frame. OSM bus lanes.
 #'
@@ -13,20 +13,21 @@
 #' @examples
 #' # Create bbox for Lisbon
 #' bbox <- sf::st_as_sfc(sf::st_bbox(c(
-#'   xmin = -9.229836, ymin = 38.691399, 
+#'   xmin = -9.229836, ymin = 38.691399,
 #'   xmax = -9.087387, ymax = 38.796760
 #' ), crs = 4326))
 #'
 #' # Use sample osmextract for Lisbon highways
 #' osm_file <- system.file(
-#'   "extdata/samples", "osmextract_lisbon_highways_sample.pbf", package = "GTFShift"
+#'   "extdata/samples", "osmextract_lisbon_highways_sample.pbf",
+#'   package = "GTFShift"
 #' )
-#' 
+#'
 #' # Export bus lanes
 #' bus_lanes <- GTFShift::osm_bus_lanes(bbox, osm_file = osm_file)
 #'
 #' names(bus_lanes)
-#' 
+#'
 #' head(bus_lanes |> dplyr::select(`osm:id`, name))
 #'
 #' @import osmdata
