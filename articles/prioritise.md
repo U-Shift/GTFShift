@@ -60,9 +60,9 @@ explore in detail each of the specific approaches followed.
 
 [`GTFShift::prioritise_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritise_lanes.md)
 is a simple method that generates indicators for most of the criteria
-mentioned above using GTFS and OpenStreetMaps data (service frequency
-and lane characteristics). With a single call, it returns a data.frame
-with the relevant metrics for each road segment with transit service.
+mentioned above using GTFS and OpenStreetMap data (service frequency and
+lane characteristics). With a single call, it returns a data.frame with
+the relevant metrics for each road segment with transit service.
 
 ``` r
 

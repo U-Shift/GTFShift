@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,9 +120,9 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>OpenStreetMaps (OSM) is an important data source for transit
-analysis, due to its rich, open, and detailed geographic data. GTFShift
-includes some methods that allow to access its information directly.</p>
+<p>OpenStreetMap (OSM) is an important data source for transit analysis,
+due to its rich, open, and detailed geographic data. GTFShift includes
+some methods that allow to access its information directly.</p>
 <blockquote>
 <p>Mind that despite this tutorial is mostly focused on the bus mode,
 GTFShift supports other transit modes, through the parameter
@@ -132,8 +132,8 @@ OSM data. Refer to each method’s documentation for more details.</p>
 <div class="section level3">
 <h3 id="using-osm-api-vs--local-osm-extract">Using OSM API vs. local OSM extract<a class="anchor" aria-label="anchor" href="#using-osm-api-vs--local-osm-extract"></a>
 </h3>
-<p>By default, GTFShift methods use OSM API to access OpenStreetMaps
-data (<a href="https://docs.ropensci.org/osmdata/reference/osmdata_sf.html" class="external-link">osmdata::osmdata_sf</a>).
+<p>By default, GTFShift methods use OSM API to access OpenStreetMap data
+(<a href="https://docs.ropensci.org/osmdata/reference/osmdata_sf.html" class="external-link">osmdata::osmdata_sf</a>).
 However, the API rate is limited, making it hard to download large
 datasets. In these cases, it is recommended to use a local OSM extract
 file. For this purpose, most of the methods support the optional
@@ -179,7 +179,7 @@ Private.coffee Overpass Instance.</p>
 <span><span class="fu"><a href="https://docs.ropensci.org/osmdata/reference/set_overpass_url.html" class="external-link">set_overpass_url</a></span><span class="op">(</span><span class="st">"https://overpass.private.coffee/api/interpreter"</span><span class="op">)</span> <span class="co"># Changin the instance to Private.coffee</span></span>
 <span><span class="fu"><a href="https://docs.ropensci.org/osmdata/reference/get_overpass_url.html" class="external-link">get_overpass_url</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># You should see the new instance now</span></span>
 <span></span>
-<span><span class="co"># Now you can call any method on osmdata and the new API instance will be used </span></span></code></pre></div>
+<span><span class="co"># Now you can call any method on osmdata and the new API instance will be used</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -188,7 +188,7 @@ Private.coffee Overpass Instance.</p>
 <p>Dedicated bus lanes can improve bus transit operation. Understanding
 their spatial distribution is important to study operation dynamics.
 <code>osm_bus_lanes</code> allows to obtain the bus lanes network on
-OpenStreetMaps for a given area.</p>
+OpenStreetMap for a given area.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">aml</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="st">"https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">lisboa</span> <span class="op">&lt;-</span> <span class="va">aml</span> <span class="op">|&gt;</span></span>
@@ -204,7 +204,7 @@ OpenStreetMaps for a given area.</p>
 <div class="section level2">
 <h2 id="get-osm-data-for-transit-routes">Get OSM data for transit routes<a class="anchor" aria-label="anchor" href="#get-osm-data-for-transit-routes"></a>
 </h2>
-<p>OpenStreetMaps defines transit routes as a <a href="https://wiki.openstreetmap.org/wiki/Public_transport#Service_routes" class="external-link">relation</a>
+<p>OpenStreetMap defines transit routes as a <a href="https://wiki.openstreetmap.org/wiki/Public_transport#Service_routes" class="external-link">relation</a>
 of ways (roads or railways, for instance) and nodes (stops and
 platforms). GTFShift provides methods to use them in the GTFS
 analysis.</p>
@@ -378,7 +378,7 @@ cities around the world at <a href="https://github.com/U-Shift/GTFShift/blob/mai
 </h4>
 <p>The association between OSM route relations id and the GTFS shapes_id
 returned by <code><a href="../reference/osm_shapes_match_routes.html">GTFShift::osm_shapes_match_routes()</a></code> can be used
-to update OpenStreetMaps data. Refer to <a href="./osm_update.html">Update OSM data</a> for more details.</p>
+to update OpenStreetMap data. Refer to <a href="./osm_update.html">Update OSM data</a> for more details.</p>
 </div>
 <div class="section level4">
 <h4 id="validating-osm-routes">Validating OSM routes<a class="anchor" aria-label="anchor" href="#validating-osm-routes"></a>
@@ -400,7 +400,7 @@ simplified road network (refer to <a href="./analyse.html#improve-visualization-
 for more details).</p>
 <p><code><a href="../reference/osm_centerlines.html">GTFShift::osm_centerlines()</a></code> allows to generate this
 simplification by creating the centerlines for the road network exported
-from OpenStreetMaps, using Python <a href="https://uscuni.org/neatnet/" class="external-link">neatnet</a> package.</p>
+from OpenStreetMap, using Python <a href="https://uscuni.org/neatnet/" class="external-link">neatnet</a> package.</p>
 <div style="display: flex; gap: 20px; overflow-x: auto;">
 <div class="section level4" style="flex: 1 1 0; min-width: 288px; max-width: 100%;">
 <h4 id="original-network">Original network<a class="anchor" aria-label="anchor" href="#original-network"></a>

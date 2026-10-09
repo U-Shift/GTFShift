@@ -1,6 +1,6 @@
-# Export designated bus lanes from OpenStreetMaps
+# Export designated bus lanes from OpenStreetMap
 
-Export designated bus lanes from OpenStreetMaps
+Export designated bus lanes from OpenStreetMap
 
 ## Usage
 
@@ -28,7 +28,7 @@ sf data.frame. OSM bus lanes.
 
 ## Details
 
-Exports roads tagged as designated bus lanes on OpenStreetMaps for given
+Exports roads tagged as designated bus lanes on OpenStreetMap for given
 area.
 
 ## Examples

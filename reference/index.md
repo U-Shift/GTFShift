@@ -58,10 +58,10 @@
 - [`create_shapes_from_stops()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_stops.md)
   : Build shapes from GTFS stops data
 
-## OpenStreetMaps
+## OpenStreetMap
 
 - [`osm_bus_lanes()`](https://u-shift.github.io/GTFShift/reference/osm_bus_lanes.md)
-  : Export designated bus lanes from OpenStreetMaps
+  : Export designated bus lanes from OpenStreetMap
 - [`osm_centerlines()`](https://u-shift.github.io/GTFShift/reference/osm_centerlines.md)
   : Get centerlines for OSM road network
 - [`osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)

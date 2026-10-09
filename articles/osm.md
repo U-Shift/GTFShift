@@ -9,7 +9,7 @@ library(dplyr)
 
 ## Introduction
 
-OpenStreetMaps (OSM) is an important data source for transit analysis,
+OpenStreetMap (OSM) is an important data source for transit analysis,
 due to its rich, open, and detailed geographic data. GTFShift includes
 some methods that allow to access its information directly.
 
@@ -20,7 +20,7 @@ some methods that allow to access its information directly.
 
 ### Using OSM API vs. local OSM extract
 
-By default, GTFShift methods use OSM API to access OpenStreetMaps data
+By default, GTFShift methods use OSM API to access OpenStreetMap data
 ([osmdata::osmdata_sf](https://docs.ropensci.org/osmdata/reference/osmdata_sf.html)).
 However, the API rate is limited, making it hard to download large
 datasets. In these cases, it is recommended to use a local OSM extract
@@ -73,14 +73,14 @@ get_overpass_url() # You will see the default API instance
 set_overpass_url("https://overpass.private.coffee/api/interpreter") # Changin the instance to Private.coffee
 get_overpass_url() # You should see the new instance now
 
-# Now you can call any method on osmdata and the new API instance will be used 
+# Now you can call any method on osmdata and the new API instance will be used
 ```
 
 ## Download bus lanes
 
 Dedicated bus lanes can improve bus transit operation. Understanding
 their spatial distribution is important to study operation dynamics.
-`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMaps
+`osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMap
 for a given area.
 
 ``` r
@@ -100,7 +100,7 @@ mapview::mapview(bus_lanes, layer.name = "Bus lanes")
 
 ## Get OSM data for transit routes
 
-OpenStreetMaps defines transit routes as a
+OpenStreetMap defines transit routes as a
 [relation](https://wiki.openstreetmap.org/wiki/Public_transport#Service_routes)
 of ways (roads or railways, for instance) and nodes (stops and
 platforms). GTFShift provides methods to use them in the GTFS analysis.
@@ -295,7 +295,7 @@ mapview::mapview(shapes_match_routes, zcol = "map_name", legend = TRUE, layer.na
 The association between OSM route relations id and the GTFS shapes_id
 returned by
 [`GTFShift::osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)
-can be used to update OpenStreetMaps data. Refer to [Update OSM
+can be used to update OpenStreetMap data. Refer to [Update OSM
 data](https://u-shift.github.io/GTFShift/articles/osm_update.md) for
 more details.
 
@@ -317,7 +317,7 @@ for more details).
 
 [`GTFShift::osm_centerlines()`](https://u-shift.github.io/GTFShift/reference/osm_centerlines.md)
 allows to generate this simplification by creating the centerlines for
-the road network exported from OpenStreetMaps, using Python
+the road network exported from OpenStreetMap, using Python
 [neatnet](https://uscuni.org/neatnet/) package.
 
 #### Original network

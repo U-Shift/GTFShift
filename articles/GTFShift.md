@@ -6,7 +6,7 @@ You can install the stable version of **GTFShift** from CRAN:
 
 ``` r
 
-install.packages('GTFShift')
+install.packages("GTFShift")
 ```
 
 For the development version, fetch from GitHub:
@@ -89,7 +89,7 @@ stop, route or road segment.
 
 #### [OSM Data](https://u-shift.github.io/GTFShift/articles/osm.html)
 
-OpenStreetMaps (OSM) is an important data source for transit analysis,
+OpenStreetMap (OSM) is an important data source for transit analysis,
 due to its rich, open, and detailed geographic data.
 
 **GTFShift** includes some methods that allow to access its information

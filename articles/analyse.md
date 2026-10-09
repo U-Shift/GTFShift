@@ -25,9 +25,9 @@ applicability with simple examples.
 ``` r
 
 # Get GTFS from library GTFS database for Portugal
-data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_id = "lisboa"
-gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
+data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_id <- "lisboa"
+gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FALSE)
 ```
 
 ## Analyse network extension
@@ -51,12 +51,12 @@ frequency for a given date.
 library(osmdata)
 library(units)
 
-osm_q = opq(bbox=sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes)))  |>
+osm_q <- opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
   add_osm_feature(key = "route", value = c("bus", "tram")) |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
-route_extent_carris = get_network_extension(gtfs, route_identifier="route_short_name", direction_wise = TRUE, use_osm_routes = osm_q, unified = TRUE)
-drop_units(route_extent_carris/1000)
+route_extent_carris <- get_network_extension(gtfs, route_identifier = "route_short_name", direction_wise = TRUE, use_osm_routes = osm_q, unified = TRUE)
+drop_units(route_extent_carris / 1000)
 #> [1] 810.5303
 ```
 
@@ -75,7 +75,7 @@ hour.
 ``` r
 
 # Perform frequency analysis
-frequencies_stop = GTFShift::get_stop_frequency_hourly(gtfs)
+frequencies_stop <- GTFShift::get_stop_frequency_hourly(gtfs)
 ```
 
 ``` r
@@ -99,7 +99,7 @@ stored in GeoPackage format.
 mapview::mapview(
   frequencies_stop |>
     filter(hour == 8 &
-           frequency > 2),
+      frequency > 2),
   zcol = "frequency",
   legend = TRUE,
   cex = 4,
@@ -110,7 +110,7 @@ mapview::mapview(
 ``` r
 
 # Store in GeoPackage format
-st_write(frequencies_stop, "database/transit/bus_stop_frequency.gpkg", append=FALSE, quiet = TRUE)
+st_write(frequencies_stop, "database/transit/bus_stop_frequency.gpkg", append = FALSE, quiet = TRUE)
 ```
 
 ## Analyse hourly frequency per road segment
@@ -125,7 +125,7 @@ returning aggregated results per hour and road segment, using OSM ways.
 
 ``` r
 
-frequencies_way = GTFShift::get_way_frequency_hourly(gtfs, osm_q)
+frequencies_way <- GTFShift::get_way_frequency_hourly(gtfs, osm_q)
 ```
 
 ``` r
@@ -177,7 +177,7 @@ The analysis can be performed for each route individually.
 
 ``` r
 
-frequencies_route = GTFShift::get_route_frequency_hourly(gtfs)
+frequencies_route <- GTFShift::get_route_frequency_hourly(gtfs)
 ```
 
 ``` r
@@ -210,7 +210,7 @@ prioritising interventions in the network.
 
 ``` r
 
-frequencies_route_overline = GTFShift::get_route_frequency_hourly(gtfs, overline = TRUE)
+frequencies_route_overline <- GTFShift::get_route_frequency_hourly(gtfs, overline = TRUE)
 ```
 
 ``` r
@@ -282,7 +282,7 @@ network with open data.
 #### Correcting geometry with OSM open data
 
 GTFShift offers several methods that allow to get routes geometry from
-OpenStreetMaps. Refer to
+OpenStreetMap. Refer to
 [vignette(“osm”)](https://u-shift.github.io/GTFShift/articles/osm.html#get-osm-bus-routes)
 for more details.
 
@@ -326,13 +326,13 @@ for more details.
 
 ``` r
 
-network = sf::st_read(
-  "https://github.com/U-Shift/GTFShift/releases/download/v0.5.0/centerline_carris.gpkg", 
+network <- sf::st_read(
+  "https://github.com/U-Shift/GTFShift/releases/download/v0.5.0/centerline_carris.gpkg",
   quiet = TRUE
 )
 
-frequencies_route_overline_improved = GTFShift::network_overline(
-  network, 
+frequencies_route_overline_improved <- GTFShift::network_overline(
+  network,
   frequencies_route |> filter(hour == 8),
   attr = "frequency"
 )

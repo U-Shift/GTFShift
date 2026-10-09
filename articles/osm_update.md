@@ -5,10 +5,10 @@
 The association between OSM route relations id and the GTFS shapes_id
 returned by
 [`GTFShift::osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)
-can be used to update OpenStreetMaps data.
+can be used to update OpenStreetMap data.
 
 Python library [OsmApi](https://osmapi.metaodi.ch/osmapi/OsmApi.html)
-enables to perform this batch process using OpenStreetMaps API. This
+enables to perform this batch process using OpenStreetMap API. This
 article, adapted from an [osmapi example
 script](https://github.com/metaodi/osmapi/blob/16aeb189c9ff8db607cc118842133b8cd7b60971/examples/oauth2.py),
 aims to document this procedure.
@@ -54,8 +54,8 @@ file.
 ``` r
 
 write.csv(shapes_match_routes |> sf::st_drop_geometry() |> mutate(
-  distance_diff=round(distance_diff),
-  points_diff=round(points_diff)
+  distance_diff = round(distance_diff),
+  points_diff = round(points_diff)
 ), "osm_match.csv", row.names = FALSE)
 ```
 

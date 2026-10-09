@@ -46,7 +46,7 @@ sf data.frame. OSM centerlines.
 
 ## Details
 
-Exports road network from OpenStreetMaps for given area and uses Python
+Exports road network from OpenStreetMap for given area and uses Python
 [neatnet](https://uscuni.org/neatnet/) package to compute its
 centerlines.
 

@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GTFShift</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,9 +99,9 @@
 </h2>
 <p>The association between OSM route relations id and the GTFS shapes_id
 returned by <code><a href="../reference/osm_shapes_match_routes.html">GTFShift::osm_shapes_match_routes()</a></code> can be used
-to update OpenStreetMaps data.</p>
+to update OpenStreetMap data.</p>
 <p>Python library <a href="https://osmapi.metaodi.ch/osmapi/OsmApi.html" class="external-link">OsmApi</a> enables
-to perform this batch process using OpenStreetMaps API. This article,
+to perform this batch process using OpenStreetMap API. This article,
 adapted from an <a href="https://github.com/metaodi/osmapi/blob/16aeb189c9ff8db607cc118842133b8cd7b60971/examples/oauth2.py" class="external-link">osmapi
 example script</a>, aims to document this procedure.</p>
 <p>It can be run either at the development or live version of OSM,
@@ -144,8 +144,8 @@ have been followed, up to the definition of the variable
 stored in a CSV file.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">shapes_match_routes</span> <span class="op">|&gt;</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>  distance_diff<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">distance_diff</span><span class="op">)</span>,</span>
-<span>  points_diff<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">points_diff</span><span class="op">)</span></span>
+<span>  distance_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">distance_diff</span><span class="op">)</span>,</span>
+<span>  points_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">points_diff</span><span class="op">)</span></span>
 <span><span class="op">)</span>, <span class="st">"osm_match.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Then, it should be loaded into the Python environment, filtering the
 matches by the criteria that best suits your context.</p>
