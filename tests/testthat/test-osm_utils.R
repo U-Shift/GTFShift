@@ -198,6 +198,40 @@ test_that("get_osm_relations correctly forwards custom osm_route_type parameter"
     )
 })
 
+test_that("prepare_osm_file handles NULL and non-existent files", {
+    expect_null(GTFShift:::prepare_osm_file(NULL))
+    expect_equal(GTFShift:::prepare_osm_file("non_existent.pbf"), "non_existent.pbf")
+})
+
+test_that("prepare_osm_file returns original path when file is in writable directory outside library", {
+    temp_dir <- file.path(tempdir(), "test_writable_dir")
+    dir.create(temp_dir, showWarnings = FALSE)
+    test_file <- file.path(temp_dir, "test.pbf")
+    file.create(test_file)
+    on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+    res <- GTFShift:::prepare_osm_file(test_file)
+    expect_equal(res, test_file)
+})
+
+test_that("prepare_osm_file copies file to tempdir when directory is read-only", {
+    temp_dir <- file.path(tempdir(), "test_ro_dir")
+    dir.create(temp_dir, showWarnings = FALSE)
+    test_file <- file.path(temp_dir, "test_ro.pbf")
+    cat("test content", file = test_file)
+    Sys.chmod(temp_dir, "0555")
+    on.exit({
+        Sys.chmod(temp_dir, "0755")
+        unlink(temp_dir, recursive = TRUE)
+        unlink(file.path(tempdir(), "test_ro.pbf"))
+    }, add = TRUE)
+
+    res <- GTFShift:::prepare_osm_file(test_file)
+    expect_true(startsWith(res, tempdir()))
+    expect_equal(basename(res), "test_ro.pbf")
+    expect_true(file.exists(res))
+})
+
 
 
 

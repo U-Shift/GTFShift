@@ -9,13 +9,12 @@
 #'
 #' @param rt_speed data.frame or sf data.frame. The result of
 #'   \code{GTFShift::rt_average_speed()}. Must contain at least the columns
-#'   \code{distance_along_geometry} and \code{timestamp}.
+#'   \code{distance_along_geometry}, \code{distance_along_geometry_reversed}, and
+#'   \code{timestamp}.
 #' @param by Character vector (Default \code{c("trip_id", "route_id", "day")}).
 #'   Columns to aggregate by. If \code{"day"} is included in \code{by} but not present
 #'   in \code{rt_speed}, it is automatically derived from the \code{timestamp} column.
 #'   Set to \code{NULL} or \code{character(0)} to compute metrics across the entire dataset.
-#' @param dist_col Character (Default \code{"distance_along_geometry"}). Column name
-#'   present in \code{rt_speed} representing cumulative distance along geometry (in meters).
 #' @param speed_col Character (Default \code{"speed_kmh"}). Column name present in
 #'   \code{rt_speed} representing estimated speed between consecutive updates (in km/h).
 #' @param time_col Character (Default \code{"timestamp"}). Column name present in
@@ -26,18 +25,26 @@
 #' \code{trip_id}, \code{route_id}, and \code{day}), observations are ordered
 #' chronologically by \code{timestamp}.
 #'
-#' Let \eqn{\{(d_i, t_i)\}_{i=1}^n} denote the ordered sequence of updates, where
-#' \eqn{d_i} is the distance along geometry (meters) and \eqn{t_i} is the timestamp (seconds).
+#' Let \eqn{\{(d_i, d_i^{\mathrm{rev}}, t_i)\}_{i=1}^n} denote the ordered sequence of updates, where
+#' \eqn{d_i} is the distance along geometry (meters), \eqn{d_i^{\mathrm{rev}}} is the reversed distance
+#' along geometry (meters), and \eqn{t_i} is the timestamp (seconds).
+#'
+#' To accommodate circular geometries (where starting and terminal positions may map to the same
+#' location on the shape), the distance traveled between two observations \eqn{i} and \eqn{j} (\eqn{j > i})
+#' is calculated by considering both the normal and reversed distances and taking the maximum:
+#' \deqn{\Delta d_{i, j}^{\mathrm{fwd}} = \left| d_j - d_i \right|}
+#' \deqn{\Delta d_{i, j}^{\mathrm{circ}} = \left| d_j - d_i^{\mathrm{rev}} \right|}
+#' \deqn{\Delta d_{i, j} = \max\left(\Delta d_{i, j}^{\mathrm{fwd}}, \Delta d_{i, j}^{\mathrm{circ}}\right)}
 #'
 #' \strong{Commercial speed} is calculated as the total distance traveled between the
 #' first and last updates divided by the elapsed time:
-#' \deqn{v_{\mathrm{commercial}} = \frac{|d_n - d_1|}{1000} \div \frac{t_n - t_1}{3600}}
+#' \deqn{v_{\mathrm{commercial}} = \frac{\Delta d_{1, n}}{1000} \div \frac{t_n - t_1}{3600}}
 #' If \eqn{n < 2} or \eqn{t_n \le t_1}, \code{commercial_speed} is \code{NA}.
 #'
 #' \strong{Alternative commercial speed} (\code{commercial_speed_alt}) uses the 2nd and
 #' penultimate (\eqn{n-1}) observations to eliminate potential dwell times or layovers at
 #' the terminal stops:
-#' \deqn{v_{\mathrm{commercial\_alt}} = \frac{|d_{n-1} - d_2|}{1000} \div \frac{t_{n-1} - t_2}{3600}}
+#' \deqn{v_{\mathrm{commercial\_alt}} = \frac{\Delta d_{2, n-1}}{1000} \div \frac{t_{n-1} - t_2}{3600}}
 #' If \eqn{n < 4} or \eqn{t_{n-1} \le t_2}, \code{commercial_speed_alt} is \code{NA}.
 #'
 #' If \code{by} does not include \code{trip_id} (e.g., aggregating at route or day level),
@@ -115,7 +122,6 @@
 get_trip_speed_profile <- function(
   rt_speed,
   by = c("trip_id", "route_id", "day"),
-  dist_col = "distance_along_geometry",
   speed_col = "speed_kmh",
   time_col = "timestamp"
 ) {
@@ -131,7 +137,7 @@ get_trip_speed_profile <- function(
   rt_speed <- dplyr::ungroup(rt_speed)
 
   # Check required columns
-  required_cols <- c(dist_col, time_col)
+  required_cols <- c("distance_along_geometry", "distance_along_geometry_reversed", time_col)
   missing_cols <- setdiff(required_cols, colnames(rt_speed))
   if (length(missing_cols) > 0) {
     stop(paste("rt_speed is missing required column(s):", paste(missing_cols, collapse = ", ")))
@@ -196,7 +202,9 @@ get_trip_speed_profile <- function(
     # First and last updates
     if (n_trip >= 2) {
       dt <- get_time_diff_sec(trip_df[[time_col]][1], trip_df[[time_col]][n_trip])
-      dd <- abs(trip_df[[dist_col]][n_trip] - trip_df[[dist_col]][1])
+      dd_normal <- abs(trip_df[["distance_along_geometry"]][n_trip] - trip_df[["distance_along_geometry"]][1])
+      dd_reversed <- abs(trip_df[["distance_along_geometry"]][n_trip] - trip_df[["distance_along_geometry_reversed"]][1])
+      dd <- pmax(dd_normal, dd_reversed, na.rm = TRUE)
       comm_speed <- compute_speed_kmh(dd, dt)
     } else {
       comm_speed <- NA_real_
@@ -205,7 +213,9 @@ get_trip_speed_profile <- function(
     # 2nd and penultimate updates
     if (n_trip >= 4) {
       dt_alt <- get_time_diff_sec(trip_df[[time_col]][2], trip_df[[time_col]][n_trip - 1])
-      dd_alt <- abs(trip_df[[dist_col]][n_trip - 1] - trip_df[[dist_col]][2])
+      dd_alt_normal <- abs(trip_df[["distance_along_geometry"]][n_trip - 1] - trip_df[["distance_along_geometry"]][2])
+      dd_alt_reversed <- abs(trip_df[["distance_along_geometry"]][n_trip - 1] - trip_df[["distance_along_geometry_reversed"]][2])
+      dd_alt <- pmax(dd_alt_normal, dd_alt_reversed, na.rm = TRUE)
       comm_speed_alt <- compute_speed_kmh(dd_alt, dt_alt)
     } else {
       comm_speed_alt <- NA_real_

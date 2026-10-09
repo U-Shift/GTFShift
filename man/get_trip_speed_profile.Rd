@@ -7,7 +7,6 @@
 get_trip_speed_profile(
   rt_speed,
   by = c("trip_id", "route_id", "day"),
-  dist_col = "distance_along_geometry",
   speed_col = "speed_kmh",
   time_col = "timestamp"
 )
@@ -15,15 +14,13 @@ get_trip_speed_profile(
 \arguments{
 \item{rt_speed}{data.frame or sf data.frame. The result of
 \code{GTFShift::rt_average_speed()}. Must contain at least the columns
-\code{distance_along_geometry} and \code{timestamp}.}
+\code{distance_along_geometry}, \code{distance_along_geometry_reversed}, and
+\code{timestamp}.}
 
 \item{by}{Character vector (Default \code{c("trip_id", "route_id", "day")}).
 Columns to aggregate by. If \code{"day"} is included in \code{by} but not present
 in \code{rt_speed}, it is automatically derived from the \code{timestamp} column.
 Set to \code{NULL} or \code{character(0)} to compute metrics across the entire dataset.}
-
-\item{dist_col}{Character (Default \code{"distance_along_geometry"}). Column name
-present in \code{rt_speed} representing cumulative distance along geometry (in meters).}
 
 \item{speed_col}{Character (Default \code{"speed_kmh"}). Column name present in
 \code{rt_speed} representing estimated speed between consecutive updates (in km/h).}
@@ -47,18 +44,26 @@ For each group defined by \code{by} (by default, each unique combination of
 \code{trip_id}, \code{route_id}, and \code{day}), observations are ordered
 chronologically by \code{timestamp}.
 
-Let \eqn{\{(d_i, t_i)\}_{i=1}^n} denote the ordered sequence of updates, where
-\eqn{d_i} is the distance along geometry (meters) and \eqn{t_i} is the timestamp (seconds).
+Let \eqn{\{(d_i, d_i^{\mathrm{rev}}, t_i)\}_{i=1}^n} denote the ordered sequence of updates, where
+\eqn{d_i} is the distance along geometry (meters), \eqn{d_i^{\mathrm{rev}}} is the reversed distance
+along geometry (meters), and \eqn{t_i} is the timestamp (seconds).
+
+To accommodate circular geometries (where starting and terminal positions may map to the same
+location on the shape), the distance traveled between two observations \eqn{i} and \eqn{j} (\eqn{j > i})
+is calculated by considering both the normal and reversed distances and taking the maximum:
+\deqn{\Delta d_{i, j}^{\mathrm{fwd}} = \left| d_j - d_i \right|}
+\deqn{\Delta d_{i, j}^{\mathrm{circ}} = \left| d_j - d_i^{\mathrm{rev}} \right|}
+\deqn{\Delta d_{i, j} = \max\left(\Delta d_{i, j}^{\mathrm{fwd}}, \Delta d_{i, j}^{\mathrm{circ}}\right)}
 
 \strong{Commercial speed} is calculated as the total distance traveled between the
 first and last updates divided by the elapsed time:
-\deqn{v_{\mathrm{commercial}} = \frac{|d_n - d_1|}{1000} \div \frac{t_n - t_1}{3600}}
+\deqn{v_{\mathrm{commercial}} = \frac{\Delta d_{1, n}}{1000} \div \frac{t_n - t_1}{3600}}
 If \eqn{n < 2} or \eqn{t_n \le t_1}, \code{commercial_speed} is \code{NA}.
 
 \strong{Alternative commercial speed} (\code{commercial_speed_alt}) uses the 2nd and
 penultimate (\eqn{n-1}) observations to eliminate potential dwell times or layovers at
 the terminal stops:
-\deqn{v_{\mathrm{commercial\_alt}} = \frac{|d_{n-1} - d_2|}{1000} \div \frac{t_{n-1} - t_2}{3600}}
+\deqn{v_{\mathrm{commercial\_alt}} = \frac{\Delta d_{2, n-1}}{1000} \div \frac{t_{n-1} - t_2}{3600}}
 If \eqn{n < 4} or \eqn{t_{n-1} \le t_2}, \code{commercial_speed_alt} is \code{NA}.
 
 If \code{by} does not include \code{trip_id} (e.g., aggregating at route or day level),

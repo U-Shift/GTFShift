@@ -124,6 +124,7 @@ osm_shapes_match_routes <- function(
   osm_route_type = "bus",
   metric_crs = 3857
 ) {
+  osm_file <- prepare_osm_file(osm_file)
   metric_crs_is_default <- missing(metric_crs)
   initial_osm_file <- osm_file
   total_steps <- 4
