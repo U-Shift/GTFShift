@@ -97,11 +97,11 @@ summary(gtfs)
 #> agency       Cascais Próxima
 #> service      from 2025-01-01 to 2027-12-31
 #> uses         stop_times (no frequencies)
-#> # routes       99
-#> # trips      3821
-#> # stop_ids   1082
+#> # routes      163
+#> # trips      6049
+#> # stop_ids   1083
 #> # stop_names  599
-#> # shapes      144
+#> # shapes      248
 ```
 
 ### Using GTFShift incorporated database for Portugal
@@ -165,9 +165,9 @@ summary(gtfs)
 #> agency       CP - Comboios de Portugal
 #> service      from 2025-12-14 to 2026-12-12
 #> uses         stop_times (no frequencies)
-#> # routes      173
-#> # trips      1699
+#> # routes      179
+#> # trips      1695
 #> # stop_ids    454
 #> # stop_names  454
-#> # shapes      240
+#> # shapes      246
 ```

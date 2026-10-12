@@ -31,14 +31,14 @@ gtfs = load_feed("https://download.gtfs.de/germany/fv_free/latest.zip")
 summary(gtfs)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
-#> agencies     BahnTouristikExpress, ZSSK, DB Fernverkehr (Codesharing) ... 10 more
-#> service      from 2026-10-03 to 2026-11-02
+#> agencies     MAV, SBB, DB Fernverkehr (Codesharing) ... 10 more
+#> service      from 2026-10-10 to 2026-11-09
 #> uses         stop_times (no frequencies)
 #> # routes       95
-#> # trips      5764
-#> # stop_ids   1185
-#> # stop_names  725
-#> # shapes     1736
+#> # trips      5538
+#> # stop_ids   1190
+#> # stop_names  733
+#> # shapes     1686
 ```
 
 Multimodal feeds aggregate several agencies.
@@ -53,14 +53,14 @@ gtfs_5 = GTFShift::filter_by_agency(gtfs, id = 5)
 summary(gtfs_5)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
-#> agency       SNCF
-#> service      from 2026-10-03 to 2026-11-02
+#> agency       Dänische Staatsbahnen
+#> service      from 2026-10-10 to 2026-11-09
 #> uses         stop_times (no frequencies)
-#> # routes      2
-#> # trips      51
-#> # stop_ids    8
-#> # stop_names  7
-#> # shapes      7
+#> # routes      3
+#> # trips      97
+#> # stop_ids   16
+#> # stop_names 15
+#> # shapes     14
 
 # Filter by agency name
 gtfs_sncf = GTFShift::filter_by_agency(gtfs, name = "SNCF")
@@ -68,10 +68,10 @@ summary(gtfs_sncf)
 #> tidygtfs object
 #> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
 #> agency       SNCF
-#> service      from 2026-10-03 to 2026-11-02
+#> service      from 2026-10-10 to 2026-11-09
 #> uses         stop_times (no frequencies)
 #> # routes      2
-#> # trips      51
+#> # trips      57
 #> # stop_ids    8
 #> # stop_names  7
 #> # shapes      7
