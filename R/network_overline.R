@@ -6,7 +6,7 @@
 #' @param target_network_split Integer (Default 100). If not NA, network is split in segments of defined meters.
 #' @param fun Method (Default \code{base::sum}). Function to summarise the attributes by.
 #' @param join_dist Integer (Default 10). Meters to consider when joining routes and network segments.
-#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute segment lengths and join distances in meters.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to compute segment lengths and join distances in meters. If NULL, spherical geometry (s2) is used by default.
 #'
 #' @details
 #' This method allows for the lines aggregation. Given a target network, it identifies (using \code{stplanr::rnet_join()})
@@ -50,8 +50,7 @@
 #'   overline <- GTFShift::network_overline(
 #'     target_network = target_network, 
 #'     lines = frequency_analysis, 
-#'     attr = "frequency",
-#'     metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+#'     attr = "frequency"
 #'   )
 #' })
 #' 
@@ -72,26 +71,25 @@ network_overline <- function(
     target_network_split=100,
     fun=sum,
     join_dist=10,
-    metric_crs = 3857
+    metric_crs = NULL
 ) {
   if (!requireNamespace("stplanr", quietly = TRUE)) {
     stop("Package 'stplanr' is required for this function. Install it with: install.packages('stplanr')")
   }
-  metric_crs_is_default <- missing(metric_crs)
   original_crs <- st_crs(target_network)
-  metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-  if (is.na(metric_crs)) {
-    stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-  }
-  if (metric_crs_is_default) {
-    warning(
-      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
-      call. = FALSE
-    )
+  if (!is.null(metric_crs)) {
+    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+    if (is.na(metric_crs)) {
+      stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+    }
+    target_network <- st_transform(target_network, crs = metric_crs)
+    lines <- st_transform(lines, crs = metric_crs)
+  } else if (!is.na(original_crs) && !is.na(st_crs(lines)) && st_crs(lines) != original_crs) {
+    lines <- st_transform(lines, crs = original_crs)
   }
 
   # 1. Prepare network
-  network_line = stplanr::line_cast(st_transform(target_network, crs = metric_crs))
+  network_line = stplanr::line_cast(target_network)
   if (!is.na(target_network_split)) {
     network_segmented = stplanr::line_segment(
       network_line,
@@ -103,7 +101,6 @@ network_overline <- function(
   }
 
   df = lines |>
-    st_transform(crs = metric_crs) |>
     mutate(df_id=row_number())
 
   # 2. Overlap df and network segments
@@ -114,7 +111,7 @@ network_overline <- function(
     length_y = FALSE,
     key_column = "df_id",
     dist = join_dist,
-    crs = st_crs(metric_crs)
+    crs = st_crs(df)
   ) |> st_drop_geometry()
 
   df_network_attr = df_network_match |>
@@ -133,8 +130,10 @@ network_overline <- function(
   result = network_segmented |>
     filter(.data$segment %in% df_network_segment$segment) |>
     left_join(df_network_segment, by="segment") |>
-    select(-"segment") |>
-    st_transform(crs = original_crs)
+    select(-"segment")
+  if (!is.na(original_crs) && st_crs(result) != original_crs) {
+    result <- result |> st_transform(crs = original_crs)
+  }
 
   return(result)
 }

@@ -71,8 +71,8 @@ rt_collection = read.csv("rt_collect_file.csv") |>
 # (Optional) Filter updates, to remove those close to bus stops
 gtfs_stops = tidytransit::stops_as_sf(gtfs$stops, crs=4326)
 within_distance = st_is_within_distance(
-  rt_collection |> st_transform(crs=3857), 
-  gtfs_stops |> st_transform(crs=3857), 
+  rt_collection, 
+  gtfs_stops, 
   dist = stop_buffer_size
 )
 rt_collection_filtered = rt_collection[lengths(within_distance) == 0, ]

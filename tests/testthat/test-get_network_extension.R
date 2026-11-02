@@ -33,15 +33,16 @@ test_that("get_network_extension throws error for invalid metric_crs", {
   )
 })
 
-test_that("get_network_extension issues warning when metric_crs is missing", {
+test_that("get_network_extension works when metric_crs is default (NULL)", {
   sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 
-  expect_warning(
-    GTFShift::get_network_extension(gtfs, date = ref_date),
-    "Using default metric_crs"
+  expect_no_warning(
+    ext <- GTFShift::get_network_extension(gtfs, date = ref_date)
   )
+  expect_true(is.numeric(ext) || inherits(ext, "units"))
+  expect_gt(as.numeric(ext), 0)
 })
 
 test_that("get_network_extension works with parameter variations", {

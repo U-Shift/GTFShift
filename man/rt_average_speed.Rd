@@ -9,7 +9,7 @@ rt_average_speed(
   trips_geometries,
   rt_collection_trips_geometries_match_col = "trip_id",
   geometry_sample_meters = 10,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 }
 \arguments{
@@ -26,8 +26,8 @@ LINESTRING.}
 \item{geometry_sample_meters}{Numeric (Default 10). Sampling step used when
 projecting points along trip geometry and estimating cumulative distance.}
 
-\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to
-compute distances and speeds.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to
+compute distances and speeds. If NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 sf data.frame. Object based on \code{rt_collection}, with added columns:
@@ -111,7 +111,7 @@ osm_routes <- sf::st_read(
   quiet = TRUE
 ) |>  
   dplyr::filter(route_id \%in\% rt_collection$route_id) |>
-  dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))
+  dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom))
 
 head(osm_routes)
 
@@ -119,8 +119,7 @@ head(osm_routes)
 speed <- GTFShift::rt_average_speed(
   rt_collection = rt_collection, 
   trips_geometries = osm_routes,
-  rt_collection_trips_geometries_match_col = "route_id",
-  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+  rt_collection_trips_geometries_match_col = "route_id"
 )
 
 head(speed |> 

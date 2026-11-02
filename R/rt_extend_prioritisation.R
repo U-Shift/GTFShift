@@ -6,7 +6,7 @@
 #' @param rt_collection sf data.frame. GTFS-RT data collection. Must include \code{speed} column.
 #' @param rt_current_status Character vector (Default \code{c("IN_TRANSIT_TO")}). If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status} in this vector are considered.
 #' @param lane_buffer numeric (Default 15). Buffer distance (in meters) to create around lane segments to capture nearby GTFS-RT points.
-#' @param metric_crs Integer or character (Default 3857). Projected CRS used to apply lane buffer distances in meters.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to apply lane buffer distances in meters. If NULL, spherical geometry (s2) is used by default.
 #'
 #' @details
 #' Extends the \code{lane_prioritisation} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
@@ -58,8 +58,7 @@
 #'
 #' lane_prioritisation_extended <- GTFShift::rt_extend_prioritisation(
 #'   lane_prioritisation = lane_prioritisation,
-#'   rt_collection = rt_collection,
-#'   metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+#'   rt_collection = rt_collection
 #' )
 #'
 #' head(
@@ -78,9 +77,8 @@ rt_extend_prioritisation <- function(
   rt_collection,
   rt_current_status = c("IN_TRANSIT_TO"),
   lane_buffer = 15, # in meters
-  metric_crs = 3857
+  metric_crs = NULL
 ) {
-  metric_crs_is_default <- missing(metric_crs)
   # 1. Validate inputs
   required_cols <- c("way_osm_id")
   missing_cols <- setdiff(required_cols, colnames(lane_prioritisation))
@@ -93,15 +91,11 @@ rt_extend_prioritisation <- function(
   if (length(missing_rt_cols) > 0) {
     stop(paste("rt_collection is missing required columns:", paste(missing_rt_cols, collapse = ", ")))
   }
-  metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-  if (is.na(metric_crs)) {
-    stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-  }
-  if (metric_crs_is_default) {
-    warning(
-      "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
-      call. = FALSE
-    )
+  if (!is.null(metric_crs)) {
+    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+    if (is.na(metric_crs)) {
+      stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+    }
   }
   rt_collection_crs <- sf::st_crs(rt_collection)
 
@@ -138,8 +132,11 @@ rt_extend_prioritisation <- function(
 
   # 4. Create buffers in lane segments to overlap with updates
   job <- callr::r_bg(function(lanes_unique, lane_buffer, metric_crs, rt_collection_crs) { # update spinner while blocking method call
+    if (!is.null(metric_crs)) {
+      lanes_unique <- sf::st_transform(lanes_unique, crs = metric_crs)
+    }
     return(sf::st_buffer(
-      sf::st_transform(lanes_unique, crs = metric_crs),
+      lanes_unique,
       dist = lane_buffer
     ) |> sf::st_transform(crs = rt_collection_crs))
   }, args = list(lanes_unique, lane_buffer, metric_crs, rt_collection_crs))

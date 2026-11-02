@@ -13,17 +13,17 @@ test_that("multiline_to_sorted_linestring sorts multilinestring into linestring"
     expect_equal(st_geometry_type(res)[1], factor("LINESTRING", levels = levels(st_geometry_type(res))))
 })
 
-test_that("multiline_to_sorted_linestring emits warning when default metric_crs is used", {
+test_that("multiline_to_sorted_linestring works when default metric_crs (NULL) is used", {
     mls <- st_multilinestring(list(
         matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
         matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- st_sf(geometry = st_sfc(mls, crs = 4326))
 
-    expect_warning(
-        GTFShift::multiline_to_sorted_linestring(mls_sf),
-        "Using default metric_crs \\(EPSG:3857\\)"
+    expect_no_warning(
+        res <- GTFShift::multiline_to_sorted_linestring(mls_sf)
     )
+    expect_s3_class(res, "sfc")
 })
 
 test_that("multiline_to_sorted_linestring stops when metric_crs is invalid NA", {

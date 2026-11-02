@@ -45,7 +45,7 @@ test_that("create_shapes_from_sf calculates shape_dist_traveled when shape_dist_
     expect_false(unmatched_shape_id %in% shapes_df$shape_id)
 })
 
-test_that("create_shapes_from_sf issues warning when metric_crs is missing", {
+test_that("create_shapes_from_sf works when metric_crs is default (NULL)", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
@@ -55,9 +55,27 @@ test_that("create_shapes_from_sf issues warning when metric_crs is missing", {
         geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
     )
 
-    expect_warning(
-        GTFShift::create_shapes_from_sf(sf_line, gtfs),
-        "Using default metric_crs"
+    expect_no_warning(
+        shapes_df <- GTFShift::create_shapes_from_sf(sf_line, gtfs, shape_dist_traveled = TRUE)
+    )
+    expect_contains(names(shapes_df), c("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled"))
+    expect_equal(shapes_df$shape_dist_traveled[1], 0)
+    expect_equal(shapes_df$shape_dist_traveled[2], as.numeric(st_length(sf_line[1, ])), tolerance = 1e-3)
+})
+
+test_that("create_shapes_from_sf stops when metric_crs is invalid NA", {
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+    gtfs <- GTFShift::load_feed(sample_file)
+
+    target_shape_id <- gtfs$trips$shape_id[1]
+    sf_line <- st_sf(
+        shape_id = target_shape_id,
+        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+    )
+
+    expect_error(
+        GTFShift::create_shapes_from_sf(sf_line, gtfs, metric_crs = NA),
+        "metric_crs should be a valid CRS value"
     )
 })
 

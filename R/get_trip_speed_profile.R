@@ -93,14 +93,13 @@
 #'   quiet = TRUE
 #' ) |>
 #'   dplyr::filter(route_id %in% rt_collection$route_id) |>
-#'   dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))
+#'   dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom))
 #'
 #' # Compute speeds with rt_average_speed()
 #' speed <- GTFShift::rt_average_speed(
 #'   rt_collection = rt_collection,
 #'   trips_geometries = osm_routes,
-#'   rt_collection_trips_geometries_match_col = "route_id",
-#'   metric_crs = 3763
+#'   rt_collection_trips_geometries_match_col = "route_id"
 #' )
 #'
 #' # Compute trip speed profile

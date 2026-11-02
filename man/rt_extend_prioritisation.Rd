@@ -9,7 +9,7 @@ rt_extend_prioritisation(
   rt_collection,
   rt_current_status = c("IN_TRANSIT_TO"),
   lane_buffer = 15,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ rt_extend_prioritisation(
 
 \item{lane_buffer}{numeric (Default 15). Buffer distance (in meters) to create around lane segments to capture nearby GTFS-RT points.}
 
-\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to apply lane buffer distances in meters.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to apply lane buffer distances in meters. If NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 sf data.frame. Extended lane prioritisation with the following columns:
@@ -77,8 +77,7 @@ rt_collection <- read.csv(rt_collect_file) |>
 
 lane_prioritisation_extended <- GTFShift::rt_extend_prioritisation(
   lane_prioritisation = lane_prioritisation,
-  rt_collection = rt_collection,
-  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+  rt_collection = rt_collection
 )
 
 head(
