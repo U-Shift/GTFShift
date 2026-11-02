@@ -16,7 +16,7 @@ osm_shapes_match_routes(
   num_cores = 1,
   osm_stop_order_relaxed = FALSE,
   osm_route_type = "bus",
-  metric_crs = 3857
+  metric_crs = NULL
 )
 }
 \arguments{
@@ -42,7 +42,7 @@ osm_shapes_match_routes(
 
 \item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
 
-\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute shapes and routes lengths and stop-to-stop distances.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute shapes and routes lengths and stop-to-stop distances. If NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 data.frame. Matched routes (\code{sf} if \code{geometry=TRUE}) with the following columns:
@@ -134,8 +134,7 @@ osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package
 # Get OSM route geometries based on geometrical match
 shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
   gtfs, q,
-  osm_file = osm_file,
-  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+  osm_file = osm_file
 )
 
 head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_diff, stops_diff))

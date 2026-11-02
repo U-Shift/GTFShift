@@ -7,7 +7,7 @@
 multiline_to_sorted_linestring(
   multilinestring,
   points = NULL,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 }
 \arguments{
@@ -18,7 +18,7 @@ If provided, the first point defines the initial segment and the second
 point (when available) is used as tie-break guidance for its orientation. Remaining points are
 used as iterative tie-break guidance.}
 
-\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute distances and lengths during sorting. If NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 sfc. LINESTRING geometry object.
@@ -87,7 +87,7 @@ head(osm_routes)
 
 # Convert geometry to LINESTRING
 osm_routes <- osm_routes |>  dplyr::mutate(
-  geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763)
+  geom = GTFShift::multiline_to_sorted_linestring(geom)
 )
 
 head(osm_routes)

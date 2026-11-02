@@ -10,14 +10,16 @@ test_that("project_points_along_geometry computes projection and cumulative dist
     expect_contains(names(res), c("distance_to_closest_on_geometry", "distance_along_geometry", "distance_along_geometry_reversed"))
 })
 
-test_that("project_points_along_geometry emits warning when default metric_crs is used", {
-    line <- st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
-    pts <- st_sfc(st_point(c(20, 10)), crs = 3857)
+test_that("project_points_along_geometry works when default metric_crs (NULL) is used on geographic CRS", {
+    line <- st_sfc(st_linestring(matrix(c(-9.1, 38.7, -9.11, 38.71), ncol = 2, byrow = TRUE)), crs = 4326)
+    pts <- st_sfc(st_point(c(-9.1, 38.7)), st_point(c(-9.105, 38.702)), crs = 4326)
 
-    expect_warning(
-        GTFShift::project_points_along_geometry(line, pts),
-        "Using default metric_crs \\(EPSG:3857\\)"
+    expect_no_warning(
+        res <- GTFShift::project_points_along_geometry(line, pts)
     )
+    expect_equal(nrow(res), 2)
+    expect_equal(res$distance_along_geometry[1], 0)
+    expect_gt(res$distance_along_geometry[2], 0)
 })
 
 test_that("project_points_along_geometry stops when metric_crs is invalid NA", {

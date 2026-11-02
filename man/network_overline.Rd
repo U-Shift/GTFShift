@@ -11,7 +11,7 @@ network_overline(
   target_network_split = 100,
   fun = sum,
   join_dist = 10,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ network_overline(
 
 \item{join_dist}{Integer (Default 10). Meters to consider when joining routes and network segments.}
 
-\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute segment lengths and join distances in meters.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute segment lengths and join distances in meters. If NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 sf. Spatial network object extended with aggregated values.
@@ -74,8 +74,7 @@ suppressWarnings({
   overline <- GTFShift::network_overline(
     target_network = target_network, 
     lines = frequency_analysis, 
-    attr = "frequency",
-    metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+    attr = "frequency"
   )
 })
 
