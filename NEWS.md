@@ -1,4 +1,4 @@
-# GTFShift (development version)
+# GTFShift 1.2.0
 
 - Use spherical geometry (s2 via sf default) to compute distances instead of Mercator, with the option to override with a local projected CRS still available (#105)
 - Improved `load_feed()` integrity validation (#104):
