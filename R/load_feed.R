@@ -11,7 +11,9 @@
 #' @details
 #' In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
 #' \itemize{
-#'  \item \code{stop_times.txt} with empty \code{arrival_time} or \code{departure_time}, filtering rows that do not comply.
+#'  \item Removes duplicated entries across tables using \code{gtfstools::remove_duplicates()}.
+#'  \item \code{stop_times.txt} with empty \code{arrival_time} or \code{departure_time}, linearly interpolating missing times using \code{tidytransit::interpolate_stop_times()}.
+#'  \item Removes unused IDs across tables using \code{gtfstools::remove_unused_ids()}.
 #'  \item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFShift::create_shapes_from_stops()}.
 #' }
 #' When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops
@@ -23,6 +25,9 @@
 #'
 #' @seealso \code{GTFShift::create_shapes_from_stops()}
 #' @seealso \code{tidytransit::read_gtfs()}
+#' @seealso \code{tidytransit::interpolate_stop_times()}
+#' @seealso \code{gtfstools::remove_duplicates()}
+#' @seealso \code{gtfstools::remove_unused_ids()}
 #' @seealso \code{gtfsrouter::gtfs_transfer_table()}
 #'
 #' @examples
@@ -54,6 +59,7 @@
 #' file.exists(store_path)
 #'
 #' @import tidytransit
+#' @importFrom gtfstools remove_duplicates remove_unused_ids
 #'
 #' @export
 load_feed <- function(path, store_path = NA, create_transfers = FALSE, transfer_distance = 300, transfer_time = 120, transfer_street_routing = FALSE, headers = NULL) {
@@ -66,16 +72,40 @@ load_feed <- function(path, store_path = NA, create_transfers = FALSE, transfer_
   }
 
   # LOAD GTFS
-  gtfs <- tidytransit::read_gtfs(path)
+  gtfs <- withCallingHandlers(
+    tidytransit::read_gtfs(path),
+    warning = function(w) {
+      if (grepl("Duplicated ids found|The returned object is not a tidygtfs object", conditionMessage(w))) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 
   # VALIDATE integrity
 
-  ## Clean empty stop_times arrival/departure (happened with Cascais GTFS) which raises an error at filter_feed_by_date method
-  stopsNPrev <- length(gtfs$stop_times$trip_id)
-  gtfs$stop_times <- gtfs$stop_times[!is.na(gtfs$stop_times$arrival_time), ]
-  stopsNAfter <- length(gtfs$stop_times$trip_id)
-  if (stopsNPrev != stopsNAfter) {
-    warning(sprintf("> FIXED GTFS, there were %d stop times without arrival time!", stopsNPrev - stopsNAfter))
+  ## Deduplicate entries across tables
+  gtfs <- gtfstools::remove_duplicates(gtfs)
+  gtfs <- suppressWarnings(tidytransit::as_tidygtfs(gtfs))
+
+  ## Interpolate missing stop_times arrival/departure
+  if ("stop_times" %in% names(gtfs) && !is.null(gtfs$stop_times) && nrow(gtfs$stop_times) > 0) {
+    has_arr <- "arrival_time" %in% names(gtfs$stop_times)
+    has_dep <- "departure_time" %in% names(gtfs$stop_times)
+    missing_rows <- sum(
+      (if (has_arr) is.na(gtfs$stop_times$arrival_time) else FALSE) |
+      (if (has_dep) is.na(gtfs$stop_times$departure_time) else FALSE)
+    )
+    if (missing_rows > 0) {
+      gtfs <- tidytransit::interpolate_stop_times(gtfs)
+      warning(sprintf("> FIXED GTFS, interpolated %d stop times with missing times!", missing_rows))
+    }
+  }
+
+  ## Remove unused IDs across tables
+  if ("trips" %in% names(gtfs) && "trip_id" %in% names(gtfs$trips) &&
+      "stop_times" %in% names(gtfs) && "trip_id" %in% names(gtfs$stop_times)) {
+    gtfs <- gtfstools::remove_unused_ids(gtfs)
+    gtfs <- suppressWarnings(tidytransit::as_tidygtfs(gtfs))
   }
 
   ## If trips does not have shape_id column, create empty one
