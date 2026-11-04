@@ -36,7 +36,8 @@ Imports:
   purrr,
   rlang,
   xml2,
-  withr
+  withr,
+  units
 Suggests: 
     knitr,
     rmarkdown,
