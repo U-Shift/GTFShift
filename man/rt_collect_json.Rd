@@ -51,20 +51,20 @@ destination_file <- withr::local_tempfile(fileext = ".csv")
 
 # Collect data
 GTFShift::rt_collect_json(
-  gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs",
+  gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs",
   entity_key = "data.entity",
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
 
 # Read data
-collection <- read.csv(destination_file)
-
-names(collection)
-
-head(
-  collection |>
-    dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
-)
+if (file.exists(destination_file)) {
+  collection <- read.csv(destination_file)
+  names(collection)
+  head(
+    collection |>
+      dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
+  )
+}
 
 }
