@@ -78,7 +78,7 @@ suppressWarnings({
   )
 })
 
-head(overline |> st_drop_geometry())
+head(overline |> sf::st_drop_geometry())
 }
 
 }

@@ -6,6 +6,7 @@
   - Remove duplicate entries across tables with `gtfstools::remove_duplicates()` (#104)
   - Remove unused IDs across tables with `gtfstools::remove_unused_ids()` (#104)
 - Bumped `gtfstools` minimum version dependency to `>= 2.0.0` (#103)
+- Fail gracefully with informative messages when internet resources are unavailable to comply with CRAN policy (#106)
 
 
 

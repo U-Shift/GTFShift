@@ -16,26 +16,24 @@
 #' @returns String. The location of the file where data was collected.
 #'
 #' @examples
-#' \dontrun{
 #' # Create file
 #' destination_file <- withr::local_tempfile(fileext = ".csv")
 #'
 #' # Collect data
 #' GTFShift::rt_collect_protobuf(
-#'   gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs.pb",
+#'   gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs.pb",
 #'   destination_file = destination_file,
 #'   scrape_interval = -1 # Negative to run only once
 #' )
 #'
 #' # Read data
-#' collection <- read.csv(destination_file)
-#'
-#' names(collection)
-#'
-#' head(
-#'   collection |>
-#'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
-#' )
+#' if (file.exists(destination_file)) {
+#'   collection <- read.csv(destination_file)
+#'   names(collection)
+#'   head(
+#'     collection |>
+#'       dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
+#'   )
 #' }
 #'
 #' @importFrom jsonlite write_json
@@ -62,12 +60,46 @@ rt_collect_protobuf <- function(
       stop("Package 'RProtoBuf' is required for this function. Install it with: install.packages('RProtoBuf')")
     }
     RProtoBuf::readProtoFiles((system.file("extdata", "gtfs-realtime.proto", package = "GTFShift")))
-    if (grepl("^http", gtfs_rt_url) && !is.null(headers)) {
+    if (grepl("^http", gtfs_rt_url)) {
       temp_pb <- withr::local_tempfile(fileext = ".pb")
-      res <- httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers), httr::write_disk(temp_pb, overwrite = TRUE))
-      httr::stop_for_status(res)
+      res <- tryCatch(
+        if (!is.null(headers)) {
+          httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers), httr::write_disk(temp_pb, overwrite = TRUE))
+        } else {
+          httr::GET(gtfs_rt_url, httr::write_disk(temp_pb, overwrite = TRUE))
+        },
+        error = function(e) NULL
+      )
+      status_err <- if (is.null(res)) {
+        "connection failed"
+      } else {
+        tryCatch(
+          {
+            httr::stop_for_status(res)
+            NULL
+          },
+          error = function(e) e$message
+        )
+      }
+
+      if (!is.null(status_err)) {
+        m_err <- sprintf(
+          "[%s] Internet resource unavailable at %s (%s).",
+          format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url, status_err
+        )
+        message(m_err)
+        if (!is.na(log_file)) cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+        if (scrape_interval < 0) {
+          return(invisible(NULL))
+        }
+        Sys.sleep(scrape_interval)
+        next
+      }
       f <- file(temp_pb, "rb")
     } else {
+      if (!file.exists(gtfs_rt_url)) {
+        stop(sprintf("File does not exist: %s", gtfs_rt_url))
+      }
       f <- file(gtfs_rt_url, "rb")
     }
     on.exit(close(f), add = TRUE)
