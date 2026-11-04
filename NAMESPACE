@@ -72,6 +72,7 @@ importFrom(stringr,
 )
 importFrom(tidyr,unnest)
 importFrom(tidyselect,any_of)
+importFrom(units,set_units)
 importFrom(utils,
   head,
   tail,

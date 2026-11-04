@@ -57,6 +57,7 @@
 #' 
 #' head(points_projected)
 #'
+#' @importFrom units set_units
 #' @export
 project_points_along_geometry <- function(
   geometry,
