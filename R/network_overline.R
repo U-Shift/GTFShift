@@ -62,6 +62,17 @@
 #' @import sf
 #' @import dplyr
 #' @importFrom rlang .data
+#' @srrstats {EA2.3} Accepts user-specified attribute column `attr` and aggregation function `fun` rather than assuming fixed column names.
+#' @srrstats {EA4.0} Returns an `sf` network object matching the class of `target_network`.
+#' @srrstats {SP2.2} Integrates with `stplanr::line_cast()`, `stplanr::line_segment()`, and `stplanr::rnet_join()`.
+#' @srrstats {SP2.2a} Demonstrates embedding `GTFShift` route frequency outputs into `stplanr` road network workflows.
+#' @srrstats {SP2.3} Examples load the target road network from a `.gpkg` file via `sf::st_read()`.
+#' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
+#' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
+#' @srrstats {SP2.8} Harmonizes CRS between `target_network` and `lines` prior to spatial joining.
+#' @srrstats {SP2.9} Transforms the aggregated `result` back to `original_crs` before returning.
+#' @srrstats {SP4.0a} Returns an `sf` object matching `target_network`.
+#' @srrstats {SP4.2} Explicitly documents the returned `sf` object.
 #'
 #' @export
 network_overline <- function(

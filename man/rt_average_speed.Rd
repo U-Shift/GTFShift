@@ -32,13 +32,13 @@ compute distances and speeds. If NULL, spherical geometry (s2) is used by defaul
 \value{
 sf data.frame. Object based on \code{rt_collection}, with added columns:
 \describe{
-  \item{closest_on_shape}{Projected point on trip geometry.}
-  \item{distance_to_closest_on_geometry}{Distance from each update point to its projected location on the shape (meters).}
-  \item{distance_along_geometry}{Cumulative distance along trip geometry (meters).}
-  \item{distance_along_geometry_reversed}{Cumulative distance from shape end to projected location (meters).}
-  \item{time_since_prev_sec}{Elapsed time since previous update (seconds).}
-  \item{distance_since_prev_meters}{Distance increment since previous update (meters).}
-  \item{speed_kmh}{Estimated speed between consecutive updates (km/h).}
+\item{closest_on_shape}{Projected point on trip geometry.}
+\item{distance_to_closest_on_geometry}{Distance from each update point to its projected location on the shape (meters).}
+\item{distance_along_geometry}{Cumulative distance along trip geometry (meters).}
+\item{distance_along_geometry_reversed}{Cumulative distance from shape end to projected location (meters).}
+\item{time_since_prev_sec}{Elapsed time since previous update (seconds).}
+\item{distance_since_prev_meters}{Distance increment since previous update (meters).}
+\item{speed_kmh}{Estimated speed between consecutive updates (km/h).}
 }
 }
 \description{
@@ -47,7 +47,7 @@ computes cumulative distance along the geometry, and derives segment speed
 between consecutive updates.
 }
 \details{
-For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n} 
+For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n}
 denote the ordered sequence of
 real-time observations, where \eqn{x_i} is the vehicle position and
 \eqn{t_i} the corresponding timestamp, with
@@ -89,7 +89,7 @@ and reported in kilometers per hour as
 Trips with fewer than two observations are ignored with a warning because
 \eqn{\Delta t_i} and \eqn{\Delta d_i} are undefined in that case.
 
-Method \code{GTFShift::multiline_to_sorted_linestring()} can be used to convert MULTILINESTRING 
+Method \code{GTFShift::multiline_to_sorted_linestring()} can be used to convert MULTILINESTRING
 geometries to LINESTRING if needed.
 }
 \examples{

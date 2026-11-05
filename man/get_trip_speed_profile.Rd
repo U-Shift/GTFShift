@@ -73,23 +73,23 @@ across trips within each group.
 \strong{Measures of centrality and spread} are calculated from all valid (non-NA, finite)
 speed observations in \code{speed_kmh} for each group:
 \describe{
-  \item{timestamp_min}{Earliest timestamp in the trip/group.}
-  \item{timestamp_max}{Latest timestamp in the trip/group.}
-  \item{commercial_speed}{Commercial speed between first and last update (km/h).}
-  \item{commercial_speed_alt}{Alternative commercial speed between 2nd and penultimate update (km/h).}
-  \item{speed_avg}{Arithmetic mean speed (km/h).}
-  \item{speed_median}{Median speed (km/h).}
-  \item{speed_sd}{Standard deviation of speeds (km/h).}
-  \item{speed_var}{Variance of speeds (km/h)^2.}
-  \item{speed_min}{Minimum observed speed (km/h).}
-  \item{speed_max}{Maximum observed speed (km/h).}
-  \item{speed_p15}{15th percentile speed (km/h).}
-  \item{speed_p25}{25th percentile (1st quartile) speed (km/h).}
-  \item{speed_p75}{75th percentile (3rd quartile) speed (km/h).}
-  \item{speed_p85}{85th percentile speed (km/h).}
-  \item{speed_iqr}{Interquartile range (speed_p75 - speed_p25) (km/h).}
-  \item{speed_count}{Count of valid speed observations.}
-  \item{n_updates}{Total number of position updates in the group.}
+\item{timestamp_min}{Earliest timestamp in the trip/group.}
+\item{timestamp_max}{Latest timestamp in the trip/group.}
+\item{commercial_speed}{Commercial speed between first and last update (km/h).}
+\item{commercial_speed_alt}{Alternative commercial speed between 2nd and penultimate update (km/h).}
+\item{speed_avg}{Arithmetic mean speed (km/h).}
+\item{speed_median}{Median speed (km/h).}
+\item{speed_sd}{Standard deviation of speeds (km/h).}
+\item{speed_var}{Variance of speeds (km/h)^2.}
+\item{speed_min}{Minimum observed speed (km/h).}
+\item{speed_max}{Maximum observed speed (km/h).}
+\item{speed_p15}{15th percentile speed (km/h).}
+\item{speed_p25}{25th percentile (1st quartile) speed (km/h).}
+\item{speed_p75}{75th percentile (3rd quartile) speed (km/h).}
+\item{speed_p85}{85th percentile speed (km/h).}
+\item{speed_iqr}{Interquartile range (speed_p75 - speed_p25) (km/h).}
+\item{speed_count}{Count of valid speed observations.}
+\item{n_updates}{Total number of position updates in the group.}
 }
 
 In addition, an attribute \code{"global_summary"} is attached to the returned data frame,

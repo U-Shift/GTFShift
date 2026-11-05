@@ -1,6 +1,12 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G5.2} Tests error when `metric_crs` is invalid `NA`.
+#' @srrstats {G5.4} Tests correctness of segment sorting, orientation reversal, tie-breaking with guiding points, and circular ring handling.
+#' @srrstats {G5.4a} Validates topological segment ordering on synthetic `MULTILINESTRING` cases with known start and end coordinates.
+#' @srrstats {G5.8c} Explicitly tests handling of identical duplicate remaining line segments (`test_that("multiline_to_sorted_linestring excludes identical duplicate remaining segments", ...)`).
+#' @srrstats {SP6.0} Verifies that returned `sfc_LINESTRING` recovers original coordinates and CRS (`EPSG:4326`) after sorting in `metric_crs = 3857`.
+#' @srrstats {SP6.1} Tests `multiline_to_sorted_linestring()` on both projected (`metric_crs = 3857`) and geographic (`metric_crs = NULL`) coordinates.
 test_that("multiline_to_sorted_linestring sorts multilinestring into linestring", {
     mls <- st_multilinestring(list(
         matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),

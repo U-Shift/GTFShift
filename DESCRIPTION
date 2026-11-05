@@ -59,5 +59,6 @@ VignetteBuilder:
     knitr
 Config/Needs/website: rmarkdown
 Config/roxygen2/version: 8.1.1
+Roxygen: list(markdown = TRUE, roclets = c ("namespace", "rd", "srr::srr_stats_roclet"))
 Encoding: UTF-8
 Language: en-US

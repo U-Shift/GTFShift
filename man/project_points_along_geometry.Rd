@@ -26,10 +26,10 @@ compute nearest points, line sampling, and cumulative distances. If NULL, spheri
 \value{
 data.frame. Input points projected along geometry with four columns:
 \describe{
-  \item{closest_on_geometry}{An \code{sfc_POINT} column with the projected location on the line.}
-  \item{distance_to_closest_on_geometry}{Numeric distance from each input point to its projected location on the line.}
-  \item{distance_along_geometry}{Numeric cumulative distance from the line start to the projected location.}
-  \item{distance_along_geometry_reversed}{Numeric cumulative distance from the line end to the projected location.}
+\item{closest_on_geometry}{An \code{sfc_POINT} column with the projected location on the line.}
+\item{distance_to_closest_on_geometry}{Numeric distance from each input point to its projected location on the line.}
+\item{distance_along_geometry}{Numeric cumulative distance from the line start to the projected location.}
+\item{distance_along_geometry_reversed}{Numeric cumulative distance from the line end to the projected location.}
 }
 
 If \code{points} is empty, returns an empty data.frame with the same columns.

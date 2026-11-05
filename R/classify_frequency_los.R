@@ -32,6 +32,10 @@
 #'   dplyr::select(route_id, frequency_los)
 #'
 #' @import dplyr
+#' @srrstats {G1.0} Cites the Highway Capacity Manual (HCM 2000, Exhibit 27-1) reference for transit frequency Level of Service thresholds.
+#' @srrstats {G1.3} Defines Level of Service (LOS A through F) thresholds unambiguously.
+#' @srrstats {EA2.3} Allows user-specified `frequency_col` rather than hardcoding a single column name.
+#' @srrstats {EA4.0} Returns a `data.frame` (or `sf` data frame) preserving the input class and columns.
 #'
 #' @export
 classify_frequency_los <- function(frequencies, frequency_col = "frequency") {

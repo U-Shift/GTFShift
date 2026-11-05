@@ -42,7 +42,7 @@ Coordinates are 4326 (WGS 84) by default, following GTFS specifications.
 
 Optionally, when \code{shape_dist_traveled = TRUE}, it estimates cumulative
 distance along each shape for all generated points and appends this as
-\code{shape_dist_traveled}. This metric is computed in the units of 
+\code{shape_dist_traveled}. This metric is computed in the units of
 \code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
 }
 \examples{

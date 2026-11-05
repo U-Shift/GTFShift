@@ -1,6 +1,22 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G5.2} Explicitly tests error behaviour on invalid input types, missing required columns, and missing grouping columns.
+#' @srrstats {G5.2a} Verifies unique error messages for each validation check in `get_trip_speed_profile()`.
+#' @srrstats {G5.2b} Compares triggered error messages against expected patterns via `expect_error()`.
+#' @srrstats {G5.3} Explicitly verifies absence of `NA` in computed speed profile columns (`expect_true(all(!is.na(...)))`).
+#' @srrstats {G5.4} Tests correctness of commercial speed, alternative commercial speed, mean, median, SD, variance, quantiles, and IQR against known analytical values.
+#' @srrstats {G5.4a} Validates circular-route commercial speed calculation and multi-trip aggregation on synthetic datasets with exact analytical solutions.
+#' @srrstats {G5.8} Tests edge cases including `n = 1, 2, 3, 4` updates, unordered timestamps, zero elapsed time, `NA` fields, and `Inf`/`-Inf` speeds.
+#' @srrstats {G5.8b} Tests unsupported input types (`123`, `list(a = 1)`).
+#' @srrstats {G5.8c} Explicitly tests all-`NA` speed columns (`df_all_na`), `NA` timestamps/distances, and identical timestamps (`df_zero_time`).
+#' @srrstats {G5.8d} Tests observation counts outside the scope of `commercial_speed` (`n < 2`) and `commercial_speed_alt` (`n < 4`).
+#' @srrstats {EA6.0} Tests return object classes, dimensions, column names, column classes (`Date`), and numeric summary values.
+#' @srrstats {EA6.0a} Tests `data.frame` class of returned object and `"global_summary"` attribute.
+#' @srrstats {EA6.0b} Tests `nrow()` of returned profiles across grouping configurations.
+#' @srrstats {EA6.0c} Tests column names of returned profile tables.
+#' @srrstats {EA6.0d} Tests column types including derived `Date` column `day`.
+#' @srrstats {EA6.0e} Tests single-valued summary metrics against expected numeric values.
 test_that("get_trip_speed_profile calculates speed profile with default parameters", {
     # 2 trips, same route, 5 updates each
     # Trip T1: 1500m over 240s -> commercial_speed = (1.5 km) / (240 / 3600 h) = 22.5 km/h

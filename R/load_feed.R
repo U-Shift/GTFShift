@@ -60,6 +60,15 @@
 #'
 #' @import tidytransit
 #' @importFrom gtfstools remove_duplicates remove_unused_ids
+#' @srrstats {G2.7} Accepts local or remote GTFS feeds and returns domain-standard `tidygtfs` tabular collections.
+#' @srrstats {G2.8} Standardizes loaded feeds via `tidytransit::as_tidygtfs()`, `gtfstools::remove_duplicates()`, and `gtfstools::remove_unused_ids()`.
+#' @srrstats {G2.9} Issues diagnostic warnings when missing `stop_times` are interpolated or missing `shapes.txt` is generated.
+#' @srrstats {G2.13} Checks for missing `arrival_time`/`departure_time` values and missing `shapes.txt` during initial feed validation.
+#' @srrstats {EA1.3} Documents accepted input parameters and GTFS feed structures.
+#' @srrstats {EA4.0} Returns a validated `tidygtfs` object.
+#' @srrstats {EA4.2} Returns a `tidygtfs` object with default `print`, `summary`, and `plot` methods from `tidytransit`.
+#' @srrstats {SP2.2} Ensures interoperability across `tidytransit`, `gtfstools`, and `gtfsrouter`.
+#' @srrstats {SP4.2} Explicitly documents the `tidygtfs` return value.
 #'
 #' @export
 load_feed <- function(path, store_path = NA, create_transfers = FALSE, transfer_distance = 300, transfer_time = 120, transfer_street_routing = FALSE, headers = NULL) {

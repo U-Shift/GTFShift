@@ -1,6 +1,22 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G5.2} Explicitly tests all error conditions triggered by invalid inputs in `project_points_along_geometry()`.
+#' @srrstats {G5.2a} Verifies unique error messages for invalid `metric_crs`, non-`sf`/`sfc` inputs, multi-feature `geometry`, invalid geometry type, and missing CRS.
+#' @srrstats {G5.2b} Tests every error condition and compares messages against expected strings via `expect_error()`.
+#' @srrstats {G5.4} Tests correctness of point projection and cumulative distance calculation against known geometric coordinates.
+#' @srrstats {G5.4a} Verifies projection accuracy on trivial horizontal lines with exact known perpendicular offsets and cumulative distances.
+#' @srrstats {G5.8} Tests edge conditions including empty point sets, non-spatial objects, and missing CRS.
+#' @srrstats {G5.8a} Explicitly tests zero-length `points` (`st_sfc(crs = 3857)`) and verifies a zero-row `sf` return object.
+#' @srrstats {G5.8b} Explicitly tests unsupported input types (character strings and `POINT` instead of `LINESTRING`).
+#' @srrstats {EA6.0} Tests return object classes, dimensions, column names, column types, and numeric values.
+#' @srrstats {EA6.0a} Tests S3 classes (`sf` and `sfc_POINT`) of returned objects.
+#' @srrstats {EA6.0b} Tests `nrow()` dimensions of returned tabular objects.
+#' @srrstats {EA6.0c} Tests expected column names via `expect_contains(names(res), ...)`.
+#' @srrstats {EA6.0d} Tests classes/types of columns inside the returned `sf` data frame (`sfc_POINT` and numeric distances).
+#' @srrstats {SP6.0} Verifies that the returned `closest_on_geometry` preserves the original CRS of the input geometry.
+#' @srrstats {SP6.1} Tests `project_points_along_geometry()` on both Cartesian (`EPSG:3857`) and curvilinear (`EPSG:4326`) coordinates.
+#' @srrstats {SP6.1b} Demonstrates accurate cumulative distance calculation on both projected (`metric_crs = 3857`) and geographic (`metric_crs = NULL`, `EPSG:4326`) coordinates.
 test_that("project_points_along_geometry computes projection and cumulative distance", {
     line <- st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     pts <- st_sfc(st_point(c(20, 10)), crs = 3857)

@@ -1,5 +1,13 @@
 library(testthat)
 
+#' @srrstats {G5.0} Tests feed loading and integrity repairs using bundled GTFS sample feeds (`gtfs_tcb_sample.zip`).
+#' @srrstats {G5.1} Uses exported sample datasets in `inst/extdata/samples`.
+#' @srrstats {G5.2} Explicitly tests warning messages when interpolating missing `stop_times` or generating missing `shapes.txt`.
+#' @srrstats {G5.2b} Verifies warning messages with `expect_warning()`.
+#' @srrstats {G5.3} Explicitly tests absence of `NA` values in interpolated `arrival_time` and `departure_time` (`expect_false(anyNA(...))`).
+#' @srrstats {G5.4b} Tests integration with `tidytransit::read_gtfs()`, `gtfstools::remove_duplicates()`, `gtfstools::remove_unused_ids()`, and `gtfsrouter::gtfs_transfer_table()`.
+#' @srrstats {SP2.2b} Demonstrates translation between `tidytransit`, `gtfstools`, and `gtfsrouter` formats in tests.
+#' @srrstats {SP2.3} Loads GTFS feeds from standard `.zip` archives rather than `.Rds` files.
 test_that("gtfs simple load", {
     gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
     testthat::expect_contains(class(gtfs), "tidygtfs")

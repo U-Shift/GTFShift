@@ -70,6 +70,17 @@
 #'
 #' @importFrom callr r_bg
 #' @importFrom rlang .data
+#' @srrstats {G2.0a} Documents vector inputs such as `rt_current_status`.
+#' @srrstats {G2.13} Validates presence of required `way_osm_id` and `speed` columns and valid `metric_crs`.
+#' @srrstats {G2.15} Passes `na.rm = TRUE` to `mean()`, `stats::median()`, and `stats::quantile()`.
+#' @srrstats {EA4.0} Returns an `sf` data frame extending `lane_prioritisation`.
+#' @srrstats {SP2.0b} Errors when `metric_crs` is invalid or required spatial table columns are missing.
+#' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
+#' @srrstats {SP2.4a} Validates `metric_crs` using `WKT2` via `sf::st_crs()`.
+#' @srrstats {SP2.8} Transforms buffer geometries to `rt_collection_crs` prior to `sf::st_join()`.
+#' @srrstats {SP2.9} Preserves all attributes and geometry of `lane_prioritisation` in the returned `sf` object.
+#' @srrstats {SP4.0a} Returns an `sf` object matching the class of `lane_prioritisation`.
+#' @srrstats {SP4.2} Explicitly documents all added speed columns in `@returns`.
 #'
 #' @export
 rt_extend_prioritisation <- function(

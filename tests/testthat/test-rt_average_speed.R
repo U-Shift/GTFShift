@@ -1,6 +1,19 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G5.2} Explicitly tests warning and error conditions in `rt_average_speed()`.
+#' @srrstats {G5.2a} Tests unique warning (fewer than 2 updates) and error messages (non-`sf` inputs, `MULTILINESTRING` geometry, missing columns, invalid `metric_crs`).
+#' @srrstats {G5.2b} Verifies every warning and error message via `expect_warning()` and `expect_error()`.
+#' @srrstats {G5.4} Tests correctness of segment speed, elapsed time, and cumulative distance on synthetic trajectories with known speeds (30 km/h and 24 km/h).
+#' @srrstats {G5.4a} Validates speed calculation against analytical ground truth on synthetic linear trajectories.
+#' @srrstats {G5.8} Tests edge conditions including single-update trips (`n < 2`), non-`sf` data frames, and missing columns.
+#' @srrstats {G5.8b} Tests unsupported input classes (`data.frame` instead of `sf`, `MULTILINESTRING` instead of `LINESTRING`).
+#' @srrstats {G5.8d} Tests data outside the scope of segment speed calculation (trips with only 1 position update).
+#' @srrstats {EA6.0} Tests return object class (`sf`), row counts, column names, and numeric values.
+#' @srrstats {EA6.0a} Verifies `sf` class via `expect_s3_class(res, "sf")`.
+#' @srrstats {EA6.0b} Verifies row count via `expect_equal(nrow(res), 4)`.
+#' @srrstats {EA6.0c} Verifies column names via `expect_contains(names(res), expected_cols)`.
+#' @srrstats {EA6.0e} Tests numeric values of distances and speeds using explicit `tolerance` parameters (`tolerance = 1e-2`, `tolerance = 0.5`).
 test_that("rt_average_speed computes speeds along trip geometry", {
     trip_geom <- st_sf(
         trip_id = c("T1", "T2"),

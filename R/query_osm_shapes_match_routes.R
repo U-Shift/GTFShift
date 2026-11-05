@@ -110,6 +110,18 @@
 #' @importFrom utils head tail
 #' @importFrom xml2 read_xml xml_find_all xml_attr
 #' @importFrom rlang .data
+#' @srrstats {G1.1} Implements a composite geometrical and stop-count closeness matching algorithm between GTFS shapes and OpenStreetMap route relations.
+#' @srrstats {G1.3} Formulates the closeness metric $C(i, j)$ and conflict resolution rules mathematically in `@details`.
+#' @srrstats {G2.2} Restricts `gtfs_match` and `osm_match` to single valid column/tag identifiers.
+#' @srrstats {G2.3} Validates character parameters `gtfs_match` and `osm_match`.
+#' @srrstats {G2.3a} Permits only expected identifier values for `gtfs_match` and `osm_match`.
+#' @srrstats {G2.3b} Explicitly documents and implements exact vs. case-insensitive partial matching via `gtfs_osm_match_exact`.
+#' @srrstats {G2.9} Issues detailed diagnostic warnings when routes have no match, partial matches, duplicate associations, or unsorted stops.
+#' @srrstats {EA2.3} Allows user-specified matching attributes (`gtfs_match` and `osm_match`).
+#' @srrstats {SP2.3} Examples load OpenStreetMap extract data from a standard `.pbf` file.
+#' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
+#' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
+#' @srrstats {SP4.2} Explicitly documents all returned columns and optional `sf` geometry.
 #'
 #' @export
 osm_shapes_match_routes <- function(

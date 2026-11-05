@@ -47,17 +47,17 @@ osm_shapes_match_routes(
 \value{
 data.frame. Matched routes (\code{sf} if \code{geometry=TRUE}) with the following columns:
 \describe{
-  \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
-  \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
-  \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
-  \item{distance_diff}{The difference, in meters, between GTFS shape and OSM route lengths.}
-  \item{points_diff}{The sum of the difference, in meters, between GTFS shape and OSM route start and end points.}
-  \item{stops_diff}{The difference between GTFS and OSM routes number of stops.}
-  \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
-  \item{route_long_name}{The \code{route_long_name} attribute from \code{routes.txt} file.}
-  \item{osm_ref}{The \code{ref} attribute from OSM route relation.}
-  \item{osm_name}{The \code{name} attribute from OSM route relation.}
-  \item{geometry}{The geometrical data for the OSM route relation.}
+\item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
+\item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
+\item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
+\item{distance_diff}{The difference, in meters, between GTFS shape and OSM route lengths.}
+\item{points_diff}{The sum of the difference, in meters, between GTFS shape and OSM route start and end points.}
+\item{stops_diff}{The difference between GTFS and OSM routes number of stops.}
+\item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
+\item{route_long_name}{The \code{route_long_name} attribute from \code{routes.txt} file.}
+\item{osm_ref}{The \code{ref} attribute from OSM route relation.}
+\item{osm_name}{The \code{name} attribute from OSM route relation.}
+\item{geometry}{The geometrical data for the OSM route relation.}
 }
 }
 \description{
@@ -79,13 +79,13 @@ We also retrieve the set of GTFS shapes associated with route \eqn{R}, denoted a
 \bold{2. Feature Extraction:}
 For each GTFS shape \eqn{S_i \in \mathcal{S}_R}:
 \itemize{
-  \item Extract the start and end coordinates of its trips' first and last stops: \eqn{\text{init}_{GTFS, i}} and \eqn{\text{fin}_{GTFS, i}}.
-  \item Compute the shape's total length \eqn{L_{GTFS, i}} and the number of stop times \eqn{N_{stops, i}}.
+\item Extract the start and end coordinates of its trips' first and last stops: \eqn{\text{init}_{GTFS, i}} and \eqn{\text{fin}_{GTFS, i}}.
+\item Compute the shape's total length \eqn{L_{GTFS, i}} and the number of stop times \eqn{N_{stops, i}}.
 }
 For each candidate OSM route relation \eqn{O_j \in \mathcal{O}_R}:
 \itemize{
-  \item Extract the coordinates of the first and last stops/platforms: \eqn{\text{init}_{OSM, j}} and \eqn{\text{fin}_{OSM, j}}.
-  \item Compute the relation's geometry length \eqn{L_{OSM, j}} and the number of stop/platform nodes \eqn{N_{stops, j}}.
+\item Extract the coordinates of the first and last stops/platforms: \eqn{\text{init}_{OSM, j}} and \eqn{\text{fin}_{OSM, j}}.
+\item Compute the relation's geometry length \eqn{L_{OSM, j}} and the number of stop/platform nodes \eqn{N_{stops, j}}.
 }
 
 \bold{3. Closeness Metric Evaluation:}
@@ -94,8 +94,8 @@ For each GTFS shape \eqn{S_i}, we calculate the closeness metric \eqn{C(i, j)} f
 
 where:
 \itemize{
-  \item \eqn{d(\cdot)} is the Euclidean distance.
-  \item The term \eqn{\frac{L_{GTFS, i}}{N_{stops, i}}}{(L_GTFS,i / N_stops,i)} represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.
+\item \eqn{d(\cdot)} is the Euclidean distance.
+\item The term \eqn{\frac{L_{GTFS, i}}{N_{stops, i}}}{(L_GTFS,i / N_stops,i)} represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.
 }
 Shape \eqn{S_i} is associated with the OSM route \eqn{O_{j^*}} that minimizes the closeness metric:
 \deqn{j^* = \operatorname{argmin}_{j} C(i, j)}{j* = argmin_j C(i, j)}
@@ -103,12 +103,11 @@ Shape \eqn{S_i} is associated with the OSM route \eqn{O_{j^*}} that minimizes th
 \bold{4. Conflict Resolution:}
 If multiple GTFS shapes are associated with the same OSM route \eqn{O_j}, only the shape \eqn{S_i} that minimizes the closeness metric is retained. The other conflicting shapes are ignored and a warning is triggered.
 
-
 Be aware that the result might ignore some GTFS routes, in the following cases:
 \itemize{
- \item If there is no OSM route relation that matches the GTFS route identifier;
- \item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order (unless \code{osm_stop_order_relaxed} is set to TRUE);
- \item If, for the same route, distinct shapes are associated to the same OSM route. In that case, only the shape that minimizes the closeness metric is retained.
+\item If there is no OSM route relation that matches the GTFS route identifier;
+\item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order (unless \code{osm_stop_order_relaxed} is set to TRUE);
+\item If, for the same route, distinct shapes are associated to the same OSM route. In that case, only the shape that minimizes the closeness metric is retained.
 }
 If any of these errors occurs, warnings will be thrown at end of the method execution, and those GTFS route will be ignored in the results.
 

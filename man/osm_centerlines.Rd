@@ -17,7 +17,7 @@ osm_centerlines(
 
 \item{place}{String (Optional, if bbox provided). Place from which to export bus lanes.}
 
-\item{osm_file}{String (Optional). Path to a local OpenStreetMap PBF file (`.pbf`).}
+\item{osm_file}{String (Optional). Path to a local OpenStreetMap PBF file (\code{.pbf}).}
 
 \item{use_buildings}{Boolean (Default TRUE). Uses buildings from OSM as exclusion_mask for neatnet.}
 

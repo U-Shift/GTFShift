@@ -47,6 +47,17 @@
 #' @import sf
 #' @importFrom stats weighted.mean
 #' @importFrom rlang .data
+#' @srrstats {G2.2} Restricts `weight` to a single univariate choice via `match.arg()`.
+#' @srrstats {G2.3} Validates character parameter `weight`.
+#' @srrstats {G2.3a} Uses `match.arg(weight)` to permit only `"length"` or `"frequency"`.
+#' @srrstats {G2.4b} Uses `as.numeric()` explicitly when converting `sf::st_length()` units to numeric lengths.
+#' @srrstats {G2.15} Passes `na.rm = TRUE` to all `sum()`, `weighted.mean()`, `min()`, and `max()` calls.
+#' @srrstats {EA3.0} Automates reporting of network-level bus lane extension, speed, and lane count statistics.
+#' @srrstats {EA3.1} Enables standardized comparison of prioritised transit networks weighted by length or frequency.
+#' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
+#' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
+#' @srrstats {SP4.1} Documents physical units (meters for extensions, km/h for speeds) in `@returns`.
+#' @srrstats {SP4.2} Explicitly documents the returned `list` structure and all elements.
 #'
 #' @export
 get_prioritisation_stats <- function(

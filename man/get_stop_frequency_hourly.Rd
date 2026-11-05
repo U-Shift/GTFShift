@@ -17,10 +17,10 @@ get_stop_frequency_hourly(
 \value{
 sf data.frame. Hourly stop frequencies, with the following columns:
 \describe{
-  \item{stop_id}{The \code{stop_id} attribute from \code{stops.txt} file.}
-  \item{hour}{The hour for which the frequency applies (24 hour format).}
-  \item{frequency}{The number of services provided at the stop for the corresponding 60 minutes period.}
-  \item{geometry}{The stop coordinates.}
+\item{stop_id}{The \code{stop_id} attribute from \code{stops.txt} file.}
+\item{hour}{The hour for which the frequency applies (24 hour format).}
+\item{frequency}{The number of services provided at the stop for the corresponding 60 minutes period.}
+\item{geometry}{The stop coordinates.}
 }
 }
 \description{

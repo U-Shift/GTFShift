@@ -35,6 +35,13 @@
 #' @import dplyr
 #' @import sf
 #' @importFrom rlang .data
+#' @srrstats {G2.2} Validates univariate `route_identifier` parameter.
+#' @srrstats {G2.3} Validates character input `route_identifier`.
+#' @srrstats {G2.3a} Restricts `route_identifier` to `"route_id"`, `"route_short_name"`, or `"route_long_name"`.
+#' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
+#' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
+#' @srrstats {SP4.1} Preserves `units` returned by `sf::st_length()` in the summed route extension.
+#' @srrstats {SP4.2} Documents the returned numeric/units extension in meters.
 #'
 #' @export
 get_network_extension <- function(
