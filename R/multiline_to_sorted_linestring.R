@@ -79,6 +79,19 @@
 #' @import dplyr
 #' @import sf
 #' @importFrom rlang .data
+#' @srrstats {G1.1} Implements a greedy topological sorting and orientation algorithm for converting `MULTILINESTRING` geometries into continuous `LINESTRING` geometries.
+#' @srrstats {G1.3} Formulates the initialization, iterative candidate selection, tie-breaking, and verification steps mathematically in `@details`.
+#' @srrstats {G2.4b} Uses `as.numeric()` explicitly when converting `sf::st_distance()` outputs.
+#' @srrstats {G2.10} Uses `drop = FALSE` when filtering single-column candidate data frames.
+#' @srrstats {G2.16} Checks `is.infinite()` on candidate distances when identical segments are excluded.
+#' @srrstats {G3.0} Selects candidate segments via `min()` and integer indices rather than testing arbitrary floating-point equality.
+#' @srrstats {SP2.3} Examples load sample `MULTILINESTRING` route geometries from a `.gpkg` file via `sf::st_read()`.
+#' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
+#' @srrstats {SP2.4a} Validates and transforms coordinate reference systems using `WKT2` via `sf::st_crs()`.
+#' @srrstats {SP2.8} Transforms input `linestrings` and `points` to a common CRS before sorting.
+#' @srrstats {SP2.9} Transforms the assembled `LINESTRING` back to `original_crs` before returning.
+#' @srrstats {SP4.0} Returns an `sfc` geometry object preserving the CRS of `multilinestring`.
+#' @srrstats {SP4.2} Explicitly documents the returned `sfc` `LINESTRING` class.
 #'
 #' @export
 multiline_to_sorted_linestring <- function(

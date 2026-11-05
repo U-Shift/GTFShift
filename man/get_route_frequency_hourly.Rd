@@ -23,13 +23,13 @@ get_route_frequency_hourly(
 \value{
 sf data.frame. Hourly route frequencies, with the following columns (the first three are only present if \code{overline=FALSE}):
 \describe{
-  \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
-  \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
-  \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
-  \item{direction_id}{The \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).}
-  \item{hour}{The hour for which the frequency applies (24 hour format).}
-  \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
-  \item{geometry}{The route shape.}
+\item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
+\item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
+\item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
+\item{direction_id}{The \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).}
+\item{hour}{The hour for which the frequency applies (24 hour format).}
+\item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+\item{geometry}{The route shape.}
 }
 }
 \description{

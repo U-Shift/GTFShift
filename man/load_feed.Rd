@@ -38,10 +38,10 @@ Read GTFS feed, fixing integrity errors
 \details{
 In addition to loading the GTFS feed, this method validates its integrity and applies the proper corrections if it does not comply with the following validations:
 \itemize{
- \item Removes duplicated entries across tables using \code{gtfstools::remove_duplicates()}.
- \item \code{stop_times.txt} with empty \code{arrival_time} or \code{departure_time}, linearly interpolating missing times using \code{tidytransit::interpolate_stop_times()}.
- \item Removes unused IDs across tables using \code{gtfstools::remove_unused_ids()}.
- \item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFShift::create_shapes_from_stops()}.
+\item Removes duplicated entries across tables using \code{gtfstools::remove_duplicates()}.
+\item \code{stop_times.txt} with empty \code{arrival_time} or \code{departure_time}, linearly interpolating missing times using \code{tidytransit::interpolate_stop_times()}.
+\item Removes unused IDs across tables using \code{gtfstools::remove_unused_ids()}.
+\item Feeds with missing \code{shapes.txt} file, generating it using \code{GTFShift::create_shapes_from_stops()}.
 }
 When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based on the stops
 network of the final aggregated version. This computation is executed with \code{gtfsrouter::gtfs_transfer_table()}, with

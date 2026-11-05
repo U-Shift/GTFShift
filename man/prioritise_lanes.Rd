@@ -26,18 +26,18 @@ prioritise_lanes(
 \value{
 sf data.frame. Prioritised lanes with the following columns:
 \describe{
-  \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
-  \item{hour}{The hour for which the frequency applies (24 hour format).}
-  \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
-  \item{is_bus_lane}{Whether the way has a bus lane.}
-  \item{n_lanes_parking}{The number of parking lanes.}
-  \item{n_lanes_circulation}{The number of circulation lanes.}
-  \item{n_directions}{The number of travel directions.}
-  \item{n_lanes_circulation_direction}{The number of circulation lanes per direction.}
-  \item{routes}{The list of route_id that use the way.}
-  \item{shapes}{The list of shape_id that use the way.}
-  \item{geometry}{The route shape.}
-  \item{(if \code{keep_osm_attributes = TRUE})}{All OSM way attributes.}
+\item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
+\item{hour}{The hour for which the frequency applies (24 hour format).}
+\item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+\item{is_bus_lane}{Whether the way has a bus lane.}
+\item{n_lanes_parking}{The number of parking lanes.}
+\item{n_lanes_circulation}{The number of circulation lanes.}
+\item{n_directions}{The number of travel directions.}
+\item{n_lanes_circulation_direction}{The number of circulation lanes per direction.}
+\item{routes}{The list of route_id that use the way.}
+\item{shapes}{The list of shape_id that use the way.}
+\item{geometry}{The route shape.}
+\item{(if \code{keep_osm_attributes = TRUE})}{All OSM way attributes.}
 }
 }
 \description{

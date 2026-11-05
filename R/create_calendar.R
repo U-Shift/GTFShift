@@ -27,6 +27,9 @@
 #'
 #' @import dplyr
 #' @importFrom rlang .data
+#' @srrstats {G2.3b} Uses `tolower()` on weekday names to ensure case-independent matching.
+#' @srrstats {G2.4a} Uses `as.integer()` explicitly to encode binary weekday service indicators (`0`/`1`).
+#' @srrstats {SP4.2} Documents the returned `calendar.txt` `data.frame` structure.
 #'
 #' @export
 create_calendar <- function(gtfs) {

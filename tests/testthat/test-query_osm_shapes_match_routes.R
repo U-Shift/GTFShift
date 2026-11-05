@@ -42,6 +42,12 @@ setup_match_fixtures <- function(gtfs) {
     )
 }
 
+#' @srrstats {G5.2} Explicitly tests all validation errors and diagnostic warnings in `osm_shapes_match_routes()`.
+#' @srrstats {G5.2a} Tests unique error and warning messages for invalid parameters, missing routes, duplicate matches, unsorted stops, and missing stops.
+#' @srrstats {G5.2b} Verifies error and warning messages via `expect_error()` and `expect_warning()`.
+#' @srrstats {G5.4} Tests closeness metric matching and conflict resolution on synthetic GTFS and OSM fixtures.
+#' @srrstats {G5.8a} Tests zero-match edge cases returning an empty `sf` or `data.frame` object.
+#' @srrstats {SP6.1} Tests `osm_shapes_match_routes()` with both projected (`metric_crs = 3857`) and geographic (`metric_crs = NULL`) CRS.
 test_that("osm_shapes_match_routes validates input parameters and throws errors", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)

@@ -1,6 +1,13 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G5.2} Tests error conditions on invalid `weight` and invalid `metric_crs`.
+#' @srrstats {G5.2b} Verifies error messages via `expect_error()`.
+#' @srrstats {G5.4} Tests weighted mean and extension calculations against exact analytical formulas for both `weight = "length"` and `weight = "frequency"`.
+#' @srrstats {EA6.0a} Tests `list` return type via `expect_type(stats, "list")`.
+#' @srrstats {EA6.0c} Tests named elements of the returned statistics list.
+#' @srrstats {EA6.0e} Tests exact numeric values of summary metrics.
+#' @srrstats {SP6.1} Tests `get_prioritisation_stats()` with explicit `metric_crs` and default `metric_crs = NULL`.
 test_that("get_prioritisation_stats calculates summary statistics without speed_avg", {
     prioritisation_df <- st_sf(
         is_bus_lane = c(TRUE, FALSE),

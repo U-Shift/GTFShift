@@ -5,6 +5,7 @@
 #' @returns sf data.frame. Filtered road OSM data.
 #'
 #' @import dplyr
+#' @srrstats {G1.4a} Internal non-exported helper function documented with `roxygen2` and `@noRd`.
 #'
 #' @noRd
 filter_osm_bus_lanes <- function(road_osm) {

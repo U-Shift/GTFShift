@@ -1,5 +1,12 @@
 library(testthat)
 
+#' @srrstats {G2.11} Tests `units` and numeric output handling from `get_network_extension()`.
+#' @srrstats {G5.0} Uses bundled sample GTFS feed (`gtfs_tcb_sample.zip`).
+#' @srrstats {G5.1} Confirms tests run on exported sample datasets in `inst/extdata/samples`.
+#' @srrstats {G5.2} Tests error messages on invalid `route_identifier` and invalid `metric_crs`.
+#' @srrstats {G5.2b} Verifies error messages via `expect_error()`.
+#' @srrstats {SP6.1} Tests `get_network_extension()` on both projected (`metric_crs = 3857`) and geographic (`metric_crs = NULL`) CRS.
+#' @srrstats {SP6.1b} Verifies equivalent results across numeric (`3857`) and character (`"EPSG:3857"`) CRS specifications.
 test_that("get_network_extension calculates network route extension in meters", {
   sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
   gtfs <- GTFShift::load_feed(sample_file)

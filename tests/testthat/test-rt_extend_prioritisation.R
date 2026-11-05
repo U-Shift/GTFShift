@@ -1,6 +1,10 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G5.2} Explicitly tests error conditions when `way_osm_id` or `speed` columns are missing or `metric_crs` is invalid.
+#' @srrstats {G5.2b} Verifies error messages via `expect_error()`.
+#' @srrstats {G5.4} Tests correctness of buffered spatial join and speed percentile aggregation (`speed_p15`, `speed_p25`, `speed_median`, `speed_p75`, `speed_p85`, `speed_avg`).
+#' @srrstats {SP6.1} Tests `rt_extend_prioritisation()` with projected (`metric_crs = 3857`, `3763`) and geographic (`metric_crs = NULL`, `EPSG:4326`) CRS.
 test_that("rt_extend_prioritisation extends lane prioritisation with speed metrics for multiple entries", {
     lanes_sf <- st_sf(
         way_osm_id = c("w1", "w2"),

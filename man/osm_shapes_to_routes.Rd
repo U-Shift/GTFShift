@@ -29,11 +29,11 @@ osm_shapes_to_routes(
 \value{
 sf data.frame. Matched shape to route geometries with the following columns:
 \describe{
-  \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
-  \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
-  \item{way_osm_id}{The \code{osm_id} attribute from OSM way (if \code{ways} parameter is set to true).}
-  \item{*}{Any column that matches \code{ways_tags} parameter.}
-  \item{geometry}{The geometrical data for the OSM route relation.}
+\item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
+\item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
+\item{way_osm_id}{The \code{osm_id} attribute from OSM way (if \code{ways} parameter is set to true).}
+\item{*}{Any column that matches \code{ways_tags} parameter.}
+\item{geometry}{The geometrical data for the OSM route relation.}
 }
 
 Shapes that do not have a match on OSM are ignored.

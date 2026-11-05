@@ -61,6 +61,18 @@
 #' @import dplyr
 #' @import tidytransit
 #' @importFrom rlang .data
+#' @srrstats {G2.3b} Uses `tolower()` and `ignore.case = TRUE` when matching OpenStreetMap `oneway` and `parking` tag values.
+#' @srrstats {G2.4a} Uses `as.integer()` explicitly when counting left and right parking lanes.
+#' @srrstats {G2.4b} Uses `as.numeric()` explicitly when parsing OSM `lanes` tags.
+#' @srrstats {G2.12} Preserves `routes` and `shapes` list columns in the returned `sf` object.
+#' @srrstats {G2.15} Uses `na.rm = TRUE` in `rowSums()` and handles `NA` values explicitly in `case_when()` and `coalesce()`.
+#' @srrstats {EA3.0} Automates extraction and aggregation of road segment frequency, bus lane presence, parking lanes, and circulation lanes.
+#' @srrstats {EA3.1} Enables standardized comparison of transit corridor segments for bus lane prioritisation.
+#' @srrstats {EA4.0} Returns an `sf` data frame consistent with spatial network analysis workflows.
+#' @srrstats {EA4.2} Returns an `sf` data frame with default `print`, `plot`, and `summary` methods.
+#' @srrstats {SP2.3} Examples load OpenStreetMap network data from a standard `.pbf` file.
+#' @srrstats {SP4.0a} Returns an `sf` object with road segment geometries and prioritisation indicators.
+#' @srrstats {SP4.2} Documents all columns of the returned `sf` data frame.
 #'
 #' @export
 prioritise_lanes <- function(

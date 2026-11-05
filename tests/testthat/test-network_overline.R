@@ -1,6 +1,12 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G5.2} Tests error when `metric_crs` is invalid `NA`.
+#' @srrstats {G5.4} Tests correctness of line attribute aggregation (`sum` and `max`) over a target road network.
+#' @srrstats {G5.4b} Tests `network_overline()` integration with `stplanr` line segmentation and network joining.
+#' @srrstats {SP2.2b} Demonstrates compatibility with `sf` and `stplanr` workflows in tests.
+#' @srrstats {SP6.0} Verifies that aggregated network segments preserve the original CRS of `target_network`.
+#' @srrstats {SP6.1} Tests `network_overline()` on both projected (`metric_crs = 3857`) and geographic (`metric_crs = NULL`, `EPSG:4326`) networks.
 test_that("network_overline aggregates lines onto target network", {
     target_net <- st_sf(
         id = 1,

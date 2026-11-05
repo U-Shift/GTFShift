@@ -58,6 +58,36 @@
 #' head(points_projected)
 #'
 #' @importFrom units set_units
+#' @srrstats {G2.0} Validates that `geometry` has length 1 and handles zero-length `points`.
+#' @srrstats {G2.0a} Documents length expectations for `geometry` (single linear feature) and `points`.
+#' @srrstats {G2.1} Validates that `geometry` and `points` inherit from `sf` or `sfc` and checks `st_geometry_type()`.
+#' @srrstats {G2.1a} Documents expected spatial and numeric data types for all parameters.
+#' @srrstats {G2.2} Restricts `geometry` to a single univariate feature (`length(geometry_sfc) != 1`).
+#' @srrstats {G2.4} Converts between `units`, `sfc`, and base vector types explicitly.
+#' @srrstats {G2.4b} Uses `as.numeric()` explicitly to convert `units` distance vectors to numeric values.
+#' @srrstats {G2.4c} Uses `as.character()` explicitly when coercing geometry type factors.
+#' @srrstats {G2.6} Processes 1D distance outputs regardless of `units` class attributes.
+#' @srrstats {G2.7} Accepts both `sf` data frames and `sfc` geometry lists.
+#' @srrstats {G2.8} Pre-processes `geometry` and `points` to `sfc` objects in a unified CRS.
+#' @srrstats {G2.11} Handles `sfc` geometry columns and `units` vectors appropriately.
+#' @srrstats {G2.13} Checks for missing (`NA`) CRS prior to coordinate transformations.
+#' @srrstats {EA1.3} Explicitly identifies accepted spatial input classes (`sf` and `sfc`).
+#' @srrstats {EA2.6} Processes vector distances regardless of `units` attributes.
+#' @srrstats {SP2.0} Accepts only dedicated spatial classes (`sf` and `sfc`).
+#' @srrstats {SP2.0b} Errors appropriately when spatial inputs lack a valid CRS or have inappropriate geometry types.
+#' @srrstats {SP2.3} Examples load spatial geometries from a standard `.gpkg` file via `sf::st_read()`.
+#' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
+#' @srrstats {SP2.4a} Represents and validates coordinate reference systems via `WKT2` (`sf::st_crs()`).
+#' @srrstats {SP2.5} Verifies CRS metadata on input `sf`/`sfc` objects.
+#' @srrstats {SP2.6} Documents accepted spatial input classes (`sf` or `sfc`) for `geometry` and `points`.
+#' @srrstats {SP2.7} Validates input spatial classes and geometry types prior to projection.
+#' @srrstats {SP2.8} Pre-processes inputs into `sfc` objects in a common CRS.
+#' @srrstats {SP2.9} Preserves original CRS metadata (`geometry_crs_original`) in the returned `sf` object.
+#' @srrstats {SP4.0} Returns an `sf` object consistent with spatial inputs.
+#' @srrstats {SP4.0a} Returns an `sf` object when given `sf`/`sfc` inputs.
+#' @srrstats {SP4.0b} Returns a documented `sf` data frame structure with projected point geometries.
+#' @srrstats {SP4.1} Computes distances in meters (using `units::set_units(..., "m")` for spherical segmentization).
+#' @srrstats {SP4.2} Explicitly documents the return class and columns in `@returns`.
 #' @export
 project_points_along_geometry <- function(
   geometry,

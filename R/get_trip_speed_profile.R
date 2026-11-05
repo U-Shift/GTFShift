@@ -116,6 +116,28 @@
 #' @import dplyr
 #' @importFrom stats median sd var quantile IQR
 #' @importFrom rlang .data
+#' @srrstats {G1.1} Implements trip- and route-level commercial speed and statistical speed profiling from GTFS-RT updates.
+#' @srrstats {G1.3} Unambiguously defines commercial speed, alternative commercial speed, and centrality/spread metrics with equations in `@details`.
+#' @srrstats {G2.0} Validates lengths of required and grouping column vectors and checks observation counts per trip.
+#' @srrstats {G2.1} Validates that `rt_speed` is a `data.frame` or `sf` object.
+#' @srrstats {G2.1a} Documents expected data types for all vector parameters (`by`, `speed_col`, `time_col`).
+#' @srrstats {G2.4} Provides explicit type conversions for timestamps (`POSIXct`, `Date`, `numeric`) and numeric metrics.
+#' @srrstats {G2.4b} Uses `as.numeric()` explicitly when computing time differences and quantiles.
+#' @srrstats {G2.6} Processes 1D timestamp and speed columns across `numeric`, `POSIXt`, `Date`, and `character` classes.
+#' @srrstats {G2.7} Accepts `data.frame`, `tibble`, grouped `tbl_df`, and `sf` tabular objects.
+#' @srrstats {G2.8} Pre-processes `rt_speed` by dropping `sf` geometry and ungrouping to a standard `data.frame`.
+#' @srrstats {G2.10} Uses `drop = FALSE` when subsetting data frames and `[[` for single-column extraction.
+#' @srrstats {G2.13} Checks for missing required columns and `NA` timestamps/distances before computing speeds.
+#' @srrstats {G2.15} Never passes unvalidated `NA` values to statistical routines; filters `!is.na()` and uses `na.rm = TRUE`.
+#' @srrstats {G2.16} Explicitly filters out undefined values (`NaN`, `Inf`, `-Inf`) via `!is.na(raw_speeds) & is.finite(raw_speeds)`.
+#' @srrstats {EA1.3} Documents required columns and types for `rt_speed` and grouping parameters.
+#' @srrstats {EA2.3} Allows user-specified grouping (`by`), speed (`speed_col`), and timestamp (`time_col`) columns rather than assuming fixed column names.
+#' @srrstats {EA2.6} Processes timestamp and speed vectors regardless of additional attributes.
+#' @srrstats {EA3.0} Automates extraction of trip, route, daily, and global summary speed statistics.
+#' @srrstats {EA3.1} Enables standardized comparison of commercial speeds and speed distributions across trips, routes, and days.
+#' @srrstats {EA4.0} Returns a tabular `data.frame` consistent with tabular input `rt_speed`.
+#' @srrstats {EA4.2} Returns a `data.frame` with standard default `print`, `plot`, and `summary` methods.
+#' @srrstats {SP4.2} Documents the returned `data.frame` structure and `"global_summary"` attribute.
 #'
 #' @export
 get_trip_speed_profile <- function(

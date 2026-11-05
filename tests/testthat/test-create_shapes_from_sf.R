@@ -1,6 +1,18 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G5.0} Uses bundled GTFS sample feed (`gtfs_tcb_sample.zip`) with known routes, trips, and stops.
+#' @srrstats {G5.1} Sample datasets in `inst/extdata/samples` are exported with the package and used across tests and examples.
+#' @srrstats {G5.2} Tests error behaviour when `metric_crs` is invalid or `shape_id` column is missing.
+#' @srrstats {G5.2b} Verifies exact error messages with `expect_error()`.
+#' @srrstats {G5.3} Explicitly tests absence of `NA` values in `shape_dist_traveled` (`expect_false(any(is.na(shapes_df$shape_dist_traveled)))`).
+#' @srrstats {G5.4} Tests correctness of shape generation and cumulative `shape_dist_traveled` against `sf::st_length()`.
+#' @srrstats {G5.4b} Compares `shape_dist_traveled` against reference length from `sf::st_length()`.
+#' @srrstats {EA6.0e} Tests numeric equality of `shape_dist_traveled` against `sf::st_length()` using an explicit `tolerance = 1e-3`.
+#' @srrstats {SP2.2b} Demonstrates integration of `sf`, `tidytransit`, and `gtfstools` in tests.
+#' @srrstats {SP6.0} Verifies that generated GTFS shapes recover WGS 84 (`EPSG:4326`) coordinates after internal metric projection.
+#' @srrstats {SP6.1} Tests `create_shapes_from_sf()` on both projected (`metric_crs = 3857`) and curvilinear (`metric_crs = NULL`) domains.
+#' @srrstats {SP6.1b} Verifies that `shape_dist_traveled` matches `sf::st_length()` in both projected and geographic CRS modes.
 test_that("create_shapes_from_sf generates shapes from sf object", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)

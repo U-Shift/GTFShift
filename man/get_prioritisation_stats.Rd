@@ -20,14 +20,14 @@ get_prioritisation_stats(
 \value{
 List. Statistics about lane prioritisation, with the following attributes:
 \describe{
-  \item{extension}{Total length of the prioritised network, in meters.}
-  \item{extension_bus_lane}{Total length of the bus lane segments, in meters.}
-  \item{speed_avg}{Average speed of the prioritised network, in km/h.}
-  \item{speed_min}{Minimum speed of the prioritised network, in km/h.}
-  \item{speed_max}{Maximum speed of the prioritised network, in km/h.}
-  \item{n_lanes_circulation_avg}{Average number of lanes in the prioritised network.}
-  \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritised network.}
-  \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritised network.}
+\item{extension}{Total length of the prioritised network, in meters.}
+\item{extension_bus_lane}{Total length of the bus lane segments, in meters.}
+\item{speed_avg}{Average speed of the prioritised network, in km/h.}
+\item{speed_min}{Minimum speed of the prioritised network, in km/h.}
+\item{speed_max}{Maximum speed of the prioritised network, in km/h.}
+\item{n_lanes_circulation_avg}{Average number of lanes in the prioritised network.}
+\item{n_lanes_circulation_min}{Minimum number of lanes in the prioritised network.}
+\item{n_lanes_circulation_max}{Maximum number of lanes in the prioritised network.}
 }
 }
 \description{

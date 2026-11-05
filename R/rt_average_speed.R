@@ -123,6 +123,31 @@
 #' @importFrom purrr map_dfr
 #' @import rlang
 #' @importFrom rlang .data
+#' @srrstats {G1.1} Implements real-time vehicle trajectory projection and segment speed estimation along transit shapes.
+#' @srrstats {G1.3} Defines forward and circular distance increments and segment speeds mathematically in `@details`.
+#' @srrstats {G2.0} Validates required columns and checks that each trip has at least 2 observations.
+#' @srrstats {G2.1} Asserts that `rt_collection` and `trips_geometries` inherit from `sf` and have `LINESTRING` geometries.
+#' @srrstats {G2.1a} Documents expected data types and classes for all parameters.
+#' @srrstats {G2.9} Issues a warning when trips with fewer than 2 updates are ignored.
+#' @srrstats {G2.10} Uses `[[` and `dplyr::select()` consistently on `sf` tabular objects.
+#' @srrstats {G2.13} Checks for required columns and minimum observation counts prior to speed calculation.
+#' @srrstats {G2.15} Uses `na.rm = TRUE` in `pmin()` when comparing normal and reversed distance increments.
+#' @srrstats {EA1.3} Documents required spatial and tabular structures for `rt_collection` and `trips_geometries`.
+#' @srrstats {EA2.3} Supports custom join column names via `rt_collection_trips_geometries_match_col`.
+#' @srrstats {EA4.0} Returns an `sf` data frame consistent with the input `rt_collection`.
+#' @srrstats {SP2.0} Accepts `sf` spatial objects for `rt_collection` and `trips_geometries`.
+#' @srrstats {SP2.0b} Errors appropriately on non-`sf` inputs, non-`LINESTRING` geometries, or invalid `metric_crs`.
+#' @srrstats {SP2.3} Examples load route geometries from a standard `.gpkg` spatial file.
+#' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
+#' @srrstats {SP2.4a} Validates and transforms CRS using `WKT2` representations via `sf::st_crs()`.
+#' @srrstats {SP2.5} Verifies CRS metadata on `rt_collection` and `trips_geometries`.
+#' @srrstats {SP2.6} Documents spatial classes and geometry types for all inputs.
+#' @srrstats {SP2.7} Validates input `sf` classes, geometry types, and CRS before processing.
+#' @srrstats {SP2.8} Harmonizes input CRS between `rt_collection` and `trips_geometries` prior to projection.
+#' @srrstats {SP2.9} Retains input attributes and geometry column from `rt_collection` in the returned `sf` object.
+#' @srrstats {SP4.0} Returns an `sf` data frame matching the class of `rt_collection`.
+#' @srrstats {SP4.0a} Preserves the `sf` class of `rt_collection` in the return object.
+#' @srrstats {SP4.2} Explicitly documents the returned `sf` data frame and all added columns.
 #'
 #' @export
 rt_average_speed <- function(
