@@ -79,41 +79,39 @@ destination_file <- withr::local_tempfile(fileext = ".csv")
 
 # Collect data
 GTFShift::rt_collect_json(
-  gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs",
+  gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs",
   entity_key = "data.entity",
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-10-12 08:02:16] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs
-#> [20261012_080216] Iteration 1 completed
-#> [1] "/tmp/Rtmpa5u5Gn/file1ec25b41c622.csv"
+#> [2026-11-05 10:27:40] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs
+#> [20261105_102740] Iteration 1 completed
+#> [1] "/tmp/RtmpevZ4L1/file7b953e002cf3.csv"
 
 # Read data
-collection <- read.csv(destination_file)
-
-names(collection)
-#> [1] "id"                            "vehicle.trip.trip_id"         
-#> [3] "vehicle.position.latitude"     "vehicle.position.longitude"   
-#> [5] "vehicle.position.speed"        "vehicle.timestamp"            
-#> [7] "vehicle.current_status"        "vehicle.current_stop_sequence"
-#> [9] "vehicle.stop_id"              
-
-head(
-  collection |>
-    dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
-)
-#>                        vehicle.trip.trip_id vehicle.position.latitude
-#> 1           [0HN8A][KJTOU]A-U:5001:0:2:0855                  41.18034
-#> 2 [PL3CL][YA15B]3710_0_2_0830_0859_0_ESC_DU                  38.70825
-#> 3           [TPNBR][BNA17]2725_0_2|1|1|0830                  38.81511
-#> 4          [ZLLEW][A2L1N]4701_0_2|1200|0815                  38.78403
-#> 5          [ZLLEW][A2L1N]4705_0_2|1200|0845                  38.70568
-#> 6          [ZLLEW][A2L1N]4725_0_1|1200|0845                  38.72089
+if (file.exists(destination_file)) {
+  collection <- read.csv(destination_file)
+  names(collection)
+  head(
+    collection |>
+      dplyr::select(
+        "vehicle.trip.trip_id", "vehicle.position.latitude",
+        "vehicle.position.longitude"
+      )
+  )
+}
+#>                                vehicle.trip.trip_id vehicle.position.latitude
+#> 1 [1NN3V][HF16N]M41-1-008-A-U-10h30-CarcavelosEstac                  38.68744
+#> 2 [1NN3V][HF16N]M31-1-012-A-U-10h00-CarcavelosEstac                  38.71481
+#> 3  [1NN3V][HF16N]M01-2-004-A-U-10h00-CascaiShopping                  38.70454
+#> 4 [1NN3V][HF16N]M46-1-005-E-U-10h30-SPedrodoEstoril                  38.69618
+#> 5 [1NN3V][HF16N]M01-1-005-A-U-10h00-ParedeTerminalC                  38.72349
+#> 6 [1NN3V][HF16N]M08-1-012-A-U-10h20-CascaisTerminal                  38.71525
 #>   vehicle.position.longitude
-#> 1                  -8.669123
-#> 2                  -9.173927
-#> 3                  -9.133284
-#> 4                  -9.075758
-#> 5                  -8.976628
-#> 6                  -9.175497
+#> 1                  -9.336246
+#> 2                  -9.372325
+#> 3                  -9.385755
+#> 4                  -9.373908
+#> 5                  -9.410613
+#> 6                  -9.424031
 ```

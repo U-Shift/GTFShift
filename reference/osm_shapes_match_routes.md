@@ -17,7 +17,7 @@ osm_shapes_match_routes(
   num_cores = 1,
   osm_stop_order_relaxed = FALSE,
   osm_route_type = "bus",
-  metric_crs = 3857
+  metric_crs = NULL
 )
 ```
 
@@ -84,8 +84,9 @@ osm_shapes_match_routes(
 
 - metric_crs:
 
-  Integer or character (Default 3857). Projected CRS used to compute
-  shapes and routes lengths and stop-to-stop distances.
+  Integer or character (Default NULL). Optional projected CRS used to
+  compute shapes and routes lengths and stop-to-stop distances. If NULL,
+  spherical geometry (s2) is used by default.
 
 ## Value
 
@@ -237,8 +238,7 @@ osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package
 # Get OSM route geometries based on geometrical match
 shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
   gtfs, q,
-  osm_file = osm_file,
-  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
+  osm_file = osm_file
 )
 #> > Found 12 GTFS shapes and 101 stops
 #> > Found 75 OSM route relations and 233 stops/platforms
@@ -246,7 +246,7 @@ shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
 #> > Combining results
 #> > Re-attaching OSM metadata and geometries
 #> > Getting route metadata
-#> > Associated 12 shapes (100.00% of 12 total) of 12 routes (100.00% of 12 total) with OSM routes, corresponding to 16 trips (100.00% of 16 total), with a mean distance of 41.02 meters for points, 83.69 meters for route length and a mean difference of 0.17 stops
+#> > Associated 12 shapes (100.00% of 12 total) of 12 routes (100.00% of 12 total) with OSM routes, corresponding to 16 trips (100.00% of 16 total), with a mean distance of 40.94 meters for points, 83.69 meters for route length and a mean difference of 0.17 stops
 #> > Of those, 12 shapes (100.00% of 12 matched) have a distance difference below 1000 meters AND a points difference below 500 meters
 
 head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_diff, stops_diff))
@@ -258,10 +258,10 @@ head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_
 #> # A tibble: 6 × 6
 #>   shape_id osm_id distance_diff points_diff stops_diff                  geometry
 #>   <chr>    <chr>          <dbl>       <dbl>      <dbl>     <MULTILINESTRING [°]>
-#> 1 1-QVBB-… 18957…         133.       409.            1 ((-9.050197 38.66117, -9…
-#> 2 1-TERM   94486…          60.1       11.9           1 ((-9.078279 38.65236, -9…
-#> 3 2-TERM   94486…          38.9       16.2           0 ((-9.078345 38.65221, -9…
-#> 4 3-SA-TE… 18958…          74.5        6.83          0 ((-9.031332 38.62453, -9…
-#> 5 3-SA-TE… 18958…          99.4        6.83          0 ((-9.031332 38.62453, -9…
-#> 6 3-TERM-… 11728…         133.         5.06          0 ((-9.078088 38.65212, -9…
+#> 1 1-QVBB-… 18957…         134.       409.            1 ((-9.050197 38.66117, -9…
+#> 2 1-TERM   94486…          60.2       11.9           1 ((-9.078279 38.65236, -9…
+#> 3 2-TERM   94486…          39.3       16.2           0 ((-9.078345 38.65221, -9…
+#> 4 3-SA-TE… 18958…          74.5        6.84          0 ((-9.031332 38.62453, -9…
+#> 5 3-SA-TE… 18958…          99.5        6.84          0 ((-9.031332 38.62453, -9…
+#> 6 3-TERM-… 11728…         133.         5.05          0 ((-9.078088 38.65212, -9…
 ```

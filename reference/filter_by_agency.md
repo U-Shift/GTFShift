@@ -41,7 +41,7 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agencies     Transportes Colectivos do Barreiro, TTSL - Transtejo Soflusa
 #> service      from 2020-12-19 to 2028-12-31
 #> uses         stop_times (no frequencies)
@@ -57,7 +57,7 @@ gtfs_id_8 = gtfs |> GTFShift::filter_by_agency(id = "8")
 
 summary(gtfs_id_8)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agency       Transportes Colectivos do Barreiro
 #> service      from 2026-08-03 to 2026-08-28
 #> uses         stop_times (no frequencies)
@@ -73,7 +73,7 @@ gtfs_ttsl <- gtfs |> GTFShift::filter_by_agency(name = "TTSL - Transtejo Soflusa
 
 summary(gtfs_ttsl)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agency       TTSL - Transtejo Soflusa
 #> service      from 2020-12-19 to 2028-12-31
 #> uses         stop_times (no frequencies)

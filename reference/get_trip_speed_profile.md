@@ -185,14 +185,13 @@ osm_routes <- sf::st_read(
   quiet = TRUE
 ) |>
   dplyr::filter(route_id %in% rt_collection$route_id) |>
-  dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))
+  dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom))
 
 # Compute speeds with rt_average_speed()
 speed <- GTFShift::rt_average_speed(
   rt_collection = rt_collection,
   trips_geometries = osm_routes,
-  rt_collection_trips_geometries_match_col = "route_id",
-  metric_crs = 3763
+  rt_collection_trips_geometries_match_col = "route_id"
 )
 #> Warning: Trip 4_4-CS-TERM has less than 2 updates. Ignoring it.
 
@@ -202,8 +201,8 @@ head(profile)
 #> # A tibble: 2 × 20
 #>   trip_id       route_id day        timestamp_min timestamp_max commercial_speed
 #>   <chr>         <chr>    <date>             <int>         <int>            <dbl>
-#> 1 20260514_DUP… 4_4-CS-… 2026-05-14    1778737742    1778738882             9.91
-#> 2 20260515_DUP… 4_4-CS-… 2026-05-15    1778823962    1778827442             6.69
+#> 1 20260514_DUP… 4_4-CS-… 2026-05-14    1778737742    1778738882             9.89
+#> 2 20260515_DUP… 4_4-CS-… 2026-05-15    1778823962    1778827442             6.68
 #> # ℹ 14 more variables: commercial_speed_alt <dbl>, speed_avg <dbl>,
 #> #   speed_median <dbl>, speed_sd <dbl>, speed_var <dbl>, speed_min <dbl>,
 #> #   speed_max <dbl>, speed_p15 <dbl>, speed_p25 <dbl>, speed_p75 <dbl>,
@@ -215,8 +214,8 @@ head(route_profile)
 #> # A tibble: 2 × 19
 #>   route_id    day        timestamp_min timestamp_max commercial_speed
 #>   <chr>       <date>             <int>         <int>            <dbl>
-#> 1 4_4-CS-TERM 2026-05-14    1778737742    1778738882             9.91
-#> 2 4_4-CS-TERM 2026-05-15    1778823962    1778827442             6.69
+#> 1 4_4-CS-TERM 2026-05-14    1778737742    1778738882             9.89
+#> 2 4_4-CS-TERM 2026-05-15    1778823962    1778827442             6.68
 #> # ℹ 14 more variables: commercial_speed_alt <dbl>, speed_avg <dbl>,
 #> #   speed_median <dbl>, speed_sd <dbl>, speed_var <dbl>, speed_min <dbl>,
 #> #   speed_max <dbl>, speed_p15 <dbl>, speed_p25 <dbl>, speed_p75 <dbl>,

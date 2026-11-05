@@ -30,15 +30,15 @@ narrow the perspective. GTFShift provides some to help in this process.
 gtfs = load_feed("https://download.gtfs.de/germany/fv_free/latest.zip")
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
-#> agencies     MAV, SBB, DB Fernverkehr (Codesharing) ... 10 more
-#> service      from 2026-10-10 to 2026-11-09
+#> files        agency, routes, stop_times, trips, attributions, ., calendar, calendar_dates, feed_info, stops
+#> agencies     Nederlandse Spoorwegen, HZZP, DB Fernverkehr AG ... 10 more
+#> service      from 2026-10-31 to 2026-11-30
 #> uses         stop_times (no frequencies)
-#> # routes       95
-#> # trips      5538
-#> # stop_ids   1190
-#> # stop_names  733
-#> # shapes     1686
+#> # routes       93
+#> # trips      4456
+#> # stop_ids   1160
+#> # stop_names  736
+#> # shapes     1534
 ```
 
 Multimodal feeds aggregate several agencies.
@@ -52,29 +52,29 @@ allows to filter by the agency id, name, or both. You can filter by the
 gtfs_5 = GTFShift::filter_by_agency(gtfs, id = 5)
 summary(gtfs_5)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
-#> agency       Dänische Staatsbahnen
-#> service      from 2026-10-10 to 2026-11-09
+#> files        agency, routes, stop_times, trips, attributions, ., calendar, calendar_dates, feed_info, stops
+#> agency       PKP Intercity
+#> service      from 2026-10-31 to 2026-11-30
 #> uses         stop_times (no frequencies)
-#> # routes      3
-#> # trips      97
-#> # stop_ids   16
-#> # stop_names 15
-#> # shapes     14
+#> # routes       4
+#> # trips      110
+#> # stop_ids   117
+#> # stop_names 117
+#> # shapes      29
 
 # Filter by agency name
 gtfs_sncf = GTFShift::filter_by_agency(gtfs, name = "SNCF")
 summary(gtfs_sncf)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, attributions, calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, attributions, ., calendar, calendar_dates, feed_info, stops
 #> agency       SNCF
-#> service      from 2026-10-10 to 2026-11-09
+#> service      from 2026-10-31 to 2026-11-30
 #> uses         stop_times (no frequencies)
 #> # routes      2
-#> # trips      57
-#> # stop_ids    8
-#> # stop_names  7
-#> # shapes      7
+#> # trips      36
+#> # stop_ids    6
+#> # stop_names  5
+#> # shapes      6
 ```
 
 #### Original GTFS
@@ -149,15 +149,15 @@ mapview::mapview(shapes_sf, zcol = "name", legend = TRUE, layer.name="Agency")
 gtfs = GTFShift::load_feed("https://gitlab.com/LACMTA/gtfs_rail/raw/master/gtfs_rail.zip", create_transfers=FALSE)
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, ., calendar, calendar_dates, feed_info, stops
 #> agency       Metro - Los Angeles
-#> service      from 2026-10-07 to 2026-10-21
+#> service      from 2026-11-05 to 2026-11-19
 #> uses         stop_times (no frequencies)
 #> # routes        6
-#> # trips      7709
+#> # trips      6803
 #> # stop_ids    463
 #> # stop_names  357
-#> # shapes       18
+#> # shapes       12
 ```
 
 Multimodal feeds aggregate several modes. `GTFShift::filter_by_mode()`
@@ -172,12 +172,12 @@ for more details on the modes id that should be used as parameters.
 gtfs_tram = GTFShift::filter_by_modes(gtfs, modes = list(0))
 summary(gtfs_tram)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, ., calendar, calendar_dates, feed_info, stops
 #> agency       Metro - Los Angeles
-#> service      from 2026-10-07 to 2026-10-21
+#> service      from 2026-11-05 to 2026-11-19
 #> uses         stop_times (no frequencies)
 #> # routes        4
-#> # trips      4988
+#> # trips      4577
 #> # stop_ids     95
 #> # stop_names   95
 #> # shapes        8
@@ -236,7 +236,7 @@ data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShif
 gtfs = GTFShift::load_feed(data[data$ID=="faro",]$URL, create_transfers=FALSE)
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, feed_info, stops
 #> agency       Próximo - Transportes Urbanos de Faro
 #> service      from 2025-01-01 to 2027-12-31
 #> uses         stop_times (no frequencies)
@@ -263,7 +263,7 @@ gtfs_1 = GTFShift::filter_by_route_name(
 )
 summary(gtfs_1)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, feed_info, stops
 #> agency       Próximo - Transportes Urbanos de Faro
 #> service      from 2025-01-02 to 2027-12-31
 #> uses         stop_times (no frequencies)
@@ -282,7 +282,7 @@ gtfs_terminal = GTFShift::filter_by_route_name(
 )
 summary(gtfs_terminal)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, feed_info, stops
 #> agency       Próximo - Transportes Urbanos de Faro
 #> service      from 2025-01-01 to 2027-12-31
 #> uses         stop_times (no frequencies)

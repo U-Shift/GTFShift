@@ -47,7 +47,7 @@ gtfs$routes |> dplyr::select(route_id, route_type)
 
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agencies     Transportes Colectivos do Barreiro, TTSL - Transtejo Soflusa
 #> service      from 2020-12-19 to 2028-12-31
 #> uses         stop_times (no frequencies)
@@ -69,7 +69,7 @@ gtfs_bus$routes |> dplyr::select(route_id, route_type)
 
 summary(gtfs_bus)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agencies     Transportes Colectivos do Barreiro, TTSL - Transtejo Soflusa
 #> service      from 2026-08-03 to 2026-08-28
 #> uses         stop_times (no frequencies)

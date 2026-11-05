@@ -12,7 +12,7 @@ get_network_extension(
   unified = FALSE,
   date = GTFShift::calendar_nextBusinessWednesday(),
   use_osm_routes = NA,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 ```
 
@@ -51,8 +51,9 @@ get_network_extension(
 
 - metric_crs:
 
-  Integer or character (Default 3857). Projected CRS used to compute
-  route lengths in meters.
+  Integer or character (Default NULL). Optional projected CRS used to
+  compute route lengths in meters. If NULL, spherical geometry (s2) is
+  used by default.
 
 ## Value
 
@@ -82,10 +83,9 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 # Get route extension
 GTFShift::get_network_extension(
   gtfs,
-  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
   date = gtfs$calendar$start_date[1]
 )
 #> Analysing GTFS for 2026-06-10...
 #> > Filtering by reference date 2026-06-10...
-#> 71910.56 [m]
+#> 71888.5 [m]
 ```

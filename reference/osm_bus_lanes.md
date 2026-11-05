@@ -36,13 +36,14 @@ area.
 ``` r
 # Create bbox for Lisbon
 bbox <- sf::st_as_sfc(sf::st_bbox(c(
-  xmin = -9.229836, ymin = 38.691399, 
+  xmin = -9.229836, ymin = 38.691399,
   xmax = -9.087387, ymax = 38.796760
 ), crs = 4326))
 
 # Use sample osmextract for Lisbon highways
 osm_file <- system.file(
-  "extdata/samples", "osmextract_lisbon_highways_sample.pbf", package = "GTFShift"
+  "extdata/samples", "osmextract_lisbon_highways_sample.pbf",
+  package = "GTFShift"
 )
 
 # Export bus lanes

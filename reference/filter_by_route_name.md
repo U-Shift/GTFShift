@@ -49,7 +49,7 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agency       Transportes Colectivos do Barreiro
 #> service      from 2026-06-08 to 2026-12-31
 #> uses         stop_times (no frequencies)
@@ -65,7 +65,7 @@ gtfs_route <- GTFShift::filter_by_route_name(gtfs, c("4"))
 
 summary(gtfs_route)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agency       Transportes Colectivos do Barreiro
 #> service      from 2026-06-08 to 2026-12-11
 #> uses         stop_times (no frequencies)

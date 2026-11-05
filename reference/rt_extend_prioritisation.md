@@ -11,7 +11,7 @@ rt_extend_prioritisation(
   rt_collection,
   rt_current_status = c("IN_TRANSIT_TO"),
   lane_buffer = 15,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 ```
 
@@ -39,8 +39,9 @@ rt_extend_prioritisation(
 
 - metric_crs:
 
-  Integer or character (Default 3857). Projected CRS used to apply lane
-  buffer distances in meters.
+  Integer or character (Default NULL). Optional projected CRS used to
+  apply lane buffer distances in meters. If NULL, spherical geometry
+  (s2) is used by default.
 
 ## Value
 
@@ -126,8 +127,7 @@ rt_collection <- read.csv(rt_collect_file) |>
 
 lane_prioritisation_extended <- GTFShift::rt_extend_prioritisation(
   lane_prioritisation = lane_prioritisation,
-  rt_collection = rt_collection,
-  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+  rt_collection = rt_collection
 )
 
 head(

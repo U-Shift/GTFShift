@@ -65,8 +65,15 @@ In addition to loading the GTFS feed, this method validates its
 integrity and applies the proper corrections if it does not comply with
 the following validations:
 
+- Removes duplicated entries across tables using
+  [`gtfstools::remove_duplicates()`](https://ipea.github.io/gtfstools/reference/remove_duplicates.html).
+
 - `stop_times.txt` with empty `arrival_time` or `departure_time`,
-  filtering rows that do not comply.
+  linearly interpolating missing times using
+  [`tidytransit::interpolate_stop_times()`](https://r-transit.github.io/tidytransit/reference/interpolate_stop_times.html).
+
+- Removes unused IDs across tables using
+  [`gtfstools::remove_unused_ids()`](https://ipea.github.io/gtfstools/reference/remove_unused_ids.html).
 
 - Feeds with missing `shapes.txt` file, generating it using
   [`GTFShift::create_shapes_from_stops()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_stops.md).
@@ -86,6 +93,12 @@ applied the library default values.
 
 [`tidytransit::read_gtfs()`](https://r-transit.github.io/tidytransit/reference/read_gtfs.html)
 
+[`tidytransit::interpolate_stop_times()`](https://r-transit.github.io/tidytransit/reference/interpolate_stop_times.html)
+
+[`gtfstools::remove_duplicates()`](https://ipea.github.io/gtfstools/reference/remove_duplicates.html)
+
+[`gtfstools::remove_unused_ids()`](https://ipea.github.io/gtfstools/reference/remove_unused_ids.html)
+
 [`gtfsrouter::gtfs_transfer_table()`](https://rdrr.io/pkg/gtfsrouter/man/gtfs_transfer_table.html)
 
 ## Examples
@@ -98,7 +111,7 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agency       Transportes Colectivos do Barreiro
 #> service      from 2026-06-08 to 2026-12-31
 #> uses         stop_times (no frequencies)
@@ -117,7 +130,7 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, ., calendar, calendar_dates, stops
 #> agency       TTSL - Transtejo Soflusa
 #> service      from 2020-12-19 to 2028-12-31
 #> uses         stop_times (no frequencies)

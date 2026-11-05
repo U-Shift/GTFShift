@@ -62,7 +62,7 @@ tidygtfs. The unified GTFS feed.
 ## Details
 
 Aggregates multiple feeds using
-[`gtfstools::merge_gtfs()`](https://rdrr.io/pkg/gtfstools/man/merge_gtfs.html).
+[`gtfstools::merge_gtfs()`](https://ipea.github.io/gtfstools/reference/merge_gtfs.html).
 When generating transfers, those already existing in each GTFS file are
 kept, extended with new ones computed based on the stops network of the
 final aggregated version.
@@ -78,7 +78,7 @@ For a detailed example, see the `vignette("unify")`.
 
 ## See also
 
-[`gtfstools::merge_gtfs()`](https://rdrr.io/pkg/gtfstools/man/merge_gtfs.html)
+[`gtfstools::merge_gtfs()`](https://ipea.github.io/gtfstools/reference/merge_gtfs.html)
 
 [`gtfsrouter::gtfs_transfer_table()`](https://rdrr.io/pkg/gtfsrouter/man/gtfs_transfer_table.html)
 
@@ -92,7 +92,7 @@ gtfs_1 <- GTFShift::load_feed(system.file("extdata/samples",
 
 summary(gtfs_1)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, shapes, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, shapes, ., calendar, calendar_dates, stops
 #> agency       Transportes Colectivos do Barreiro
 #> service      from 2026-06-08 to 2026-12-31
 #> uses         stop_times (no frequencies)
@@ -129,7 +129,7 @@ gtfs_2 <- GTFShift::load_feed(system.file("extdata/samples",
 
 summary(gtfs_2)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, ., calendar, calendar_dates, stops
 #> agency       TTSL - Transtejo Soflusa
 #> service      from 2020-12-19 to 2028-12-31
 #> uses         stop_times (no frequencies)

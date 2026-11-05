@@ -12,7 +12,7 @@ rt_average_speed(
   trips_geometries,
   rt_collection_trips_geometries_match_col = "trip_id",
   geometry_sample_meters = 10,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 ```
 
@@ -40,8 +40,9 @@ rt_average_speed(
 
 - metric_crs:
 
-  Integer or character (Default 3857). Projected CRS used to compute
-  distances and speeds.
+  Integer or character (Default NULL). Optional projected CRS used to
+  compute distances and speeds. If NULL, spherical geometry (s2) is used
+  by default.
 
 ## Value
 
@@ -167,7 +168,7 @@ osm_routes <- sf::st_read(
   quiet = TRUE
 ) |>  
   dplyr::filter(route_id %in% rt_collection$route_id) |>
-  dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))
+  dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom))
 
 head(osm_routes)
 #> Simple feature collection with 1 feature and 3 fields
@@ -182,8 +183,7 @@ head(osm_routes)
 speed <- GTFShift::rt_average_speed(
   rt_collection = rt_collection, 
   trips_geometries = osm_routes,
-  rt_collection_trips_geometries_match_col = "route_id",
-  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+  rt_collection_trips_geometries_match_col = "route_id"
 )
 #> Warning: Trip 4_4-CS-TERM has less than 2 updates. Ignoring it.
 
@@ -197,20 +197,20 @@ head(speed |>
 #> Simple feature collection with 6 features and 5 fields
 #> Geometry type: POINT
 #> Dimension:     XY
-#> Bounding box:  xmin: -82292.68 ymin: -114578.7 xmax: -78322.61 ymax: -112380.6
-#> Projected CRS: ETRS89 / Portugal TM06
+#> Bounding box:  xmin: -9.07846 ymin: 38.63273 xmax: -9.03264 ymax: 38.65217
+#> Geodetic CRS:  WGS 84
 #> # A tibble: 6 × 6
 #>   trip_id      timestamp speed_kmh distance_along_geome…¹ distance_to_closest_…²
 #>   <chr>            <int>     <dbl>                  <dbl>                  <dbl>
-#> 1 20260514_DU…    1.78e9      18.1                  6465.                  8.75 
-#> 2 20260514_DU…    1.78e9      20.4                  2385.                  8.70 
-#> 3 20260514_DU…    1.78e9      61.9                   321.                  1.16 
-#> 4 20260515_DU…    1.78e9      14.2                  3388.                  6.87 
+#> 1 20260514_DU…    1.78e9      18.1                  6462.                  8.75 
+#> 2 20260514_DU…    1.78e9      20.4                  2389.                  8.68 
+#> 3 20260514_DU…    1.78e9      62.1                   319.                  1.16 
+#> 4 20260515_DU…    1.78e9      14.2                  3386.                  6.88 
 #> 5 20260515_DU…    1.78e9      16.8                     0                  13.1  
-#> 6 20260515_DU…    1.78e9      17                    2546.                  0.120
+#> 6 20260515_DU…    1.78e9      17.0                  2542.                  0.120
 #> # ℹ abbreviated names: ¹​distance_along_geometry,
 #> #   ²​distance_to_closest_on_geometry
-#> # ℹ 1 more variable: geometry <POINT [m]>
+#> # ℹ 1 more variable: geometry <POINT [°]>
 
 nrow(speed)
 #> [1] 9

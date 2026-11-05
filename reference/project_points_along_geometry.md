@@ -11,7 +11,7 @@ project_points_along_geometry(
   geometry,
   points,
   geometry_sample_meters = 10,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 ```
 
@@ -33,8 +33,9 @@ project_points_along_geometry(
 
 - metric_crs:
 
-  Integer or character (Default 3857). Projected CRS used to compute
-  nearest points, line sampling, and cumulative distances.
+  Integer or character (Default NULL). Optional projected CRS used to
+  compute nearest points, line sampling, and cumulative distances. If
+  NULL, spherical geometry (s2) is used by default.
 
 ## Value
 
@@ -113,8 +114,7 @@ head(osm_routes)
 # Project points to geometry
 points_projected <- GTFShift::project_points_along_geometry(
   geometry = osm_routes,
-  points = points,
-  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+  points = points
 )
 
 head(points_projected)
@@ -124,15 +124,15 @@ head(points_projected)
 #> Bounding box:  xmin: -9.078512 ymin: 38.63273 xmax: -9.032493 ymax: 38.6521
 #> Geodetic CRS:  WGS 84
 #>   distance_to_closest_on_geometry distance_along_geometry
-#> 1                        6.450152               6464.7182
-#> 2                      145.430240                  0.0000
-#> 3                        8.700216               2385.4309
-#> 4                        1.160281                320.7302
-#> 5                        1.230545               3457.8725
+#> 1                        6.435256               6462.1113
+#> 2                      145.453074                  0.0000
+#> 3                        8.683401               2389.0311
+#> 4                        1.157701                319.2555
+#> 5                        1.230265               3451.6479
 #>   distance_along_geometry_reversed        closest_on_geometry
 #> 1                            0.000  POINT (-9.078512 38.6521)
-#> 2                         6464.718 POINT (-9.032493 38.63509)
-#> 3                         4079.287 POINT (-9.048347 38.64166)
-#> 4                         6143.988 POINT (-9.032757 38.63273)
-#> 5                         3006.846 POINT (-9.058299 38.64185)
+#> 2                         6462.111 POINT (-9.032493 38.63509)
+#> 3                         4073.080 POINT (-9.048347 38.64166)
+#> 4                         6142.856 POINT (-9.032757 38.63273)
+#> 5                         3010.463 POINT (-9.058299 38.64185)
 ```

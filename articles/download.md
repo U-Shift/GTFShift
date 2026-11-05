@@ -35,7 +35,7 @@ as the option to store it locally.
 ``` r
 
 # Using tidytransit
-gtfs = tidytransit::load_feed("https://operator.com/gtfs.zip")
+gtfs = tidytransit::read_gtfs("https://operator.com/gtfs.zip")
 
 # Using GTFShift
 gtfs = GTFShift::load_feed("https://operator.com/gtfs.zip")
@@ -93,15 +93,15 @@ feeds_active |>
 gtfs = GTFShift::load_feed(feeds_active$producer_url[2], create_transfers=FALSE)
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, fare_attributes, fare_rules, shapes, vehicles, calendar, calendar_dates, feed_info, stops
+#> files        agency, routes, stop_times, trips, fare_attributes, shapes, vehicles, ., calendar, calendar_dates, feed_info, stops
 #> agency       Cascais Próxima
 #> service      from 2025-01-01 to 2027-12-31
 #> uses         stop_times (no frequencies)
-#> # routes      163
+#> # routes      162
 #> # trips      6049
 #> # stop_ids   1083
 #> # stop_names  599
-#> # shapes      248
+#> # shapes      245
 ```
 
 ### Using GTFShift incorporated database for Portugal
@@ -161,13 +161,13 @@ head(data)
 gtfs = GTFShift::load_feed(data$URL[1], create_transfers = FALSE) # example with CP - trains
 summary(gtfs)
 #> tidygtfs object
-#> files        agency, routes, stop_times, trips, calendar, calendar_dates, stops
+#> files        agency, routes, stop_times, trips, ., calendar, calendar_dates, stops
 #> agency       CP - Comboios de Portugal
-#> service      from 2025-12-14 to 2026-12-12
+#> service      from 2025-12-14 to 2027-12-11
 #> uses         stop_times (no frequencies)
-#> # routes      179
-#> # trips      1695
-#> # stop_ids    454
-#> # stop_names  454
-#> # shapes      246
+#> # routes      186
+#> # trips      2935
+#> # stop_ids    457
+#> # stop_names  457
+#> # shapes      251
 ```

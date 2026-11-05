@@ -8,7 +8,7 @@ Get statistics about lane prioritisation
 get_prioritisation_stats(
   lane_prioritisation,
   weight = c("length", "frequency"),
-  metric_crs = 3857
+  metric_crs = NULL
 )
 ```
 
@@ -25,8 +25,9 @@ get_prioritisation_stats(
 
 - metric_crs:
 
-  Integer or character (Default 3857). Projected CRS used to compute
-  lengths in meters.
+  Integer or character (Default NULL). Optional projected CRS used to
+  compute lengths in meters. If NULL, spherical geometry (s2) is used by
+  default.
 
 ## Value
 
@@ -91,13 +92,13 @@ lane_prioritisation <- GTFShift::prioritise_lanes(
 #> Matched 1 shapes (100.00% of 1 in GTFS) of 1 routes (100.00% of 1 in GTFS) with OSM routes!
 
 # Get statistics for prioritisation
-stats <- GTFShift::get_prioritisation_stats(lane_prioritisation, metric_crs = 3763)
+stats <- GTFShift::get_prioritisation_stats(lane_prioritisation)
 
 data.frame(metric = names(stats), value = unlist(stats, use.names = FALSE))
 #>                    metric       value
-#> 1               extension 6464.718236
+#> 1               extension 6462.111272
 #> 2      extension_bus_lane    0.000000
-#> 3 n_lanes_circulation_avg    1.746812
+#> 3 n_lanes_circulation_avg    1.746802
 #> 4 n_lanes_circulation_min    1.000000
 #> 5 n_lanes_circulation_max    4.000000
 #> 6     n_lanes_parking_avg    0.000000

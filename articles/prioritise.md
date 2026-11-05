@@ -150,10 +150,10 @@ lanes_0800 <- lanes |> filter(hour == 8)
 stats <- GTFShift::get_prioritisation_stats(lanes_0800, weight = "frequency")
 stats
 #> $extension
-#> [1] 747177
+#> [1] 582141
 #> 
 #> $extension_bus_lane
-#> [1] 63209.47
+#> [1] 49251.15
 #> 
 #> $speed_avg
 #> [1] 10.42806
@@ -189,13 +189,13 @@ lanes_0800_736 <- lanes |> filter(hour == 8 & grepl("199_0", routes))
 stats_736 <- GTFShift::get_prioritisation_stats(lanes_0800_736, weight = "length")
 stats_736
 #> $extension
-#> [1] 27339.54
+#> [1] 21294.93
 #> 
 #> $extension_bus_lane
-#> [1] 13568.05
+#> [1] 10570.1
 #> 
 #> $speed_avg
-#> [1] 10.41267
+#> [1] 10.41271
 #> 
 #> $speed_min
 #> [1] 0.6754755
@@ -204,7 +204,7 @@ stats_736
 #> [1] 18.62128
 #> 
 #> $n_lanes_circulation_avg
-#> [1] 2.624208
+#> [1] 2.624408
 #> 
 #> $n_lanes_circulation_min
 #> [1] 1

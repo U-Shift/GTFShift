@@ -8,7 +8,7 @@ Build shapes from simple feature object
 create_shapes_from_sf(
   sf_shapes,
   gtfs,
-  metric_crs = 3857,
+  metric_crs = NULL,
   shape_dist_traveled = FALSE
 )
 ```
@@ -26,8 +26,10 @@ create_shapes_from_sf(
 
 - metric_crs:
 
-  numeric (Default 3857). EPSG code for a metric CRS used when computing
-  distances (passed to `multiline_to_sorted_linestring`).
+  Integer or character (Default NULL). Optional projected CRS used when
+  computing distances (passed to `multiline_to_sorted_linestring` and
+  `project_points_along_geometry`). If NULL, spherical geometry (s2) is
+  used by default.
 
 - shape_dist_traveled:
 
@@ -49,7 +51,7 @@ guide per shape: all ordered stops when the selected trip is circular
 (first and last `stop_id` are equal), or the first two stops otherwise.
 Then, it converts the LINESTRING geometries to a data.frame representing
 a GTFS shapes table using
-[`gtfstools::convert_sf_to_shapes`](https://rdrr.io/pkg/gtfstools/man/convert_sf_to_shapes.html).
+[`gtfstools::convert_sf_to_shapes`](https://ipea.github.io/gtfstools/reference/convert_sf_to_shapes.html).
 
 Coordinates are 4326 (WGS 84) by default, following GTFS specifications.
 
@@ -61,7 +63,7 @@ distance along each shape for all generated points and appends this as
 
 ## See also
 
-[`gtfstools::convert_sf_to_shapes()`](https://rdrr.io/pkg/gtfstools/man/convert_sf_to_shapes.html)
+[`gtfstools::convert_sf_to_shapes()`](https://ipea.github.io/gtfstools/reference/convert_sf_to_shapes.html)
 
 [`GTFShift::multiline_to_sorted_linestring()`](https://u-shift.github.io/GTFShift/reference/multiline_to_sorted_linestring.md)
 
@@ -94,19 +96,18 @@ head(osm_routes)
 # Create shapes.txt for geometries
 shapes_txt <- GTFShift::create_shapes_from_sf(
   osm_routes, gtfs, 
-  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
   shape_dist_traveled = TRUE
 )
-#> Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.4.0; sf_use_s2() is TRUE
+#> Linking to GEOS 3.14.1, GDAL 3.12.2, PROJ 9.7.1; sf_use_s2() is TRUE
 
 head(shapes_txt)
 #>        shape_id shape_pt_lon shape_pt_lat shape_pt_sequence shape_dist_traveled
 #>          <char>        <num>        <num>             <int>               <num>
-#> 1: 3-SA-TERM_R2    -9.031332     38.62453                 1             0.00000
-#> 2: 3-SA-TERM_R2    -9.031376     38.62458                 2             0.00000
-#> 3: 3-SA-TERM_R2    -9.031686     38.62495                 3            50.05256
-#> 4: 3-SA-TERM_R2    -9.031686     38.62495                 4            50.05256
-#> 5: 3-SA-TERM_R2    -9.031714     38.62498                 5            60.06307
-#> 6: 3-SA-TERM_R2    -9.031745     38.62501                 6            60.06307
+#> 1: 3-SA-TERM_R2    -9.031332     38.62453                 1            0.000000
+#> 2: 3-SA-TERM_R2    -9.031376     38.62458                 2            6.964638
+#> 3: 3-SA-TERM_R2    -9.031686     38.62495                 3           56.155285
+#> 4: 3-SA-TERM_R2    -9.031686     38.62495                 4           56.155285
+#> 5: 3-SA-TERM_R2    -9.031714     38.62498                 5           60.262026
+#> 6: 3-SA-TERM_R2    -9.031745     38.62501                 6           64.299661
 # }
 ```

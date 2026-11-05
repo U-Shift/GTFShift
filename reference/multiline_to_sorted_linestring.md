@@ -8,7 +8,7 @@ Convert a MULTILINESTRING to a sorted LINESTRING
 multiline_to_sorted_linestring(
   multilinestring,
   points = NULL,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 ```
 
@@ -28,8 +28,9 @@ multiline_to_sorted_linestring(
 
 - metric_crs:
 
-  Integer or character (Default 3857). Projected CRS used to compute
-  distances and lengths during sorting.
+  Integer or character (Default NULL). Optional projected CRS used to
+  compute distances and lengths during sorting. If NULL, spherical
+  geometry (s2) is used by default.
 
 ## Value
 
@@ -115,7 +116,7 @@ head(osm_routes)
 
 # Convert geometry to LINESTRING
 osm_routes <- osm_routes |>  dplyr::mutate(
-  geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763)
+  geom = GTFShift::multiline_to_sorted_linestring(geom)
 )
 
 head(osm_routes)
