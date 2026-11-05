@@ -71,7 +71,7 @@ appended to the ordered sequence. When points are provided, consecutive
 unvisited points \eqn{Q} are marked visited when
 \deqn{d\!\left(L^{(k+1)}, Q\right) \leq \min_{J \in \mathcal{R}^{(k+1)}} d(J, Q).}
 
-The ordered segments are concatenated into a single \code{LINESTRING} and
+The ordered segments are concatenated into a single two-dimensional (\code{XY}) \code{LINESTRING} (supporting both curvilinear/geographic and Cartesian/projected coordinate reference systems) and
 transformed back to the original CRS of \code{multilinestring}.
 }
 \examples{

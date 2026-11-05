@@ -74,6 +74,8 @@
 #' @srrstats {G2.13} Validates presence of required `way_osm_id` and `speed` columns and valid `metric_crs`.
 #' @srrstats {G2.15} Passes `na.rm = TRUE` to `mean()`, `stats::median()`, and `stats::quantile()`.
 #' @srrstats {EA4.0} Returns an `sf` data frame extending `lane_prioritisation`.
+#' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
+#' @srrstats {SP1.1} Operates on two-dimensional (`XY`) road segment and vehicle position geometries.
 #' @srrstats {SP2.0b} Errors when `metric_crs` is invalid or required spatial table columns are missing.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
 #' @srrstats {SP2.4a} Validates `metric_crs` using `WKT2` via `sf::st_crs()`.

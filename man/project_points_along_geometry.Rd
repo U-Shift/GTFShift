@@ -45,7 +45,7 @@ The function first computes nearest points from each input point to
 line. Then, it samples the line at regular intervals and assigns cumulative
 distance by nearest sampled location.
 
-Distances are always computed in \code{metric_crs} units. The returned
+Distances are always computed in \code{metric_crs} units (or meters on the sphere when \code{metric_crs = NULL}). The function applies to two-dimensional (\code{XY}) geometries in both curvilinear (geographic) and Cartesian (projected) coordinate reference systems. The returned
 projected points are transformed back to the original \code{geometry} CRS.
 }
 \examples{

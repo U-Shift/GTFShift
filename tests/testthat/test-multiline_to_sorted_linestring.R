@@ -7,6 +7,7 @@ library(sf)
 #' @srrstats {G5.8c} Explicitly tests handling of identical duplicate remaining line segments (`test_that("multiline_to_sorted_linestring excludes identical duplicate remaining segments", ...)`).
 #' @srrstats {SP6.0} Verifies that returned `sfc_LINESTRING` recovers original coordinates and CRS (`EPSG:4326`) after sorting in `metric_crs = 3857`.
 #' @srrstats {SP6.1} Tests `multiline_to_sorted_linestring()` on both projected (`metric_crs = 3857`) and geographic (`metric_crs = NULL`) coordinates.
+#' @srrstats {SP6.2} Tests sorting of multilinestring segments extending to polar extremes of +/-90 degrees latitude.
 test_that("multiline_to_sorted_linestring sorts multilinestring into linestring", {
     mls <- st_multilinestring(list(
         matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
@@ -153,4 +154,28 @@ test_that("multiline_to_sorted_linestring handles circular ring line segment", {
 
     res <- GTFShift::multiline_to_sorted_linestring(mls_sf, metric_crs = 3857)
     expect_s3_class(res, "sfc")
+})
+
+test_that("multiline_to_sorted_linestring handles polar extreme coordinates (+/-90 degrees)", {
+    mls_polar <- st_multilinestring(list(
+        matrix(c(0, 88, 0, 89), ncol = 2, byrow = TRUE),
+        matrix(c(0, 89, 0, 90), ncol = 2, byrow = TRUE)
+    ))
+    mls_sf <- st_sf(geometry = st_sfc(mls_polar, crs = 4326))
+
+    res_np <- GTFShift::multiline_to_sorted_linestring(mls_sf)
+    expect_s3_class(res_np, "sfc")
+    coords_np <- unname(st_coordinates(res_np))
+    expect_equal(coords_np[nrow(coords_np), 2], 90)
+
+    mls_south <- st_multilinestring(list(
+        matrix(c(0, -88, 0, -89), ncol = 2, byrow = TRUE),
+        matrix(c(0, -89, 0, -90), ncol = 2, byrow = TRUE)
+    ))
+    mls_south_sf <- st_sf(geometry = st_sfc(mls_south, crs = 4326))
+
+    res_sp <- GTFShift::multiline_to_sorted_linestring(mls_south_sf)
+    expect_s3_class(res_sp, "sfc")
+    coords_sp <- unname(st_coordinates(res_sp))
+    expect_equal(coords_sp[nrow(coords_sp), 2], -90)
 })
