@@ -4,7 +4,7 @@
 #'
 #' @param lane_prioritisation sf data.frame. Lane prioritisation.
 #' @param weight Character. Weight to use for weighted mean. Accepted values: "length", "frequency".
-#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute lengths in meters.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to compute lengths in meters. If NULL, spherical geometry (s2) is used by default.
 #'
 #' @returns List. Statistics about lane prioritisation, with the following attributes:
 #' \describe{
@@ -39,7 +39,7 @@
 #' )
 #' 
 #' # Get statistics for prioritisation
-#' stats <- GTFShift::get_prioritisation_stats(lane_prioritisation, metric_crs = 3763)
+#' stats <- GTFShift::get_prioritisation_stats(lane_prioritisation)
 #' 
 #' data.frame(metric = names(stats), value = unlist(stats, use.names = FALSE))
 #'
@@ -52,24 +52,22 @@
 get_prioritisation_stats <- function(
   lane_prioritisation,
   weight = c("length", "frequency"),
-  metric_crs = 3857
+  metric_crs = NULL
 ) {
-    metric_crs_is_default <- missing(metric_crs)
     weight <- match.arg(weight)
-    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-    if (is.na(metric_crs)) {
-        stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-    }
-    if (metric_crs_is_default) {
-        warning(
-            "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
-            call. = FALSE
-        )
+    if (!is.null(metric_crs)) {
+        metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+        if (is.na(metric_crs)) {
+            stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+        }
     }
 
     prioritisation_internal <- lane_prioritisation |>
-        st_as_sf() |>
-        st_transform(crs = metric_crs)
+        st_as_sf()
+    if (!is.null(metric_crs)) {
+        prioritisation_internal <- prioritisation_internal |>
+            st_transform(crs = metric_crs)
+    }
 
     geom_col <- st_geometry(prioritisation_internal)
     prioritisation_internal <- prioritisation_internal |>

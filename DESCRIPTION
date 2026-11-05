@@ -2,7 +2,7 @@ Type: Package
 Package: GTFShift
 Title: Explore and Analyse General Transit Feed Specification (GTFS) Files
     with a Focus on Urban Mobility
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: c(
     person(c("Gonçalo", "F."), "Matos", , "goncaloafmatos@tecnico.pt", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0001-3489-1732")),
@@ -22,7 +22,7 @@ Depends:
     R (>= 4.1.0)
 Imports: 
   tidytransit,
-  gtfstools,
+  gtfstools (>= 2.0.0),
   sf,
   tidyselect,
   tidyr,
@@ -36,7 +36,8 @@ Imports:
   purrr,
   rlang,
   xml2,
-  withr
+  withr,
+  units
 Suggests: 
     knitr,
     rmarkdown,
@@ -57,6 +58,6 @@ Suggests:
 VignetteBuilder: 
     knitr
 Config/Needs/website: rmarkdown
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
 Encoding: UTF-8
 Language: en-US

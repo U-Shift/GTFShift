@@ -163,5 +163,11 @@ test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
         GTFShift::rt_average_speed(rt_no_time, trip_geom),
         "rt_collection is missing required columns"
     )
+
+    # Invalid metric_crs
+    expect_error(
+        GTFShift::rt_average_speed(rt_updates, trip_geom, metric_crs = NA),
+        "metric_crs should be a valid CRS value"
+    )
 })
 

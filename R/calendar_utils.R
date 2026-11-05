@@ -57,13 +57,22 @@ calendar_nextBusinessWednesday = function(
 #' @noRd
 calendar_get_pt_holidays = function(year, country_code) {
   url = paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/", country_code)
-  response = httr::GET(url)
+  response = tryCatch(
+    httr::GET(url),
+    error = function(e) NULL
+  )
 
-  if (status_code(response) == 200) {
-    holidays = jsonlite::fromJSON(content(response, "text", encoding = "UTF-8"))
-    return(as.Date(holidays$date))
-  } else {
-    stop("Failed to retrieve holidays. Please check your internet connection or API availability.")
+  if (!is.null(response) && httr::status_code(response) == 200) {
+    holidays = tryCatch(
+      jsonlite::fromJSON(httr::content(response, "text", encoding = "UTF-8")),
+      error = function(e) NULL
+    )
+    if (!is.null(holidays) && "date" %in% names(holidays)) {
+      return(as.Date(holidays$date))
+    }
   }
+
+  message("Internet resource unavailable: could not retrieve holidays from Nager.Date API. Proceeding without holiday filtering.")
+  return(as.Date(character(0)))
 }
 

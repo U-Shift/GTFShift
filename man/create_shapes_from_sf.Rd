@@ -7,7 +7,7 @@
 create_shapes_from_sf(
   sf_shapes,
   gtfs,
-  metric_crs = 3857,
+  metric_crs = NULL,
   shape_dist_traveled = FALSE
 )
 }
@@ -16,7 +16,7 @@ create_shapes_from_sf(
 
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{metric_crs}{numeric (Default 3857). EPSG code for a metric CRS used when computing distances (passed to \code{multiline_to_sorted_linestring}).}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used when computing distances (passed to \code{multiline_to_sorted_linestring} and \code{project_points_along_geometry}). If NULL, spherical geometry (s2) is used by default.}
 
 \item{shape_dist_traveled}{Boolean (Default FALSE). If TRUE, computes
 \code{shape_dist_traveled} for each generated shape.}
@@ -63,7 +63,6 @@ head(osm_routes)
 # Create shapes.txt for geometries
 shapes_txt <- GTFShift::create_shapes_from_sf(
   osm_routes, gtfs, 
-  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
   shape_dist_traveled = TRUE
 )
 

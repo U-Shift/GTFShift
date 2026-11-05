@@ -209,3 +209,156 @@ test_that("scrape_interval performs at least 3 requests", {
     expect_equal(nrow(res_df), 3)
     expect_gte(elapsed_time, 3)
 })
+
+test_that("rt_collect_json fails gracefully with informative message when internet resource is unavailable", {
+    dest_file <- withr::local_tempfile(fileext = ".csv")
+    log_file <- withr::local_tempfile(fileext = ".log")
+    URL <- "http://example.com/unavailable.json"
+
+    # Connection error without headers (with log_file)
+    testthat::with_mocked_bindings(
+        fromJSON = function(...) {
+            stop("cannot open the connection to 'http://example.com/unavailable.json'")
+        },
+        .package = "jsonlite",
+        code = {
+            expect_message(
+                res <- GTFShift::rt_collect_json(
+                    gtfs_rt_url = URL,
+                    destination_file = dest_file,
+                    scrape_interval = -1,
+                    log_file = log_file
+                ),
+                "Internet resource unavailable"
+            )
+            expect_null(res)
+            expect_false(file.exists(dest_file))
+            expect_true(file.exists(log_file))
+            expect_true(any(grepl("Internet resource unavailable", readLines(log_file))))
+        }
+    )
+
+    # Connection error with headers (GET throws error, with log_file)
+    log_file2 <- withr::local_tempfile(fileext = ".log")
+    testthat::with_mocked_bindings(
+        GET = function(...) {
+            stop("Failed to connect to host")
+        },
+        .package = "httr",
+        code = {
+            expect_message(
+                res <- GTFShift::rt_collect_json(
+                    gtfs_rt_url = URL,
+                    destination_file = dest_file,
+                    scrape_interval = -1,
+                    headers = c("Authorization" = "token"),
+                    log_file = log_file2
+                ),
+                "Internet resource unavailable"
+            )
+            expect_null(res)
+            expect_true(any(grepl("Internet resource unavailable", readLines(log_file2))))
+        }
+    )
+
+    # HTTP error with headers (with log_file)
+    log_file3 <- withr::local_tempfile(fileext = ".log")
+    testthat::with_mocked_bindings(
+        GET = function(...) {
+            structure(list(status_code = 404), class = "response")
+        },
+        stop_for_status = function(...) {
+            stop("Not Found (HTTP 404)")
+        },
+        .package = "httr",
+        code = {
+            expect_message(
+                res <- GTFShift::rt_collect_json(
+                    gtfs_rt_url = URL,
+                    destination_file = dest_file,
+                    scrape_interval = -1,
+                    headers = c("Authorization" = "token"),
+                    log_file = log_file3
+                ),
+                "Internet resource unavailable"
+            )
+            expect_null(res)
+            expect_false(file.exists(dest_file))
+            expect_true(any(grepl("Internet resource unavailable", readLines(log_file3))))
+        }
+    )
+
+    # JSON parse error with headers
+    log_file4 <- withr::local_tempfile(fileext = ".log")
+    testthat::with_mocked_bindings(
+        GET = function(...) {
+            structure(list(status_code = 200), class = "response")
+        },
+        stop_for_status = function(...) {
+            NULL
+        },
+        content = function(...) "invalid json",
+        .package = "httr",
+        code = {
+            testthat::with_mocked_bindings(
+                fromJSON = function(...) {
+                    stop("lexical error: invalid char in json text.")
+                },
+                .package = "jsonlite",
+                code = {
+                    expect_message(
+                        res <- GTFShift::rt_collect_json(
+                            gtfs_rt_url = URL,
+                            destination_file = dest_file,
+                            scrape_interval = -1,
+                            headers = c("Authorization" = "token"),
+                            log_file = log_file4
+                        ),
+                        "Failed to parse JSON"
+                    )
+                    expect_null(res)
+                    expect_true(any(grepl("Failed to parse JSON", readLines(log_file4))))
+                }
+            )
+        }
+    )
+})
+
+test_that("rt_collect_json retries when resource temporarily fails in loop mode", {
+    dest_file <- withr::local_tempfile(fileext = ".csv")
+    URL <- "http://example.com/retry.json"
+    req_count <- 0
+    parsed_json <- list(
+        header = list(timestamp = 1700000000),
+        entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
+    )
+
+    testthat::with_mocked_bindings(
+        fromJSON = function(...) {
+            req_count <<- req_count + 1
+            if (req_count == 1) {
+                stop("cannot open the connection to 'http://example.com/retry.json'")
+            }
+            if (req_count == 2) {
+                return(parsed_json)
+            }
+            stop("stop_after_second_iteration")
+        },
+        .package = "jsonlite",
+        code = {
+            expect_message(
+                expect_error(
+                    GTFShift::rt_collect_json(
+                        gtfs_rt_url = URL,
+                        destination_file = dest_file,
+                        scrape_interval = 0.01
+                    ),
+                    "stop_after_second_iteration"
+                ),
+                "Internet resource unavailable"
+            )
+        }
+    )
+    expect_gte(req_count, 2)
+    expect_true(file.exists(dest_file))
+})

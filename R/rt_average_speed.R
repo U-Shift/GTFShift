@@ -13,8 +13,8 @@
 #'   \code{trips_geometries} used to match updates to trip geometry.
 #' @param geometry_sample_meters Numeric (Default 10). Sampling step used when
 #'   projecting points along trip geometry and estimating cumulative distance.
-#' @param metric_crs Integer or character (Default 3857). Projected CRS used to
-#'   compute distances and speeds.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to
+#'   compute distances and speeds. If NULL, spherical geometry (s2) is used by default.
 #'
 #' @details
 #' For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n} 
@@ -92,7 +92,7 @@
 #'   quiet = TRUE
 #' ) |>  
 #'   dplyr::filter(route_id %in% rt_collection$route_id) |>
-#'   dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763))
+#'   dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom))
 #' 
 #' head(osm_routes)
 #' 
@@ -100,8 +100,7 @@
 #' speed <- GTFShift::rt_average_speed(
 #'   rt_collection = rt_collection, 
 #'   trips_geometries = osm_routes,
-#'   rt_collection_trips_geometries_match_col = "route_id",
-#'   metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+#'   rt_collection_trips_geometries_match_col = "route_id"
 #' )
 #' 
 #' head(speed |> 
@@ -131,7 +130,7 @@ rt_average_speed <- function(
   trips_geometries, # sf data.frame with trips geometry (LINESTRING) 
   rt_collection_trips_geometries_match_col = "trip_id", # column name in rt_collection and trips_geometries to match trips
   geometry_sample_meters = 10, # sample trip geometry every X meters to compute distance along shape
-  metric_crs = 3857
+  metric_crs = NULL
 ) {
   # 0. Validations 
   # > rt_collection and trips_geometries must be spatial objects
@@ -160,9 +159,20 @@ rt_average_speed <- function(
     stop(paste("rt_collection is missing required columns:", paste(missing_cols, collapse = ", ")))
   }
 
+  if (!is.null(metric_crs)) {
+    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+    if (is.na(metric_crs)) {
+      stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+    }
+    rt_collection <- rt_collection |> sf::st_transform(crs = metric_crs)
+    trips_geometries <- trips_geometries |> sf::st_transform(crs = metric_crs)
+  } else if (!is.na(sf::st_crs(rt_collection)) && !is.na(sf::st_crs(trips_geometries)) &&
+             sf::st_crs(trips_geometries) != sf::st_crs(rt_collection)) {
+    trips_geometries <- trips_geometries |> sf::st_transform(crs = sf::st_crs(rt_collection))
+  }
+
   # 1. Compute speed for each trip update
   rt_collection |>
-    sf::st_transform(crs = metric_crs) |>
     group_split(.data$trip_id) |>
     purrr::map_dfr(function(trip_df) {
       # If trip has less than 2 updates, ignore it
@@ -170,10 +180,9 @@ rt_average_speed <- function(
         warning(paste("Trip", trip_df[[rt_collection_trips_geometries_match_col]][[1]], "has less than 2 updates. Ignoring it."))
         return(NULL)
       }
-      trip_df <- trip_df |> arrange(.data$timestamp) |> st_transform(crs = metric_crs)
+      trip_df <- trip_df |> arrange(.data$timestamp)
       trip_geometry <- trips_geometries |> 
-        filter(!!sym(rt_collection_trips_geometries_match_col) == trip_df[[rt_collection_trips_geometries_match_col]][[1]]) |> 
-        st_transform(crs = metric_crs)
+        filter(!!sym(rt_collection_trips_geometries_match_col) == trip_df[[rt_collection_trips_geometries_match_col]][[1]])
       # mapview(trip_geometry)
       
       projected <- project_points_along_geometry(

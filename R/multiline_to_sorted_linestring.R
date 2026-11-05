@@ -5,7 +5,7 @@
 #'   If provided, the first point defines the initial segment and the second
 #'   point (when available) is used as tie-break guidance for its orientation. Remaining points are
 #'   used as iterative tie-break guidance.
-#' @param metric_crs Integer or character (Default 3857). Projected CRS used to compute distances and lengths during sorting.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to compute distances and lengths during sorting. If NULL, spherical geometry (s2) is used by default.
 #'
 #' @details
 #' The function takes a MULTILINESTRING object and converts it to a LINESTRING object
@@ -70,7 +70,7 @@
 #' 
 #' # Convert geometry to LINESTRING
 #' osm_routes <- osm_routes |>  dplyr::mutate(
-#'   geom = GTFShift::multiline_to_sorted_linestring(geom, metric_crs = 3763)
+#'   geom = GTFShift::multiline_to_sorted_linestring(geom)
 #' )
 #' 
 #' head(osm_routes)
@@ -84,21 +84,16 @@
 multiline_to_sorted_linestring <- function(
     multilinestring, 
     points = NULL,
-    metric_crs = 3857
+    metric_crs = NULL
 ) {
     if (!requireNamespace("lwgeom", quietly = TRUE)) {
       stop("Package 'lwgeom' is required for this function. Install it with: install.packages('lwgeom')")
     }
-    metric_crs_is_default <- missing(metric_crs)
-    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-    if (is.na(metric_crs)) {
-        stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-    }
-    if (metric_crs_is_default) {
-        warning(
-            "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
-            call. = FALSE
-        )
+    if (!is.null(metric_crs)) {
+        metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+        if (is.na(metric_crs)) {
+            stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+        }
     }
     original_crs <- st_crs(multilinestring)
 
@@ -107,8 +102,11 @@ multiline_to_sorted_linestring <- function(
     # 1. Extract all individual LINESTRING components
     linestrings <- st_cast(multilinestring, "LINESTRING") |>
         st_as_sf() |>
-        st_set_geometry("geometry") |>
-        st_transform(metric_crs) |>
+        st_set_geometry("geometry")
+    if (!is.null(metric_crs)) {
+        linestrings <- linestrings |> st_transform(metric_crs)
+    }
+    linestrings <- linestrings |>
         mutate(
             start = lwgeom::st_startpoint(.data$geometry),
             end = lwgeom::st_endpoint(.data$geometry)
@@ -125,8 +123,12 @@ multiline_to_sorted_linestring <- function(
             geometry = points,
             visited = FALSE
         )) |>
-            mutate(order = row_number()) |>
-            st_transform(metric_crs)
+            mutate(order = row_number())
+        if (!is.null(metric_crs)) {
+            points_df <- points_df |> st_transform(metric_crs)
+        } else if (!is.na(st_crs(linestrings)) && !is.na(st_crs(points_df)) && st_crs(points_df) != st_crs(linestrings)) {
+            points_df <- points_df |> st_transform(st_crs(linestrings))
+        }
         start_point <- points_df |> slice(1) |> pull(.data$geometry)
         if (length(points) > 1) {
             second_point <- points_df |> slice(2) |> pull(.data$geometry)
@@ -170,7 +172,9 @@ multiline_to_sorted_linestring <- function(
         # If second_point is defined, orient towards it (end is closest); otherwise,
         # orient away from start_point (start is closest).
         if (!is.null(second_point)) {
-            second_point <- st_transform(second_point, metric_crs)
+            if (!is.null(metric_crs)) {
+                second_point <- st_transform(second_point, metric_crs)
+            }
             if (st_distance(second_point, current_start) < st_distance(second_point, current_end)) {
                 current_line$geometry <- st_reverse(current_line$geometry)
             }
@@ -301,7 +305,7 @@ multiline_to_sorted_linestring <- function(
 
     # 4. Create new LINESTRING from the combined coordinates
     result <- st_sfc(st_linestring(all_coords), crs = st_crs(linestrings))
-    if (!is.na(original_crs)) {
+    if (!is.na(original_crs) && st_crs(result) != original_crs) {
         result <- st_transform(result, original_crs)
     }
     return(result)

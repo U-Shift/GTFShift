@@ -7,7 +7,7 @@
 get_prioritisation_stats(
   lane_prioritisation,
   weight = c("length", "frequency"),
-  metric_crs = 3857
+  metric_crs = NULL
 )
 }
 \arguments{
@@ -15,7 +15,7 @@ get_prioritisation_stats(
 
 \item{weight}{Character. Weight to use for weighted mean. Accepted values: "length", "frequency".}
 
-\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute lengths in meters.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute lengths in meters. If NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 List. Statistics about lane prioritisation, with the following attributes:
@@ -55,7 +55,7 @@ lane_prioritisation <- GTFShift::prioritise_lanes(
 )
 
 # Get statistics for prioritisation
-stats <- GTFShift::get_prioritisation_stats(lane_prioritisation, metric_crs = 3763)
+stats <- GTFShift::get_prioritisation_stats(lane_prioritisation)
 
 data.frame(metric = names(stats), value = unlist(stats, use.names = FALSE))
 \dontshow{\}) # examplesIf}

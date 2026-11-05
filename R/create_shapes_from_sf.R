@@ -2,7 +2,7 @@
 #'
 #' @param sf_shapes sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING).
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param metric_crs numeric (Default 3857). EPSG code for a metric CRS used when computing distances (passed to \code{multiline_to_sorted_linestring}).
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used when computing distances (passed to \code{multiline_to_sorted_linestring} and \code{project_points_along_geometry}). If NULL, spherical geometry (s2) is used by default.
 #' @param shape_dist_traveled Boolean (Default FALSE). If TRUE, computes
 #'   \code{shape_dist_traveled} for each generated shape.
 #'
@@ -45,7 +45,6 @@
 #' # Create shapes.txt for geometries
 #' shapes_txt <- GTFShift::create_shapes_from_sf(
 #'   osm_routes, gtfs, 
-#'   metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
 #'   shape_dist_traveled = TRUE
 #' )
 #' 
@@ -65,14 +64,14 @@
 create_shapes_from_sf <- function(
     sf_shapes, 
     gtfs, 
-    metric_crs = 3857,
+    metric_crs = NULL,
     shape_dist_traveled = FALSE
 ) {
-    if (missing(metric_crs)) {
-        warning(
-            "Using default metric_crs (EPSG:3857). Consider setting metric_crs to a projected CRS better suited to your local context for more accurate distance calculations.",
-            call. = FALSE
-        )
+    if (!is.null(metric_crs)) {
+        metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
+        if (is.na(metric_crs)) {
+            stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
+        }
     }
 
     # Initial validations

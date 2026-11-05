@@ -23,21 +23,24 @@
 #'
 #' # Collect data
 #' GTFShift::rt_collect_json(
-#'   gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/realtime/vehicles/positions/gtfs",
+#'   gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs",
 #'   entity_key = "data.entity",
 #'   destination_file = destination_file,
 #'   scrape_interval = -1 # Negative to run only once
 #' )
 #'
 #' # Read data
-#' collection <- read.csv(destination_file)
-#'
-#' names(collection)
-#'
-#' head(
-#'   collection |>
-#'     dplyr::select("vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude")
-#' )
+#' if (file.exists(destination_file)) {
+#'   collection <- read.csv(destination_file)
+#'   names(collection)
+#'   head(
+#'     collection |>
+#'       dplyr::select(
+#'         "vehicle.trip.trip_id", "vehicle.position.latitude",
+#'         "vehicle.position.longitude"
+#'       )
+#'   )
+#' }
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom utils write.table
@@ -61,11 +64,69 @@ rt_collect_json <- function(
     count <- count + 1
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
     if (grepl("^http", gtfs_rt_url) && !is.null(headers)) {
-      res <- httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers))
-      httr::stop_for_status(res)
-      feed <- jsonlite::fromJSON(httr::content(res, as = "text", encoding = "UTF-8"))
+      res <- tryCatch(
+        httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers)),
+        error = function(e) NULL
+      )
+      status_err <- if (is.null(res)) {
+        "connection failed"
+      } else {
+        tryCatch(
+          {
+            httr::stop_for_status(res)
+            NULL
+          },
+          error = function(e) e$message
+        )
+      }
+
+      if (!is.null(status_err)) {
+        m_err <- sprintf(
+          "[%s] Internet resource unavailable at %s (%s).",
+          format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url, status_err
+        )
+        message(m_err)
+        if (!is.na(log_file)) cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+        feed <- NULL
+      } else {
+        feed <- tryCatch(
+          jsonlite::fromJSON(httr::content(res, as = "text", encoding = "UTF-8")),
+          error = function(e) {
+            m_err <- sprintf(
+              "[%s] Failed to parse JSON from %s: %s",
+              format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url, e$message
+            )
+            message(m_err)
+            if (!is.na(log_file)) cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+            NULL
+          }
+        )
+      }
     } else {
-      feed <- jsonlite::fromJSON(gtfs_rt_url)
+      feed <- tryCatch(
+        suppressWarnings(jsonlite::fromJSON(gtfs_rt_url)),
+        error = function(e) {
+          if (grepl("^http", gtfs_rt_url) && grepl("cannot open the connection|HTTP status|Could not resolve|Timeout|Failed to connect", e$message, ignore.case = TRUE)) {
+            m_err <- sprintf(
+              "[%s] Internet resource unavailable at %s (%s).",
+              format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url, e$message
+            )
+            message(m_err)
+            if (!is.na(log_file)) cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+            NULL
+          } else {
+            stop(e)
+          }
+        }
+      )
+    }
+
+    if (is.null(feed)) {
+      if (scrape_interval < 0) {
+        return(invisible(NULL))
+      }
+      Sys.sleep(scrape_interval)
+      next
     }
 
     if (!is.na(entity_key) && entity_key != "") {

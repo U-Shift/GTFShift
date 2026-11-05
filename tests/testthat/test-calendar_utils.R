@@ -61,7 +61,7 @@ test_that("calendar_nextBusinessWednesday handles mocked holiday response", {
     )
 })
 
-test_that("calendar_nextBusinessWednesday stops when API does not respond with status 200", {
+test_that("calendar_nextBusinessWednesday fails gracefully when API does not respond with status 200 or is unreachable", {
     start_date <- as.Date("2026-07-20") # Monday
 
     testthat::with_mocked_bindings(
@@ -76,10 +76,26 @@ test_that("calendar_nextBusinessWednesday stops when API does not respond with s
         },
         .package = "httr",
         code = {
-            expect_error(
-                GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT"),
-                "Failed to retrieve holidays. Please check your internet connection or API availability."
+            expect_message(
+                res <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT"),
+                "Internet resource unavailable"
             )
+            expect_equal(res, as.Date("2026-07-22"))
+        }
+    )
+
+    # When network fails completely (e.g. timeout / connection refused)
+    testthat::with_mocked_bindings(
+        GET = function(url, ...) {
+            stop("Connection timed out")
+        },
+        .package = "httr",
+        code = {
+            expect_message(
+                res <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT"),
+                "Internet resource unavailable"
+            )
+            expect_equal(res, as.Date("2026-07-22"))
         }
     )
 })
