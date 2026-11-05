@@ -45,7 +45,7 @@ To create it, you can either use `GTFShift::load_feed()` or the tidytransit meth
 
 ```{r eval = FALSE}
 # Using tidytransit
-gtfs = tidytransit::load_feed("https://operator.com/gtfs.zip")
+gtfs = tidytransit::read_gtfs("https://operator.com/gtfs.zip")
 
 # Using GTFShift
 gtfs = GTFShift::load_feed("https://operator.com/gtfs.zip")

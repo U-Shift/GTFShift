@@ -333,7 +333,7 @@ test_that("osm_shapes_match_routes issues warnings when routes or stops are miss
     )
 })
 
-test_that("osm_shapes_match_routes issues warning when metric_crs is default / missing", {
+test_that("osm_shapes_match_routes works when metric_crs is default (NULL)", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
@@ -341,7 +341,6 @@ test_that("osm_shapes_match_routes issues warning when metric_crs is default / m
     log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
-    warn_pattern <- "Using default metric_crs"
     testthat::with_mocked_bindings(
         get_osm_relations = function(...) fx$rel_df,
         .package = "GTFShift",
@@ -352,18 +351,17 @@ test_that("osm_shapes_match_routes issues warning when metric_crs is default / m
                 },
                 .package = "osmextract",
                 code = {
-                    res <- expect_warning(
+                    res <- suppressWarnings(
                         GTFShift::osm_shapes_match_routes(
                             gtfs = gtfs,
                             q = NA,
                             log_file = log_tmp,
                             osm_file = "dummy.pbf"
-                        ),
-                        warn_pattern
+                        )
                     )
+                    expect_s3_class(res, "sf")
+                    expect_equal(res$osm_id[1], "rel_1")
                     expect_true(file.exists(log_tmp))
-                    log_lines <- readLines(log_tmp)
-                    expect_true(any(grepl("WARNING!", log_lines) & grepl(warn_pattern, log_lines)))
                 }
             )
         }

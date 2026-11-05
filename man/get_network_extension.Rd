@@ -11,7 +11,7 @@ get_network_extension(
   unified = FALSE,
   date = GTFShift::calendar_nextBusinessWednesday(),
   use_osm_routes = NA,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ get_network_extension(
 
 \item{use_osm_routes}{osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.}
 
-\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to compute route lengths in meters.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute route lengths in meters. If NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 Numeric. The routes extension, in meters.
@@ -50,7 +50,6 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 # Get route extension
 GTFShift::get_network_extension(
   gtfs,
-  metric_crs = 3763, # Make sure to addapt to the projection that better suits your location
   date = gtfs$calendar$start_date[1]
 )
 

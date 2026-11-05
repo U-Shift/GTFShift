@@ -74,7 +74,7 @@ test_that("get_prioritisation_stats calculates speed metrics when speed_avg colu
     expect_equal(stats$n_lanes_parking_max, 1)
 })
 
-test_that("get_prioritisation_stats raises warning when metric_crs is default", {
+test_that("get_prioritisation_stats works when metric_crs is default (NULL)", {
     prioritisation_df <- st_sf(
         is_bus_lane = c(TRUE, FALSE),
         frequency = c(10, 5),
@@ -87,10 +87,10 @@ test_that("get_prioritisation_stats raises warning when metric_crs is default", 
         )
     )
 
-    expect_warning(
-        GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length"),
-        "Using default metric_crs"
+    expect_no_warning(
+        stats <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length")
     )
+    expect_equal(stats$extension, 200)
 })
 
 test_that("get_prioritisation_stats stops on invalid weight or metric_crs", {

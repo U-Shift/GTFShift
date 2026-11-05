@@ -99,22 +99,22 @@ test_that("rt_extend_prioritisation accurately computes speed_p15 and speed_p85 
     expect_true(is.na(res$speed_count[res$way_osm_id == "w_empty"]))
 })
 
-test_that("rt_extend_prioritisation raises warning when metric_crs is default", {
+test_that("rt_extend_prioritisation works when metric_crs is default (NULL)", {
     lanes_sf <- st_sf(
         way_osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
+        geometry = st_sfc(st_linestring(matrix(c(-9.15, 38.7, -9.14, 38.7), ncol = 2, byrow = TRUE)), crs = 4326)
     )
 
     rt_points <- st_sf(
         speed = 25,
         current_status = "IN_TRANSIT_TO",
-        geometry = st_sfc(st_point(c(50, 0)), crs = 4326)
+        geometry = st_sfc(st_point(c(-9.145, 38.7)), crs = 4326)
     )
 
-    expect_warning(
-        GTFShift::rt_extend_prioritisation(lanes_sf, rt_points),
-        "Using default metric_crs"
+    expect_no_warning(
+        res <- GTFShift::rt_extend_prioritisation(lanes_sf, rt_points)
     )
+    expect_equal(res$speed_avg[1], 25)
 })
 
 test_that("rt_extend_prioritisation stops when lane_prioritisation is missing way_osm_id column", {

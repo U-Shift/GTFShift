@@ -8,7 +8,7 @@ project_points_along_geometry(
   geometry,
   points,
   geometry_sample_meters = 10,
-  metric_crs = 3857
+  metric_crs = NULL
 )
 }
 \arguments{
@@ -20,8 +20,8 @@ project_points_along_geometry(
 \item{geometry_sample_meters}{Numeric (Default 10). Sampling step used to
 discretize the line when estimating cumulative distance along geometry.}
 
-\item{metric_crs}{Integer or character (Default 3857). Projected CRS used to
-compute nearest points, line sampling, and cumulative distances.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to
+compute nearest points, line sampling, and cumulative distances. If NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 data.frame. Input points projected along geometry with four columns:
@@ -69,8 +69,7 @@ head(osm_routes)
 # Project points to geometry
 points_projected <- GTFShift::project_points_along_geometry(
   geometry = osm_routes,
-  points = points,
-  metric_crs = 3763 # Make sure to addapt to the projection that better suits your location
+  points = points
 )
 
 head(points_projected)

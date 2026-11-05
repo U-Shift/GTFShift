@@ -38,7 +38,9 @@ import(tidytransit)
 importFrom(callr,r_bg)
 importFrom(gtfstools,
   convert_sf_to_shapes,
-  merge_gtfs
+  merge_gtfs,
+  remove_duplicates,
+  remove_unused_ids
 )
 importFrom(httr,
   GET,
@@ -70,6 +72,7 @@ importFrom(stringr,
 )
 importFrom(tidyr,unnest)
 importFrom(tidyselect,any_of)
+importFrom(units,set_units)
 importFrom(utils,
   head,
   tail,
