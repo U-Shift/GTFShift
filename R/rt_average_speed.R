@@ -135,6 +135,8 @@
 #' @srrstats {EA1.3} Documents required spatial and tabular structures for `rt_collection` and `trips_geometries`.
 #' @srrstats {EA2.3} Supports custom join column names via `rt_collection_trips_geometries_match_col`.
 #' @srrstats {EA4.0} Returns an `sf` data frame consistent with the input `rt_collection`.
+#' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
+#' @srrstats {SP1.1} Operates on two-dimensional (`XY`) `POINT` and `LINESTRING` geometries.
 #' @srrstats {SP2.0} Accepts `sf` spatial objects for `rt_collection` and `trips_geometries`.
 #' @srrstats {SP2.0b} Errors appropriately on non-`sf` inputs, non-`LINESTRING` geometries, or invalid `metric_crs`.
 #' @srrstats {SP2.3} Examples load route geometries from a standard `.gpkg` spatial file.

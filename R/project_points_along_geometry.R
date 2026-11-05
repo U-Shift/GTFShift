@@ -18,7 +18,7 @@
 #' line. Then, it samples the line at regular intervals and assigns cumulative
 #' distance by nearest sampled location.
 #'
-#' Distances are always computed in \code{metric_crs} units. The returned
+#' Distances are always computed in \code{metric_crs} units (or meters on the sphere when \code{metric_crs = NULL}). The function applies to two-dimensional (\code{XY}) geometries in both curvilinear (geographic) and Cartesian (projected) coordinate reference systems. The returned
 #' projected points are transformed back to the original \code{geometry} CRS.
 #'
 #' @returns data.frame. Input points projected along geometry with four columns:
@@ -73,6 +73,8 @@
 #' @srrstats {G2.13} Checks for missing (`NA`) CRS prior to coordinate transformations.
 #' @srrstats {EA1.3} Explicitly identifies accepted spatial input classes (`sf` and `sfc`).
 #' @srrstats {EA2.6} Processes vector distances regardless of `units` attributes.
+#' @srrstats {SP1.0} Explicitly supports both curvilinear/geographic (`metric_crs = NULL` using `s2`) and Cartesian/projected (`metric_crs` specified) spatial domains.
+#' @srrstats {SP1.1} Explicitly documents applicability to two-dimensional (`XY`) `POINT`, `LINESTRING`, and `MULTILINESTRING` geometries.
 #' @srrstats {SP2.0} Accepts only dedicated spatial classes (`sf` and `sfc`).
 #' @srrstats {SP2.0b} Errors appropriately when spatial inputs lack a valid CRS or have inappropriate geometry types.
 #' @srrstats {SP2.3} Examples load spatial geometries from a standard `.gpkg` file via `sf::st_read()`.

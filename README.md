@@ -80,6 +80,17 @@ Visit it at [ushift.pt/apps/gtfshift](https://ushift.tecnico.ulisboa.pt/apps/gtf
 
 [![](man/figures/web.png)](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/)
 
+## Spatial domain of applicability
+
+**GTFShift** operates on **two-dimensional (`XY`)** spatial geometries (`POINT`, `LINESTRING`, and `MULTILINESTRING` represented via the `sf` package) across **both curvilinear (geographic/ellipsoidal) and Cartesian (projected/planar) domains**:
+
+- By default (`metric_crs = NULL`), spatial distance, length, and buffer operations use spherical geometry (`s2` via `sf`) directly on geographic coordinates (`EPSG:4326` / WGS 84, as defined by the GTFS and OpenStreetMap specifications).
+- Users may optionally supply a local projected coordinate reference system via the `metric_crs` parameter (compliant with `PROJ >= 6` / `WKT2`) to perform planar Cartesian calculations in the units of that projection.
+
+## Lifecycle
+
+**GTFShift** is currently in an **active and stable** state of development (published on CRAN and actively maintained by the [U-Shift](https://ushift.tecnico.ulisboa.pt) research group). Future development focuses on maintaining compatibility with evolving GTFS/GTFS-RT specifications and upstream spatial packages (`sf`, `tidytransit`, `gtfstools`, `osmdata`, `osmextract`, `stplanr`), expanding real-time transit performance indicators, and addressing community bug reports and feature requests via [GitHub Issues](https://github.com/U-Shift/GTFShift/issues).
+
 ## Related packages
 
 -   [`{tidytransit}`](https://github.com/r-transit/tidytransit)

@@ -17,6 +17,7 @@ library(sf)
 #' @srrstats {SP6.0} Verifies that the returned `closest_on_geometry` preserves the original CRS of the input geometry.
 #' @srrstats {SP6.1} Tests `project_points_along_geometry()` on both Cartesian (`EPSG:3857`) and curvilinear (`EPSG:4326`) coordinates.
 #' @srrstats {SP6.1b} Demonstrates accurate cumulative distance calculation on both projected (`metric_crs = 3857`) and geographic (`metric_crs = NULL`, `EPSG:4326`) coordinates.
+#' @srrstats {SP6.2} Tests extreme geographical coordinates extending to polar extremes of +90 and -90 degrees latitude.
 test_that("project_points_along_geometry computes projection and cumulative distance", {
     line <- st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     pts <- st_sfc(st_point(c(20, 10)), crs = 3857)
@@ -121,4 +122,22 @@ test_that("project_points_along_geometry works with MULTILINESTRING and sf input
     expect_equal(nrow(res), 2)
     expect_s3_class(res$closest_on_geometry, "sfc_POINT")
     expect_equal(st_crs(res$closest_on_geometry), st_crs(3857))
+})
+
+test_that("project_points_along_geometry handles polar extreme geographical coordinates (+/-90 degrees)", {
+    line_north_pole <- st_sfc(st_linestring(matrix(c(0, 89, 0, 90), ncol = 2, byrow = TRUE)), crs = 4326)
+    pts_north_pole <- st_sfc(st_point(c(0, 89)), st_point(c(0, 90)), crs = 4326)
+
+    res_np <- GTFShift::project_points_along_geometry(line_north_pole, pts_north_pole, geometry_sample_meters = 1000)
+    expect_equal(nrow(res_np), 2)
+    expect_equal(res_np$distance_along_geometry[1], 0)
+    expect_gt(res_np$distance_along_geometry[2], 110000)
+
+    line_south_pole <- st_sfc(st_linestring(matrix(c(0, -89, 0, -90), ncol = 2, byrow = TRUE)), crs = 4326)
+    pts_south_pole <- st_sfc(st_point(c(0, -89)), st_point(c(0, -90)), crs = 4326)
+
+    res_sp <- GTFShift::project_points_along_geometry(line_south_pole, pts_south_pole, geometry_sample_meters = 1000)
+    expect_equal(nrow(res_sp), 2)
+    expect_equal(res_sp$distance_along_geometry[1], 0)
+    expect_gt(res_sp$distance_along_geometry[2], 110000)
 })

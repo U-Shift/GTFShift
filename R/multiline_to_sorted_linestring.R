@@ -53,7 +53,7 @@
 #' unvisited points \eqn{Q} are marked visited when
 #' \deqn{d\!\left(L^{(k+1)}, Q\right) \leq \min_{J \in \mathcal{R}^{(k+1)}} d(J, Q).}
 #'
-#' The ordered segments are concatenated into a single \code{LINESTRING} and
+#' The ordered segments are concatenated into a single two-dimensional (\code{XY}) \code{LINESTRING} (supporting both curvilinear/geographic and Cartesian/projected coordinate reference systems) and
 #' transformed back to the original CRS of \code{multilinestring}.
 #'
 #' @returns sfc. LINESTRING geometry object.
@@ -85,6 +85,8 @@
 #' @srrstats {G2.10} Uses `drop = FALSE` when filtering single-column candidate data frames.
 #' @srrstats {G2.16} Checks `is.infinite()` on candidate distances when identical segments are excluded.
 #' @srrstats {G3.0} Selects candidate segments via `min()` and integer indices rather than testing arbitrary floating-point equality.
+#' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
+#' @srrstats {SP1.1} Operates on two-dimensional (`XY`) `MULTILINESTRING`, `LINESTRING`, and `POINT` geometries (`all_coords[, 1:2]`).
 #' @srrstats {SP2.3} Examples load sample `MULTILINESTRING` route geometries from a `.gpkg` file via `sf::st_read()`.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
 #' @srrstats {SP2.4a} Validates and transforms coordinate reference systems using `WKT2` via `sf::st_crs()`.

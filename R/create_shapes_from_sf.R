@@ -63,6 +63,8 @@
 #' @srrstats {G2.4b} Uses `as.numeric()` explicitly when assigning cumulative `shape_dist_traveled`.
 #' @srrstats {G2.12} Processes list columns of stop point guides (`points = I(list(trip_points))`) to orient shapes.
 #' @srrstats {G2.13} Checks for missing/invalid `metric_crs` and required `shape_id` column before processing.
+#' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
+#' @srrstats {SP1.1} Operates on two-dimensional (`XY`) `LINESTRING`, `MULTILINESTRING`, and `POINT` geometries.
 #' @srrstats {SP2.3} Examples load OSM route geometries from a `.gpkg` file via `sf::st_read()`.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
 #' @srrstats {SP2.4a} Validates CRS using `WKT2` via `sf::st_crs()`.

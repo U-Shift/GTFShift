@@ -54,6 +54,8 @@
 #' @srrstats {G2.15} Passes `na.rm = TRUE` to all `sum()`, `weighted.mean()`, `min()`, and `max()` calls.
 #' @srrstats {EA3.0} Automates reporting of network-level bus lane extension, speed, and lane count statistics.
 #' @srrstats {EA3.1} Enables standardized comparison of prioritised transit networks weighted by length or frequency.
+#' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
+#' @srrstats {SP1.1} Operates on two-dimensional (`XY`) road segment geometries.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
 #' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
 #' @srrstats {SP4.1} Documents physical units (meters for extensions, km/h for speeds) in `@returns`.

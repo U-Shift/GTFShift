@@ -64,6 +64,8 @@
 #' @importFrom rlang .data
 #' @srrstats {EA2.3} Accepts user-specified attribute column `attr` and aggregation function `fun` rather than assuming fixed column names.
 #' @srrstats {EA4.0} Returns an `sf` network object matching the class of `target_network`.
+#' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
+#' @srrstats {SP1.1} Operates on two-dimensional (`XY`) linear network geometries.
 #' @srrstats {SP2.2} Integrates with `stplanr::line_cast()`, `stplanr::line_segment()`, and `stplanr::rnet_join()`.
 #' @srrstats {SP2.2a} Demonstrates embedding `GTFShift` route frequency outputs into `stplanr` road network workflows.
 #' @srrstats {SP2.3} Examples load the target road network from a `.gpkg` file via `sf::st_read()`.

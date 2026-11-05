@@ -8,19 +8,17 @@
 #'
 #' @srrstats {G1.0} Primary academic reference is documented in `DESCRIPTION` and `README.md` (Barata et al., 2023, <https://doi.org/10.5281/zenodo.8124235>), alongside the Highway Capacity Manual (HCM 2000) in `classify_frequency_los()`.
 #' @srrstats {G1.1} Package documentation, `README.md`, and function-level `@details` document how `GTFShift` provides novel GTFS-to-OSM route matching (`osm_shapes_match_routes()`), topological multilinestring sorting (`multiline_to_sorted_linestring()`), real-time speed profiling (`rt_average_speed()`, `get_trip_speed_profile()`), and integrated bus lane prioritisation (`prioritise_lanes()`) building upon `tidytransit`, `gtfstools`, `sf`, `osmdata`, `osmextract`, and `stplanr`.
+#' @srrstats {G1.2} A Life Cycle Statement describing current stability and anticipated future development is included in `README.md` alongside the repostatus Active badge.
 #' @srrstats {G1.3} All statistical, transit, and geometric terminology (such as commercial speed, alternative commercial speed, percentiles, interquartile range, closeness metric, and level of service) is unambiguously defined using mathematical formulas and prose in function `@details`.
 #' @srrstats {G1.4} All exported functions are documented using `roxygen2`.
 #' @srrstats {EA1.0} Target audiences (public transport planners, urban mobility researchers, and transit agencies/operators) are identified in `DESCRIPTION`, `README.md`, and package vignettes.
 #' @srrstats {EA1.1} The kinds of data the software analyses (static GTFS schedules, GTFS-Realtime vehicle position feeds in JSON and Protocol Buffers formats, and OpenStreetMap road networks) are documented in `DESCRIPTION`, `README.md`, and function documentation.
 #' @srrstats {EA1.2} The exploratory and analytical questions addressed by the software (network extension, stop/route/way service frequencies, level of service classification, bus lane prioritisation, and real-time commercial speed profiling) are identified in `README.md` and vignettes.
+#' @srrstats {SP1.0} `README.md` and spatial function documentation explicitly state that `GTFShift` applies to both curvilinear/geographic domains (using `s2` spherical geometry by default when `metric_crs = NULL`) and Cartesian/projected domains (when a projected `metric_crs` is provided).
+#' @srrstats {SP1.1} `README.md` and spatial function documentation explicitly indicate that `GTFShift` is applicable to two-dimensional (`XY`) `POINT`, `LINESTRING`, and `MULTILINESTRING` geometries.
 #' @srrstats {SP2.1} `GTFShift` uses the `sf` package exclusively for all spatial representations and operations and does not use `sp`.
 #' @srrstats {SP2.2} `GTFShift` ensures compatibility with established spatial and transit R packages (`sf`, `tidytransit`, `gtfstools`, `gtfsrouter`, `osmdata`, `osmextract`, `stplanr`).
 #' @srrstats {SP2.2a} Documentation, `@examples`, and vignettes demonstrate how `GTFShift` routines integrate directly into workflows using `sf`, `tidytransit`, `osmdata`, `osmextract`, and `stplanr`.
-#'
-#' @srrstatsTODO {G1.2} *Statistical Software should include a* Life Cycle Statement *describing current and anticipated future states of development.*
-#' @srrstatsTODO {SP1.0} *Spatial software should explicitly indicate its domain of applicability, and in particular distinguish whether the software may be applied in Cartesian/rectilinear/geometric domains, curvilinear/geographic domains, or both.*
-#' @srrstatsTODO {SP1.1} *Spatial software should explicitly indicate its dimensional domain of applicability, in particular through identifying whether it is applicable to two or three dimensions only, or whether there are any other restrictions on dimensionality.*
-#' @srrstatsTODO {SP6.2} *Geographical Software should include tests with extreme geographical coordinates, minimally including extension to polar extremes of +/-90 degrees.*
 #' @noRd
 NULL
 

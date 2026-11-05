@@ -118,6 +118,8 @@
 #' @srrstats {G2.3b} Explicitly documents and implements exact vs. case-insensitive partial matching via `gtfs_osm_match_exact`.
 #' @srrstats {G2.9} Issues detailed diagnostic warnings when routes have no match, partial matches, duplicate associations, or unsorted stops.
 #' @srrstats {EA2.3} Allows user-specified matching attributes (`gtfs_match` and `osm_match`).
+#' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
+#' @srrstats {SP1.1} Operates on two-dimensional (`XY`) route shapes and stop point geometries.
 #' @srrstats {SP2.3} Examples load OpenStreetMap extract data from a standard `.pbf` file.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
 #' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
