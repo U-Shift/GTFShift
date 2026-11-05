@@ -84,9 +84,9 @@ GTFShift::rt_collect_json(
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
-#> [2026-11-05 10:27:40] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs
-#> [20261105_102740] Iteration 1 completed
-#> [1] "/tmp/RtmpevZ4L1/file7b953e002cf3.csv"
+#> [2026-11-05 13:48:51] Starting GTFS-RT data collection from https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs
+#> [20261105_134851] Iteration 1 completed
+#> [1] "/tmp/RtmpYA0vRV/file1e4b36c1971b.csv"
 
 # Read data
 if (file.exists(destination_file)) {
@@ -101,17 +101,17 @@ if (file.exists(destination_file)) {
   )
 }
 #>                                vehicle.trip.trip_id vehicle.position.latitude
-#> 1 [1NN3V][HF16N]M41-1-008-A-U-10h30-CarcavelosEstac                  38.68744
-#> 2 [1NN3V][HF16N]M31-1-012-A-U-10h00-CarcavelosEstac                  38.71481
-#> 3  [1NN3V][HF16N]M01-2-004-A-U-10h00-CascaiShopping                  38.70454
-#> 4 [1NN3V][HF16N]M46-1-005-E-U-10h30-SPedrodoEstoril                  38.69618
-#> 5 [1NN3V][HF16N]M01-1-005-A-U-10h00-ParedeTerminalC                  38.72349
-#> 6 [1NN3V][HF16N]M08-1-012-A-U-10h20-CascaisTerminal                  38.71525
+#> 1   [1NN3V][HF16N]M37-1-012-A-U-13h40-ELeclercNorte                  38.72135
+#> 2   [1NN3V][HF16N]M37-1-012-A-U-13h40-ELeclercNorte                  38.72514
+#> 3 [1NN3V][HF16N]M27-1-026-A-U-13h30-CascaisEstacaoA                  38.69588
+#> 4 [1NN3V][HF16N]M42-2-006-A-U-13h40-EscolaSecCarcav                  38.71037
+#> 5 [1NN3V][HF16N]M30-1-023-A-U-13h40-ParedeTerminalC                  38.69279
+#> 6 [1NN3V][HF16N]M33-2-016-A-U-13h45-ELeclercSDoming                  38.71326
 #>   vehicle.position.longitude
-#> 1                  -9.336246
-#> 2                  -9.372325
-#> 3                  -9.385755
-#> 4                  -9.373908
-#> 5                  -9.410613
-#> 6                  -9.424031
+#> 1                  -9.344327
+#> 2                  -9.342605
+#> 3                  -9.439000
+#> 4                  -9.329523
+#> 5                  -9.354504
+#> 6                  -9.336975
 ```
