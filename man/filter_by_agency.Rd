@@ -32,7 +32,7 @@ summary(gtfs)
 
 
 # Filter by id
-gtfs_id_8 = gtfs |> GTFShift::filter_by_agency(id = "8")
+gtfs_id_8 <- gtfs |> GTFShift::filter_by_agency(id = "8")
 
 summary(gtfs_id_8)
 

@@ -100,10 +100,10 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
     left_join(service_pattern_summary, by = "servicepattern_id")
 
   ## Get service patterns that run on the date selected
-  service_pattern_ids = pattern_gtfs$.$dates_servicepatterns |>
+  service_pattern_ids <- pattern_gtfs$.$dates_servicepatterns |>
     filter(.data$date==date)
 
-  service_ids = pattern_gtfs$.$servicepattern |>
+  service_ids <- pattern_gtfs$.$servicepattern |>
     filter(.data$servicepattern_id %in% service_pattern_ids$servicepattern_id) |>
     pull(.data$service_id)
 
@@ -111,11 +111,11 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
 
   # Get stop frequency (missing data)
 
-  frame = data.frame()
+  frame <- data.frame()
 
-  stop_times = gtfs_date$stop_times |> mutate(hour = lubridate::hour(.data$departure_time))
-  min_hour = min(stop_times$hour, na.rm=TRUE)
-  max_hour = max(stop_times$hour, na.rm=TRUE)
+  stop_times <- gtfs_date$stop_times |> mutate(hour = lubridate::hour(.data$departure_time))
+  min_hour <- min(stop_times$hour, na.rm=TRUE)
+  max_hour <- max(stop_times$hour, na.rm=TRUE)
 
   message(sprintf("> Calculating stop frequencies for hours %d to %d...", min_hour, max_hour))
 
