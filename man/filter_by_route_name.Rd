@@ -11,9 +11,9 @@ filter_by_route_name(gtfs, values, short_name = TRUE, exact_match = TRUE)
 
 \item{values}{String[]. List of the route names to filter the feed.}
 
-\item{short_name}{Boolean. If TRUE, query for route_short_name, otherwise, route_long_name is considered.}
+\item{short_name}{Boolean. If TRUE, query for \code{route_short_name}, otherwise, \code{route_long_name} is considered.}
 
-\item{exact_match}{Boolean. If TRUE, route name is queried for an exact match, otherwise, partial match is considered.}
+\item{exact_match}{Boolean. If TRUE, route name is queried for an exact (case-sensitive) match, otherwise, partial (case-insensitive) match is considered.}
 }
 \value{
 tidygtfs. The filtered GTFS feed.

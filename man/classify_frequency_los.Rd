@@ -9,7 +9,7 @@ classify_frequency_los(frequencies, frequency_col = "frequency")
 \arguments{
 \item{frequencies}{data.frame. Data frame with frequency information.}
 
-\item{frequency_col}{String (Default "frequency"). Name of the column with frequency values.}
+\item{frequency_col}{String (Default \code{"frequency"}). Case-sensitive name of the column with frequency values.}
 }
 \value{
 data.frame. Input data frame with an additional column \code{frequency_los} indicating the LOS classification.

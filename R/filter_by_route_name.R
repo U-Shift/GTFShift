@@ -2,8 +2,8 @@
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param values String[]. List of the route names to filter the feed.
-#' @param short_name Boolean. If TRUE, query for route_short_name, otherwise, route_long_name is considered.
-#' @param exact_match Boolean. If TRUE, route name is queried for an exact match, otherwise, partial match is considered.
+#' @param short_name Boolean. If TRUE, query for \code{route_short_name}, otherwise, \code{route_long_name} is considered.
+#' @param exact_match Boolean. If TRUE, route name is queried for an exact (case-sensitive) match, otherwise, partial (case-insensitive) match is considered.
 #'
 #' @details
 #' On a GTFS feed, the \code{route_id} rarely matches the real name of the route, that can range from numbers,

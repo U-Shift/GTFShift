@@ -59,7 +59,7 @@
 #' @seealso \code{gtfstools::convert_sf_to_shapes()}
 #' @seealso \code{GTFShift::multiline_to_sorted_linestring()}
 #' @seealso \code{GTFShift::project_points_along_geometry()}
-#' @srrstats {G2.1} Validates `metric_crs` and presence of `shape_id` column in `sf_shapes`.
+#' @srrstats {G2.1} Validates `sf_shapes`, `gtfs`, `metric_crs`, and presence of `shape_id` column in `sf_shapes`.
 #' @srrstats {G2.4b} Uses `as.numeric()` explicitly when assigning cumulative `shape_dist_traveled`.
 #' @srrstats {G2.12} Processes list columns of stop point guides (`points = I(list(trip_points))`) to orient shapes.
 #' @srrstats {G2.13} Checks for missing/invalid `metric_crs` and required `shape_id` column before processing.
@@ -67,9 +67,10 @@
 #' @srrstats {SP1.1} Operates on two-dimensional (`XY`) `LINESTRING`, `MULTILINESTRING`, and `POINT` geometries.
 #' @srrstats {SP2.3} Examples load OSM route geometries from a `.gpkg` file via `sf::st_read()`.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
-#' @srrstats {SP2.4a} Validates CRS using `WKT2` via `sf::st_crs()`.
+#' @srrstats {SP2.4a} Validates CRS using `WKT2` via `validate_metric_crs()`, explicitly rejecting PROJ4-strings.
 #' @srrstats {SP2.6} Documents expected `sf` and `tidygtfs` input classes.
 #' @srrstats {SP2.7} Validates `metric_crs` and required `sf_shapes` attributes.
+#' @srrstats {SP2.8} Uses `validate_metric_crs()` and `preprocess_spatial_crs()` for spatial input validation.
 #' @srrstats {SP4.0} Returns a standard GTFS `shapes` `data.frame` structure.
 #' @srrstats {SP4.0b} Returns a GTFS specification-compliant `shapes` table.
 #' @srrstats {SP4.2} Documents the returned `data.frame` and optional `shape_dist_traveled` column.
@@ -81,14 +82,15 @@ create_shapes_from_sf <- function(
     metric_crs = NULL,
     shape_dist_traveled = FALSE
 ) {
-    if (!is.null(metric_crs)) {
-        metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-        if (is.na(metric_crs)) {
-            stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-        }
-    }
+    metric_crs <- validate_metric_crs(metric_crs)
 
     # Initial validations
+    if (!inherits(sf_shapes, "sf")) {
+        stop("The sf_shapes object must be an sf object.")
+    }
+    if (!inherits(gtfs, "gtfs")) {
+        stop("gtfs must be a tidygtfs object.")
+    }
     if (!"shape_id" %in% names(sf_shapes)) {
         stop("The sf_shapes object must contain a \"shape_id\" column.")
     }

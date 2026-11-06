@@ -15,9 +15,9 @@
 #'   Columns to aggregate by. If \code{"day"} is included in \code{by} but not present
 #'   in \code{rt_speed}, it is automatically derived from the \code{timestamp} column.
 #'   Set to \code{NULL} or \code{character(0)} to compute metrics across the entire dataset.
-#' @param speed_col Character (Default \code{"speed_kmh"}). Column name present in
+#' @param speed_col Character (Default \code{"speed_kmh"}). Case-sensitive column name present in
 #'   \code{rt_speed} representing estimated speed between consecutive updates (in km/h).
-#' @param time_col Character (Default \code{"timestamp"}). Column name present in
+#' @param time_col Character (Default \code{"timestamp"}). Case-sensitive column name present in
 #'   \code{rt_speed} representing update timestamps (numeric epoch, POSIXct, or Date).
 #'
 #' @details
@@ -122,22 +122,28 @@
 #' @srrstats {G2.0} Validates lengths of required and grouping column vectors and checks observation counts per trip.
 #' @srrstats {G2.1} Validates that `rt_speed` is a `data.frame` or `sf` object.
 #' @srrstats {G2.1a} Documents expected data types for all vector parameters (`by`, `speed_col`, `time_col`).
-#' @srrstats {G2.4} Provides explicit type conversions for timestamps (`POSIXct`, `Date`, `numeric`) and numeric metrics.
-#' @srrstats {G2.4b} Uses `as.numeric()` explicitly when computing time differences and quantiles.
-#' @srrstats {G2.6} Processes 1D timestamp and speed columns across `numeric`, `POSIXt`, `Date`, and `character` classes.
+#' @srrstats {G2.2} Validates univariate character parameters `speed_col` and `time_col`.
+#' @srrstats {G2.3} Validates character column name inputs `by`, `speed_col`, and `time_col`.
+#' @srrstats {G2.3b} Explicitly documents case sensitivity for column name parameters (`by`, `speed_col`, `time_col`).
+#' @srrstats {G2.4} Provides explicit type conversions for timestamps (`POSIXct`, `Date`, `numeric`), `units`, and numeric metrics.
+#' @srrstats {G2.4b} Uses `as.numeric()` explicitly when computing time differences, distances, and quantiles.
+#' @srrstats {G2.6} Processes 1D timestamp and speed columns across `numeric`, `units`, `POSIXt`, `Date`, and `character` classes.
 #' @srrstats {G2.7} Accepts `data.frame`, `tibble`, grouped `tbl_df`, and `sf` tabular objects.
 #' @srrstats {G2.8} Pre-processes `rt_speed` by dropping `sf` geometry and ungrouping to a standard `data.frame`.
 #' @srrstats {G2.10} Uses `drop = FALSE` when subsetting data frames and `[[` for single-column extraction.
+#' @srrstats {G2.11} Supports `units`-classed columns for `speed_col` and `distance_along_geometry` in `rt_speed`.
+#' @srrstats {G2.12} Safely ignores extra `list` columns present in `rt_speed` during aggregation.
 #' @srrstats {G2.13} Checks for missing required columns and `NA` timestamps/distances before computing speeds.
 #' @srrstats {G2.15} Never passes unvalidated `NA` values to statistical routines; filters `!is.na()` and uses `na.rm = TRUE`.
 #' @srrstats {G2.16} Explicitly filters out undefined values (`NaN`, `Inf`, `-Inf`) via `!is.na(raw_speeds) & is.finite(raw_speeds)`.
 #' @srrstats {EA1.3} Documents required columns and types for `rt_speed` and grouping parameters.
 #' @srrstats {EA2.3} Allows user-specified grouping (`by`), speed (`speed_col`), and timestamp (`time_col`) columns rather than assuming fixed column names.
-#' @srrstats {EA2.6} Processes timestamp and speed vectors regardless of additional attributes.
+#' @srrstats {EA2.6} Processes timestamp and speed vectors regardless of additional `units` or class attributes.
 #' @srrstats {EA3.0} Automates extraction of trip, route, daily, and global summary speed statistics.
 #' @srrstats {EA3.1} Enables standardized comparison of commercial speeds and speed distributions across trips, routes, and days.
 #' @srrstats {EA4.0} Returns a tabular `data.frame` consistent with tabular input `rt_speed`.
 #' @srrstats {EA4.2} Returns a `data.frame` with standard default `print`, `plot`, and `summary` methods.
+#' @srrstats {SP4.1} Preserves `units` on returned speed summary columns when the input `speed_col` has `units` attributes.
 #' @srrstats {SP4.2} Documents the returned `data.frame` structure and `"global_summary"` attribute.
 #'
 #' @export
@@ -151,6 +157,12 @@ get_trip_speed_profile <- function(
   if (!is.data.frame(rt_speed)) {
     stop("rt_speed must be a data.frame or sf object")
   }
+  if (!is.character(speed_col) || length(speed_col) != 1) {
+    stop("speed_col must be a single character string")
+  }
+  if (!is.character(time_col) || length(time_col) != 1) {
+    stop("time_col must be a single character string")
+  }
 
   # Drop sf geometry if present for aggregation performance
   if (inherits(rt_speed, "sf")) {
@@ -163,6 +175,11 @@ get_trip_speed_profile <- function(
   missing_cols <- setdiff(required_cols, colnames(rt_speed))
   if (length(missing_cols) > 0) {
     stop(paste("rt_speed is missing required column(s):", paste(missing_cols, collapse = ", ")))
+  }
+  speed_units <- if (speed_col %in% colnames(rt_speed) && inherits(rt_speed[[speed_col]], "units")) {
+    units(rt_speed[[speed_col]])
+  } else {
+    NULL
   }
 
   # 1. Handle "day" column derivation if included in 'by' but absent in rt_speed
@@ -222,10 +239,12 @@ get_trip_speed_profile <- function(
     n_trip <- nrow(trip_df)
 
     # First and last updates
+    d_fwd <- as.numeric(trip_df[["distance_along_geometry"]])
+    d_rev <- as.numeric(trip_df[["distance_along_geometry_reversed"]])
     if (n_trip >= 2) {
       dt <- get_time_diff_sec(trip_df[[time_col]][1], trip_df[[time_col]][n_trip])
-      dd_normal <- abs(trip_df[["distance_along_geometry"]][n_trip] - trip_df[["distance_along_geometry"]][1])
-      dd_reversed <- abs(trip_df[["distance_along_geometry"]][n_trip] - trip_df[["distance_along_geometry_reversed"]][1])
+      dd_normal <- abs(d_fwd[n_trip] - d_fwd[1])
+      dd_reversed <- abs(d_fwd[n_trip] - d_rev[1])
       dd <- pmax(dd_normal, dd_reversed, na.rm = TRUE)
       comm_speed <- compute_speed_kmh(dd, dt)
     } else {
@@ -235,8 +254,8 @@ get_trip_speed_profile <- function(
     # 2nd and penultimate updates
     if (n_trip >= 4) {
       dt_alt <- get_time_diff_sec(trip_df[[time_col]][2], trip_df[[time_col]][n_trip - 1])
-      dd_alt_normal <- abs(trip_df[["distance_along_geometry"]][n_trip - 1] - trip_df[["distance_along_geometry"]][2])
-      dd_alt_reversed <- abs(trip_df[["distance_along_geometry"]][n_trip - 1] - trip_df[["distance_along_geometry_reversed"]][2])
+      dd_alt_normal <- abs(d_fwd[n_trip - 1] - d_fwd[2])
+      dd_alt_reversed <- abs(d_fwd[n_trip - 1] - d_rev[2])
       dd_alt <- pmax(dd_alt_normal, dd_alt_reversed, na.rm = TRUE)
       comm_speed_alt <- compute_speed_kmh(dd_alt, dt_alt)
     } else {
@@ -275,7 +294,7 @@ get_trip_speed_profile <- function(
 
     # Measures of centrality and spread for speed observations
     if (speed_col %in% colnames(group_df)) {
-      raw_speeds <- group_df[[speed_col]]
+      raw_speeds <- as.numeric(group_df[[speed_col]])
       valid_speeds <- raw_speeds[!is.na(raw_speeds) & is.finite(raw_speeds)]
     } else {
       valid_speeds <- numeric(0)
@@ -344,7 +363,20 @@ get_trip_speed_profile <- function(
   }
 
   # Attach global summary across the entire dataset as attribute
-  attr(result, "global_summary") <- compute_profile(rt_speed)
+  global_summary <- compute_profile(rt_speed)
+  if (!is.null(speed_units)) {
+    unit_cols <- c(
+      "commercial_speed", "commercial_speed_alt",
+      "speed_avg", "speed_median", "speed_sd",
+      "speed_min", "speed_max",
+      "speed_p15", "speed_p25", "speed_p75", "speed_p85", "speed_iqr"
+    )
+    for (col in unit_cols) {
+      units(result[[col]]) <- speed_units
+      units(global_summary[[col]]) <- speed_units
+    }
+  }
+  attr(result, "global_summary") <- global_summary
 
   return(result)
 }

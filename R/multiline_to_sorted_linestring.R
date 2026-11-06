@@ -85,13 +85,13 @@
 #' @srrstats {G2.4b} Uses `as.numeric()` explicitly when converting `sf::st_distance()` outputs.
 #' @srrstats {G2.10} Uses `drop = FALSE` when filtering single-column candidate data frames.
 #' @srrstats {G2.16} Checks `is.infinite()` on candidate distances when identical segments are excluded.
-#' @srrstats {G3.0} Selects candidate segments via `min()` and integer indices rather than testing arbitrary floating-point equality.
+#' @srrstats {G3.0} Uses floating-point tolerance (`sqrt(.Machine$double.eps)`) rather than exact `==` comparisons when comparing candidate distances.
 #' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
 #' @srrstats {SP1.1} Operates on two-dimensional (`XY`) `MULTILINESTRING`, `LINESTRING`, and `POINT` geometries (`all_coords[, 1:2]`).
 #' @srrstats {SP2.3} Examples load sample `MULTILINESTRING` route geometries from a `.gpkg` file via `sf::st_read()`.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
-#' @srrstats {SP2.4a} Validates and transforms coordinate reference systems using `WKT2` via `sf::st_crs()`.
-#' @srrstats {SP2.8} Transforms input `linestrings` and `points` to a common CRS before sorting.
+#' @srrstats {SP2.4a} Validates and transforms coordinate reference systems using `WKT2` via `validate_metric_crs()`, rejecting PROJ4-strings.
+#' @srrstats {SP2.8} Transforms input `linestrings` and `points` to a common CRS via `preprocess_spatial_crs()` before sorting.
 #' @srrstats {SP2.9} Transforms the assembled `LINESTRING` back to `original_crs` before returning.
 #' @srrstats {SP4.0} Returns an `sfc` geometry object preserving the CRS of `multilinestring`.
 #' @srrstats {SP4.2} Explicitly documents the returned `sfc` `LINESTRING` class.
@@ -105,13 +105,9 @@ multiline_to_sorted_linestring <- function(
     if (!requireNamespace("lwgeom", quietly = TRUE)) {
       stop("Package 'lwgeom' is required for this function. Install it with: install.packages('lwgeom')")
     }
-    if (!is.null(metric_crs)) {
-        metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-        if (is.na(metric_crs)) {
-            stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-        }
-    }
+    metric_crs <- validate_metric_crs(metric_crs)
     original_crs <- st_crs(multilinestring)
+    fp_tol <- sqrt(.Machine$double.eps)
 
     # browser()
 
@@ -119,9 +115,11 @@ multiline_to_sorted_linestring <- function(
     linestrings <- st_cast(multilinestring, "LINESTRING") |>
         st_as_sf() |>
         st_set_geometry("geometry")
-    if (!is.null(metric_crs)) {
-        linestrings <- linestrings |> st_transform(metric_crs)
-    }
+    linestrings <- preprocess_spatial_crs(
+        linestrings,
+        metric_crs = metric_crs,
+        arg_name = "multilinestring"
+    )
     linestrings <- linestrings |>
         mutate(
             start = lwgeom::st_startpoint(.data$geometry),
@@ -140,11 +138,12 @@ multiline_to_sorted_linestring <- function(
             visited = FALSE
         )) |>
             mutate(order = row_number())
-        if (!is.null(metric_crs)) {
-            points_df <- points_df |> st_transform(metric_crs)
-        } else if (!is.na(st_crs(linestrings)) && !is.na(st_crs(points_df)) && st_crs(points_df) != st_crs(linestrings)) {
-            points_df <- points_df |> st_transform(st_crs(linestrings))
-        }
+        points_df <- preprocess_spatial_crs(
+            points_df,
+            metric_crs = metric_crs,
+            reference_crs = st_crs(linestrings),
+            arg_name = "points"
+        )
         start_point <- points_df |> slice(1) |> pull(.data$geometry)
         if (length(points) > 1) {
             second_point <- points_df |> slice(2) |> pull(.data$geometry)
@@ -182,9 +181,12 @@ multiline_to_sorted_linestring <- function(
     } else {
         Inf
     }
-    if (distance_start_to_remaining < distance_end_to_remaining) {
+    equidistant_to_remaining <- (is.infinite(distance_start_to_remaining) && is.infinite(distance_end_to_remaining)) ||
+        (is.finite(distance_start_to_remaining) && is.finite(distance_end_to_remaining) &&
+         abs(distance_start_to_remaining - distance_end_to_remaining) <= fp_tol)
+    if (!equidistant_to_remaining && distance_start_to_remaining < distance_end_to_remaining) {
         current_line$geometry <- st_reverse(current_line$geometry)
-    } else if (distance_start_to_remaining == distance_end_to_remaining) {
+    } else if (equidistant_to_remaining) {
         # If second_point is defined, orient towards it (end is closest); otherwise,
         # orient away from start_point (start is closest).
         if (!is.null(second_point)) {
@@ -241,8 +243,8 @@ multiline_to_sorted_linestring <- function(
         # 1) If next_point is provided, pick the candidate whose geometry is closest to next_point
         # 2) If still tied, pick the one whose start point is closest to last_point
         min_distance <- min(c(distance_to_start, distance_to_end))
-        candidate_start_idx <- which(distance_to_start == min_distance)
-        candidate_end_idx <- which(distance_to_end == min_distance)
+        candidate_start_idx <- which(abs(distance_to_start - min_distance) <= fp_tol)
+        candidate_end_idx <- which(abs(distance_to_end - min_distance) <= fp_tol)
         candidate_df <- data.frame(
             idx = c(candidate_start_idx, candidate_end_idx),
             stringsAsFactors = FALSE
@@ -255,7 +257,8 @@ multiline_to_sorted_linestring <- function(
                 function(candidate_i) as.numeric(st_distance(next_point, remaining_lines[candidate_i, ]$geometry)),
                 numeric(1)
             )
-            candidate_df <- candidate_df[candidate_df$geometry_to_next == min(candidate_df$geometry_to_next), , drop = FALSE]
+            min_geom_to_next <- min(candidate_df$geometry_to_next)
+            candidate_df <- candidate_df[abs(candidate_df$geometry_to_next - min_geom_to_next) <= fp_tol, , drop = FALSE]
         }
 
         if (nrow(candidate_df) > 1 && !is.null(last_point)) { # 2)
@@ -264,7 +267,8 @@ multiline_to_sorted_linestring <- function(
                 function(candidate_i) as.numeric(st_distance(last_point, remaining_lines[candidate_i, ]$start)),
                 numeric(1)
             )
-            candidate_df <- candidate_df[candidate_df$start_to_last_point == min(candidate_df$start_to_last_point), , drop = FALSE]
+            min_start_to_last <- min(candidate_df$start_to_last_point)
+            candidate_df <- candidate_df[abs(candidate_df$start_to_last_point - min_start_to_last) <= fp_tol, , drop = FALSE]
         }
 
         nearest_idx <- candidate_df$idx[1]
@@ -280,7 +284,7 @@ multiline_to_sorted_linestring <- function(
         }
 
         # Check if we need to reverse the next line to connect properly
-        if (next_start == next_end) {
+        if (as.numeric(st_distance(next_start, next_end)) <= fp_tol) {
             # message("> Circular shape...")
         } else if (st_distance(last_point, next_start) > st_distance(last_point, next_end)) {
             # message("> Inverting next line...")

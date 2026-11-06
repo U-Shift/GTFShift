@@ -100,5 +100,20 @@ test_that("get_network_extension works with parameter variations", {
     metric_crs = "EPSG:3857"
   )
   expect_equal(as.numeric(ext_epsg_str), as.numeric(ext_non_unified))
+
+  # Variation 5: local rectilinear CRS (EPSG:3763) vs curvilinear (metric_crs = NULL)
+  ext_curv <- GTFShift::get_network_extension(gtfs, date = ref_date, metric_crs = NULL)
+  ext_3763 <- GTFShift::get_network_extension(gtfs, date = ref_date, metric_crs = 3763)
+  expect_equal(as.numeric(ext_curv), as.numeric(ext_3763), tolerance = 5e-3)
+
+  # Variation 6: PROJ4-string is explicitly rejected (SP2.4a)
+  expect_error(
+    GTFShift::get_network_extension(
+      gtfs,
+      date = ref_date,
+      metric_crs = "+proj=merc +lat_ts=0 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+    ),
+    "PROJ4-strings are not permitted"
+  )
 })
 

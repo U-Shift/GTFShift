@@ -1,12 +1,16 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G2.11} Tests `get_prioritisation_stats()` with `units`-classed `speed_avg` and `frequency` columns.
+#' @srrstats {G2.12} Tests `get_prioritisation_stats()` when `lane_prioritisation` includes `list` columns (`routes`, `shapes`).
 #' @srrstats {G5.2} Tests error conditions on invalid `weight` and invalid `metric_crs`.
 #' @srrstats {G5.2b} Verifies error messages via `expect_error()`.
+#' @srrstats {G5.3} Explicitly verifies that all returned summary statistics are finite (`is.finite()`).
 #' @srrstats {G5.4} Tests weighted mean and extension calculations against exact analytical formulas for both `weight = "length"` and `weight = "frequency"`.
 #' @srrstats {EA6.0a} Tests `list` return type via `expect_type(stats, "list")`.
 #' @srrstats {EA6.0c} Tests named elements of the returned statistics list.
 #' @srrstats {EA6.0e} Tests exact numeric values of summary metrics.
+#' @srrstats {SP4.1} Verifies that `units` on input `speed_avg` are preserved in returned `speed_avg`, `speed_min`, and `speed_max`.
 #' @srrstats {SP6.1} Tests `get_prioritisation_stats()` with explicit `metric_crs` and default `metric_crs = NULL`.
 test_that("get_prioritisation_stats calculates summary statistics without speed_avg", {
     prioritisation_df <- st_sf(
@@ -154,4 +158,30 @@ test_that("get_prioritisation_stats calculates stats using weight = 'length' vs 
     expect_equal(stats_freq$speed_avg, 30)
     # n_lanes_circulation_avg: (2*30 + 4*10) / 40 = (60 + 40) / 40 = 2.5
     expect_equal(stats_freq$n_lanes_circulation_avg, 2.5)
+    expect_true(all(vapply(stats_freq, is.finite, logical(1))))
+})
+
+test_that("get_prioritisation_stats supports units columns and list columns and preserves speed units (G2.11, G2.12, SP4.1)", {
+    prioritisation_df <- st_sf(
+        is_bus_lane = c(TRUE, FALSE),
+        frequency = units::set_units(c(10, 5), "1/h"),
+        speed_avg = units::set_units(c(30, 60), "km/h"),
+        n_lanes_circulation = c(2, 4),
+        n_lanes_parking = c(1, 2),
+        routes = I(list(c("R1", "R2"), "R3")),
+        shapes = I(list("S1", c("S2", "S3"))),
+        geometry = st_sfc(
+            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
+            st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
+            crs = 3857
+        )
+    )
+
+    stats <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "FREQUENCY", metric_crs = 3857)
+    expect_s3_class(stats$speed_avg, "units")
+    expect_s3_class(stats$speed_min, "units")
+    expect_s3_class(stats$speed_max, "units")
+    expect_equal(as.numeric(stats$speed_avg), 40)
+    expect_equal(as.numeric(stats$speed_min), 30)
+    expect_equal(as.numeric(stats$speed_max), 60)
 })

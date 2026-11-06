@@ -22,7 +22,7 @@ query_mobilitydatabase(
 
 \item{refresh_token}{String (Optional when access_token). Refresh token.}
 
-\item{bounding_filter_method}{String (Default partially_enclosed). Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.}
+\item{bounding_filter_method}{String (Default \code{"partially_enclosed"}). Case-insensitive filtering method to use with the \code{dataset_latitudes} and \code{dataset_longitudes} parameters. Accepted values: \code{"partially_enclosed"}, \code{"completely_enclosed"}, \code{"disjoint"}.}
 
 \item{limit}{Integer (Default 10). The number of items to be returned.}
 

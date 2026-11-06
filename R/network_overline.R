@@ -2,7 +2,7 @@
 #'
 #' @param target_network sf. A spatial object representing the target network.
 #' @param lines sf. A spatial object representing the lines to aggregate.
-#' @param attr String. The attribute to aggregate the lines by.
+#' @param attr String. Case-sensitive column name in \code{lines} to aggregate by.
 #' @param target_network_split Integer (Default 100). If not NA, network is split in segments of defined meters.
 #' @param fun Method (Default \code{base::sum}). Function to summarise the attributes by.
 #' @param join_dist Integer (Default 10). Meters to consider when joining routes and network segments.
@@ -63,6 +63,12 @@
 #' @import dplyr
 #' @importFrom rlang .data
 #' @srrstats {G1.1} Documents how this function improves upon `stplanr::overline2()` by aggregating arbitrary route attributes onto a segmented target network using `stplanr::rnet_join()` and a customizable summary function `fun`.
+#' @srrstats {G2.0} Validates that `attr` is a single column name of length 1.
+#' @srrstats {G2.1} Validates that `target_network` and `lines` inherit from `sf` and `attr` is character.
+#' @srrstats {G2.2} Prohibits multivariate `attr` values.
+#' @srrstats {G2.3} Validates character input `attr` against `names(lines)`.
+#' @srrstats {G2.3b} Explicitly documents that `attr` is a case-sensitive column name in `lines`.
+#' @srrstats {G2.11} Supports `units`-classed columns for `attr` in `lines`.
 #' @srrstats {EA2.3} Accepts user-specified attribute column `attr` and aggregation function `fun` rather than assuming fixed column names.
 #' @srrstats {EA4.0} Returns an `sf` network object matching the class of `target_network`.
 #' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
@@ -71,10 +77,11 @@
 #' @srrstats {SP2.2a} Demonstrates embedding `GTFShift` route frequency outputs into `stplanr` road network workflows.
 #' @srrstats {SP2.3} Examples load the target road network from a `.gpkg` file via `sf::st_read()`.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
-#' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
-#' @srrstats {SP2.8} Harmonizes CRS between `target_network` and `lines` prior to spatial joining.
+#' @srrstats {SP2.4a} Validates `metric_crs` via `validate_metric_crs()`, explicitly rejecting PROJ4-strings.
+#' @srrstats {SP2.8} Harmonizes CRS between `target_network` and `lines` via `preprocess_spatial_crs()` prior to spatial joining.
 #' @srrstats {SP2.9} Transforms the aggregated `result` back to `original_crs` before returning.
 #' @srrstats {SP4.0a} Returns an `sf` object matching `target_network`.
+#' @srrstats {SP4.1} Preserves `units` on the aggregated `attr` column when input `lines[[attr]]` has `units`.
 #' @srrstats {SP4.2} Explicitly documents the returned `sf` object.
 #'
 #' @export
@@ -90,17 +97,29 @@ network_overline <- function(
   if (!requireNamespace("stplanr", quietly = TRUE)) {
     stop("Package 'stplanr' is required for this function. Install it with: install.packages('stplanr')")
   }
-  original_crs <- st_crs(target_network)
-  if (!is.null(metric_crs)) {
-    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-    if (is.na(metric_crs)) {
-      stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-    }
-    target_network <- st_transform(target_network, crs = metric_crs)
-    lines <- st_transform(lines, crs = metric_crs)
-  } else if (!is.na(original_crs) && !is.na(st_crs(lines)) && st_crs(lines) != original_crs) {
-    lines <- st_transform(lines, crs = original_crs)
+  if (!inherits(target_network, "sf")) {
+    stop("target_network must be an sf object")
   }
+  if (!inherits(lines, "sf")) {
+    stop("lines must be an sf object")
+  }
+  if (!is.character(attr) || length(attr) != 1 || !(attr %in% names(lines))) {
+    stop("attr must be a single column name present in lines")
+  }
+  attr_units <- if (inherits(lines[[attr]], "units")) units(lines[[attr]]) else NULL
+  original_crs <- st_crs(target_network)
+  metric_crs <- validate_metric_crs(metric_crs)
+  target_network <- preprocess_spatial_crs(
+    target_network,
+    metric_crs = metric_crs,
+    arg_name = "target_network"
+  )
+  lines <- preprocess_spatial_crs(
+    lines,
+    metric_crs = metric_crs,
+    reference_crs = original_crs,
+    arg_name = "lines"
+  )
 
   # 1. Prepare network
   network_line = stplanr::line_cast(target_network)
@@ -145,6 +164,9 @@ network_overline <- function(
     filter(.data$segment %in% df_network_segment$segment) |>
     left_join(df_network_segment, by="segment") |>
     select(-"segment")
+  if (!is.null(attr_units) && !inherits(result[[attr]], "units")) {
+    units(result[[attr]]) <- attr_units
+  }
   if (!is.na(original_crs) && st_crs(result) != original_crs) {
     result <- result |> st_transform(crs = original_crs)
   }

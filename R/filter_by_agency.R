@@ -1,8 +1,8 @@
 #' Filter GTFS feed by agency
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param id Integer (Optional when name). Ids of the agency.
-#' @param name String (Optional when id). Name of the agency.
+#' @param id Integer or String (Optional when name). Case-sensitive ID of the agency.
+#' @param name String (Optional when id). Case-sensitive name of the agency.
 #'
 #' @details
 #' Allows to filter a GTFS feed for the agency, using the id, name or both. Returns empty feed it none provided.

@@ -9,9 +9,9 @@ filter_by_agency(gtfs, id = NA, name = NA)
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{id}{Integer (Optional when name). Ids of the agency.}
+\item{id}{Integer or String (Optional when name). Case-sensitive ID of the agency.}
 
-\item{name}{String (Optional when id). Name of the agency.}
+\item{name}{String (Optional when id). Case-sensitive name of the agency.}
 }
 \value{
 tidygtfs. The filtered GTFS feed.

@@ -78,7 +78,7 @@
 #' @srrstats {SP1.1} Operates on two-dimensional (`XY`) road segment and vehicle position geometries.
 #' @srrstats {SP2.0b} Errors when `metric_crs` is invalid or required spatial table columns are missing.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
-#' @srrstats {SP2.4a} Validates `metric_crs` using `WKT2` via `sf::st_crs()`.
+#' @srrstats {SP2.4a} Validates `metric_crs` using `WKT2` via `validate_metric_crs()`, rejecting PROJ4-strings.
 #' @srrstats {SP2.8} Transforms buffer geometries to `rt_collection_crs` prior to `sf::st_join()`.
 #' @srrstats {SP2.9} Preserves all attributes and geometry of `lane_prioritisation` in the returned `sf` object.
 #' @srrstats {SP4.0a} Returns an `sf` object matching the class of `lane_prioritisation`.
@@ -93,6 +93,12 @@ rt_extend_prioritisation <- function(
   metric_crs = NULL
 ) {
   # 1. Validate inputs
+  if (!inherits(lane_prioritisation, "sf")) {
+    stop("lane_prioritisation must be an sf object")
+  }
+  if (!inherits(rt_collection, "sf")) {
+    stop("rt_collection must be an sf object")
+  }
   required_cols <- c("way_osm_id")
   missing_cols <- setdiff(required_cols, colnames(lane_prioritisation))
   if (length(missing_cols) > 0) {
@@ -104,12 +110,7 @@ rt_extend_prioritisation <- function(
   if (length(missing_rt_cols) > 0) {
     stop(paste("rt_collection is missing required columns:", paste(missing_rt_cols, collapse = ", ")))
   }
-  if (!is.null(metric_crs)) {
-    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-    if (is.na(metric_crs)) {
-      stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-    }
-  }
+  metric_crs <- validate_metric_crs(metric_crs)
   rt_collection_crs <- sf::st_crs(rt_collection)
 
   # Display feedback
