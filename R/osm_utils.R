@@ -81,9 +81,8 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
   })
 
   pb$update(pb_update_3)
-  rel_n <- 0
-  relations_data <- lapply(relations, function(rel) {
-    rel_n <<- rel_n + 1
+  relations_data <- lapply(seq_along(relations), function(rel_n) {
+    rel <- relations[[rel_n]]
     pb$update(min(
       round(pb_update_3 + ((pb_update_4 - pb_update_3) * rel_n / length(relations)), digits = 2),
       ifelse(rel_n < length(relations), 0.99, 1) # Prevent 0.9999 rounding to 1 before reaching last
