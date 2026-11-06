@@ -30,9 +30,14 @@
 #' @import dplyr
 #' @importFrom stringr str_detect regex
 #' @importFrom rlang .data
+#' @srrstats {G2.0} Validates that `values` is a non-empty vector or list (`length(values) > 0`).
+#' @srrstats {G2.0a} Documents that `values` is a vector/list of route names.
 #'
 #' @export
 filter_by_route_name <- function(gtfs, values, short_name=TRUE, exact_match=TRUE) {
+  if (missing(values) || length(values) == 0) {
+    stop("values must be a non-empty vector or list of route names")
+  }
 
   # Get routes that match query
   pattern <- paste(unlist(values), collapse = "|")

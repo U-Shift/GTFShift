@@ -33,4 +33,10 @@ test_that("filter_by_modes returns empty feed when no routes match mode code", {
     expect_contains(class(gtfs_empty), "tidygtfs")
     expect_equal(nrow(gtfs_empty$routes), 0)
     expect_equal(nrow(gtfs_empty$trips), 0)
+
+    # Empty modes vector/list throws error (G2.0)
+    expect_error(
+        GTFShift::filter_by_modes(gtfs, modes = list()),
+        "modes must be a non-empty vector or list of mode IDs"
+    )
 })

@@ -41,4 +41,10 @@ test_that("filter_by_route_name filters by long name partial match", {
     gtfs_long_partial <- GTFShift::filter_by_route_name(gtfs, values = list(long_partial), short_name = FALSE, exact_match = FALSE)
     expect_contains(class(gtfs_long_partial), "tidygtfs")
     expect_true(all(grepl(long_partial, gtfs_long_partial$routes$route_long_name, ignore.case = TRUE)))
+
+    # Empty values vector/list throws error (G2.0)
+    expect_error(
+        GTFShift::filter_by_route_name(gtfs, values = character(0)),
+        "values must be a non-empty vector or list of route names"
+    )
 })

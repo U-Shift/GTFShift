@@ -31,9 +31,14 @@
 #' @import tidytransit
 #' @import dplyr
 #' @importFrom rlang .data
+#' @srrstats {G2.0} Validates that `modes` is a non-empty vector or list (`length(modes) > 0`).
+#' @srrstats {G2.0a} Documents that `modes` is a vector/list of integer mode IDs.
 #'
 #' @export
 filter_by_modes <- function(gtfs, modes=list()) {
+  if (length(modes) == 0) {
+    stop("modes must be a non-empty vector or list of mode IDs")
+  }
 
   # Get routes that match query
   routes = gtfs$routes |>
