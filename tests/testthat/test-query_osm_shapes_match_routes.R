@@ -52,6 +52,12 @@ test_that("osm_shapes_match_routes validates input parameters and throws errors"
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
 
+    # Invalid gtfs
+    expect_error(
+        GTFShift::osm_shapes_match_routes(list(), q = NA),
+        "gtfs must be a tidygtfs object"
+    )
+
     # Invalid gtfs_match
     expect_error(
         GTFShift::osm_shapes_match_routes(gtfs, q = NA, gtfs_match = "invalid_col"),

@@ -55,9 +55,17 @@ test_that("network_overline works when metric_crs is default (NULL)", {
             attr = "frequency",
             target_network_split = NA
         )
+        res_reprojected <- GTFShift::network_overline(
+            target_network = target_net,
+            lines = lines_sf,
+            attr = "frequency",
+            target_network_split = NA,
+            metric_crs = 3857
+        )
     })
     expect_s3_class(res, "sf")
     expect_equal(res$frequency, 5)
+    expect_equal(sf::st_crs(res_reprojected), sf::st_crs(target_net))
 })
 
 test_that("network_overline stops on invalid metric_crs", {
@@ -78,6 +86,46 @@ test_that("network_overline stops on invalid metric_crs", {
             metric_crs = NA
         ),
         "metric_crs should be a valid CRS value"
+    )
+    expect_error(
+        GTFShift::network_overline(
+            target_network = data.frame(id = 1),
+            lines = lines_sf,
+            attr = "frequency"
+        ),
+        "target_network must be an sf object"
+    )
+    expect_error(
+        GTFShift::network_overline(
+            target_network = target_net,
+            lines = data.frame(frequency = 5),
+            attr = "frequency"
+        ),
+        "lines must be an sf object"
+    )
+    expect_error(
+        GTFShift::network_overline(
+            target_network = target_net,
+            lines = lines_sf,
+            attr = "missing_attr"
+        ),
+        "attr must be a single column name present in lines"
+    )
+    expect_error(
+        GTFShift::network_overline(
+            target_network = target_net,
+            lines = lines_sf,
+            attr = 123
+        ),
+        "attr must be a single column name present in lines"
+    )
+    expect_error(
+        GTFShift::network_overline(
+            target_network = target_net,
+            lines = lines_sf,
+            attr = c("frequency", "other")
+        ),
+        "attr must be a single column name present in lines"
     )
 })
 
@@ -141,4 +189,18 @@ test_that("network_overline preserves units on attr column (G2.11, SP4.1)", {
 
     expect_s3_class(res_units$frequency, "units")
     expect_equal(as.numeric(res_units$frequency), 15)
+
+    # Also test when custom fun strips units (triggers units restoration branch)
+    suppressWarnings({
+        res_units_stripped <- GTFShift::network_overline(
+            target_network = target_net,
+            lines = lines_sf,
+            attr = "frequency",
+            fun = function(x) sum(as.numeric(x)),
+            target_network_split = NA,
+            metric_crs = 3857
+        )
+    })
+    expect_s3_class(res_units_stripped$frequency, "units")
+    expect_equal(as.numeric(res_units_stripped$frequency), 15)
 })

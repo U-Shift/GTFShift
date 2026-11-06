@@ -169,4 +169,12 @@ test_that("rt_extend_prioritisation stops when metric_crs is invalid", {
     expect_error(
         GTFShift::rt_extend_prioritisation(lanes_sf, rt_points, metric_crs = NA)
     )
+    expect_error(
+        GTFShift::rt_extend_prioritisation(data.frame(way_osm_id = "w1"), rt_points),
+        "lane_prioritisation must be an sf object"
+    )
+    expect_error(
+        GTFShift::rt_extend_prioritisation(lanes_sf, data.frame(speed = 25)),
+        "rt_collection must be an sf object"
+    )
 })

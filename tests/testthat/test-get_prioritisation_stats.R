@@ -127,6 +127,14 @@ test_that("get_prioritisation_stats stops on invalid weight or metric_crs", {
         GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length", metric_crs = NA),
         "metric_crs should be a valid CRS value"
     )
+    expect_error(
+        GTFShift::get_prioritisation_stats(data.frame(x = 1)),
+        "lane_prioritisation must be an sf object"
+    )
+    expect_error(
+        GTFShift::get_prioritisation_stats(prioritisation_df, weight = 123),
+        "weight must be a character string"
+    )
 })
 
 test_that("get_prioritisation_stats calculates stats using weight = 'length' vs weight = 'frequency'", {

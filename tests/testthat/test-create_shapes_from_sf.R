@@ -104,6 +104,14 @@ test_that("create_shapes_from_sf stops when shape_id column is missing", {
         GTFShift::create_shapes_from_sf(sf_line_no_id, gtfs, metric_crs = 3857),
         "The sf_shapes object must contain a \"shape_id\" column."
     )
+    expect_error(
+        GTFShift::create_shapes_from_sf(data.frame(shape_id = "1"), gtfs),
+        "The sf_shapes object must be an sf object."
+    )
+    expect_error(
+        GTFShift::create_shapes_from_sf(sf_line_no_id, list()),
+        "gtfs must be a tidygtfs object."
+    )
 })
 
 test_that("create_shapes_from_sf yields equivalent results across curvilinear, metric_crs, and st_transform (SP6.1b, G5.3)", {
