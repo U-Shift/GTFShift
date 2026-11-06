@@ -28,7 +28,7 @@
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
 #' 
 #' # Load OSM network to serve as target network
-#' target_network = sf::st_read(
+#' target_network <- sf::st_read(
 #'   system.file("extdata/samples", "osm_ways_tcb.gpkg", package = "GTFShift"),
 #'   quiet = TRUE
 #' )
@@ -89,22 +89,22 @@ network_overline <- function(
   }
 
   # 1. Prepare network
-  network_line = stplanr::line_cast(target_network)
+  network_line <- stplanr::line_cast(target_network)
   if (!is.na(target_network_split)) {
-    network_segmented = stplanr::line_segment(
+    network_segmented <- stplanr::line_segment(
       network_line,
       segment_length=target_network_split
     ) |> mutate(segment=row_number())
   } else {
-    network_segmented = network_line |>
+    network_segmented <- network_line |>
       mutate(segment = row_number())
   }
 
-  df = lines |>
+  df <- lines |>
     mutate(df_id=row_number())
 
   # 2. Overlap df and network segments
-  df_network_match = stplanr::rnet_join(
+  df_network_match <- stplanr::rnet_join(
     rnet_x = df,
     rnet_y = network_segmented |>
       select("segment"),
@@ -114,20 +114,20 @@ network_overline <- function(
     crs = st_crs(df)
   ) |> st_drop_geometry()
 
-  df_network_attr = df_network_match |>
+  df_network_attr <- df_network_match |>
     left_join(df |>
                 st_drop_geometry() |>
                 select(all_of(attr), "df_id"),
               by = "df_id")
 
   # 3. Group attr by segment
-  df_network_segment = df_network_attr |>
+  df_network_segment <- df_network_attr |>
     select("segment", all_of(attr)) |>
     group_by(.data$segment) |>
     summarise(!!attr := fun(.data[[attr]]))
 
   # 4. Get geometry back
-  result = network_segmented |>
+  result <- network_segmented |>
     filter(.data$segment %in% df_network_segment$segment) |>
     left_join(df_network_segment, by="segment") |>
     select(-"segment")

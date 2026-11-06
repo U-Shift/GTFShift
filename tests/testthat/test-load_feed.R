@@ -88,9 +88,9 @@ test_that("load_feed passes custom parameters to gtfsrouter::gtfs_transfer_table
 
 test_that("clean empty stop_times", {
     gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE)
-    random_trip = gtfs$trips |> sample_n(1) |> pull(trip_id)
+    random_trip <- gtfs$trips |> sample_n(1) |> pull(trip_id)
     gtfs$stop_times[random_trip == gtfs$stop_times$trip_id, ][1, ]$arrival_time <- NA 
-    location = withr::local_tempfile(fileext = ".zip")
+    location <- withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs, location)
     testthat::expect_warning(gtfs_new <- GTFShift::load_feed(location), "interpolated .* stop times with missing times")
     testthat::expect_equal(nrow(gtfs_new$stop_times), nrow(gtfs$stop_times))

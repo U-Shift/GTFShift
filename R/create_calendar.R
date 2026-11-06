@@ -31,12 +31,12 @@
 #' @export
 create_calendar <- function(gtfs) {
 
-  dates = gtfs$calendar_dates |>
+  dates <- gtfs$calendar_dates |>
     filter(.data$exception_type==1)  |> # Get dates for service inclusion (not removal, which corresponds to exception_type 2)
     mutate(weekday = tolower(weekdays(.data$date))) # Get week day from date
 
   # Aggregate values in calendar.txt structure
-  calendar = dates |>
+  calendar <- dates |>
     group_by(.data$service_id) |>
     summarise(
       monday = as.integer(any(.data$weekday == "monday")),

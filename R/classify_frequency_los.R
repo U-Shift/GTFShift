@@ -25,7 +25,7 @@
 #' ) 
 #' 
 #' # Compute LOS
-#' frequency_los = GTFShift::classify_frequency_los(frequency_analysis)
+#' frequency_los <- GTFShift::classify_frequency_los(frequency_analysis)
 #' 
 #' frequency_los |> 
 #'   sf::st_drop_geometry() |>
@@ -36,7 +36,7 @@
 #' @export
 classify_frequency_los <- function(frequencies, frequency_col = "frequency") {
 
-  los = frequencies |>
+  los <- frequencies |>
     mutate(
       frequency_los = case_when(
         .data[[frequency_col]] == 0 ~ "F",

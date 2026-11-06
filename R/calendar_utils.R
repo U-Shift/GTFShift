@@ -20,28 +20,28 @@
 #' @import lubridate
 #'
 #' @export
-calendar_nextBusinessWednesday = function(
+calendar_nextBusinessWednesday <- function(
   start_date = Sys.Date(),
   country_code = "PT"
 ) {
-  year = lubridate::year(start_date)
+  year <- lubridate::year(start_date)
   if (!is.na(country_code)) {
-    holidays = calendar_get_pt_holidays(year, country_code)
+    holidays <- calendar_get_pt_holidays(year, country_code)
   } else {
-    holidays = list()
+    holidays <- list()
   }
 
   # Find the next Wednesday
-  next_wed = lubridate::ymd(start_date) + (4 - lubridate::wday(start_date) + 7) %% 7
+  next_wed <- lubridate::ymd(start_date) + (4 - lubridate::wday(start_date) + 7) %% 7
 
   # If next Wednesday is a holiday, keep searching
   while (next_wed %in% holidays) {
-    next_wed = next_wed + 7  # Move to the next Wednesday
+    next_wed <- next_wed + 7  # Move to the next Wednesday
 
     # If we cross into a new year, update holidays
     if (year(next_wed) != year) {
-      year = lubridate::year(next_wed)
-      holidays = calendar_get_pt_holidays(year, country_code)
+      year <- lubridate::year(next_wed)
+      holidays <- calendar_get_pt_holidays(year, country_code)
     }
   }
 
@@ -55,15 +55,15 @@ calendar_nextBusinessWednesday = function(
 #' @importFrom httr GET status_code
 #' @importFrom jsonlite fromJSON
 #' @noRd
-calendar_get_pt_holidays = function(year, country_code) {
-  url = paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/", country_code)
-  response = tryCatch(
+calendar_get_pt_holidays <- function(year, country_code) {
+  url <- paste0("https://date.nager.at/api/v3/PublicHolidays/", year, "/", country_code)
+  response <- tryCatch(
     httr::GET(url),
     error = function(e) NULL
   )
 
   if (!is.null(response) && httr::status_code(response) == 200) {
-    holidays = tryCatch(
+    holidays <- tryCatch(
       jsonlite::fromJSON(httr::content(response, "text", encoding = "UTF-8")),
       error = function(e) NULL
     )

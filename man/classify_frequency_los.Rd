@@ -37,7 +37,7 @@ frequency_analysis <- GTFShift::get_route_frequency_hourly(
 ) 
 
 # Compute LOS
-frequency_los = GTFShift::classify_frequency_los(frequency_analysis)
+frequency_los <- GTFShift::classify_frequency_los(frequency_analysis)
 
 frequency_los |> 
   sf::st_drop_geometry() |>
