@@ -27,6 +27,10 @@ test_that("get_network_extension throws error for invalid route_identifier", {
     GTFShift::get_network_extension(gtfs, route_identifier = "invalid_id", date = ref_date, metric_crs = 3857),
     "route_identifier should be one of: route_id, route_short_name or route_long_name"
   )
+  expect_error(
+    GTFShift::get_network_extension(list(), date = ref_date),
+    "gtfs must be a tidygtfs object"
+  )
 })
 
 test_that("get_network_extension throws error for invalid metric_crs", {

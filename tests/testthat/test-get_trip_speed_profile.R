@@ -482,6 +482,14 @@ test_that("get_trip_speed_profile stops with informative error on invalid inputs
         GTFShift::get_trip_speed_profile(df_valid, by = c("non_existent_col")),
         "The following grouping columns specified in 'by' were not found in rt_speed: non_existent_col"
     )
+    expect_error(
+        GTFShift::get_trip_speed_profile(df_valid, speed_col = 123),
+        "speed_col must be a single character string"
+    )
+    expect_error(
+        GTFShift::get_trip_speed_profile(df_valid, time_col = 123),
+        "time_col must be a single character string"
+    )
 })
 
 test_that("get_trip_speed_profile integrates seamlessly with rt_average_speed output", {

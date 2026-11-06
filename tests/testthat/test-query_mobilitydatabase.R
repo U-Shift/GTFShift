@@ -11,10 +11,21 @@ create_mock_response <- function(status_code = 200) {
   )
 }
 
-test_that("query_mobilitydatabase throws error if no token is provided", {
+test_that("query_mobilitydatabase throws error if no token is provided or bounding_filter_method is invalid", {
   expect_error(
     GTFShift::query_mobilitydatabase(),
     "No token provided!"
+  )
+  expect_error(
+    GTFShift::query_mobilitydatabase(access_token = "tok", bounding_filter_method = NA),
+    "bounding_filter_method must be one of"
+  )
+  expect_error(
+    GTFShift::query_mobilitydatabase(access_token = "tok", bounding_filter_method = c("partially_enclosed", "disjoint")),
+    "bounding_filter_method must be one of"
+  )
+  expect_error(
+    GTFShift::query_mobilitydatabase(access_token = "tok", bounding_filter_method = "invalid_method")
   )
 })
 

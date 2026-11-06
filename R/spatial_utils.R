@@ -25,7 +25,10 @@ validate_metric_crs <- function(metric_crs = NULL) {
   if (is.character(metric_crs) && !is.na(metric_crs) && grepl("^\\+", trimws(metric_crs))) {
     stop("PROJ4-strings are not permitted for metric_crs; please use WKT2 or an authority:code CRS value (e.g., 3857 or 'EPSG:3857')")
   }
-  parsed_crs <- suppressWarnings(sf::st_crs(metric_crs))
+  parsed_crs <- tryCatch(
+    suppressWarnings(sf::st_crs(metric_crs)),
+    error = function(e) sf::NA_crs_
+  )
   if (is.na(parsed_crs)) {
     stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
   }
