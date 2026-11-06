@@ -18,6 +18,7 @@ Description: A bundle of methods to
 License: GPL
 URL: https://github.com/U-Shift/GTFShift,
     https://u-shift.github.io/GTFShift/
+BugReports: https://github.com/U-Shift/GTFShift/issues
 Depends:
     R (>= 4.1.0)
 Imports: 
