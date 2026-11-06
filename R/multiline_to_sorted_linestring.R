@@ -10,6 +10,7 @@
 #' @details
 #' The function takes a MULTILINESTRING object and converts it to a LINESTRING object
 #' by sorting the linestrings and combining them in the correct order.
+#' It provides the first implementation of a novel stop-guided greedy topological sorting and orientation algorithm for route geometries.
 #'
 #' The algorithm is formulated as follows:
 #' Let \eqn{\mathcal{L} = \{L_1, \dots, L_n\}} be the set of individual LINESTRING components.
@@ -79,7 +80,7 @@
 #' @import dplyr
 #' @import sf
 #' @importFrom rlang .data
-#' @srrstats {G1.1} Implements a greedy topological sorting and orientation algorithm for converting `MULTILINESTRING` geometries into continuous `LINESTRING` geometries.
+#' @srrstats {G1.1} Documents that this function is the first implementation of a novel stop-guided greedy topological sorting and orientation algorithm for converting `MULTILINESTRING` geometries into continuous `LINESTRING` geometries.
 #' @srrstats {G1.3} Formulates the initialization, iterative candidate selection, tie-breaking, and verification steps mathematically in `@details`.
 #' @srrstats {G2.4b} Uses `as.numeric()` explicitly when converting `sf::st_distance()` outputs.
 #' @srrstats {G2.10} Uses `drop = FALSE` when filtering single-column candidate data frames.

@@ -21,6 +21,7 @@
 #'   \code{rt_speed} representing update timestamps (numeric epoch, POSIXct, or Date).
 #'
 #' @details
+#' This function provides the first implementation of a novel transit speed profiling algorithm that pairs overall commercial speed with a terminal-layover-adjusted alternative commercial speed (\code{commercial_speed_alt}) and circular-geometry distance handling.
 #' For each group defined by \code{by} (by default, each unique combination of
 #' \code{trip_id}, \code{route_id}, and \code{day}), observations are ordered
 #' chronologically by \code{timestamp}.
@@ -116,7 +117,7 @@
 #' @import dplyr
 #' @importFrom stats median sd var quantile IQR
 #' @importFrom rlang .data
-#' @srrstats {G1.1} Implements trip- and route-level commercial speed and statistical speed profiling from GTFS-RT updates.
+#' @srrstats {G1.1} Documents that this function is the first implementation of a novel transit speed profiling algorithm combining circular-route-aware commercial speed and terminal-layover-adjusted commercial speed (`commercial_speed_alt`).
 #' @srrstats {G1.3} Unambiguously defines commercial speed, alternative commercial speed, and centrality/spread metrics with equations in `@details`.
 #' @srrstats {G2.0} Validates lengths of required and grouping column vectors and checks observation counts per trip.
 #' @srrstats {G2.1} Validates that `rt_speed` is a `data.frame` or `sf` object.

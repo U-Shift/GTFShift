@@ -9,6 +9,7 @@
 #' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
 #'
 #' @details
+#' This method provides the first implementation of a novel road-segment bus lane prioritisation algorithm integrating planned GTFS frequencies with OpenStreetMap lane, parking, and bus-lane topology.
 #' This method analyses the GTFS feed for a representative day, returning a data.frame with the road segments where transit routes
 #' run and for each, a set of parameters that can be used to prioritise bus lane implementations.
 #'
@@ -61,6 +62,7 @@
 #' @import dplyr
 #' @import tidytransit
 #' @importFrom rlang .data
+#' @srrstats {G1.1} Documents that this function is the first implementation of a novel road-segment bus lane prioritisation algorithm combining GTFS schedules and OpenStreetMap lane topology.
 #' @srrstats {G2.3b} Uses `tolower()` and `ignore.case = TRUE` when matching OpenStreetMap `oneway` and `parking` tag values.
 #' @srrstats {G2.4a} Uses `as.integer()` explicitly when counting left and right parking lanes.
 #' @srrstats {G2.4b} Uses `as.numeric()` explicitly when parsing OSM `lanes` tags.

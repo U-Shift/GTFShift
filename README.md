@@ -80,6 +80,22 @@ Visit it at [ushift.pt/apps/gtfshift](https://ushift.tecnico.ulisboa.pt/apps/gtf
 
 [![](man/figures/web.png)](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/)
 
+## Implemented algorithms and methodology
+
+The methods implemented in **GTFShift** span three categories of algorithmic contributions:
+
+1. **First implementation of novel algorithms**:
+   - `osm_shapes_match_routes()`: Composite closeness heuristic matching GTFS shapes to OpenStreetMap route relations using endpoint proximity, route length difference, and scaled stop-count difference.
+   - `multiline_to_sorted_linestring()`: Stop-guided greedy topological sorting and orientation algorithm converting unordered `MULTILINESTRING` route geometries into continuous `LINESTRING` shapes.
+   - `prioritise_lanes()` and `rt_extend_prioritisation()`: End-to-end road segment bus lane prioritisation combining scheduled transit frequencies, OpenStreetMap lane/parking/bus-lane topology, and buffered GTFS-RT speed distributions.
+   - `rt_average_speed()` and `get_trip_speed_profile()`: Circular-route-aware linear referencing speed estimation and commercial speed profiling (including terminal-layover-adjusted `commercial_speed_alt`).
+2. **First implementation within R of algorithms from other languages or contexts**:
+   - `osm_centerlines()`: First R interface to the Python `neatnet` / `lp_streets` road network centerline simplification methodology (Relvas Pires, 2025).
+   - `classify_frequency_los()`: R implementation of the Highway Capacity Manual (HCM 2000, Exhibit 27-1) transit frequency Level of Service classification.
+3. **Improvements and extensions on existing implementations in R**:
+   - `load_feed()` and `unify()`: Extend `tidytransit`, `gtfstools`, and `gtfsrouter` with automated feed integrity repair (duplicate removal, missing stop-time interpolation, unused ID cleanup, fallback shape generation, and transfer table creation).
+   - `network_overline()` and `get_route_frequency_hourly()`: Extend `stplanr::rnet_join()` and `stplanr::overline2()` with custom segment-level aggregation functions and OpenStreetMap route geometry replacement.
+
 ## Spatial domain of applicability
 
 **GTFShift** operates on **two-dimensional (`XY`)** spatial geometries (`POINT`, `LINESTRING`, and `MULTILINESTRING` represented via the `sf` package) across **both curvilinear (geographic/ellipsoidal) and Cartesian (projected/planar) domains**:
