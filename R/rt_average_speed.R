@@ -17,6 +17,7 @@
 #'   compute distances and speeds. If NULL, spherical geometry (s2) is used by default.
 #'
 #' @details
+#' This function provides the first implementation of a novel circular-route-aware linear referencing algorithm in R for estimating segment speeds from sequential GTFS-RT vehicle position updates.
 #' For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n} 
 #' denote the ordered sequence of
 #' real-time observations, where \eqn{x_i} is the vehicle position and
@@ -123,7 +124,7 @@
 #' @importFrom purrr map_dfr
 #' @import rlang
 #' @importFrom rlang .data
-#' @srrstats {G1.1} Implements real-time vehicle trajectory projection and segment speed estimation along transit shapes.
+#' @srrstats {G1.1} Documents that this function is the first implementation of a novel circular-route-aware linear referencing algorithm for estimating segment speeds along transit shapes.
 #' @srrstats {G1.3} Defines forward and circular distance increments and segment speeds mathematically in `@details`.
 #' @srrstats {G2.0} Validates required columns and checks that each trip has at least 2 observations.
 #' @srrstats {G2.1} Asserts that `rt_collection` and `trips_geometries` inherit from `sf` and have `LINESTRING` geometries.

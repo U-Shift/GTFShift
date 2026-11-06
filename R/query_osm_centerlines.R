@@ -39,6 +39,8 @@
 #' }
 #'
 #' @author \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires}
+#' @srrstats {G1.0} Cites academic reference (Relvas Pires, 2025, <https://scholar.tecnico.ulisboa.pt/records/DhKWeFU5YLpMDcOhQbKR4f7ul05HCQnZr7ND>) and the `neatnet` library for road network centerline simplification.
+#' @srrstats {G1.1} Documents that this function is the first implementation within R of the road centerline simplification workflow previously implemented in Python (`neatnet` / `lp_streets`).
 #'
 #' @import sf
 #' @export

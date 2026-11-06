@@ -15,6 +15,7 @@
 #'
 #' @details
 #' For each route, matches its trips' shapes with OSM route relations.
+#' This function provides the first implementation of a novel composite geometrical and stop-count matching algorithm for harmonizing GTFS shapes with OpenStreetMap route relations.
 #'
 #' The matching algorithm is formulated as follows:
 #' Let \eqn{R} be a GTFS route identifier.
@@ -110,7 +111,7 @@
 #' @importFrom utils head tail
 #' @importFrom xml2 read_xml xml_find_all xml_attr
 #' @importFrom rlang .data
-#' @srrstats {G1.1} Implements a composite geometrical and stop-count closeness matching algorithm between GTFS shapes and OpenStreetMap route relations.
+#' @srrstats {G1.1} Documents that this function is the first implementation of a novel composite geometrical and stop-count closeness matching algorithm between GTFS shapes and OpenStreetMap route relations.
 #' @srrstats {G1.3} Formulates the closeness metric $C(i, j)$ and conflict resolution rules mathematically in `@details`.
 #' @srrstats {G2.2} Restricts `gtfs_match` and `osm_match` to single valid column/tag identifiers.
 #' @srrstats {G2.3} Validates character parameters `gtfs_match` and `osm_match`.

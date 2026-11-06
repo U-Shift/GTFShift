@@ -62,6 +62,7 @@
 #' @import sf
 #' @import dplyr
 #' @importFrom rlang .data
+#' @srrstats {G1.1} Documents how this function improves upon `stplanr::overline2()` by aggregating arbitrary route attributes onto a segmented target network using `stplanr::rnet_join()` and a customizable summary function `fun`.
 #' @srrstats {EA2.3} Accepts user-specified attribute column `attr` and aggregation function `fun` rather than assuming fixed column names.
 #' @srrstats {EA4.0} Returns an `sf` network object matching the class of `target_network`.
 #' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
