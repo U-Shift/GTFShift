@@ -1,3 +1,7 @@
+# GTFShift (development version)
+
+- CRAN submission fixes
+
 # GTFShift 1.2.0
 
 - Use spherical geometry (s2 via sf default) to compute distances instead of Mercator, with the option to override with a local projected CRS still available (#105)
