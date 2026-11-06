@@ -3,9 +3,9 @@
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param q osmdata::opq. Overpass query for transit network
 #' @param geometry Boolean (Default TRUE). If TRUE, returns sf object with geometry, otherwise, a simple data.frame.
-#' @param gtfs_match String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
-#' @param osm_match String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.
-#' @param gtfs_osm_match_exact Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).
+#' @param gtfs_match String (Default \code{"route_short_name"}). Case-sensitive \code{routes.txt} attribute that identifies routes. Accepted values: \code{"route_id"}, \code{"route_short_name"}, \code{"route_long_name"}.
+#' @param osm_match String (Default \code{"ref"}). Case-sensitive OSM attribute that identifies routes by matching with \code{gtfs_match}. Accepted values: \code{"ref"}, \code{"name"}, \code{"gtfs:route_id"}.
+#' @param gtfs_osm_match_exact Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly (case-sensitive). Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).
 #' @param log_file String (Optional). If provided, will log warnings to this file, in addition to the console.
 #' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
 #' @param num_cores Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).
@@ -123,7 +123,7 @@
 #' @srrstats {SP1.1} Operates on two-dimensional (`XY`) route shapes and stop point geometries.
 #' @srrstats {SP2.3} Examples load OpenStreetMap extract data from a standard `.pbf` file.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
-#' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
+#' @srrstats {SP2.4a} Validates `metric_crs` via `validate_metric_crs()`, explicitly rejecting PROJ4-strings.
 #' @srrstats {SP4.2} Explicitly documents all returned columns and optional `sf` geometry.
 #'
 #' @export
@@ -138,6 +138,19 @@ osm_shapes_match_routes <- function(
   osm_route_type = "bus",
   metric_crs = NULL
 ) {
+  if (!inherits(gtfs, "gtfs")) {
+    stop("gtfs must be a tidygtfs object")
+  }
+  if (!is.character(gtfs_match) || length(gtfs_match) != 1 ||
+      !(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
+    stop("gtfs_match should be one of: route_id, route_short_name or route_long_name")
+  }
+  if (!is.character(osm_match) || length(osm_match) != 1 ||
+      !(osm_match %in% c("ref", "name", "gtfs:route_id"))) {
+    stop("osm_match should be one of: ref, name, gtfs:route_id")
+  }
+  metric_crs <- validate_metric_crs(metric_crs)
+
   osm_file <- prepare_osm_file(osm_file)
   initial_osm_file <- osm_file
   total_steps <- 4
@@ -150,19 +163,6 @@ osm_shapes_match_routes <- function(
       sprintf("-----------------------------\n%s: Running osm_shapes_match_routes() for %s...\n\n", Sys.time(), paste(gtfs$agency$agency_name, collapse = ", ")),
       file = log_file, append = TRUE
     )
-  }
-
-  if (!(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
-    stop("gtfs_match should be one of: route_id, route_short_name or route_long_name")
-  }
-  if (!(osm_match %in% c("ref", "name", "gtfs:route_id"))) {
-    stop("osm_match should be one of: ref, name, gtfs:route_id")
-  }
-  if (!is.null(metric_crs)) {
-    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-    if (is.na(metric_crs)) {
-      stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-    }
   }
 
   # 1. Get geometry for shapes and stops

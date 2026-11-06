@@ -1,5 +1,10 @@
 library(testthat)
 
+#' @srrstats {EA6.0} Tests return object classes, dimensions, column names, and column types of `get_route_frequency_hourly()`.
+#' @srrstats {EA6.0a} Tests `sf` and `data.frame` classes of returned table.
+#' @srrstats {EA6.0b} Tests `nrow()` dimensions of returned route frequency tables.
+#' @srrstats {EA6.0c} Tests expected column names (`frequency`, `hour`, `geometry`, `route_id`, `route_short_name`, `shape_id`).
+#' @srrstats {EA6.0d} Tests numeric/integer types of `frequency` and `hour` columns and `sfc` geometry column.
 test_that("get_route_frequency_hourly calculates route frequencies", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
@@ -8,7 +13,12 @@ test_that("get_route_frequency_hourly calculates route frequencies", {
 
     res <- GTFShift::get_route_frequency_hourly(gtfs, date = ref_date)
     expect_s3_class(res, "sf")
+    expect_s3_class(res, "data.frame")
+    expect_gt(nrow(res), 0)
     expect_contains(names(res), c("frequency", "hour", "geometry", "route_id", "route_short_name", "shape_id"))
+    expect_true(is.numeric(res$frequency))
+    expect_true(is.numeric(res$hour))
+    expect_s3_class(sf::st_geometry(res), "sfc")
 })
 
 test_that("get_route_frequency_hourly supports overline = TRUE", {

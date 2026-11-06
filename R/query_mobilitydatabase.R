@@ -3,7 +3,7 @@
 #'
 #' @param access_token String (Optional when refresh_token). Access token.
 #' @param refresh_token String (Optional when access_token). Refresh token.
-#' @param bounding_filter_method String (Default partially_enclosed). Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.
+#' @param bounding_filter_method String (Default \code{"partially_enclosed"}). Case-insensitive filtering method to use with the \code{dataset_latitudes} and \code{dataset_longitudes} parameters. Accepted values: \code{"partially_enclosed"}, \code{"completely_enclosed"}, \code{"disjoint"}.
 #' @param limit Integer (Default 10). The number of items to be returned.
 #' @param offset Integer (Default 0). Offset of the first item to return.
 #' @param country_code String (Optional). Filter feeds by their exact country code.
@@ -38,6 +38,12 @@
 #'
 #' @importFrom httr GET POST add_headers content http_error http_status
 #' @import dplyr
+#' @srrstats {G2.0} Validates that `bounding_filter_method` has length 1.
+#' @srrstats {G2.1} Validates character type of `bounding_filter_method`.
+#' @srrstats {G2.2} Prohibits multivariate `bounding_filter_method`.
+#' @srrstats {G2.3} Validates character input `bounding_filter_method`.
+#' @srrstats {G2.3a} Uses `match.arg()` to restrict `bounding_filter_method` to `"partially_enclosed"`, `"completely_enclosed"`, or `"disjoint"`.
+#' @srrstats {G2.3b} Uses `tolower()` on `bounding_filter_method` so matching is case-insensitive.
 #'
 #' @export
 query_mobilitydatabase <- function(access_token = NA,
@@ -55,6 +61,13 @@ query_mobilitydatabase <- function(access_token = NA,
   if (is.na(access_token) && is.na(refresh_token)) {
     stop("No token provided! At least one of the access or refresh tokens must be provided as an argument.")
   }
+  if (!is.character(bounding_filter_method) || length(bounding_filter_method) != 1 || is.na(bounding_filter_method)) {
+    stop("bounding_filter_method must be one of: partially_enclosed, completely_enclosed, or disjoint.")
+  }
+  bounding_filter_method <- match.arg(
+    tolower(bounding_filter_method),
+    c("partially_enclosed", "completely_enclosed", "disjoint")
+  )
 
   # If refresh token, get access token from API
   if (is.na(access_token) && !is.na(refresh_token)) {

@@ -22,10 +22,10 @@ Columns to aggregate by. If \code{"day"} is included in \code{by} but not presen
 in \code{rt_speed}, it is automatically derived from the \code{timestamp} column.
 Set to \code{NULL} or \code{character(0)} to compute metrics across the entire dataset.}
 
-\item{speed_col}{Character (Default \code{"speed_kmh"}). Column name present in
+\item{speed_col}{Character (Default \code{"speed_kmh"}). Case-sensitive column name present in
 \code{rt_speed} representing estimated speed between consecutive updates (in km/h).}
 
-\item{time_col}{Character (Default \code{"timestamp"}). Column name present in
+\item{time_col}{Character (Default \code{"timestamp"}). Case-sensitive column name present in
 \code{rt_speed} representing update timestamps (numeric epoch, POSIXct, or Date).}
 }
 \value{
@@ -40,6 +40,7 @@ alternative commercial speed (considering the 2nd and penultimate updates to avo
 terminal wait biases), and measures of centrality and spread for speed observations.
 }
 \details{
+This function provides the first implementation of a novel transit speed profiling algorithm that pairs overall commercial speed with a terminal-layover-adjusted alternative commercial speed (\code{commercial_speed_alt}) and circular-geometry distance handling.
 For each group defined by \code{by} (by default, each unique combination of
 \code{trip_id}, \code{route_id}, and \code{day}), observations are ordered
 chronologically by \code{timestamp}.

@@ -17,7 +17,7 @@ get_network_extension(
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{route_identifier}{String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
+\item{route_identifier}{String. (Default \code{"route_id"}). Case-sensitive \code{routes.txt} attribute that identifies routes. Accepted values: \code{"route_id"}, \code{"route_short_name"}, \code{"route_long_name"}.}
 
 \item{direction_wise}{Boolean (Default \code{TRUE}). If TRUE, extension considers sum of both directions. Otherwise, only one direction is considered.}
 

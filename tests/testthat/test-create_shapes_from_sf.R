@@ -105,3 +105,24 @@ test_that("create_shapes_from_sf stops when shape_id column is missing", {
         "The sf_shapes object must contain a \"shape_id\" column."
     )
 })
+
+test_that("create_shapes_from_sf yields equivalent results across curvilinear, metric_crs, and st_transform (SP6.1b, G5.3)", {
+    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+    gtfs <- GTFShift::load_feed(sample_file)
+
+    target_shape_id <- gtfs$trips$shape_id[1]
+    sf_line_4326 <- st_sf(
+        shape_id = target_shape_id,
+        geometry = st_sfc(st_linestring(matrix(c(-9.07, -9.08, 38.66, 38.67), ncol = 2)), crs = 4326)
+    )
+    sf_line_3763 <- st_transform(sf_line_4326, 3763)
+
+    shapes_curv <- GTFShift::create_shapes_from_sf(sf_line_4326, gtfs, metric_crs = NULL, shape_dist_traveled = TRUE)
+    shapes_metric <- GTFShift::create_shapes_from_sf(sf_line_4326, gtfs, metric_crs = 3763, shape_dist_traveled = TRUE)
+    shapes_transformed <- GTFShift::create_shapes_from_sf(sf_line_3763, gtfs, metric_crs = 3763, shape_dist_traveled = TRUE)
+
+    expect_true(all(is.finite(shapes_curv$shape_dist_traveled)))
+    expect_true(all(is.finite(shapes_metric$shape_dist_traveled)))
+    expect_equal(shapes_metric$shape_dist_traveled, shapes_transformed$shape_dist_traveled, tolerance = 1e-6)
+    expect_equal(shapes_curv$shape_dist_traveled, shapes_metric$shape_dist_traveled, tolerance = 5e-3)
+})

@@ -19,7 +19,7 @@ network_overline(
 
 \item{lines}{sf. A spatial object representing the lines to aggregate.}
 
-\item{attr}{String. The attribute to aggregate the lines by.}
+\item{attr}{String. Case-sensitive column name in \code{lines} to aggregate by.}
 
 \item{target_network_split}{Integer (Default 100). If not NA, network is split in segments of defined meters.}
 

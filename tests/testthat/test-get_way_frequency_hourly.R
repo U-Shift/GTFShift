@@ -1,6 +1,13 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G2.12} Tests `routes` and `shapes` list columns in the returned `sf` table.
+#' @srrstats {EA6.0} Tests return object classes, dimensions, column names, column types, and numeric frequency values of `get_way_frequency_hourly()`.
+#' @srrstats {EA6.0a} Tests `sf` and `data.frame` classes of returned table.
+#' @srrstats {EA6.0b} Tests `nrow()` and `ncol()` dimensions of returned way frequency table.
+#' @srrstats {EA6.0c} Tests expected column names (`way_osm_id`, `hour`, `frequency`, `routes`, `shapes`, `geometry`).
+#' @srrstats {EA6.0d} Tests column types including `list` columns (`routes`, `shapes`), numeric `frequency`, and `sfc` geometry.
+#' @srrstats {EA6.0e} Tests exact numeric equality of aggregated way frequencies.
 test_that("get_way_frequency_hourly calculates way frequencies with mocked osm_shapes_to_routes", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
@@ -30,7 +37,14 @@ test_that("get_way_frequency_hourly calculates way frequencies with mocked osm_s
         code = {
             res <- GTFShift::get_way_frequency_hourly(gtfs, q = NA, date = ref_date)
             expect_s3_class(res, "sf")
-            expect_contains(names(res), c("way_osm_id", "frequency", "geometry", "routes", "shapes"))
+            expect_s3_class(res, "data.frame")
+            expect_equal(ncol(res), 6)
+            expect_contains(names(res), c("way_osm_id", "hour", "frequency", "geometry", "routes", "shapes"))
+            expect_type(res$way_osm_id, "character")
+            expect_true(is.numeric(res$frequency))
+            expect_type(res$routes, "list")
+            expect_type(res$shapes, "list")
+            expect_s3_class(sf::st_geometry(res), "sfc")
 
             # Validate that the way frequency matches the route frequency for the selected shape
             way_freq_by_hour <- res |>

@@ -1,5 +1,11 @@
 library(testthat)
 
+#' @srrstats {EA6.0} Tests return object classes, dimensions, column names, column types, and numeric frequency values of `get_stop_frequency_hourly()`.
+#' @srrstats {EA6.0a} Tests `sf` and `data.frame` classes of returned table.
+#' @srrstats {EA6.0b} Tests `nrow()` and `ncol()` dimensions of returned stop frequency table.
+#' @srrstats {EA6.0c} Tests expected column names (`stop_id`, `hour`, `frequency`, `geometry`).
+#' @srrstats {EA6.0d} Tests column types of `stop_id`, `hour`, `frequency`, and `sfc_POINT` geometry.
+#' @srrstats {EA6.0e} Tests exact numeric equality of hourly stop departure counts.
 test_that("get_stop_frequency_hourly calculates stop departures per hour", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
@@ -8,7 +14,14 @@ test_that("get_stop_frequency_hourly calculates stop departures per hour", {
 
     res <- GTFShift::get_stop_frequency_hourly(gtfs, date = ref_date)
     expect_s3_class(res, "sf")
+    expect_s3_class(res, "data.frame")
+    expect_gt(nrow(res), 0)
+    expect_equal(ncol(res), 4)
     expect_contains(names(res), c("stop_id", "hour", "frequency", "geometry"))
+    expect_type(res$stop_id, "character")
+    expect_true(is.numeric(res$hour))
+    expect_true(is.numeric(res$frequency))
+    expect_s3_class(sf::st_geometry(res), "sfc_POINT")
 
     # Validate frequency calculation for a selected stop against filtered stop_times
     target_stop_id <- res$stop_id[1]

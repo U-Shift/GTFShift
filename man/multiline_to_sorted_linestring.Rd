@@ -29,6 +29,7 @@ Convert a MULTILINESTRING to a sorted LINESTRING
 \details{
 The function takes a MULTILINESTRING object and converts it to a LINESTRING object
 by sorting the linestrings and combining them in the correct order.
+It provides the first implementation of a novel stop-guided greedy topological sorting and orientation algorithm for route geometries.
 
 The algorithm is formulated as follows:
 Let \eqn{\mathcal{L} = \{L_1, \dots, L_n\}} be the set of individual LINESTRING components.

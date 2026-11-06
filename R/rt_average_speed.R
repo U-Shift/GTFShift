@@ -9,7 +9,7 @@
 #' @param trips_geometries sf data.frame with trip geometries. Geometry must be
 #'   LINESTRING.
 #' @param rt_collection_trips_geometries_match_col Character (Default
-#'   \code{"trip_id"}). Column name present in both \code{rt_collection} and
+#'   \code{"trip_id"}). Case-sensitive column name present in both \code{rt_collection} and
 #'   \code{trips_geometries} used to match updates to trip geometry.
 #' @param geometry_sample_meters Numeric (Default 10). Sampling step used when
 #'   projecting points along trip geometry and estimating cumulative distance.
@@ -129,6 +129,8 @@
 #' @srrstats {G2.0} Validates required columns and checks that each trip has at least 2 observations.
 #' @srrstats {G2.1} Asserts that `rt_collection` and `trips_geometries` inherit from `sf` and have `LINESTRING` geometries.
 #' @srrstats {G2.1a} Documents expected data types and classes for all parameters.
+#' @srrstats {G2.3} Validates character parameter `rt_collection_trips_geometries_match_col` against column names.
+#' @srrstats {G2.3b} Explicitly documents case sensitivity for `rt_collection_trips_geometries_match_col`.
 #' @srrstats {G2.9} Issues a warning when trips with fewer than 2 updates are ignored.
 #' @srrstats {G2.10} Uses `[[` and `dplyr::select()` consistently on `sf` tabular objects.
 #' @srrstats {G2.13} Checks for required columns and minimum observation counts prior to speed calculation.
@@ -142,11 +144,11 @@
 #' @srrstats {SP2.0b} Errors appropriately on non-`sf` inputs, non-`LINESTRING` geometries, or invalid `metric_crs`.
 #' @srrstats {SP2.3} Examples load route geometries from a standard `.gpkg` spatial file.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
-#' @srrstats {SP2.4a} Validates and transforms CRS using `WKT2` representations via `sf::st_crs()`.
+#' @srrstats {SP2.4a} Validates and transforms CRS using `WKT2` representations via `validate_metric_crs()`, rejecting PROJ4-strings.
 #' @srrstats {SP2.5} Verifies CRS metadata on `rt_collection` and `trips_geometries`.
 #' @srrstats {SP2.6} Documents spatial classes and geometry types for all inputs.
 #' @srrstats {SP2.7} Validates input `sf` classes, geometry types, and CRS before processing.
-#' @srrstats {SP2.8} Harmonizes input CRS between `rt_collection` and `trips_geometries` prior to projection.
+#' @srrstats {SP2.8} Harmonizes input CRS between `rt_collection` and `trips_geometries` via `preprocess_spatial_crs()` prior to projection.
 #' @srrstats {SP2.9} Retains input attributes and geometry column from `rt_collection` in the returned `sf` object.
 #' @srrstats {SP4.0} Returns an `sf` data frame matching the class of `rt_collection`.
 #' @srrstats {SP4.0a} Preserves the `sf` class of `rt_collection` in the return object.
@@ -173,7 +175,9 @@ rt_average_speed <- function(
     stop("trips_geometries geometry must be LINESTRING. Use GTFShift::multiline_to_sorted_linestring() to convert MULTILINESTRING to LINESTRING.")
   }
   # > rt_collection_trips_geometries_match_col must be one of the columns in rt_collection and trips_geometries
-  if (!rt_collection_trips_geometries_match_col %in% colnames(rt_collection)) {
+  if (!is.character(rt_collection_trips_geometries_match_col) ||
+      length(rt_collection_trips_geometries_match_col) != 1 ||
+      !rt_collection_trips_geometries_match_col %in% colnames(rt_collection)) {
     stop(paste("rt_collection_trips_geometries_match_col must be one of the columns in rt_collection. Available columns:", paste(colnames(rt_collection), collapse = ", ")))
   }
   if (!rt_collection_trips_geometries_match_col %in% colnames(trips_geometries)) {
@@ -187,17 +191,18 @@ rt_average_speed <- function(
     stop(paste("rt_collection is missing required columns:", paste(missing_cols, collapse = ", ")))
   }
 
-  if (!is.null(metric_crs)) {
-    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-    if (is.na(metric_crs)) {
-      stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-    }
-    rt_collection <- rt_collection |> sf::st_transform(crs = metric_crs)
-    trips_geometries <- trips_geometries |> sf::st_transform(crs = metric_crs)
-  } else if (!is.na(sf::st_crs(rt_collection)) && !is.na(sf::st_crs(trips_geometries)) &&
-             sf::st_crs(trips_geometries) != sf::st_crs(rt_collection)) {
-    trips_geometries <- trips_geometries |> sf::st_transform(crs = sf::st_crs(rt_collection))
-  }
+  metric_crs <- validate_metric_crs(metric_crs)
+  rt_collection <- preprocess_spatial_crs(
+    rt_collection,
+    metric_crs = metric_crs,
+    arg_name = "rt_collection"
+  )
+  trips_geometries <- preprocess_spatial_crs(
+    trips_geometries,
+    metric_crs = metric_crs,
+    reference_crs = sf::st_crs(rt_collection),
+    arg_name = "trips_geometries"
+  )
 
   # 1. Compute speed for each trip update
   rt_collection |>

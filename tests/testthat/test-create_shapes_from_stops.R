@@ -1,5 +1,10 @@
 library(testthat)
 
+#' @srrstats {EA6.0} Tests return object classes, dimensions, column names, and column types of `create_shapes_from_stops()`.
+#' @srrstats {EA6.0a} Tests `tidygtfs` and `data.frame` classes of returned objects.
+#' @srrstats {EA6.0b} Tests `nrow()` and `ncol()` dimensions of generated `shapes` and `trips` tables.
+#' @srrstats {EA6.0c} Tests expected column names in `res_gtfs$shapes` and `res_gtfs$trips`.
+#' @srrstats {EA6.0d} Tests character/numeric column types in `res_gtfs$shapes`.
 test_that("create_shapes_from_stops constructs shape geometries from stop sequences", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
@@ -9,8 +14,14 @@ test_that("create_shapes_from_stops constructs shape geometries from stop sequen
         "The GTFS feed already has shapes defined"
     )
 
+    expect_s3_class(res_gtfs, "tidygtfs")
+    expect_s3_class(res_gtfs$shapes, "data.frame")
+    expect_equal(ncol(res_gtfs$shapes), 4)
     expect_contains(names(res_gtfs), "shapes")
     expect_contains(names(res_gtfs$shapes), c("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence"))
+    expect_type(res_gtfs$shapes$shape_id, "character")
+    expect_type(res_gtfs$shapes$shape_pt_lat, "double")
+    expect_type(res_gtfs$shapes$shape_pt_lon, "double")
 
     # Select a target shape_id and validate that its shape point count equals the stop count of a trip sharing that shape
     target_shape_id <- res_gtfs$shapes$shape_id[1]

@@ -20,7 +20,7 @@ Must include at least \code{trip_id} and \code{timestamp} columns.}
 LINESTRING.}
 
 \item{rt_collection_trips_geometries_match_col}{Character (Default
-\code{"trip_id"}). Column name present in both \code{rt_collection} and
+\code{"trip_id"}). Case-sensitive column name present in both \code{rt_collection} and
 \code{trips_geometries} used to match updates to trip geometry.}
 
 \item{geometry_sample_meters}{Numeric (Default 10). Sampling step used when
@@ -47,6 +47,7 @@ computes cumulative distance along the geometry, and derives segment speed
 between consecutive updates.
 }
 \details{
+This function provides the first implementation of a novel circular-route-aware linear referencing algorithm in R for estimating segment speeds from sequential GTFS-RT vehicle position updates.
 For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n}
 denote the ordered sequence of
 real-time observations, where \eqn{x_i} is the vehicle position and

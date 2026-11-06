@@ -47,18 +47,24 @@
 #' @import sf
 #' @importFrom stats weighted.mean
 #' @importFrom rlang .data
+#' @srrstats {G2.1} Validates that `lane_prioritisation` is an `sf` object and `weight` is character.
 #' @srrstats {G2.2} Restricts `weight` to a single univariate choice via `match.arg()`.
 #' @srrstats {G2.3} Validates character parameter `weight`.
-#' @srrstats {G2.3a} Uses `match.arg(weight)` to permit only `"length"` or `"frequency"`.
+#' @srrstats {G2.3a} Uses `match.arg()` to permit only `"length"` or `"frequency"`.
+#' @srrstats {G2.3b} Normalizes `weight` with `tolower()` for case-insensitive matching.
 #' @srrstats {G2.4b} Uses `as.numeric()` explicitly when converting `sf::st_length()` units to numeric lengths.
+#' @srrstats {G2.11} Supports `units`-classed columns in `lane_prioritisation` (e.g., `speed_avg` or `frequency`).
+#' @srrstats {G2.12} Ignores extra `list` columns in `lane_prioritisation` when computing summary metrics.
 #' @srrstats {G2.15} Passes `na.rm = TRUE` to all `sum()`, `weighted.mean()`, `min()`, and `max()` calls.
 #' @srrstats {EA3.0} Automates reporting of network-level bus lane extension, speed, and lane count statistics.
 #' @srrstats {EA3.1} Enables standardized comparison of prioritised transit networks weighted by length or frequency.
 #' @srrstats {SP1.0} Applies to both curvilinear/geographic (`metric_crs = NULL`) and Cartesian/projected (`metric_crs`) spatial domains.
 #' @srrstats {SP1.1} Operates on two-dimensional (`XY`) road segment geometries.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
-#' @srrstats {SP2.4a} Validates `metric_crs` via `WKT2` (`sf::st_crs()`).
-#' @srrstats {SP4.1} Documents physical units (meters for extensions, km/h for speeds) in `@returns`.
+#' @srrstats {SP2.4a} Validates `metric_crs` via `validate_metric_crs()`, explicitly rejecting PROJ4-strings.
+#' @srrstats {SP2.8} Uses `preprocess_spatial_crs()` as a single pre-processing routine to validate and transform `lane_prioritisation`.
+#' @srrstats {SP2.9} Preserves non-spatial attributes during coordinate transformation.
+#' @srrstats {SP4.1} Preserves `units` on `speed_avg`, `speed_min`, and `speed_max` when input `speed_avg` has `units` attributes, and documents physical units in `@returns`.
 #' @srrstats {SP4.2} Explicitly documents the returned `list` structure and all elements.
 #'
 #' @export
@@ -67,20 +73,20 @@ get_prioritisation_stats <- function(
   weight = c("length", "frequency"),
   metric_crs = NULL
 ) {
-    weight <- match.arg(weight)
-    if (!is.null(metric_crs)) {
-        metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-        if (is.na(metric_crs)) {
-            stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-        }
+    if (!inherits(lane_prioritisation, "sf")) {
+        stop("lane_prioritisation must be an sf object")
     }
+    if (!is.character(weight) || length(weight) < 1) {
+        stop("weight must be a character string ('length' or 'frequency')")
+    }
+    weight <- match.arg(tolower(weight), c("length", "frequency"))
+    metric_crs <- validate_metric_crs(metric_crs)
 
-    prioritisation_internal <- lane_prioritisation |>
-        st_as_sf()
-    if (!is.null(metric_crs)) {
-        prioritisation_internal <- prioritisation_internal |>
-            st_transform(crs = metric_crs)
-    }
+    prioritisation_internal <- preprocess_spatial_crs(
+        lane_prioritisation,
+        metric_crs = metric_crs,
+        arg_name = "lane_prioritisation"
+    )
 
     geom_col <- st_geometry(prioritisation_internal)
     prioritisation_internal <- prioritisation_internal |>
@@ -89,6 +95,7 @@ get_prioritisation_stats <- function(
         ) |>
         st_drop_geometry()
     stats <- list()
+    weight_vals <- as.numeric(prioritisation_internal[[weight]])
 
     # Compute bus lane extension
     stats$extension <- sum(prioritisation_internal$length, na.rm = TRUE)
@@ -99,19 +106,30 @@ get_prioritisation_stats <- function(
 
     # Compute average speed, weighted by chosen weight
     if ("speed_avg" %in% names(prioritisation_internal)) {
-        stats$speed_avg <- weighted.mean(prioritisation_internal$speed_avg, prioritisation_internal[[weight]], na.rm = TRUE)
-        stats$speed_min <- min(prioritisation_internal$speed_avg, na.rm = TRUE)
-        stats$speed_max <- max(prioritisation_internal$speed_avg, na.rm = TRUE)
+        speed_units <- if (inherits(prioritisation_internal$speed_avg, "units")) {
+            units(prioritisation_internal$speed_avg)
+        } else {
+            NULL
+        }
+        speed_vals <- as.numeric(prioritisation_internal$speed_avg)
+        stats$speed_avg <- weighted.mean(speed_vals, weight_vals, na.rm = TRUE)
+        stats$speed_min <- min(speed_vals, na.rm = TRUE)
+        stats$speed_max <- max(speed_vals, na.rm = TRUE)
+        if (!is.null(speed_units)) {
+            units(stats$speed_avg) <- speed_units
+            units(stats$speed_min) <- speed_units
+            units(stats$speed_max) <- speed_units
+        }
     }
 
     # Compute number of lanes, weighted by chosen weight
-    stats$n_lanes_circulation_avg <- weighted.mean(prioritisation_internal$n_lanes_circulation, prioritisation_internal[[weight]], na.rm = TRUE)
-    stats$n_lanes_circulation_min <- min(prioritisation_internal$n_lanes_circulation, na.rm = TRUE)
-    stats$n_lanes_circulation_max <- max(prioritisation_internal$n_lanes_circulation, na.rm = TRUE)
+    stats$n_lanes_circulation_avg <- weighted.mean(as.numeric(prioritisation_internal$n_lanes_circulation), weight_vals, na.rm = TRUE)
+    stats$n_lanes_circulation_min <- min(as.numeric(prioritisation_internal$n_lanes_circulation), na.rm = TRUE)
+    stats$n_lanes_circulation_max <- max(as.numeric(prioritisation_internal$n_lanes_circulation), na.rm = TRUE)
 
-    stats$n_lanes_parking_avg <- weighted.mean(prioritisation_internal$n_lanes_parking, prioritisation_internal[[weight]], na.rm = TRUE)
-    stats$n_lanes_parking_min <- min(prioritisation_internal$n_lanes_parking, na.rm = TRUE)
-    stats$n_lanes_parking_max <- max(prioritisation_internal$n_lanes_parking, na.rm = TRUE)
+    stats$n_lanes_parking_avg <- weighted.mean(as.numeric(prioritisation_internal$n_lanes_parking), weight_vals, na.rm = TRUE)
+    stats$n_lanes_parking_min <- min(as.numeric(prioritisation_internal$n_lanes_parking), na.rm = TRUE)
+    stats$n_lanes_parking_max <- max(as.numeric(prioritisation_internal$n_lanes_parking), na.rm = TRUE)
 
     return(stats)
 }

@@ -1,10 +1,12 @@
 library(testthat)
 library(sf)
 
+#' @srrstats {G2.11} Explicitly tests `get_trip_speed_profile()` on `data.frame` inputs with `units`-classed `speed_kmh` and `distance_along_geometry` columns.
+#' @srrstats {G2.12} Explicitly tests `get_trip_speed_profile()` on `data.frame` inputs containing `list` columns.
 #' @srrstats {G5.2} Explicitly tests error behaviour on invalid input types, missing required columns, and missing grouping columns.
 #' @srrstats {G5.2a} Verifies unique error messages for each validation check in `get_trip_speed_profile()`.
 #' @srrstats {G5.2b} Compares triggered error messages against expected patterns via `expect_error()`.
-#' @srrstats {G5.3} Explicitly verifies absence of `NA` in computed speed profile columns (`expect_true(all(!is.na(...)))`).
+#' @srrstats {G5.3} Explicitly verifies absence of `NA`, `NaN`, or `Inf` in computed speed profile columns (`expect_true(all(is.finite(...)))`).
 #' @srrstats {G5.4} Tests correctness of commercial speed, alternative commercial speed, mean, median, SD, variance, quantiles, and IQR against known analytical values.
 #' @srrstats {G5.4a} Validates circular-route commercial speed calculation and multi-trip aggregation on synthetic datasets with exact analytical solutions.
 #' @srrstats {G5.8} Tests edge cases including `n = 1, 2, 3, 4` updates, unordered timestamps, zero elapsed time, `NA` fields, and `Inf`/`-Inf` speeds.
@@ -17,6 +19,7 @@ library(sf)
 #' @srrstats {EA6.0c} Tests column names of returned profile tables.
 #' @srrstats {EA6.0d} Tests column types including derived `Date` column `day`.
 #' @srrstats {EA6.0e} Tests single-valued summary metrics against expected numeric values.
+#' @srrstats {SP4.1} Verifies that `units` on input `speed_col` are preserved in returned speed profile columns.
 test_that("get_trip_speed_profile calculates speed profile with default parameters", {
     # 2 trips, same route, 5 updates each
     # Trip T1: 1500m over 240s -> commercial_speed = (1.5 km) / (240 / 3600 h) = 22.5 km/h
@@ -553,4 +556,25 @@ test_that("get_trip_speed_profile accommodates circular geometries by taking max
     res_circ <- GTFShift::get_trip_speed_profile(df_circ, by = "trip_id")
     expect_equal(res_circ$commercial_speed, 29.1)
     expect_equal(res_circ$commercial_speed_alt, 45.0)
+})
+
+test_that("get_trip_speed_profile handles units columns and list columns and preserves units (G2.11, G2.12, SP4.1, G5.3)", {
+    df_units_list <- data.frame(
+        trip_id = rep("T1", 4),
+        route_id = "R1",
+        timestamp = c(1000, 1060, 1120, 1180),
+        distance_along_geometry = units::set_units(c(0, 500, 1000, 1500), "m"),
+        distance_along_geometry_reversed = units::set_units(c(1500, 1000, 500, 0), "m"),
+        speed_kmh = units::set_units(c(NA, 30, 30, 30), "km/h"),
+        extra_list_col = I(list(c("a", "b"), "c", c(1, 2), list(x = 1)))
+    )
+
+    res <- GTFShift::get_trip_speed_profile(df_units_list, by = "trip_id")
+    expect_s3_class(res, "data.frame")
+    expect_s3_class(res$speed_avg, "units")
+    expect_s3_class(res$commercial_speed, "units")
+    expect_equal(as.numeric(res$commercial_speed), 30.0)
+    expect_equal(as.numeric(res$speed_avg), 30.0)
+    expect_true(all(is.finite(as.numeric(res$commercial_speed))))
+    expect_true(all(is.finite(as.numeric(res$speed_avg))))
 })

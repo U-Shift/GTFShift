@@ -26,11 +26,11 @@ osm_shapes_match_routes(
 
 \item{geometry}{Boolean (Default TRUE). If TRUE, returns sf object with geometry, otherwise, a simple data.frame.}
 
-\item{gtfs_match}{String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
+\item{gtfs_match}{String (Default \code{"route_short_name"}). Case-sensitive \code{routes.txt} attribute that identifies routes. Accepted values: \code{"route_id"}, \code{"route_short_name"}, \code{"route_long_name"}.}
 
-\item{osm_match}{String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.}
+\item{osm_match}{String (Default \code{"ref"}). Case-sensitive OSM attribute that identifies routes by matching with \code{gtfs_match}. Accepted values: \code{"ref"}, \code{"name"}, \code{"gtfs:route_id"}.}
 
-\item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
+\item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly (case-sensitive). Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
 
 \item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
 
@@ -65,6 +65,7 @@ Get OSM routes that match shapes, based on geometrical match
 }
 \details{
 For each route, matches its trips' shapes with OSM route relations.
+This function provides the first implementation of a novel composite geometrical and stop-count matching algorithm for harmonizing GTFS shapes with OpenStreetMap route relations.
 
 The matching algorithm is formulated as follows:
 Let \eqn{R} be a GTFS route identifier.

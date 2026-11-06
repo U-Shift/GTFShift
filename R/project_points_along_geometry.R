@@ -79,11 +79,11 @@
 #' @srrstats {SP2.0b} Errors appropriately when spatial inputs lack a valid CRS or have inappropriate geometry types.
 #' @srrstats {SP2.3} Examples load spatial geometries from a standard `.gpkg` file via `sf::st_read()`.
 #' @srrstats {SP2.4} Uses `sf::st_crs()` and `sf::st_transform()` compliant with `PROJ >= 6`.
-#' @srrstats {SP2.4a} Represents and validates coordinate reference systems via `WKT2` (`sf::st_crs()`).
+#' @srrstats {SP2.4a} Represents and validates coordinate reference systems via `WKT2` (`validate_metric_crs()`), explicitly rejecting PROJ4-strings.
 #' @srrstats {SP2.5} Verifies CRS metadata on input `sf`/`sfc` objects.
 #' @srrstats {SP2.6} Documents accepted spatial input classes (`sf` or `sfc`) for `geometry` and `points`.
 #' @srrstats {SP2.7} Validates input spatial classes and geometry types prior to projection.
-#' @srrstats {SP2.8} Pre-processes inputs into `sfc` objects in a common CRS.
+#' @srrstats {SP2.8} Pre-processes inputs into `sfc` objects in a common CRS via `preprocess_spatial_crs()`.
 #' @srrstats {SP2.9} Preserves original CRS metadata (`geometry_crs_original`) in the returned `sf` object.
 #' @srrstats {SP4.0} Returns an `sf` object consistent with spatial inputs.
 #' @srrstats {SP4.0a} Returns an `sf` object when given `sf`/`sfc` inputs.
@@ -97,12 +97,7 @@ project_points_along_geometry <- function(
   geometry_sample_meters = 10,
   metric_crs = NULL
 ) {
-  if (!is.null(metric_crs)) {
-    metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
-    if (is.na(metric_crs)) {
-      stop("metric_crs should be a valid CRS value (e.g., 3857 or 'EPSG:3857')")
-    }
-  }
+  metric_crs <- validate_metric_crs(metric_crs)
 
   geometry_sfc <- if (inherits(geometry, "sf")) sf::st_geometry(geometry) else geometry
   points_sfc <- if (inherits(points, "sf")) sf::st_geometry(points) else points
@@ -132,21 +127,22 @@ project_points_along_geometry <- function(
   }
 
   geometry_crs_original <- sf::st_crs(geometry_sfc)
-  if (!is.null(metric_crs)) {
-    if (is.na(sf::st_crs(geometry_sfc)) || is.na(sf::st_crs(points_sfc))) {
-      stop("geometry and points must have a valid CRS to use metric_crs")
-    }
-    geometry_metric <- sf::st_transform(geometry_sfc, metric_crs)
-    points_metric <- sf::st_transform(points_sfc, metric_crs)
-  } else {
-    geometry_metric <- geometry_sfc
-    if (!is.na(sf::st_crs(geometry_sfc)) && !is.na(sf::st_crs(points_sfc)) &&
-        sf::st_crs(points_sfc) != sf::st_crs(geometry_sfc)) {
-      points_metric <- sf::st_transform(points_sfc, sf::st_crs(geometry_sfc))
-    } else {
-      points_metric <- points_sfc
-    }
+  if (!is.null(metric_crs) && (is.na(sf::st_crs(geometry_sfc)) || is.na(sf::st_crs(points_sfc)))) {
+    stop("geometry and points must have a valid CRS to use metric_crs")
   }
+  geometry_metric <- preprocess_spatial_crs(
+    geometry_sfc,
+    metric_crs = metric_crs,
+    arg_name = "geometry",
+    require_valid_crs = TRUE
+  )
+  points_metric <- preprocess_spatial_crs(
+    points_sfc,
+    metric_crs = metric_crs,
+    reference_crs = geometry_crs_original,
+    arg_name = "points",
+    require_valid_crs = TRUE
+  )
 
   if (geometry_type == "MULTILINESTRING") {
     geom_merged <- sf::st_line_merge(geometry_metric)

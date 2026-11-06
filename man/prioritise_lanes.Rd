@@ -44,6 +44,7 @@ sf data.frame. Prioritised lanes with the following columns:
 For each OSM way with GTFS service, aggregates its characteristics to assist in the bus lane implementation prioritisation
 }
 \details{
+This method provides the first implementation of a novel road-segment bus lane prioritisation algorithm integrating planned GTFS frequencies with OpenStreetMap lane, parking, and bus-lane topology.
 This method analyses the GTFS feed for a representative day, returning a data.frame with the road segments where transit routes
 run and for each, a set of parameters that can be used to prioritise bus lane implementations.
 
