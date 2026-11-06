@@ -1,0 +1,65 @@
+{
+  "data": {
+    "entity": [
+      {
+        "id": "HF16N:df64ec9fa1df4933c88b2bead56cacc8889b74fa98b1c90261e3ba0800e629b2",
+        "vehicle": {
+          "current_status": "IN_TRANSIT_TO",
+          "position": {
+            "bearing": 182,
+            "latitude": 38.7057,
+            "longitude": -9.3866,
+            "speed": {}
+          },
+          "stop_id": "20067",
+          "timestamp": 1793974253,
+          "trip": {
+            "direction_id": "1",
+            "route_id": "[HF16N]M29_A",
+            "schedule_relationship": "SCHEDULED",
+            "start_date": 20261106,
+            "trip_id": "[1NN3V][HF16N]M29-2-021-A-U-14h00-CascaiShoppingT"
+          },
+          "vehicle": {
+            "id": "[HF16N]2008",
+            "wheelchair_accessible": "UNKNOWN"
+          }
+        }
+      },
+      {
+        "id": "HF16N:95d7e464b88345a2dbb7034cfd931ae4054c3309e61741a7a26ba99de801f2f7",
+        "vehicle": {
+          "current_status": "STOPPED_AT",
+          "position": {
+            "bearing": 256,
+            "latitude": 38.7051,
+            "longitude": -9.4086,
+            "speed": {}
+          },
+          "stop_id": "20338",
+          "timestamp": 1793974253,
+          "trip": {
+            "direction_id": "1",
+            "route_id": "[HF16N]M12_A",
+            "schedule_relationship": "SCHEDULED",
+            "start_date": 20261106,
+            "trip_id": "[1NN3V][HF16N]M12-2-008-A-U-14h00-EstorilEstacao"
+          },
+          "vehicle": {
+            "id": "[HF16N]3020",
+            "wheelchair_accessible": "UNKNOWN"
+          }
+        }
+      }
+    ],
+    "header": {
+      "gtfs_realtime_version": "2.0",
+      "incrementality": "FULL_DATASET",
+      "timestamp": 1793974270
+    }
+  },
+  "error": {},
+  "generated_at": {},
+  "status_code": "200",
+  "timestamp": 1793974282062
+}

@@ -46,28 +46,27 @@ Downloads GTFS-RT data from the specified URL at regular intervals and saves the
 This function will run indefinitely until manually stopped (CTRL + C).
 }
 \examples{
-# Create file
+# Sample GTFS-RT JSON file
+sample_json <- system.file("extdata/samples", "gtfs_rt_sample.json", package = "GTFShift")
 destination_file <- withr::local_tempfile(fileext = ".csv")
 
 # Collect data
 GTFShift::rt_collect_json(
-  gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs",
+  gtfs_rt_url = sample_json,
   entity_key = "data.entity",
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
 
 # Read data
-if (file.exists(destination_file)) {
-  collection <- read.csv(destination_file)
-  names(collection)
-  head(
-    collection |>
-      dplyr::select(
-        "vehicle.trip.trip_id", "vehicle.position.latitude",
-        "vehicle.position.longitude"
-      )
-  )
-}
+collection <- read.csv(destination_file)
+names(collection)
+head(
+  collection |>
+    dplyr::select(
+      "vehicle.trip.trip_id", "vehicle.position.latitude",
+      "vehicle.position.longitude"
+    )
+)
 
 }

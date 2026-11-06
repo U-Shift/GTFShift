@@ -16,28 +16,27 @@
 #' @returns String. The location of the file where data was collected.
 #'
 #' @examples
-#' # Create file
+#' # Sample GTFS-RT Protobuf file
+#' sample_pb <- system.file("extdata/samples", "gtfs_rt_sample.pb", package = "GTFShift")
 #' destination_file <- withr::local_tempfile(fileext = ".csv")
 #'
 #' # Collect data
 #' GTFShift::rt_collect_protobuf(
-#'   gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs.pb",
+#'   gtfs_rt_url = sample_pb,
 #'   destination_file = destination_file,
 #'   scrape_interval = -1 # Negative to run only once
 #' )
 #'
 #' # Read data
-#' if (file.exists(destination_file)) {
-#'   collection <- read.csv(destination_file)
-#'   names(collection)
-#'   head(
-#'     collection |>
-#'       dplyr::select(
-#'         "vehicle.trip.trip_id", "vehicle.position.latitude",
-#'         "vehicle.position.longitude"
-#'       )
-#'   )
-#' }
+#' collection <- read.csv(destination_file)
+#' names(collection)
+#' head(
+#'   collection |>
+#'     dplyr::select(
+#'       "vehicle.trip.trip_id", "vehicle.position.latitude",
+#'       "vehicle.position.longitude"
+#'     )
+#' )
 #'
 #' @importFrom jsonlite write_json
 #' @importFrom stats setNames
