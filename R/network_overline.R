@@ -104,21 +104,22 @@ network_overline <- function(
     mutate(df_id=row_number())
 
   # 2. Overlap df and network segments
+  network_segments_only <- network_segmented |>
+    select("segment")
   df_network_match <- stplanr::rnet_join(
     rnet_x = df,
-    rnet_y = network_segmented |>
-      select("segment"),
+    rnet_y = network_segments_only,
     length_y = FALSE,
     key_column = "df_id",
     dist = join_dist,
     crs = st_crs(df)
   ) |> st_drop_geometry()
 
+  df_attrs <- df |>
+    st_drop_geometry() |>
+    select(all_of(attr), "df_id")
   df_network_attr <- df_network_match |>
-    left_join(df |>
-                st_drop_geometry() |>
-                select(all_of(attr), "df_id"),
-              by = "df_id")
+    left_join(df_attrs, by = "df_id")
 
   # 3. Group attr by segment
   df_network_segment <- df_network_attr |>

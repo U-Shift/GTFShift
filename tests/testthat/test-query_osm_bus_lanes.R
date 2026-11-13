@@ -14,7 +14,7 @@ test_that("osm_bus_lanes queries and filters bus lanes using mocked osmextract",
             mock_lines
         },
         oe_get_keys = function(...) {
-            c("psv")
+            "psv"
         },
         .package = "osmextract",
         code = {

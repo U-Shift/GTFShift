@@ -99,18 +99,19 @@ test_that("query_mobilitydatabase fetches access token using refresh token when 
   mock_resp_post <- create_mock_response(status_code = 200)
   mock_resp_get <- create_mock_response(status_code = 200)
 
-  post_called <- FALSE
-  get_called <- FALSE
+  state <- new.env(parent = emptyenv())
+  state$post_called <- FALSE
+  state$get_called <- FALSE
 
   testthat::with_mocked_bindings(
     POST = function(url, body, ...) {
-      post_called <<- TRUE
+      state$post_called <- TRUE
       expect_equal(url, "https://api.mobilitydatabase.org/v1/tokens")
-      expect_true(grepl("mock_refresh_token", body))
+      expect_true(grepl("mock_refresh_token", body, fixed = TRUE))
       return(mock_resp_post)
     },
     GET = function(url, query, ...) {
-      get_called <<- TRUE
+      state$get_called <- TRUE
       expect_equal(url, "https://api.mobilitydatabase.org/v1/gtfs_feeds")
       return(mock_resp_get)
     },
@@ -118,9 +119,7 @@ test_that("query_mobilitydatabase fetches access token using refresh token when 
     code = {
       testthat::with_mocked_bindings(
         content = function(x, ...) {
-          if (!get_called) {
-            return(list(access_token = "new_access_token_from_refresh"))
-          } else {
+          if (state$get_called) {
             return(list(
               list(
                 id = "feed_2",
@@ -128,14 +127,16 @@ test_that("query_mobilitydatabase fetches access token using refresh token when 
                 status = "active"
               )
             ))
+          } else {
+            return(list(access_token = "new_access_token_from_refresh"))
           }
         },
         http_error = function(x) FALSE,
         .package = "GTFShift",
         code = {
           df <- GTFShift::query_mobilitydatabase(refresh_token = "mock_refresh_token")
-          expect_true(post_called)
-          expect_true(get_called)
+          expect_true(state$post_called)
+          expect_true(state$get_called)
           expect_equal(nrow(df), 1)
           expect_equal(df$id[1], "feed_2")
         }

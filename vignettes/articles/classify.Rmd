@@ -42,14 +42,14 @@ Data classification helps to categorize transit data into meaningful groups base
 
 ```{r}
 # Get GTFS from library GTFS database for Portugal
-data = read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
-gtfs_id = "barreiro"
-gtfs = GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers=FALSE)
+data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+gtfs_id <- "barreiro"
+gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FALSE)
 ```
 
 # Bus frequency LOS
 
-Bus frequency level of service (LOS) classification is a methodology used to evaluate the quality of bus services based on their frequency. The classification is based on the Highway Capacity Manual (HCM) 2000 guidelines on "Service Frequency LOS for Urban Scheduled Transit Service" (Exhibit 27-1), implemented in `GTFShift::classify_frequency_los()`. 
+Bus frequency level of service (LOS) classification is a methodology used to evaluate the quality of bus services based on their frequency. The classification is based on the Highway Capacity Manual (HCM) 2000 guidelines on "Service Frequency LOS for Urban Scheduled Transit Service" (Exhibit 27-1), implemented in `GTFShift::classify_frequency_los()`.
 
 The LOS categories range from A to F, with A representing the highest level of service (most frequent buses) and F representing the lowest level of service (least frequent buses).
 
@@ -61,10 +61,10 @@ Also, mind that HCM states that "LOS is determined by destination from a given t
 
 ```{r}
 # Get route frequency analysis
-frequency_analysis = GTFShift::get_route_frequency_hourly(gtfs)
+frequency_analysis <- GTFShift::get_route_frequency_hourly(gtfs)
 
 # Classify frequency level of service
-frequency_los = GTFShift::classify_frequency_los(frequency_analysis)
+frequency_los <- GTFShift::classify_frequency_los(frequency_analysis)
 
 frequency_los
 

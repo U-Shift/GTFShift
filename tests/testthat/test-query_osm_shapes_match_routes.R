@@ -57,7 +57,7 @@ test_that("osm_shapes_match_routes validates input parameters and throws errors"
 
     # Invalid metric_crs
     expect_error(
-        GTFShift::osm_shapes_match_routes(gtfs, q = NA, metric_crs = "invalid_crs_string"),
+        GTFShift::osm_shapes_match_routes(gtfs, q = NA, metric_crs = "invalid_crs_string")
     )
 
     # Invalid metric_crs
@@ -130,19 +130,20 @@ test_that("osm_shapes_match_routes executes matching flow when osm_file is NULL 
     mock_bg_job_points <- list(is_alive = function() FALSE, get_result = function() fx$stops)
     mock_bg_job_rel <- list(is_alive = function() FALSE, get_result = function() fx$rel_df)
 
-    r_bg_call_count <- 0
+    state <- new.env(parent = emptyenv())
+    state$r_bg_call_count <- 0
 
     log_tmp <- withr::local_tempfile(fileext = ".log")
     on.exit(unlink(log_tmp), add = TRUE)
 
     testthat::with_mocked_bindings(
         r_bg = function(...) {
-            r_bg_call_count <<- r_bg_call_count + 1
-            if (r_bg_call_count == 1) {
+            state$r_bg_call_count <- state$r_bg_call_count + 1
+            if (state$r_bg_call_count == 1) {
                 return(mock_bg_job_xml)
-            } else if (r_bg_call_count == 2) {
+            } else if (state$r_bg_call_count == 2) {
                 return(mock_bg_job_sf)
-            } else if (r_bg_call_count == 3) {
+            } else if (state$r_bg_call_count == 3) {
                 return(mock_bg_job_points)
             } else {
                 return(mock_bg_job_rel)
@@ -230,7 +231,7 @@ test_that("osm_shapes_match_routes writes logs to log_file when provided", {
 
                     expect_true(file.exists(log_tmp))
                     log_lines <- readLines(log_tmp)
-                    expect_true(any(grepl("Running osm_shapes_match_routes", log_lines)))
+                    expect_true(any(grepl("Running osm_shapes_match_routes", log_lines, fixed = TRUE)))
                 }
             )
         }
@@ -323,7 +324,7 @@ test_that("osm_shapes_match_routes issues warnings when routes or stops are miss
                     )
                     expect_true(file.exists(log_tmp))
                     log_lines <- readLines(log_tmp)
-                    expect_true(any(grepl("WARNING!", log_lines) & grepl(warn_pattern, log_lines)))
+                    expect_true(any(grepl("WARNING!", log_lines, fixed = TRUE) & grepl(warn_pattern, log_lines)))
                 }
             )
         }
@@ -413,7 +414,7 @@ test_that("osm_shapes_match_routes handles unsorted stops and osm_stop_order_rel
                     )
                     expect_true(file.exists(log_tmp))
                     log_lines <- readLines(log_tmp)
-                    expect_true(any(grepl("WARNING!", log_lines) & grepl(warn_pattern, log_lines)))
+                    expect_true(any(grepl("WARNING!", log_lines, fixed = TRUE) & grepl(warn_pattern, log_lines)))
 
                     # With osm_stop_order_relaxed = TRUE, relation is matched despite unsorted stops
                     res <- suppressWarnings(GTFShift::osm_shapes_match_routes(
@@ -529,7 +530,7 @@ test_that("osm_shapes_match_routes handles empty gtfs_route_name or error in sto
                             )
                             expect_true(file.exists(log_tmp))
                             log_lines <- readLines(log_tmp)
-                            expect_true(any(grepl("WARNING!", log_lines) & grepl("error\\(s\\) during the algorithm execution", log_lines)))
+                            expect_true(any(grepl("WARNING!", log_lines, fixed = TRUE) & grepl("error(s) during the algorithm execution", log_lines, fixed = TRUE)))
                         }
                     )
                 }
@@ -623,7 +624,7 @@ test_that("osm_shapes_match_routes prints warning messages to console when error
                     )
                     expect_true(file.exists(log_tmp))
                     log_lines <- readLines(log_tmp)
-                    expect_true(any(grepl("WARNING!", log_lines) & grepl("error\\(s\\) during the algorithm execution", log_lines)))
+                    expect_true(any(grepl("WARNING!", log_lines, fixed = TRUE) & grepl("error(s) during the algorithm execution", log_lines, fixed = TRUE)))
                 }
             )
         }

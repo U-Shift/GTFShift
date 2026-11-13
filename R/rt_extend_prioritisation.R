@@ -75,21 +75,21 @@
 rt_extend_prioritisation <- function(
   lane_prioritisation,
   rt_collection,
-  rt_current_status = c("IN_TRANSIT_TO"),
+  rt_current_status = "IN_TRANSIT_TO",
   lane_buffer = 15, # in meters
   metric_crs = NULL
 ) {
   # 1. Validate inputs
-  required_cols <- c("way_osm_id")
+  required_cols <- "way_osm_id"
   missing_cols <- setdiff(required_cols, colnames(lane_prioritisation))
   if (length(missing_cols) > 0) {
-    stop(paste("lane_prioritisation is missing required columns:", paste(missing_cols, collapse = ", ")))
+    stop("lane_prioritisation is missing required columns: ", toString(missing_cols))
   }
   rt_attr_speed <- "speed"
-  required_rt_cols <- c(rt_attr_speed)
+  required_rt_cols <- rt_attr_speed
   missing_rt_cols <- setdiff(required_rt_cols, colnames(rt_collection))
   if (length(missing_rt_cols) > 0) {
-    stop(paste("rt_collection is missing required columns:", paste(missing_rt_cols, collapse = ", ")))
+    stop("rt_collection is missing required columns: ", toString(missing_rt_cols))
   }
   if (!is.null(metric_crs)) {
     metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
@@ -119,9 +119,10 @@ rt_extend_prioritisation <- function(
   # 3. Get unique lane segments (to optimize spatial join)
   job <- callr::r_bg(function(lane_prioritisation) { # update spinner while blocking method call
     requireNamespace("sf", quietly = TRUE)
-    return(lane_prioritisation |>
+    lanes_unique <- lane_prioritisation |>
       dplyr::distinct(.data$way_osm_id, .keep_all = TRUE) |>
-      dplyr::select("way_osm_id"))
+      dplyr::select("way_osm_id")
+    return(lanes_unique)
   }, args = list(lane_prioritisation))
   while (job$is_alive()) {
     pb$tick(0)
@@ -135,10 +136,9 @@ rt_extend_prioritisation <- function(
     if (!is.null(metric_crs)) {
       lanes_unique <- sf::st_transform(lanes_unique, crs = metric_crs)
     }
-    return(sf::st_buffer(
-      lanes_unique,
-      dist = lane_buffer
-    ) |> sf::st_transform(crs = rt_collection_crs))
+    buffered <- sf::st_buffer(lanes_unique, dist = lane_buffer) |>
+      sf::st_transform(crs = rt_collection_crs)
+    return(buffered)
   }, args = list(lanes_unique, lane_buffer, metric_crs, rt_collection_crs))
   while (job$is_alive()) {
     pb$tick(0)
@@ -149,12 +149,14 @@ rt_extend_prioritisation <- function(
 
   # 4. Spatial join between lane buffers and rt_collection points
   job <- callr::r_bg(function(rt_collection, lane_buffers) { # update spinner while blocking method call
-    return(sf::st_join(
+    lane_buffers_way <- lane_buffers |> dplyr::select("way_osm_id")
+    joined <- sf::st_join(
       rt_collection,
-      lane_buffers |> dplyr::select("way_osm_id"),
+      lane_buffers_way,
       left = FALSE,
       join = sf::st_within
-    ) |> sf::st_drop_geometry())
+    ) |> sf::st_drop_geometry()
+    return(joined)
   }, args = list(rt_collection, lane_buffers))
   while (job$is_alive()) {
     pb$tick(0)
@@ -166,7 +168,7 @@ rt_extend_prioritisation <- function(
   # 5. Aggregate speed metrics by way_osm_id
   job <- callr::r_bg(function(overlap, rt_attr_speed) { # update spinner while blocking method call
     requireNamespace("rlang", quietly = TRUE)
-    return(overlap |>
+    metrics <- overlap |>
       dplyr::group_by(.data$way_osm_id) |>
       dplyr::summarise(
         speed_avg = mean(.data[[rt_attr_speed]], na.rm = TRUE),
@@ -177,7 +179,8 @@ rt_extend_prioritisation <- function(
         speed_p85 = stats::quantile(.data[[rt_attr_speed]], probs = 0.85, na.rm = TRUE),
         speed_count = dplyr::n()
       ) |>
-      dplyr::ungroup())
+      dplyr::ungroup()
+    return(metrics)
   }, args = list(overlap, rt_attr_speed))
   while (job$is_alive()) {
     pb$tick(0)
@@ -189,8 +192,9 @@ rt_extend_prioritisation <- function(
   # 6. Join speed metrics back to lane_prioritisation
   job <- callr::r_bg(function(lane_prioritisation, speed_metrics) { # update spinner while blocking method call
     requireNamespace("sf", quietly = TRUE)
-    return(lane_prioritisation |>
-      dplyr::left_join(speed_metrics, by = "way_osm_id"))
+    extended <- lane_prioritisation |>
+      dplyr::left_join(speed_metrics, by = "way_osm_id")
+    return(extended)
   }, args = list(lane_prioritisation, speed_metrics))
   while (job$is_alive()) {
     pb$tick(0)

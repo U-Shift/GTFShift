@@ -64,12 +64,13 @@ test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overp
         get_result = function() NULL
     )
 
-    r_bg_call_count <- 0
+    state <- new.env(parent = emptyenv())
+    state$r_bg_call_count <- 0
 
     testthat::with_mocked_bindings(
         r_bg = function(...) {
-            r_bg_call_count <<- r_bg_call_count + 1
-            if (r_bg_call_count == 1) {
+            state$r_bg_call_count <- state$r_bg_call_count + 1
+            if (state$r_bg_call_count == 1) {
                 return(mock_bg_job_xml)
             } else {
                 return(mock_bg_job)
@@ -196,14 +197,15 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file = NULL extracts wa
         stringsAsFactors = FALSE
     )
 
-    r_bg_call_count <- 0
+    state <- new.env(parent = emptyenv())
+    state$r_bg_call_count <- 0
 
     testthat::with_mocked_bindings(
         r_bg = function(func, args, ...) {
-            r_bg_call_count <<- r_bg_call_count + 1
-            if (r_bg_call_count == 1) {
+            state$r_bg_call_count <- state$r_bg_call_count + 1
+            if (state$r_bg_call_count == 1) {
                 return(mock_bg_job_xml)
-            } else if (r_bg_call_count == 2) {
+            } else if (state$r_bg_call_count == 2) {
                 return(mock_bg_job_sf)
             } else {
                 return(list(

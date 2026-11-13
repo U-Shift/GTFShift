@@ -142,9 +142,9 @@ osm_shapes_to_routes <- function(
     pb$update(0)
 
     # Convert query to XML string for overpass API
-    if ("opq" %in% class(q)) { # opq format
+    if (inherits(q, "opq")) { # opq format
       query_xml <- osmdata::opq_string(q)
-    } else if ("character" %in% class(q)) { # xml format
+    } else if (inherits(q, "character")) { # xml format
       query_xml <- q
     } else {
       stop("Invalid query format. Must be an opq object or a valid XML string.")
@@ -248,9 +248,9 @@ osm_shapes_to_routes <- function(
   } else if (ways && !is.null(initial_osm_file) && !is.null(ways_tags) && length(ways_tags) > 0) {
     ways_other_tags <- osmextract::oe_get_keys(osm_ways)
     # Filter ways_other_tags for elements that contain any of strings in ways_tags
-    tags_to_extract <- ways_other_tags[Reduce(`|`, lapply(ways_tags, function(t) grepl(t, ways_other_tags)))]
+    tags_to_extract <- ways_other_tags[Reduce(`|`, lapply(ways_tags, grepl, ways_other_tags))]
     osm_extra_tags <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE, extra_tags = tags_to_extract) |> st_drop_geometry()
-    names(osm_extra_tags)[names(osm_extra_tags) != "osm_id"] <- gsub("_", ":", names(osm_extra_tags)[names(osm_extra_tags) != "osm_id"])
+    names(osm_extra_tags)[names(osm_extra_tags) != "osm_id"] <- gsub("_", ":", names(osm_extra_tags)[names(osm_extra_tags) != "osm_id"], fixed = TRUE)
     result <- result |>
       left_join(osm_extra_tags |> select(-"other:tags"), by = c("way_osm_id" = "osm_id"))
     # Remove columns that only have empty values

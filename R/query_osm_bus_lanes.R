@@ -46,7 +46,7 @@ osm_bus_lanes <- function(bbox, osm_file = NULL) {
       "psv"
     )
     road_osm <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE, extra_tags = cols_to_check)
-    names(road_osm) <- gsub("_", ":", names(road_osm))
+    names(road_osm) <- gsub("_", ":", names(road_osm), fixed = TRUE)
   } else {
     road_osm <- opq(bbox) |> # uses osmdata package, to extract only with BB
       add_osm_feature(key = "highway") |>

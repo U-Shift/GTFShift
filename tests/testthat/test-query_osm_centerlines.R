@@ -4,14 +4,15 @@ test_that("osm_centerlines reads generated geopkg from python call with mocked r
         geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
-    get_centerline_called <- FALSE
+    state <- new.env(parent = emptyenv())
+    state$get_centerline_called <- FALSE
 
     testthat::with_mocked_bindings(
         virtualenv_create = function(...) "mock_venv",
         use_virtualenv = function(...) TRUE,
         source_python = function(file, envir = parent.frame(), ...) {
             envir$get_centerline <- function(...) {
-                get_centerline_called <<- TRUE
+                state$get_centerline_called <- TRUE
                 TRUE
             }
             TRUE
@@ -25,7 +26,7 @@ test_that("osm_centerlines reads generated geopkg from python call with mocked r
                 .package = "sf",
                 code = {
                     res <- GTFShift::osm_centerlines(bbox = NULL, place = "Porto", venv = "mock_env")
-                    expect_true(get_centerline_called)
+                    expect_true(state$get_centerline_called)
                     expect_s3_class(res, "sf")
                 }
             )
@@ -39,18 +40,19 @@ test_that("osm_centerlines creates virtualenv when venv parameter is omitted/NA"
         geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
-    virtualenv_create_called <- FALSE
-    get_centerline_called <- FALSE
+    state <- new.env(parent = emptyenv())
+    state$virtualenv_create_called <- FALSE
+    state$get_centerline_called <- FALSE
 
     testthat::with_mocked_bindings(
         virtualenv_create = function(...) {
-            virtualenv_create_called <<- TRUE
+            state$virtualenv_create_called <- TRUE
             "mock_created_venv"
         },
         use_virtualenv = function(...) TRUE,
         source_python = function(file, envir = parent.frame(), ...) {
             envir$get_centerline <- function(...) {
-                get_centerline_called <<- TRUE
+                state$get_centerline_called <- TRUE
                 TRUE
             }
             TRUE
@@ -64,8 +66,8 @@ test_that("osm_centerlines creates virtualenv when venv parameter is omitted/NA"
                 .package = "sf",
                 code = {
                     res <- GTFShift::osm_centerlines(bbox = NULL, place = "Porto")
-                    expect_true(virtualenv_create_called)
-                    expect_true(get_centerline_called)
+                    expect_true(state$virtualenv_create_called)
+                    expect_true(state$get_centerline_called)
                     expect_s3_class(res, "sf")
                 }
             )
@@ -79,11 +81,12 @@ test_that("osm_centerlines uses existing venv without virtualenv_create when ven
         geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
-    virtualenv_create_called <- FALSE
+    state <- new.env(parent = emptyenv())
+    state$virtualenv_create_called <- FALSE
 
     testthat::with_mocked_bindings(
         virtualenv_create = function(...) {
-            virtualenv_create_called <<- TRUE
+            state$virtualenv_create_called <- TRUE
             "mock_created_venv"
         },
         use_virtualenv = function(...) TRUE,
@@ -100,7 +103,7 @@ test_that("osm_centerlines uses existing venv without virtualenv_create when ven
                 .package = "sf",
                 code = {
                     res <- GTFShift::osm_centerlines(bbox = NULL, place = "Porto", venv = "existing_env")
-                    expect_false(virtualenv_create_called)
+                    expect_false(state$virtualenv_create_called)
                     expect_s3_class(res, "sf")
                 }
             )
@@ -114,14 +117,15 @@ test_that("osm_centerlines passes osm_file parameter to python call", {
         geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
-    received_osm_file <- NULL
+    state <- new.env(parent = emptyenv())
+    state$received_osm_file <- NULL
 
     testthat::with_mocked_bindings(
         virtualenv_create = function(...) "mock_venv",
         use_virtualenv = function(...) TRUE,
         source_python = function(file, envir = parent.frame(), ...) {
             envir$get_centerline <- function(bbox, study_area, use_buildings, output_path, osm_file = NULL) {
-                received_osm_file <<- osm_file
+                state$received_osm_file <- osm_file
                 TRUE
             }
             TRUE
@@ -135,7 +139,7 @@ test_that("osm_centerlines passes osm_file parameter to python call", {
                 .package = "sf",
                 code = {
                     res <- GTFShift::osm_centerlines(osm_file = "path/to/region.osm.pbf", venv = "mock_env")
-                    expect_equal(received_osm_file, "path/to/region.osm.pbf")
+                    expect_equal(state$received_osm_file, "path/to/region.osm.pbf")
                     expect_s3_class(res, "sf")
                 }
             )

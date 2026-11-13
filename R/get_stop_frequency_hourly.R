@@ -68,7 +68,7 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
   ### Creates $.$servicepatterns with unique id per pattern
   ### Creates $.$dates_servicepatterns matching each individual date covered by the GTFS with the corresponding id
   pattern_gtfs <- tidytransit::set_servicepattern(gtfs_date)
-  message(sprintf("> Identified %d service patterns matching date: %s", length(pattern_gtfs$.$servicepatterns$servicepattern_id), paste(pattern_gtfs$.$servicepatterns$service_id, collapse=", ")))
+  message(sprintf("> Identified %d service patterns matching date: %s", length(pattern_gtfs$.$servicepatterns$servicepattern_id), toString(pattern_gtfs$.$servicepatterns$service_id)))
   ### WARNING: every time we run this, random ids will be generated for the service patterns
 
   ## Convert stops and shapes to simple features
@@ -142,9 +142,10 @@ get_stop_frequency_hourly <- function(gtfs, date = GTFShift::calendar_nextBusine
     summarise(frequency = sum(.data$frequency)) |>
     ungroup()
 
+  stops_coords <- gtfs_date$stops |>
+    select("stop_id", "stop_lon", "stop_lat")
   table <- frequency |>
-    left_join(gtfs_date$stops |>
-                select("stop_id", "stop_lon", "stop_lat"), by = "stop_id") |>
+    left_join(stops_coords, by = "stop_id") |>
     st_as_sf(crs = 4326, coords = c("stop_lon", "stop_lat"))
 
   message("Finished GTFS analysis!")

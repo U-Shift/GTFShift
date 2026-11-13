@@ -78,10 +78,10 @@ get_route_frequency_hourly <- function(
   # PROCESS GTFS, generating table calculating the frequencies per route
   trips <- gtfs_date$trip
   stops <- gtfs_date$stops
-  if (any(!is.na(use_osm_routes))) {
-    shapes <- GTFShift::osm_shapes_to_routes(gtfs, use_osm_routes)
-  } else {
+  if (all(is.na(use_osm_routes))) {
     shapes <- tidytransit::shapes_as_sf(gtfs_date$shapes)
+  } else {
+    shapes <- GTFShift::osm_shapes_to_routes(gtfs, use_osm_routes)
   }
 
   routes <- gtfs_date$routes

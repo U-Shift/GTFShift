@@ -7,13 +7,14 @@ test_that("calendar_nextBusinessWednesday computes next Wednesday without networ
 test_that("calendar_nextBusinessWednesday fetches new year holidays when next Wednesday triggers new year", {
     # 2026-12-30 is Wednesday. If 2026-12-30 is a holiday, the next Wednesday is 2027-01-06 (new year)
     start_date <- as.Date("2026-12-28") # Monday
-    called_years <- c()
+    state <- new.env(parent = emptyenv())
+    state$called_years <- NULL
 
     testthat::with_mocked_bindings(
         GET = function(url, ...) {
             # Extract year from URL https://date.nager.at/api/v3/PublicHolidays/{year}/{country}
             yr <- gsub(".*/PublicHolidays/([0-9]+)/.*", "\\1", url)
-            called_years <<- c(called_years, yr)
+            state$called_years <- c(state$called_years, yr)
 
             content_json <- if (yr == "2026") '[{"date":"2026-12-30"}]' else '[]'
             structure(
@@ -33,7 +34,7 @@ test_that("calendar_nextBusinessWednesday fetches new year holidays when next We
         }
     )
 
-    expect_equal(called_years, c("2026", "2027"))
+    expect_equal(state$called_years, c("2026", "2027"))
 })
 
 test_that("calendar_nextBusinessWednesday handles mocked holiday response", {
