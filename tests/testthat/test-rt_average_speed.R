@@ -1,25 +1,22 @@
-library(testthat)
-library(sf)
-
 test_that("rt_average_speed computes speeds along trip geometry", {
-    trip_geom <- st_sf(
+    trip_geom <- sf::st_sf(
         trip_id = c("T1", "T2"),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(0, 100, 1000, 100), ncol = 2, byrow = TRUE)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(0, 100, 1000, 100), ncol = 2, byrow = TRUE)),
             crs = 3857
         )
     )
 
-    rt_updates <- st_sf(
+    rt_updates <- sf::st_sf(
         trip_id = c("T1", "T1", "UNMATCHED_TRIP", "T2", "T2"),
         timestamp = c(1000, 1060, 1070, 1080, 1140),
-        geometry = st_sfc(
-            st_point(c(0, 0)),
-            st_point(c(500, 10)), # Offset by 10m off line
-            st_point(c(600, 0)),
-            st_point(c(0, 100)),
-            st_point(c(400, 100)),
+        geometry = sf::st_sfc(
+            sf::st_point(c(0, 0)),
+            sf::st_point(c(500, 10)), # Offset by 10m off line
+            sf::st_point(c(600, 0)),
+            sf::st_point(c(0, 100)),
+            sf::st_point(c(400, 100)),
             crs = 3857
         )
     )
@@ -82,15 +79,15 @@ test_that("rt_average_speed computes speeds along trip geometry", {
 })
 
 test_that("rt_average_speed issues warning and ignores trips with less than 2 updates", {
-    trip_geom <- st_sf(
+    trip_geom <- sf::st_sf(
         trip_id = "T1",
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     )
 
-    rt_updates_single <- st_sf(
+    rt_updates_single <- sf::st_sf(
         trip_id = "T1",
         timestamp = 1000,
-        geometry = st_sfc(st_point(c(0, 0)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_point(c(0, 0)), crs = 3857)
     )
 
     expect_warning(
@@ -101,17 +98,17 @@ test_that("rt_average_speed issues warning and ignores trips with less than 2 up
 })
 
 test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
-    trip_geom <- st_sf(
+    trip_geom <- sf::st_sf(
         trip_id = "T1",
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     )
 
-    rt_updates <- st_sf(
+    rt_updates <- sf::st_sf(
         trip_id = c("T1", "T1"),
         timestamp = c(1000, 1060),
-        geometry = st_sfc(
-            st_point(c(0, 0)),
-            st_point(c(500, 0)),
+        geometry = sf::st_sfc(
+            sf::st_point(c(0, 0)),
+            sf::st_point(c(500, 0)),
             crs = 3857
         )
     )
@@ -129,9 +126,9 @@ test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
     )
 
     # MULTILINESTRING trip geometry
-    multiline_geom <- st_sf(
+    multiline_geom <- sf::st_sf(
         trip_id = "T1",
-        geometry = st_sfc(st_multilinestring(list(matrix(c(0, 0, 500, 0), ncol = 2, byrow = TRUE))), crs = 3857)
+        geometry = sf::st_sfc(sf::st_multilinestring(list(matrix(c(0, 0, 500, 0), ncol = 2, byrow = TRUE))), crs = 3857)
     )
     expect_error(
         GTFShift::rt_average_speed(rt_updates, multiline_geom),
@@ -145,9 +142,9 @@ test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
     )
 
     # Missing match column in trips_geometries
-    trip_geom_other_col <- st_sf(
+    trip_geom_other_col <- sf::st_sf(
         other_id = "T1",
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     )
     expect_error(
         GTFShift::rt_average_speed(rt_updates, trip_geom_other_col, rt_collection_trips_geometries_match_col = "trip_id"),
@@ -155,9 +152,9 @@ test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
     )
 
     # Missing required timestamp column
-    rt_no_time <- st_sf(
+    rt_no_time <- sf::st_sf(
         trip_id = c("T1", "T1"),
-        geometry = st_sfc(st_point(c(0, 0)), st_point(c(500, 0)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_point(c(0, 0)), sf::st_point(c(500, 0)), crs = 3857)
     )
     expect_error(
         GTFShift::rt_average_speed(rt_no_time, trip_geom),

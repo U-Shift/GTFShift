@@ -1,6 +1,3 @@
-library(testthat)
-library(sf)
-
 test_that("get_trip_speed_profile calculates speed profile with default parameters", {
     # 2 trips, same route, 5 updates each
     # Trip T1: 1500m over 240s -> commercial_speed = (1.5 km) / (240 / 3600 h) = 22.5 km/h

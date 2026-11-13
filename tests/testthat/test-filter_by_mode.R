@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("filter_by_modes filters routes by mode code", {
     sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
     # agency_id 8 (TCB) has bus routes (route_type 3) and agency 4 (TTSL) has ferry routes (route_type 4)

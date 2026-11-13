@@ -93,7 +93,7 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
     names(tag_vals) <- tag_keys
 
     # Check if relation matches all features in q
-    matches_all <- all(sapply(parsed_features, function(feat) {
+    matches_all <- all(vapply(parsed_features, function(feat) {
       val <- tag_vals[feat$key]
       if (is.na(val)) {
         return(FALSE)
@@ -105,7 +105,7 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
         return(grepl(feat$val, val))
       }
       return(FALSE)
-    }))
+    }, logical(1)))
 
     if (!matches_all) {
       return(NULL)

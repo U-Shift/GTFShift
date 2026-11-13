@@ -35,27 +35,27 @@
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' summary(gtfs)
 #'
-#' 
+#'
 #' # Simple call with missing shapes (triggering shapes creation because missing on GTFS file)
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' summary(gtfs)
 #'
-#' 
+#'
 #' # With some parameters to build transfers and store to given location
 #' store_path <- withr::local_tempfile(fileext = ".zip")
-#' 
+#'
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE, store_path
 #' )
-#' 
+#'
 #' head(gtfs$transfers)
-#' 
+#'
 #' file.exists(store_path)
 #'
 #' @import tidytransit

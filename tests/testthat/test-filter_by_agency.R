@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("filter_by_agency filters by id and name using merged feed sample", {
     sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)

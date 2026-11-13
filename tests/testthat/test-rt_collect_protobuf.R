@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("rt_collect_protobuf decodes protobuf and passes to rt_collect_json via mocks", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     pb_file <- withr::local_tempfile(fileext = ".pb")

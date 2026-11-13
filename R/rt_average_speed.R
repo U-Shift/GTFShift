@@ -17,7 +17,7 @@
 #'   compute distances and speeds. If NULL, spherical geometry (s2) is used by default.
 #'
 #' @details
-#' For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n} 
+#' For each trip (grouped by \code{trip_id}), let \eqn{\{(x_i, t_i)\}_{i=1}^n}
 #' denote the ordered sequence of
 #' real-time observations, where \eqn{x_i} is the vehicle position and
 #' \eqn{t_i} the corresponding timestamp, with
@@ -58,8 +58,8 @@
 #'
 #' Trips with fewer than two observations are ignored with a warning because
 #' \eqn{\Delta t_i} and \eqn{\Delta d_i} are undefined in that case.
-#' 
-#' Method \code{GTFShift::multiline_to_sorted_linestring()} can be used to convert MULTILINESTRING 
+#'
+#' Method \code{GTFShift::multiline_to_sorted_linestring()} can be used to convert MULTILINESTRING
 #' geometries to LINESTRING if needed.
 #'
 #' @returns sf data.frame. Object based on \code{rt_collection}, with added columns:
@@ -79,38 +79,38 @@
 #' rt_collect_file <- system.file(
 #'   "extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift"
 #' )
-#' rt_collection <- read.csv(rt_collect_file) |> 
+#' rt_collection <- read.csv(rt_collect_file) |>
 #'   sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::select(-speed)
-#' 
+#'
 #' head(rt_collection |> dplyr::select(trip_id, timestamp, geometry))
-#' 
+#'
 #' nrow(rt_collection)
-#' 
+#'
 #' # Get route geometry for data collected
 #' osm_routes <- sf::st_read(
 #'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
 #'   quiet = TRUE
-#' ) |>  
+#' ) |>
 #'   dplyr::filter(route_id %in% rt_collection$route_id) |>
 #'   dplyr::mutate(geom = GTFShift::multiline_to_sorted_linestring(geom))
-#' 
+#'
 #' head(osm_routes)
-#' 
+#'
 #' # Compute average speed (aggregated at route level) based on cumulative distance along the geometry
 #' speed <- GTFShift::rt_average_speed(
-#'   rt_collection = rt_collection, 
+#'   rt_collection = rt_collection,
 #'   trips_geometries = osm_routes,
 #'   rt_collection_trips_geometries_match_col = "route_id"
 #' )
-#' 
-#' head(speed |> 
+#'
+#' head(speed |>
 #'   dplyr::filter(!is.na(speed_kmh)) |>
 #'   dplyr::select(
-#'     trip_id, timestamp, speed_kmh, 
+#'     trip_id, timestamp, speed_kmh,
 #'     distance_along_geometry, distance_to_closest_on_geometry
 #'   )
 #' )
-#' 
+#'
 #' nrow(speed)
 #' }
 #'
@@ -126,13 +126,13 @@
 #'
 #' @export
 rt_average_speed <- function(
-  rt_collection, # sf data.frame with GTFS-RT updates for multiple trips 
-  trips_geometries, # sf data.frame with trips geometry (LINESTRING) 
+  rt_collection, # sf data.frame with GTFS-RT updates for multiple trips
+  trips_geometries, # sf data.frame with trips geometry (LINESTRING)
   rt_collection_trips_geometries_match_col = "trip_id", # column name in rt_collection and trips_geometries to match trips
   geometry_sample_meters = 10, # sample trip geometry every X meters to compute distance along shape
   metric_crs = NULL
 ) {
-  # 0. Validations 
+  # 0. Validations
   # > rt_collection and trips_geometries must be spatial objects
   if (!inherits(rt_collection, "sf")) {
     stop("rt_collection must be an sf object")
@@ -181,10 +181,10 @@ rt_average_speed <- function(
         return(NULL)
       }
       trip_df <- trip_df |> arrange(.data$timestamp)
-      trip_geometry <- trips_geometries |> 
+      trip_geometry <- trips_geometries |>
         filter(!!sym(rt_collection_trips_geometries_match_col) == trip_df[[rt_collection_trips_geometries_match_col]][[1]])
       # mapview(trip_geometry)
-      
+
       projected <- project_points_along_geometry(
         geometry = trip_geometry,
         points = trip_df,
@@ -203,7 +203,7 @@ rt_average_speed <- function(
         # When computing distances
         # 1. Use absolute value to avoid negative distances
         # 2. Consider both normal and reversed distances (to work with circular shapes) and take the minimum
-        distance_since_prev_meters_normal = abs(.data$distance_along_geometry - lag(.data$distance_along_geometry)), 
+        distance_since_prev_meters_normal = abs(.data$distance_along_geometry - lag(.data$distance_along_geometry)),
         distance_since_prev_meters_reversed = abs(.data$distance_along_geometry - lag(.data$distance_along_geometry_reversed)),
         distance_since_prev_meters = pmin(.data$distance_since_prev_meters_normal, .data$distance_since_prev_meters_reversed, na.rm = TRUE),
         # Compute speed in km/h

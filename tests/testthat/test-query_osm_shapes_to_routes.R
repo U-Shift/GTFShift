@@ -1,6 +1,3 @@
-library(testthat)
-library(sf)
-
 test_that("osm_shapes_to_routes matches shapes by gtfs:shape_id using mocks", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
@@ -17,9 +14,9 @@ test_that("osm_shapes_to_routes matches shapes by gtfs:shape_id using mocks", {
         check.names = FALSE
     )
 
-    mock_ways <- st_sf(
+    mock_ways <- sf::st_sf(
         osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
     )
 
     testthat::with_mocked_bindings(
@@ -47,10 +44,10 @@ test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overp
 
     target_shape_id <- gtfs$trips$shape_id[1]
 
-    mock_multilines <- st_sf(
+    mock_multilines <- sf::st_sf(
         osm_id = "rel_1",
         `gtfs:shape_id` = target_shape_id,
-        geometry = st_sfc(st_multilinestring(list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))), crs = 4326)
+        geometry = sf::st_sfc(sf::st_multilinestring(list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))), crs = 4326)
     )
 
     mock_osm_data <- list(
@@ -108,9 +105,9 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
         check.names = FALSE
     )
 
-    mock_ways <- st_sf(
+    mock_ways <- sf::st_sf(
         osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
     )
 
     mock_extra_tags <- data.frame(
@@ -131,7 +128,7 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
                     if (is.null(extra_tags)) {
                         return(mock_ways)
                     } else {
-                        return(st_sf(mock_extra_tags, geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)))
+                        return(sf::st_sf(mock_extra_tags, geometry = sf::st_sfc(sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)))
                     }
                 },
                 oe_get_keys = function(...) c("lanes", "maxspeed"),
@@ -163,17 +160,17 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file = NULL extracts wa
 
     target_shape_id <- gtfs$trips$shape_id[1]
 
-    mock_multilines <- st_sf(
+    mock_multilines <- sf::st_sf(
         osm_id = "rel_1",
         `gtfs:shape_id` = target_shape_id,
-        geometry = st_sfc(st_multilinestring(list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))), crs = 4326)
+        geometry = sf::st_sfc(sf::st_multilinestring(list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))), crs = 4326)
     )
 
-    mock_lines <- st_sf(
+    mock_lines <- sf::st_sf(
         osm_id = "w1",
         lanes = "3",
         maxspeed = "60",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
     )
 
     mock_osm_data <- list(

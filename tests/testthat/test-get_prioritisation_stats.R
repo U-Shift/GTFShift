@@ -1,15 +1,12 @@
-library(testthat)
-library(sf)
-
 test_that("get_prioritisation_stats calculates summary statistics without speed_avg", {
-    prioritisation_df <- st_sf(
+    prioritisation_df <- sf::st_sf(
         is_bus_lane = c(TRUE, FALSE),
         frequency = c(10, 5),
         n_lanes_circulation = c(2, 4),
         n_lanes_parking = c(1, 3),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), # 100 m
-            st_linestring(matrix(c(100, 0, 300, 0), ncol = 2, byrow = TRUE)), # 200 m
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), # 100 m
+            sf::st_linestring(matrix(c(100, 0, 300, 0), ncol = 2, byrow = TRUE)), # 200 m
             crs = 3857
         )
     )
@@ -40,15 +37,15 @@ test_that("get_prioritisation_stats calculates summary statistics without speed_
 })
 
 test_that("get_prioritisation_stats calculates speed metrics when speed_avg column is present", {
-    prioritisation_df <- st_sf(
+    prioritisation_df <- sf::st_sf(
         is_bus_lane = c(TRUE, FALSE),
         frequency = c(10, 5),
         speed_avg = c(30, 50),
         n_lanes_circulation = c(2, 3),
         n_lanes_parking = c(1, 0),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
             crs = 3857
         )
     )
@@ -75,14 +72,14 @@ test_that("get_prioritisation_stats calculates speed metrics when speed_avg colu
 })
 
 test_that("get_prioritisation_stats works when metric_crs is default (NULL)", {
-    prioritisation_df <- st_sf(
+    prioritisation_df <- sf::st_sf(
         is_bus_lane = c(TRUE, FALSE),
         frequency = c(10, 5),
         n_lanes_circulation = c(2, 3),
         n_lanes_parking = c(1, 0),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
             crs = 3857
         )
     )
@@ -94,14 +91,14 @@ test_that("get_prioritisation_stats works when metric_crs is default (NULL)", {
 })
 
 test_that("get_prioritisation_stats stops on invalid weight or metric_crs", {
-    prioritisation_df <- st_sf(
+    prioritisation_df <- sf::st_sf(
         is_bus_lane = c(TRUE, FALSE),
         frequency = c(10, 5),
         n_lanes_circulation = c(2, 3),
         n_lanes_parking = c(1, 0),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
             crs = 3857
         )
     )
@@ -121,15 +118,15 @@ test_that("get_prioritisation_stats stops on invalid weight or metric_crs", {
 test_that("get_prioritisation_stats calculates stats using weight = 'length' vs weight = 'frequency'", {
     # Feature 1: length = 100m, frequency = 30, speed_avg = 20, n_lanes_circulation = 2
     # Feature 2: length = 300m, frequency = 10, speed_avg = 60, n_lanes_circulation = 4
-    prioritisation_df <- st_sf(
+    prioritisation_df <- sf::st_sf(
         is_bus_lane = c(TRUE, FALSE),
         frequency = c(30, 10),
         speed_avg = c(20, 60),
         n_lanes_circulation = c(2, 4),
         n_lanes_parking = c(1, 3),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(100, 0, 400, 0), ncol = 2, byrow = TRUE)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(100, 0, 400, 0), ncol = 2, byrow = TRUE)),
             crs = 3857
         )
     )

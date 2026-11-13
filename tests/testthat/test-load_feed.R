@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("gtfs simple load", {
     gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
     testthat::expect_contains(class(gtfs), "tidygtfs")
@@ -89,7 +87,7 @@ test_that("load_feed passes custom parameters to gtfsrouter::gtfs_transfer_table
 test_that("clean empty stop_times", {
     gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"), create_transfers = TRUE)
     random_trip <- gtfs$trips |> sample_n(1) |> pull(trip_id)
-    gtfs$stop_times[random_trip == gtfs$stop_times$trip_id, ][1, ]$arrival_time <- NA 
+    gtfs$stop_times[random_trip == gtfs$stop_times$trip_id, ][1, ]$arrival_time <- NA
     location <- withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs, location)
     testthat::expect_warning(gtfs_new <- GTFShift::load_feed(location), "interpolated .* stop times with missing times")
@@ -108,7 +106,7 @@ test_that("load_feed interpolates missing intermediate stop times", {
     }
     location <- withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs, location)
-    
+
     testthat::expect_warning(gtfs_new <- GTFShift::load_feed(location), "interpolated .* stop times with missing times")
     testthat::expect_equal(nrow(gtfs_new$stop_times), nrow(gtfs$stop_times))
     testthat::expect_false(anyNA(gtfs_new$stop_times$arrival_time))
@@ -121,7 +119,7 @@ test_that("load_feed removes duplicates across tables", {
     gtfs$agency <- rbind(gtfs$agency, gtfs$agency[1, ])
     location <- withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs, location)
-    
+
     gtfs_new <- GTFShift::load_feed(location)
     testthat::expect_equal(nrow(gtfs_new$agency), 1)
 })
@@ -134,7 +132,7 @@ test_that("load_feed removes unused IDs across tables", {
     gtfs$stops <- rbind(gtfs$stops, unused_stop)
     location <- withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs, location)
-    
+
     gtfs_new <- GTFShift::load_feed(location)
     testthat::expect_false("unused_stop_id_test" %in% gtfs_new$stops$stop_id)
 })

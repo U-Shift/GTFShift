@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("unify merges two GTFS feeds with default parameters", {
     sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
     gtfs1 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(8)

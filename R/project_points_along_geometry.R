@@ -36,25 +36,25 @@
 #' rt_collect_file <- system.file(
 #'   "extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift"
 #' )
-#' points <- read.csv(rt_collect_file) |> 
+#' points <- read.csv(rt_collect_file) |>
 #'   sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::sample_n(5)
-#' 
+#'
 #' head(points |> dplyr::select(geometry))
-#' 
+#'
 #' # Get route geometry for points
 #' osm_routes <- sf::st_read(
 #'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
 #'   quiet = TRUE
 #' ) |> dplyr::filter(route_id %in% points$route_id)
-#' 
+#'
 #' head(osm_routes)
-#' 
+#'
 #' # Project points to geometry
 #' points_projected <- GTFShift::project_points_along_geometry(
 #'   geometry = osm_routes,
 #'   points = points
 #' )
-#' 
+#'
 #' head(points_projected)
 #'
 #' @importFrom units set_units

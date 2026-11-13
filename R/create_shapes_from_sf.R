@@ -8,21 +8,21 @@
 #'
 #' @details
 #' This function builds the shapes.txt file from a simple feature object.
-#' 
+#'
 #' It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
 #' \code{multiline_to_sorted_linestring}, using a point guide per shape:
 #' all ordered stops when the selected trip is circular (first and last
 #' \code{stop_id} are equal), or the first two stops otherwise.
 #' Then, it converts the LINESTRING geometries to a data.frame representing a GTFS shapes table using
 #' \code{gtfstools::convert_sf_to_shapes}.
-#' 
+#'
 #' Coordinates are 4326 (WGS 84) by default, following GTFS specifications.
-#' 
+#'
 #' Optionally, when \code{shape_dist_traveled = TRUE}, it estimates cumulative
 #' distance along each shape for all generated points and appends this as
-#' \code{shape_dist_traveled}. This metric is computed in the units of 
+#' \code{shape_dist_traveled}. This metric is computed in the units of
 #' \code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
-#' 
+#'
 #'
 #' @returns data.frame. A GTFS shapes table. Includes
 #' \code{shape_dist_traveled} if \code{shape_dist_traveled = TRUE}.
@@ -33,21 +33,21 @@
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' # Load TCB OSM routes sample linestring
 #' osm_routes = sf::st_read(
 #'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
 #'   quiet = TRUE
 #' ) |> dplyr::filter(shape_id %in% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
-#' 
+#'
 #' head(osm_routes)
-#' 
+#'
 #' # Create shapes.txt for geometries
 #' shapes_txt <- GTFShift::create_shapes_from_sf(
-#'   osm_routes, gtfs, 
+#'   osm_routes, gtfs,
 #'   shape_dist_traveled = TRUE
 #' )
-#' 
+#'
 #' head(shapes_txt)
 #' }
 #'
@@ -62,8 +62,8 @@
 #'
 #' @export
 create_shapes_from_sf <- function(
-    sf_shapes, 
-    gtfs, 
+    sf_shapes,
+    gtfs,
     metric_crs = NULL,
     shape_dist_traveled = FALSE
 ) {
@@ -131,7 +131,7 @@ create_shapes_from_sf <- function(
     #mapview::mapview(sf_shapes_linestrings |> select(-stop_point), zcol="shape_id")
     #sf_shapes_linestrings_debug = sf_shapes_linestrings|>filter(shape_id=="1-VA-TERM")
     #mapview::mapview((sf_shapes_linestrings_debug )$geom)+
-    #    mapview::mapview((sf_shapes_linestrings_debug)$stop_point) 
+    #    mapview::mapview((sf_shapes_linestrings_debug)$stop_point)
 
     # Convert LINESTRING to GTFS shapes.txt data.frame
     shapes_gtfstools <- gtfstools::convert_sf_to_shapes(

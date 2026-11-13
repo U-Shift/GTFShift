@@ -21,14 +21,14 @@
 #' \eqn{P_2} the second point (if available). The initial segment is chosen as
 #' \deqn{L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}} d(\mathrm{start\_point}, L).}
 #' where \eqn{d(\cdot)} is the Euclidean distance. If no points are provided, \eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
-#' 
-#' Additionally, the orientation of \eqn{L^{(1)}} is determined by comparing the distances 
-#' from its edges to the remaining segments in \eqn{\mathcal{L} \setminus \{L^{(1)}\}}. 
-#' The edge that is closest to any remaining segment is designated as the end of \eqn{L^{(1)}}. 
-#' 
-#' If both edges are equidistant to the remaining segments, the orientation is determined 
+#'
+#' Additionally, the orientation of \eqn{L^{(1)}} is determined by comparing the distances
+#' from its edges to the remaining segments in \eqn{\mathcal{L} \setminus \{L^{(1)}\}}.
+#' The edge that is closest to any remaining segment is designated as the end of \eqn{L^{(1)}}.
+#'
+#' If both edges are equidistant to the remaining segments, the orientation is determined
 #' by the proximity to \eqn{P_2} (if available) or by orienting away from \eqn{P_1}.
-#' 
+#'
 #'
 #' \bold{2. Iterative Step}
 #'
@@ -57,22 +57,22 @@
 #' transformed back to the original CRS of \code{multilinestring}.
 #'
 #' @returns sfc. LINESTRING geometry object.
-#' 
+#'
 #' @examples
 #' \donttest{
-#' # Get OSM route geometries (MULTILINESTRING)  
+#' # Get OSM route geometries (MULTILINESTRING)
 #' osm_routes <- sf::st_read(
 #'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
 #'   quiet = TRUE
 #' ) |> dplyr::sample_n(1)
-#' 
+#'
 #' head(osm_routes)
-#' 
+#'
 #' # Convert geometry to LINESTRING
 #' osm_routes <- osm_routes |>  dplyr::mutate(
 #'   geom = GTFShift::multiline_to_sorted_linestring(geom)
 #' )
-#' 
+#'
 #' head(osm_routes)
 #' }
 #'
@@ -82,7 +82,7 @@
 #'
 #' @export
 multiline_to_sorted_linestring <- function(
-    multilinestring, 
+    multilinestring,
     points = NULL,
     metric_crs = NULL
 ) {
@@ -144,12 +144,12 @@ multiline_to_sorted_linestring <- function(
         current_line <- linestrings[nearest_idx, ]
         current_start <- lwgeom::st_startpoint(current_line$geometry)
         current_end <- lwgeom::st_endpoint(current_line$geometry)
-        remaining_lines <- linestrings[-nearest_idx, ]        
+        remaining_lines <- linestrings[-nearest_idx, ]
     } else {
         current_line <- linestrings[1, ] # Start with the first line
         current_start <- lwgeom::st_startpoint(current_line$geometry)
         current_end <- lwgeom::st_endpoint(current_line$geometry)
-        remaining_lines <- linestrings[-1, ] 
+        remaining_lines <- linestrings[-1, ]
     }
     # Validate start segment orientation
     # 1st criteria: If it connects to only one other segment, orient it to connect to that segment (end point is closest to the other segment)
@@ -190,7 +190,7 @@ multiline_to_sorted_linestring <- function(
 
     next_point_index <- NULL
     next_point <- NULL
-    while (nrow(remaining_lines) > 0) { 
+    while (nrow(remaining_lines) > 0) {
         if (!is.null(points_df)) {
             # Get index of the next point in points_df that has not been visited yet
             next_point_index <- points_df |> filter(!.data$visited) |> slice(1) |> pull(.data$order)
@@ -232,7 +232,7 @@ multiline_to_sorted_linestring <- function(
             stringsAsFactors = FALSE
         )
         candidate_df <- unique(candidate_df)
-        
+
         if (nrow(candidate_df) > 1 && !is.null(next_point)) { # 1)
             candidate_df$geometry_to_next <- vapply(
                 candidate_df$idx,

@@ -1,13 +1,10 @@
-library(testthat)
-library(sf)
-
 test_that("osm_bus_lanes queries and filters bus lanes using mocked osmextract", {
-    mock_lines <- st_sf(
+    mock_lines <- sf::st_sf(
         osm_id = c("1", "2"),
         psv = c("designated", "no"),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)),
-            st_linestring(matrix(c(1, 1, 2, 2), ncol = 2)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)),
+            sf::st_linestring(matrix(c(1, 1, 2, 2), ncol = 2)),
             crs = 4326
         )
     )
@@ -21,7 +18,7 @@ test_that("osm_bus_lanes queries and filters bus lanes using mocked osmextract",
         },
         .package = "osmextract",
         code = {
-            bbox <- st_bbox(st_sfc(st_point(c(0, 0)), crs = 4326))
+            bbox <- sf::st_bbox(sf::st_sfc(sf::st_point(c(0, 0)), crs = 4326))
             res <- GTFShift::osm_bus_lanes(bbox, osm_file = "dummy.pbf")
             expect_s3_class(res, "sf")
             expect_equal(nrow(res), 1)
@@ -32,12 +29,12 @@ test_that("osm_bus_lanes queries and filters bus lanes using mocked osmextract",
 })
 
 test_that("osm_bus_lanes queries bus lanes when osm_file = NULL using mocked osmdata", {
-    mock_lines <- st_sf(
+    mock_lines <- sf::st_sf(
         osm_id = c("1", "2"),
         psv = c("designated", "no"),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)),
-            st_linestring(matrix(c(1, 1, 2, 2), ncol = 2)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)),
+            sf::st_linestring(matrix(c(1, 1, 2, 2), ncol = 2)),
             crs = 4326
         )
     )
@@ -51,7 +48,7 @@ test_that("osm_bus_lanes queries bus lanes when osm_file = NULL using mocked osm
         osm_poly2line = function(...) mock_osmdata,
         .package = "GTFShift",
         code = {
-            bbox <- st_bbox(st_sfc(st_point(c(0, 0)), crs = 4326))
+            bbox <- sf::st_bbox(sf::st_sfc(sf::st_point(c(0, 0)), crs = 4326))
             res <- GTFShift::osm_bus_lanes(bbox, osm_file = NULL)
             expect_s3_class(res, "sf")
             expect_equal(nrow(res), 1)

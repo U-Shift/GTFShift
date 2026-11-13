@@ -1,5 +1,3 @@
-library(testthat)
-
 create_mock_response <- function(status_code = 200) {
   structure(
     list(

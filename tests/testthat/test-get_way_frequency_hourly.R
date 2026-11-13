@@ -1,6 +1,3 @@
-library(testthat)
-library(sf)
-
 test_that("get_way_frequency_hourly calculates way frequencies with mocked osm_shapes_to_routes", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
@@ -16,10 +13,10 @@ test_that("get_way_frequency_hourly calculates way frequencies with mocked osm_s
         dplyr::group_by(hour) |>
         dplyr::summarise(total_freq = sum(frequency))
 
-    mock_line <- st_sf(
+    mock_line <- sf::st_sf(
         shape_id = target_shape_id,
         way_osm_id = "12345",
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
     testthat::with_mocked_bindings(

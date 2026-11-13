@@ -17,13 +17,13 @@
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' summary(gtfs)
-#' 
-#' 
+#'
+#'
 #' # Filter by route
 #' gtfs_route <- GTFShift::filter_by_route_name(gtfs, c("4"))
-#' 
+#'
 #' summary(gtfs_route)
 #'
 #' @import tidytransit
