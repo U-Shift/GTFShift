@@ -1,10 +1,7 @@
-library(testthat)
-library(sf)
-
 test_that("osm_centerlines reads generated geopkg from python call with mocked reticulate", {
-    mock_line <- st_sf(
+    mock_line <- sf::st_sf(
         id = 1,
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
     get_centerline_called <- FALSE
@@ -37,9 +34,9 @@ test_that("osm_centerlines reads generated geopkg from python call with mocked r
 })
 
 test_that("osm_centerlines creates virtualenv when venv parameter is omitted/NA", {
-    mock_line <- st_sf(
+    mock_line <- sf::st_sf(
         id = 1,
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
     virtualenv_create_called <- FALSE
@@ -77,9 +74,9 @@ test_that("osm_centerlines creates virtualenv when venv parameter is omitted/NA"
 })
 
 test_that("osm_centerlines uses existing venv without virtualenv_create when venv is provided", {
-    mock_line <- st_sf(
+    mock_line <- sf::st_sf(
         id = 1,
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
     virtualenv_create_called <- FALSE
@@ -112,9 +109,9 @@ test_that("osm_centerlines uses existing venv without virtualenv_create when ven
 })
 
 test_that("osm_centerlines passes osm_file parameter to python call", {
-    mock_line <- st_sf(
+    mock_line <- sf::st_sf(
         id = 1,
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)), crs = 4326)
     )
 
     received_osm_file <- NULL

@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("rt_collect_json extracts JSON feed data and appends to CSV destination", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     parsed_json <- list(

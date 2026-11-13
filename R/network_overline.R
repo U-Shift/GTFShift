@@ -26,34 +26,34 @@
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
-#' 
+#'
 #' # Load OSM network to serve as target network
 #' target_network <- sf::st_read(
 #'   system.file("extdata/samples", "osm_ways_tcb.gpkg", package = "GTFShift"),
 #'   quiet = TRUE
 #' )
-#' 
+#'
 #' head(target_network)
-#' 
+#'
 #' # Get route frequency (and geometry)
 #' frequency_analysis <- GTFShift::get_route_frequency_hourly(
-#'   gtfs, 
+#'   gtfs,
 #'   date = gtfs$calendar$start_date[1]
-#' ) |> 
+#' ) |>
 #' dplyr::group_by(shape_id) |>
 #' dplyr::summarize(frequency = max(frequency))
-#' 
+#'
 #' head(frequency_analysis)
-#' 
+#'
 #' # Aggregate frequencies based on geometry overlap using GTFShift::network_overline
-#' suppressWarnings({ 
+#' suppressWarnings({
 #'   overline <- GTFShift::network_overline(
-#'     target_network = target_network, 
-#'     lines = frequency_analysis, 
+#'     target_network = target_network,
+#'     lines = frequency_analysis,
 #'     attr = "frequency"
 #'   )
 #' })
-#' 
+#'
 #' head(overline |> sf::st_drop_geometry())
 #' }
 #'

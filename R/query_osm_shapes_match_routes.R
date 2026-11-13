@@ -391,7 +391,7 @@ osm_shapes_match_routes <- function(
       ))
     }
     osm_route_error <- FALSE
-    for (i in 1:nrow(osm_route_name)) { # Validate that if OSM route has entry/exit stops, they respect the right order
+    for (i in seq_len(nrow(osm_route_name))) { # Validate that if OSM route has entry/exit stops, they respect the right order
       route <- osm_route_name[i, ]
       relation_df <- relations_df |> dplyr::filter(.data$type == "node" & .data$relation_osm_id == route$osm_id)
       entry_rows <- grep("entry", relation_df$role, ignore.case = TRUE)
@@ -600,14 +600,19 @@ osm_shapes_match_routes <- function(
     fin_dist <- sf::st_distance(osm_fin, gtfs_fin)
     init <- matrix(as.numeric(init_dist), nrow = nrow(init_dist), ncol = ncol(init_dist))
     fin <- matrix(as.numeric(fin_dist), nrow = nrow(fin_dist), ncol = ncol(fin_dist))
-    length_diff <- sapply(gtfs_route_name$route_dist, function(y) abs(osm_route_name$route_dist - y))
+    length_diff <- vapply(
+      gtfs_route_name$route_dist,
+      function(y) abs(osm_route_name$route_dist - y),
+      numeric(nrow(osm_route_name))
+    )
     # Proxy for number of stops distance: average distance between stops on GTFS, times the difference between osm and gtfs stops
-    stops_diff <- sapply(
+    stops_diff <- vapply(
       seq_along(gtfs_route_name$nr_stops),
       function(i) {
         (gtfs_route_name$route_dist[i] / gtfs_route_name$nr_stops[i]) *
           abs(osm_route_name$nr_stops - gtfs_route_name$nr_stops[i])
-      }
+      },
+      numeric(nrow(osm_route_name))
     )
 
     # > Match OSM network and GTFS shapes considering the match with min aggregated distance (init + fin)
@@ -619,14 +624,14 @@ osm_shapes_match_routes <- function(
     gtfs_route_name_minimos <- gtfs_route_name |>
       dplyr::mutate(osm_id = NA)
 
-    for (i in 1:nrow(gtfs_route_name_minimos)) {
+    for (i in seq_len(nrow(gtfs_route_name_minimos))) {
       gtfs_route_name_minimos[i, ]$osm_id <- osm_route_name[which.min(closeness[, i, drop = TRUE]), ]$osm_id
     }
 
     gtfs_route_name_result <- gtfs_route_name_minimos |>
       sf::st_drop_geometry() |>
       dplyr::left_join(
-        osm_route_name |> dplyr::select("osm_id", "name", "ref", "route_dist", "nr_stops", "geometry", "initial", "final") |> 
+        osm_route_name |> dplyr::select("osm_id", "name", "ref", "route_dist", "nr_stops", "geometry", "initial", "final") |>
         dplyr::rename(osm_name = .data$name, osm_ref = .data$ref),
         by = "osm_id",
         suffix = c("_gtfs", "_osm")

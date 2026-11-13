@@ -14,19 +14,19 @@
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_merged_sample.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' summary(gtfs)
-#' 
-#' 
+#'
+#'
 #' # Filter by id
 #' gtfs_id_8 <- gtfs |> GTFShift::filter_by_agency(id = "8")
-#' 
+#'
 #' summary(gtfs_id_8)
-#' 
-#' 
-#' # Filter by name 
-#' gtfs_ttsl <- gtfs |> GTFShift::filter_by_agency(name = "TTSL - Transtejo Soflusa") 
-#' 
+#'
+#'
+#' # Filter by name
+#' gtfs_ttsl <- gtfs |> GTFShift::filter_by_agency(name = "TTSL - Transtejo Soflusa")
+#'
 #' summary(gtfs_ttsl)
 #'
 #' @import tidytransit

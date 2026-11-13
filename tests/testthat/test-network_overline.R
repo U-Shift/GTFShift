@@ -1,16 +1,13 @@
-library(testthat)
-library(sf)
-
 test_that("network_overline aggregates lines onto target network", {
-    target_net <- st_sf(
+    target_net <- sf::st_sf(
         id = 1,
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     )
-    lines_sf <- st_sf(
+    lines_sf <- sf::st_sf(
         frequency = c(5, 10),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
             crs = 3857
         )
     )
@@ -31,13 +28,13 @@ test_that("network_overline aggregates lines onto target network", {
     })
 
 test_that("network_overline works when metric_crs is default (NULL)", {
-    target_net <- st_sf(
+    target_net <- sf::st_sf(
         id = 1,
-        geometry = st_sfc(st_linestring(matrix(c(-9.1, 38.7, -9.11, 38.71), ncol = 2, byrow = TRUE)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-9.1, 38.7, -9.11, 38.71), ncol = 2, byrow = TRUE)), crs = 4326)
     )
-    lines_sf <- st_sf(
+    lines_sf <- sf::st_sf(
         frequency = 5,
-        geometry = st_sfc(st_linestring(matrix(c(-9.1, 38.7, -9.11, 38.71), ncol = 2, byrow = TRUE)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-9.1, 38.7, -9.11, 38.71), ncol = 2, byrow = TRUE)), crs = 4326)
     )
 
     suppressWarnings({ # stplanr will warn about sub-geometries / rsgeo
@@ -53,13 +50,13 @@ test_that("network_overline works when metric_crs is default (NULL)", {
 })
 
 test_that("network_overline stops on invalid metric_crs", {
-    target_net <- st_sf(
+    target_net <- sf::st_sf(
         id = 1,
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     )
-    lines_sf <- st_sf(
+    lines_sf <- sf::st_sf(
         frequency = 5,
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     )
 
     expect_error(
@@ -74,15 +71,15 @@ test_that("network_overline stops on invalid metric_crs", {
 })
 
 test_that("network_overline handles parameter variations (target_network_split, fun, join_dist)", {
-    target_net <- st_sf(
+    target_net <- sf::st_sf(
         id = 1,
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 200, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 200, 0), ncol = 2, byrow = TRUE)), crs = 3857)
     )
-    lines_sf <- st_sf(
+    lines_sf <- sf::st_sf(
         frequency = c(10, 20),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 200, 0), ncol = 2, byrow = TRUE)), # original line at y = 0
-            st_linestring(matrix(c(0, 5, 50, 5), ncol = 2, byrow = TRUE)), # parallel line offset by +5m at y = 5
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 200, 0), ncol = 2, byrow = TRUE)), # original line at y = 0
+            sf::st_linestring(matrix(c(0, 5, 50, 5), ncol = 2, byrow = TRUE)), # parallel line offset by +5m at y = 5
             crs = 3857
         )
     )

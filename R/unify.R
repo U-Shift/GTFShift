@@ -26,30 +26,30 @@
 #' gtfs_1 <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' summary(gtfs_1)
-#' 
+#'
 #' gtfs_1$agency
-#' 
+#'
 #' head(gtfs_1$trips)
-#' 
+#'
 #' gtfs_2 <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' summary(gtfs_2)
-#' 
+#'
 #' gtfs_2$agency
-#' 
+#'
 #' head(gtfs_2$trips)
-#' 
+#'
 #' # Unify them
 #' unified <- GTFShift::unify(gtfs_1, gtfs_2, prefix = TRUE)
-#' 
+#'
 #' summary(unified)
-#' 
+#'
 #' unified$agency
-#' 
+#'
 #' head(unified$trips)
 #'
 #' @seealso \code{gtfstools::merge_gtfs()}

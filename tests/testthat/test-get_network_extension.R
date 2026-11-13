@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("get_network_extension calculates network route extension in meters", {
   sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
   gtfs <- GTFShift::load_feed(sample_file)

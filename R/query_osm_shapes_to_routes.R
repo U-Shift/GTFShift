@@ -43,20 +43,20 @@
 #' )
 #'
 #' head(shapes_osm_routes |> dplyr::select(shape_id, osm_id))
-#' 
+#'
 #' nrow(shapes_osm_routes)
-#' 
+#'
 #' # Get OSM ways instead
 #' shapes_osm_ways <- GTFShift::osm_shapes_to_routes(
 #'   gtfs, q,
 #'   osm_file = osm_file,
 #'   ways = TRUE
 #' )
-#' 
+#'
 #' head(shapes_osm_ways |> dplyr::select(way_osm_id, shape_id, osm_id))
-#' 
+#'
 #' nrow(shapes_osm_ways)
-#' 
+#'
 #' @import osmdata
 #' @import sf
 #' @import dplyr

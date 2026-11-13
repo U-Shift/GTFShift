@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("get_stop_frequency_hourly calculates stop departures per hour", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)

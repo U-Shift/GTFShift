@@ -13,7 +13,7 @@
 #' @examples
 #' # Example of Portuguese holiday (10/06/2026) ignored
 #' GTFShift::calendar_nextBusinessWednesday(start_date = "2026-06-09", country_code="PT")
-#' 
+#'
 #' # Example of Hong Kong holiday (01/07/2026) ignored
 #' GTFShift::calendar_nextBusinessWednesday(start_date = "2026-06-30", country_code="HK")
 #'

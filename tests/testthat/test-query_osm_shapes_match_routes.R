@@ -1,6 +1,3 @@
-library(testthat)
-library(sf)
-
 # Helper fixture setup for osm_shapes_match_routes
 setup_match_fixtures <- function(gtfs) {
     target_route_id <- gtfs$routes$route_id[1]
@@ -21,15 +18,15 @@ setup_match_fixtures <- function(gtfs) {
         check.names = FALSE
     )
 
-    mock_ways <- st_sf(
+    mock_ways <- sf::st_sf(
         osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
     )
 
-    mock_stops <- st_sf(
+    mock_stops <- sf::st_sf(
         osm_id = c("n1", "n2"),
         public_transport = c("stop_position", "stop_position"),
-        geometry = st_sfc(st_point(c(-8.6, 41.1)), st_point(c(-8.61, 41.11)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_point(c(-8.6, 41.1)), sf::st_point(c(-8.61, 41.11)), crs = 4326)
     )
 
     list(
@@ -116,11 +113,11 @@ test_that("osm_shapes_match_routes executes matching flow when osm_file is NULL 
     gtfs <- GTFShift::load_feed(sample_file)
     fx <- setup_match_fixtures(gtfs)
 
-    mock_multilines <- st_sf(
+    mock_multilines <- sf::st_sf(
         osm_id = "rel_1",
         ref = fx$target_route,
         name = paste("Line", fx$target_route),
-        geometry = st_sfc(st_multilinestring(list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))), crs = 4326)
+        geometry = sf::st_sfc(sf::st_multilinestring(list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))), crs = 4326)
     )
 
     mock_osm_data <- list(
@@ -289,15 +286,15 @@ test_that("osm_shapes_match_routes issues warnings when routes or stops are miss
         stringsAsFactors = FALSE
     )
 
-    mock_ways_empty <- st_sf(
+    mock_ways_empty <- sf::st_sf(
         osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
     )
 
-    mock_stops <- st_sf(
+    mock_stops <- sf::st_sf(
         osm_id = "n1",
         public_transport = "stop_position",
-        geometry = st_sfc(st_point(c(-8.6, 41.1)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_point(c(-8.6, 41.1)), crs = 4326)
     )
 
     log_tmp <- withr::local_tempfile(fileext = ".log")
@@ -589,15 +586,15 @@ test_that("osm_shapes_match_routes prints warning messages to console when error
         stringsAsFactors = FALSE
     )
 
-    mock_ways_empty <- st_sf(
+    mock_ways_empty <- sf::st_sf(
         osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
     )
 
-    mock_stops <- st_sf(
+    mock_stops <- sf::st_sf(
         osm_id = "n1",
         public_transport = "stop_position",
-        geometry = st_sfc(st_point(c(-8.6, 41.1)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_point(c(-8.6, 41.1)), crs = 4326)
     )
 
     log_tmp <- withr::local_tempfile(fileext = ".log")

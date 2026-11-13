@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("filter_by_route_name filters by short name exact match", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)

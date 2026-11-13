@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("calendar_nextBusinessWednesday computes next Wednesday without network call when country_code is NA", {
     start_date <- as.Date("2026-07-20") # Monday
     next_wed <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = NA)
@@ -16,7 +14,7 @@ test_that("calendar_nextBusinessWednesday fetches new year holidays when next We
             # Extract year from URL https://date.nager.at/api/v3/PublicHolidays/{year}/{country}
             yr <- gsub(".*/PublicHolidays/([0-9]+)/.*", "\\1", url)
             called_years <<- c(called_years, yr)
-            
+
             content_json <- if (yr == "2026") '[{"date":"2026-12-30"}]' else '[]'
             structure(
                 list(

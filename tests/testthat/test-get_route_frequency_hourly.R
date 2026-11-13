@@ -1,5 +1,3 @@
-library(testthat)
-
 test_that("get_route_frequency_hourly calculates route frequencies", {
     sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
     gtfs <- GTFShift::load_feed(sample_file)
@@ -21,7 +19,7 @@ test_that("get_route_frequency_hourly supports overline = TRUE", {
     expect_s3_class(res, "sf")
     expect_contains(names(res), c("frequency", "hour", "geometry"))
 
-    res_no_overline <- GTFShift::get_route_frequency_hourly(gtfs, date = ref_date, overline = FALSE) 
+    res_no_overline <- GTFShift::get_route_frequency_hourly(gtfs, date = ref_date, overline = FALSE)
     expect_gt(nrow(res), nrow(res_no_overline))
 })
 

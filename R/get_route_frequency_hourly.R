@@ -40,13 +40,13 @@
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
-#' 
+#'
 #' # Get frequency
 #' frequency_analysis <- GTFShift::get_route_frequency_hourly(
 #'   gtfs,
 #'   date = gtfs$calendar$start_date[1]
 #' )
-#' 
+#'
 #' head(frequency_analysis |> sf::st_drop_geometry())
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}

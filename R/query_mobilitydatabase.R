@@ -33,7 +33,7 @@
 #'   country_code = "PT",
 #'   is_official = TRUE
 #' )
-#' 
+#'
 #' head(feeds |> dplyr::select(id, provider, producer_url))
 #'
 #' @importFrom httr GET POST add_headers content http_error http_status

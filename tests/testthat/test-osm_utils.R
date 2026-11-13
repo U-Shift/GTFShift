@@ -1,15 +1,12 @@
-library(testthat)
-library(sf)
-
 test_that("filter_osm_bus_lanes correctly filters bus lane features", {
-    road_osm <- st_sf(
+    road_osm <- sf::st_sf(
         osm_id = c("1", "2", "3"),
         psv = c("designated", "no", "no"),
         `lanes:bus` = c(NA, "0", "1"),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)),
-            st_linestring(matrix(c(1, 1, 2, 2), ncol = 2)),
-            st_linestring(matrix(c(2, 2, 3, 3), ncol = 2)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2)),
+            sf::st_linestring(matrix(c(1, 1, 2, 2), ncol = 2)),
+            sf::st_linestring(matrix(c(2, 2, 3, 3), ncol = 2)),
             crs = 4326
         )
     )

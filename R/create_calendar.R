@@ -18,11 +18,11 @@
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' head(gtfs$calendar_dates |> dplyr::filter(exception_type == 1))
-#' 
+#'
 #' gtfs_calendar <- GTFShift::create_calendar(gtfs)
-#' 
+#'
 #' gtfs_calendar
 #'
 #' @import dplyr

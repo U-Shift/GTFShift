@@ -24,23 +24,23 @@
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
-#' 
+#'
 #' # Build query and prepare osm extract (possible to use API as alternative)
-#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
-#'   osmdata::add_osm_feature(key = "route", value = "bus") |> 
+#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+#'   osmdata::add_osm_feature(key = "route", value = "bus") |>
 #'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
 #' osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
-#' 
+#'
 #' # Prioritise lanes
 #' lane_prioritisation <- GTFShift::prioritise_lanes(
-#'   gtfs, q, 
-#'   osm_file = osm_file,  
+#'   gtfs, q,
+#'   osm_file = osm_file,
 #'   date = gtfs$calendar$start_date[1]
 #' )
-#' 
+#'
 #' # Get statistics for prioritisation
 #' stats <- GTFShift::get_prioritisation_stats(lane_prioritisation)
-#' 
+#'
 #' data.frame(metric = names(stats), value = unlist(stats, use.names = FALSE))
 #'
 #' @import dplyr

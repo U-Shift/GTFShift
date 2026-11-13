@@ -1,24 +1,21 @@
-library(testthat)
-library(sf)
-
 test_that("rt_extend_prioritisation extends lane prioritisation with speed metrics for multiple entries", {
-    lanes_sf <- st_sf(
+    lanes_sf <- sf::st_sf(
         way_osm_id = c("w1", "w2"),
-        geometry = st_sfc(
-            st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(200, 0, 300, 0), ncol = 2, byrow = TRUE)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(200, 0, 300, 0), ncol = 2, byrow = TRUE)),
             crs = 4326
         )
     )
 
-    rt_points <- st_sf(
+    rt_points <- sf::st_sf(
         speed = c(10, 20, 30, 40),
         current_status = c("IN_TRANSIT_TO", "IN_TRANSIT_TO", "STOPPED_AT", "IN_TRANSIT_TO"),
-        geometry = st_sfc(
-            st_point(c(20, 0)),
-            st_point(c(50, 0)),
-            st_point(c(80, 0)), # Filtered out due to status STOPPED_AT
-            st_point(c(250, 0)),
+        geometry = sf::st_sfc(
+            sf::st_point(c(20, 0)),
+            sf::st_point(c(50, 0)),
+            sf::st_point(c(80, 0)), # Filtered out due to status STOPPED_AT
+            sf::st_point(c(250, 0)),
             crs = 4326
         )
     )
@@ -47,30 +44,30 @@ test_that("rt_extend_prioritisation extends lane prioritisation with speed metri
 })
 
 test_that("rt_extend_prioritisation accurately computes speed_p15 and speed_p85 with multiple observations and NA values", {
-    lanes_sf <- st_sf(
+    lanes_sf <- sf::st_sf(
         way_osm_id = c("w1", "w2", "w_empty"),
-        geometry = st_sfc(
-            st_linestring(matrix(c(-9.150, 38.700, -9.140, 38.700), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(-9.130, 38.700, -9.120, 38.700), ncol = 2, byrow = TRUE)),
-            st_linestring(matrix(c(-9.100, 38.700, -9.090, 38.700), ncol = 2, byrow = TRUE)),
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(-9.150, 38.700, -9.140, 38.700), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(-9.130, 38.700, -9.120, 38.700), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(matrix(c(-9.100, 38.700, -9.090, 38.700), ncol = 2, byrow = TRUE)),
             crs = 4326
         )
     )
 
     # w1: 10 points with speeds 10, 20, ..., 100
     w1_lons <- seq(-9.149, -9.141, length.out = 10)
-    w1_points <- lapply(w1_lons, function(x) st_point(c(x, 38.700)))
+    w1_points <- lapply(w1_lons, function(x) sf::st_point(c(x, 38.700)))
     w1_speeds <- seq(10, 100, by = 10)
 
     # w2: 4 points, one with NA speed: speeds 20, 40, NA, 60
     w2_lons <- seq(-9.128, -9.122, length.out = 4)
-    w2_points <- lapply(w2_lons, function(x) st_point(c(x, 38.700)))
+    w2_points <- lapply(w2_lons, function(x) sf::st_point(c(x, 38.700)))
     w2_speeds <- c(20, 40, NA, 60)
 
-    rt_points <- st_sf(
+    rt_points <- sf::st_sf(
         speed = c(w1_speeds, w2_speeds),
         current_status = "IN_TRANSIT_TO",
-        geometry = st_sfc(c(w1_points, w2_points), crs = 4326)
+        geometry = sf::st_sfc(c(w1_points, w2_points), crs = 4326)
     )
 
     res <- GTFShift::rt_extend_prioritisation(lanes_sf, rt_points, metric_crs = 3763)
@@ -100,15 +97,15 @@ test_that("rt_extend_prioritisation accurately computes speed_p15 and speed_p85 
 })
 
 test_that("rt_extend_prioritisation works when metric_crs is default (NULL)", {
-    lanes_sf <- st_sf(
+    lanes_sf <- sf::st_sf(
         way_osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(-9.15, 38.7, -9.14, 38.7), ncol = 2, byrow = TRUE)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(-9.15, 38.7, -9.14, 38.7), ncol = 2, byrow = TRUE)), crs = 4326)
     )
 
-    rt_points <- st_sf(
+    rt_points <- sf::st_sf(
         speed = 25,
         current_status = "IN_TRANSIT_TO",
-        geometry = st_sfc(st_point(c(-9.145, 38.7)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_point(c(-9.145, 38.7)), crs = 4326)
     )
 
     expect_no_warning(
@@ -118,14 +115,14 @@ test_that("rt_extend_prioritisation works when metric_crs is default (NULL)", {
 })
 
 test_that("rt_extend_prioritisation stops when lane_prioritisation is missing way_osm_id column", {
-    invalid_lanes <- st_sf(
+    invalid_lanes <- sf::st_sf(
         id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
     )
 
-    rt_points <- st_sf(
+    rt_points <- sf::st_sf(
         speed = 25,
-        geometry = st_sfc(st_point(c(50, 0)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_point(c(50, 0)), crs = 4326)
     )
 
     expect_error(
@@ -135,14 +132,14 @@ test_that("rt_extend_prioritisation stops when lane_prioritisation is missing wa
 })
 
 test_that("rt_extend_prioritisation stops when rt_collection is missing speed column", {
-    lanes_sf <- st_sf(
+    lanes_sf <- sf::st_sf(
         way_osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
     )
 
-    invalid_rt <- st_sf(
+    invalid_rt <- sf::st_sf(
         velocity = 25,
-        geometry = st_sfc(st_point(c(50, 0)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_point(c(50, 0)), crs = 4326)
     )
 
     expect_error(
@@ -152,14 +149,14 @@ test_that("rt_extend_prioritisation stops when rt_collection is missing speed co
 })
 
 test_that("rt_extend_prioritisation stops when metric_crs is invalid", {
-    lanes_sf <- st_sf(
+    lanes_sf <- sf::st_sf(
         way_osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), crs = 4326)
     )
 
-    rt_points <- st_sf(
+    rt_points <- sf::st_sf(
         speed = 25,
-        geometry = st_sfc(st_point(c(50, 0)), crs = 4326)
+        geometry = sf::st_sfc(sf::st_point(c(50, 0)), crs = 4326)
     )
 
     expect_error(

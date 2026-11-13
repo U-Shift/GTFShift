@@ -14,20 +14,20 @@
 #' gtfs <- tidytransit::read_gtfs(
 #'   system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' summary(gtfs)
-#' 
+#'
 #' # Create shapes from GTFS stops data
 #' gtfs_with_shapes <- GTFShift::create_shapes_from_stops(gtfs)
-#' 
+#'
 #' head(gtfs_with_shapes$shapes)
-#' 
+#'
 #' head(
-#'   gtfs_with_shapes$trips |> 
-#'     dplyr::select(trip_id, shape_id) |> 
+#'   gtfs_with_shapes$trips |>
+#'     dplyr::select(trip_id, shape_id) |>
 #'     dplyr::distinct(shape_id, .keep_all = TRUE)
 #' )
-#' 
+#'
 #' summary(gtfs_with_shapes)
 #'
 #' @import dplyr
@@ -82,6 +82,6 @@ create_shapes_from_stops <- function(gtfs) {
       shape_pt_lon = .data$stop_lon,
       shape_pt_sequence = .data$stop_sequence
     )
-  
+
   return(gtfs)
 }
