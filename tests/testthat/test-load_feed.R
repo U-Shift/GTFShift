@@ -13,13 +13,13 @@ test_that("gtfs simple load", {
 
 test_that("stores file at defined location", {
     tempfolder <- withr::local_tempdir()
-    location <- paste0(tempfolder, "/new_dir/gtfs_tcb_sample.zip")
+    location <- file.path(tempfolder, "new_dir", "gtfs_tcb_sample.zip")
     gtfs <- GTFShift::load_feed(
         system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"),
         store_path = location
     )
     testthat::expect_true(file.exists(location))
-    testthat::expect_true(file.size(location) > 0)
+    testthat::expect_gt(file.size(location), 0)
     testthat::expect_contains(class(gtfs), "tidygtfs")
     zip::zip_list(location) |>
         dplyr::pull(filename) |>
@@ -47,17 +47,18 @@ test_that("creates transfers with custom transfer_distance and transfer_time", {
 })
 
 test_that("load_feed passes custom parameters to gtfsrouter::gtfs_transfer_table", {
-    transfer_table_called <- FALSE
-    captured_d_limit <- NULL
-    captured_min_transfer_time <- NULL
-    captured_network_times <- NULL
+    state <- new.env(parent = emptyenv())
+    state$transfer_table_called <- FALSE
+    state$captured_d_limit <- NULL
+    state$captured_min_transfer_time <- NULL
+    state$captured_network_times <- NULL
 
     testthat::with_mocked_bindings(
         gtfs_transfer_table = function(gtfs_transfers, d_limit, min_transfer_time, network_times, ...) {
-            transfer_table_called <<- TRUE
-            captured_d_limit <<- d_limit
-            captured_min_transfer_time <<- min_transfer_time
-            captured_network_times <<- network_times
+            state$transfer_table_called <- TRUE
+            state$captured_d_limit <- d_limit
+            state$captured_min_transfer_time <- min_transfer_time
+            state$captured_network_times <- network_times
             list(transfers = data.frame(
                 from_stop_id = "s1",
                 to_stop_id = "s2",
@@ -74,10 +75,10 @@ test_that("load_feed passes custom parameters to gtfsrouter::gtfs_transfer_table
                 transfer_time = 240,
                 transfer_street_routing = FALSE
             )
-            expect_true(transfer_table_called)
-            expect_equal(captured_d_limit, 600)
-            expect_equal(captured_min_transfer_time, 240)
-            expect_false(captured_network_times)
+            expect_true(state$transfer_table_called)
+            expect_equal(state$captured_d_limit, 600)
+            expect_equal(state$captured_min_transfer_time, 240)
+            expect_false(state$captured_network_times)
             expect_contains(names(res), "transfers")
             expect_equal(nrow(res$transfers), 1)
         }
@@ -139,9 +140,9 @@ test_that("load_feed removes unused IDs across tables", {
 
 test_that("creates shapes when missing", {
     gtfs <- GTFShift::load_feed(system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"))
-    gtfs_manipulated <- gtfs[!names(gtfs) %in% "shapes"]
+    gtfs_manipulated <- gtfs[names(gtfs) != "shapes"]
     gtfs_manipulated <- tidytransit::as_tidygtfs(gtfs_manipulated)
-    gtfs_manipulated$trips <- gtfs_manipulated$trips[, !names(gtfs_manipulated$trips) %in% "shape_id"]
+    gtfs_manipulated$trips <- gtfs_manipulated$trips[, names(gtfs_manipulated$trips) != "shape_id"]
     location <- withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs_manipulated, location)
     testthat::expect_warning(gtfs_new <- GTFShift::load_feed(location), "CREATED shapes.txt")
@@ -155,8 +156,9 @@ test_that("headers set when calling remote gtfs url", {
     headers <- c("X-App-Id" = API_KEY)
     URL <- "http://example.com/gtfs.zip"
 
-    captured_url <- NULL
-    captured_headers <- NULL
+    state <- new.env(parent = emptyenv())
+    state$captured_url <- NULL
+    state$captured_headers <- NULL
 
     sample_gtfs <- structure(
         list(
@@ -172,8 +174,8 @@ test_that("headers set when calling remote gtfs url", {
 
     testthat::with_mocked_bindings(
         GET = function(url, config, ...) {
-            captured_url <<- url
-            captured_headers <<- config$headers
+            state$captured_url <- url
+            state$captured_headers <- config$headers
             structure(list(status_code = 200), class = "response")
         },
         stop_for_status = function(res) {
@@ -194,6 +196,6 @@ test_that("headers set when calling remote gtfs url", {
         }
     )
 
-    expect_equal(captured_url, URL)
-    expect_equal(captured_headers, headers)
+    expect_equal(state$captured_url, URL)
+    expect_equal(state$captured_headers, headers)
 })

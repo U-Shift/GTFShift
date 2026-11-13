@@ -109,12 +109,14 @@ get_way_frequency_hourly <- function(
     summarize(frequency = n()) |>
     ungroup()
 
+  trips_distinct <- trips |>
+    select(any_of(c("route_id", "direction_id", "shape_id"))) |>
+    distinct()
+
   routes_freq <-
     freq_data |>
     left_join(
-      trips |>
-        select(any_of(c("route_id", "direction_id", "shape_id"))) |>
-        distinct(),
+      trips_distinct,
       by = c("route_id", "direction_id"),
       relationship = "many-to-many"
     ) |>

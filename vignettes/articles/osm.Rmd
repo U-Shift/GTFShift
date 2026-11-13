@@ -41,8 +41,8 @@ GTFShift includes some methods that allow to access its information directly.
 
 ## Using OSM API vs. local OSM extract
 
-By default, GTFShift methods use OSM API to access OpenStreetMap data ([osmdata::osmdata_sf](https://docs.ropensci.org/osmdata/reference/osmdata_sf.html)). 
-However, the API rate is limited, making it hard to download large datasets. 
+By default, GTFShift methods use OSM API to access OpenStreetMap data ([osmdata::osmdata_sf](https://docs.ropensci.org/osmdata/reference/osmdata_sf.html)).
+However, the API rate is limited, making it hard to download large datasets.
 In these cases, it is recommended to use a local OSM extract file.
 For this purpose, most of the methods support the optional parameter `osm_file`. Check each method documentation
 to confirm.
@@ -65,7 +65,7 @@ gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FAL
 # Build OSM query
 library(osmdata)
 q <- opq("Lisbon") |>
-  add_osm_feature(key = "route", value = c("bus")) |>
+  add_osm_feature(key = "route", value = "bus") |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 
 # Call method with osm_file parameter
@@ -91,7 +91,7 @@ get_overpass_url() # You should see the new instance now
 # Now you can call any method on osmdata and the new API instance will be used
 ```
 
-# Download bus lanes 
+# Download bus lanes
 
 Dedicated bus lanes can improve bus transit operation. Understanding their spatial distribution is important to study operation dynamics.
 `osm_bus_lanes` allows to obtain the bus lanes network on OpenStreetMap for a given area.
@@ -129,7 +129,7 @@ gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FAL
 # Build OSM query
 library(osmdata)
 q <- opq("Lisbon") |>
-  add_osm_feature(key = "route", value = c("bus")) |>
+  add_osm_feature(key = "route", value = "bus") |>
   add_osm_feature(key = "network", value = "Carris", key_exact = TRUE)
 ```
 

@@ -50,10 +50,10 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
     expect_equal(r_t1$n_updates, 5)
 
     # Monotonicity of percentiles
-    expect_true(r_t1$speed_p15 <= r_t1$speed_p25)
-    expect_true(r_t1$speed_p25 <= r_t1$speed_median)
-    expect_true(r_t1$speed_median <= r_t1$speed_p75)
-    expect_true(r_t1$speed_p75 <= r_t1$speed_p85)
+    expect_lte(r_t1$speed_p15, r_t1$speed_p25)
+    expect_lte(r_t1$speed_p25, r_t1$speed_median)
+    expect_lte(r_t1$speed_median, r_t1$speed_p75)
+    expect_lte(r_t1$speed_p75, r_t1$speed_p85)
 
     # Trip T2 checks
     r_t2 <- res[res$trip_id == "T2", ]
@@ -457,7 +457,7 @@ test_that("get_trip_speed_profile stops with informative error on invalid inputs
         distance_along_geometry_reversed = 1000
     )
     expect_error(
-        GTFShift::get_trip_speed_profile(df_valid, by = c("non_existent_col")),
+        GTFShift::get_trip_speed_profile(df_valid, by = "non_existent_col"),
         "The following grouping columns specified in 'by' were not found in rt_speed: non_existent_col"
     )
 })
@@ -497,11 +497,11 @@ test_that("get_trip_speed_profile integrates seamlessly with rt_average_speed ou
     expect_equal(nrow(profile), 2)
     expect_equal(profile$trip_id, c("T1", "T2"))
     expect_equal(profile$route_id, c("R1", "R1"))
-    expect_true(all(!is.na(profile$commercial_speed)))
-    expect_true(all(!is.na(profile$commercial_speed_alt)))
-    expect_true(all(!is.na(profile$speed_avg)))
-    expect_true(all(!is.na(profile$speed_p15)))
-    expect_true(all(!is.na(profile$speed_p85)))
+    expect_false(anyNA(profile$commercial_speed))
+    expect_false(anyNA(profile$commercial_speed_alt))
+    expect_false(anyNA(profile$speed_avg))
+    expect_false(anyNA(profile$speed_p15))
+    expect_false(anyNA(profile$speed_p85))
 
     # Global summary check
     global_summary <- attr(profile, "global_summary")

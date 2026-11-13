@@ -11,7 +11,7 @@ test_that("filter_osm_bus_lanes correctly filters bus lane features", {
         )
     )
 
-    filtered <- GTFShift:::filter_osm_bus_lanes(road_osm)
+    filtered <- filter_osm_bus_lanes(road_osm)
     expect_equal(nrow(filtered), 2)
     expect_equal(filtered$osm_id, c("1", "3"))
 })
@@ -91,7 +91,7 @@ test_that("get_osm_relations parses relations with regex feature operator ~", {
                 show_content = function(...) mock_xml_file,
                 .package = "rosmium",
                 code = {
-                    res_regex <- GTFShift:::get_osm_relations(
+                    res_regex <- get_osm_relations(
                         osm_file = "dummy.pbf",
                         q = list(features = '["ref"~"701"]'),
                         pb = make_mock_pb(),
@@ -119,7 +119,7 @@ test_that("get_osm_relations parses relations with exact equality feature operat
                 show_content = function(...) mock_xml_file,
                 .package = "rosmium",
                 code = {
-                    res_exact <- GTFShift:::get_osm_relations(
+                    res_exact <- get_osm_relations(
                         osm_file = "dummy.pbf",
                         q = list(features = '["ref"="701exact"]'),
                         pb = make_mock_pb(),
@@ -147,7 +147,7 @@ test_that("get_osm_relations returns empty data frame when no features match", {
                 show_content = function(...) mock_xml_file,
                 .package = "rosmium",
                 code = {
-                    res_none <- GTFShift:::get_osm_relations(
+                    res_none <- get_osm_relations(
                         osm_file = "dummy.pbf",
                         q = list(features = '["ref"="nonexistent"]'),
                         pb = make_mock_pb(),
@@ -165,12 +165,13 @@ test_that("get_osm_relations correctly forwards custom osm_route_type parameter"
     mock_xml_file <- setup_mock_xml()
     on.exit(unlink(mock_xml_file), add = TRUE)
 
-    passed_filter <- NULL
+    state <- new.env(parent = emptyenv())
+    state$passed_filter <- NULL
 
     testthat::with_mocked_bindings(
         r_bg = function(func, args, ...) {
             # Capture filter string passed to rosmium::tags_filter in r_bg call
-            passed_filter <<- args[[3]]
+            state$passed_filter <- args[[3]]
             make_mock_bg_job()
         },
         .package = "callr",
@@ -179,14 +180,14 @@ test_that("get_osm_relations correctly forwards custom osm_route_type parameter"
                 show_content = function(...) mock_xml_file,
                 .package = "rosmium",
                 code = {
-                    res <- GTFShift:::get_osm_relations(
+                    res <- get_osm_relations(
                         osm_file = "dummy.pbf",
                         q = list(features = '["ref"~"701"]'),
                         pb = make_mock_pb(),
                         osm_route_type = "train"
                     )
 
-                    expect_equal(passed_filter, "train")
+                    expect_equal(state$passed_filter, "train")
                     expect_s3_class(res, "data.frame")
                     expect_equal(nrow(res), 4)
                 }
@@ -196,8 +197,8 @@ test_that("get_osm_relations correctly forwards custom osm_route_type parameter"
 })
 
 test_that("prepare_osm_file handles NULL and non-existent files", {
-    expect_null(GTFShift:::prepare_osm_file(NULL))
-    expect_equal(GTFShift:::prepare_osm_file("non_existent.pbf"), "non_existent.pbf")
+    expect_null(prepare_osm_file(NULL))
+    expect_equal(prepare_osm_file("non_existent.pbf"), "non_existent.pbf")
 })
 
 test_that("prepare_osm_file returns original path when file is in writable directory outside library", {
@@ -207,7 +208,7 @@ test_that("prepare_osm_file returns original path when file is in writable direc
     file.create(test_file)
     on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
 
-    res <- GTFShift:::prepare_osm_file(test_file)
+    res <- prepare_osm_file(test_file)
     expect_equal(res, test_file)
 })
 
@@ -223,7 +224,7 @@ test_that("prepare_osm_file copies file to tempdir when directory is read-only",
         unlink(file.path(tempdir(), "test_ro.pbf"))
     }, add = TRUE)
 
-    res <- GTFShift:::prepare_osm_file(test_file)
+    res <- prepare_osm_file(test_file)
     expect_true(startsWith(res, tempdir()))
     expect_equal(basename(res), "test_ro.pbf")
     expect_true(file.exists(res))

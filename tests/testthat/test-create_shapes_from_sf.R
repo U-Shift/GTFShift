@@ -34,7 +34,7 @@ test_that("create_shapes_from_sf calculates shape_dist_traveled when shape_dist_
 
     shapes_df <- GTFShift::create_shapes_from_sf(sf_lines, gtfs, metric_crs = 3857, shape_dist_traveled = TRUE)
     expect_contains(names(shapes_df), c("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled"))
-    expect_false(any(is.na(shapes_df$shape_dist_traveled)))
+    expect_false(anyNA(shapes_df$shape_dist_traveled))
     expect_equal(shapes_df$shape_dist_traveled[1], 0)
     expect_equal(shapes_df$shape_dist_traveled[2], expected_dist, tolerance = 1e-3)
 

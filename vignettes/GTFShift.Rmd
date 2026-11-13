@@ -45,7 +45,7 @@ the [articles](https://u-shift.github.io/GTFShift/articles/index.html).
 
 ### [Prioritise](https://u-shift.github.io/GTFShift/articles/prioritise.html)
 
-The main purpose of **GTFShift** is to support the decision-making process for 
+The main purpose of **GTFShift** is to support the decision-making process for
 bus lane implementation prioritisation. This article presents a step-by-step guide
 on how to use the package to achieve this goal, from data gathering to analysis and visualization.
 
@@ -112,7 +112,7 @@ network and export the OSM transit routes.
 
 ### [Real Time transit data](https://u-shift.github.io/GTFShift/articles/rt.html)
 
-Real time operational data provides valuable insights about how planned operation 
+Real time operational data provides valuable insights about how planned operation
 performs in practice and how it interacts with the urban traffic conditions.
 
 **GTFShift** provides several methods to enable this data collection and analysis.

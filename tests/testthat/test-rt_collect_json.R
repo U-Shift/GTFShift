@@ -27,8 +27,9 @@ test_that("headers are passed and httr is mocked", {
     URL <- "http://example.com/rt.json"
     headers <- c("Authorization" = "Bearer token123")
 
-    captured_url <- NULL
-    captured_headers <- NULL
+    state <- new.env(parent = emptyenv())
+    state$captured_url <- NULL
+    state$captured_headers <- NULL
 
     parsed_json <- list(
         header = list(timestamp = 1700000000),
@@ -37,8 +38,8 @@ test_that("headers are passed and httr is mocked", {
 
     testthat::with_mocked_bindings(
         GET = function(url, config, ...) {
-            captured_url <<- url
-            captured_headers <<- config$headers
+            state$captured_url <- url
+            state$captured_headers <- config$headers
             structure(list(status_code = 200), class = "response")
         },
         stop_for_status = function(res) {
@@ -64,8 +65,8 @@ test_that("headers are passed and httr is mocked", {
         }
     )
 
-    expect_equal(captured_url, URL)
-    expect_equal(captured_headers, headers)
+    expect_equal(state$captured_url, URL)
+    expect_equal(state$captured_headers, headers)
     expect_true(file.exists(dest_file))
     res_df <- read.csv(dest_file)
     expect_equal(nrow(res_df), 1)
@@ -94,8 +95,8 @@ test_that("parameter variation: log_file", {
 
     expect_true(file.exists(log_file))
     log_content <- readLines(log_file)
-    expect_true(any(grepl("Starting GTFS-RT data collection", log_content)))
-    expect_true(any(grepl("Iteration 1 completed", log_content)))
+    expect_true(any(grepl("Starting GTFS-RT data collection", log_content, fixed = TRUE)))
+    expect_true(any(grepl("Iteration 1 completed", log_content, fixed = TRUE)))
 })
 
 test_that("parameter variation: entity_key custom and NA", {
@@ -177,13 +178,14 @@ test_that("scrape_interval performs at least 3 requests", {
         entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
     )
 
-    request_count <- 0
+    state <- new.env(parent = emptyenv())
+    state$request_count <- 0
     start_time <- Sys.time()
 
     testthat::with_mocked_bindings(
         fromJSON = function(...) {
-            request_count <<- request_count + 1
-            if (request_count > 3) {
+            state$request_count <- state$request_count + 1
+            if (state$request_count > 3) {
                 stop("stop_loop_after_3_requests")
             }
             parsed_json
@@ -202,7 +204,7 @@ test_that("scrape_interval performs at least 3 requests", {
     )
 
     elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-    expect_equal(request_count, 4)
+    expect_equal(state$request_count, 4)
     res_df <- read.csv(dest_file)
     expect_equal(nrow(res_df), 3)
     expect_gte(elapsed_time, 3)
@@ -232,7 +234,7 @@ test_that("rt_collect_json fails gracefully with informative message when intern
             expect_null(res)
             expect_false(file.exists(dest_file))
             expect_true(file.exists(log_file))
-            expect_true(any(grepl("Internet resource unavailable", readLines(log_file))))
+            expect_true(any(grepl("Internet resource unavailable", readLines(log_file), fixed = TRUE)))
         }
     )
 
@@ -255,7 +257,7 @@ test_that("rt_collect_json fails gracefully with informative message when intern
                 "Internet resource unavailable"
             )
             expect_null(res)
-            expect_true(any(grepl("Internet resource unavailable", readLines(log_file2))))
+            expect_true(any(grepl("Internet resource unavailable", readLines(log_file2), fixed = TRUE)))
         }
     )
 
@@ -282,7 +284,7 @@ test_that("rt_collect_json fails gracefully with informative message when intern
             )
             expect_null(res)
             expect_false(file.exists(dest_file))
-            expect_true(any(grepl("Internet resource unavailable", readLines(log_file3))))
+            expect_true(any(grepl("Internet resource unavailable", readLines(log_file3), fixed = TRUE)))
         }
     )
 
@@ -315,7 +317,7 @@ test_that("rt_collect_json fails gracefully with informative message when intern
                         "Failed to parse JSON"
                     )
                     expect_null(res)
-                    expect_true(any(grepl("Failed to parse JSON", readLines(log_file4))))
+                    expect_true(any(grepl("Failed to parse JSON", readLines(log_file4), fixed = TRUE)))
                 }
             )
         }
@@ -325,7 +327,8 @@ test_that("rt_collect_json fails gracefully with informative message when intern
 test_that("rt_collect_json retries when resource temporarily fails in loop mode", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     URL <- "http://example.com/retry.json"
-    req_count <- 0
+    state <- new.env(parent = emptyenv())
+    state$req_count <- 0
     parsed_json <- list(
         header = list(timestamp = 1700000000),
         entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
@@ -333,11 +336,11 @@ test_that("rt_collect_json retries when resource temporarily fails in loop mode"
 
     testthat::with_mocked_bindings(
         fromJSON = function(...) {
-            req_count <<- req_count + 1
-            if (req_count == 1) {
+            state$req_count <- state$req_count + 1
+            if (state$req_count == 1) {
                 stop("cannot open the connection to 'http://example.com/retry.json'")
             }
-            if (req_count == 2) {
+            if (state$req_count == 2) {
                 return(parsed_json)
             }
             stop("stop_after_second_iteration")
@@ -357,6 +360,6 @@ test_that("rt_collect_json retries when resource temporarily fails in loop mode"
             )
         }
     )
-    expect_gte(req_count, 2)
+    expect_gte(state$req_count, 2)
     expect_true(file.exists(dest_file))
 })

@@ -63,7 +63,7 @@ create_shapes_from_stops <- function(gtfs) {
       trip_id = list(.data$trip_id)
     ) |>
     mutate(
-      shape_id = paste0("shape-", 1:n())
+      shape_id = paste0("shape-", seq_len(n()))
     )
 
   # Asssociate trips to shape_id

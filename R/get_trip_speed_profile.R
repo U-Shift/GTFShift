@@ -139,7 +139,7 @@ get_trip_speed_profile <- function(
   required_cols <- c("distance_along_geometry", "distance_along_geometry_reversed", time_col)
   missing_cols <- setdiff(required_cols, colnames(rt_speed))
   if (length(missing_cols) > 0) {
-    stop(paste("rt_speed is missing required column(s):", paste(missing_cols, collapse = ", ")))
+    stop("rt_speed is missing required column(s): ", toString(missing_cols))
   }
 
   # 1. Handle "day" column derivation if included in 'by' but absent in rt_speed
@@ -162,8 +162,8 @@ get_trip_speed_profile <- function(
     } else {
       missing_by <- setdiff(by, colnames(rt_speed))
       if (length(missing_by) > 0) {
-        stop(paste("The following grouping columns specified in 'by' were not found in rt_speed:",
-                   paste(missing_by, collapse = ", ")))
+        stop("The following grouping columns specified in 'by' were not found in rt_speed: ",
+             toString(missing_by))
       }
     }
   }
@@ -241,8 +241,8 @@ get_trip_speed_profile <- function(
       comm_vec <- vapply(trip_res, function(x) x$commercial_speed, numeric(1))
       comm_alt_vec <- vapply(trip_res, function(x) x$commercial_speed_alt, numeric(1))
 
-      commercial_speed <- if (any(!is.na(comm_vec))) round(mean(comm_vec, na.rm = TRUE), 2) else NA_real_
-      commercial_speed_alt <- if (any(!is.na(comm_alt_vec))) round(mean(comm_alt_vec, na.rm = TRUE), 2) else NA_real_
+      commercial_speed <- if (all(is.na(comm_vec))) NA_real_ else round(mean(comm_vec, na.rm = TRUE), 2)
+      commercial_speed_alt <- if (all(is.na(comm_alt_vec))) NA_real_ else round(mean(comm_alt_vec, na.rm = TRUE), 2)
     } else {
       # Single trip within group (standard case)
       trip_res <- compute_single_trip_commercial_speeds(group_df)

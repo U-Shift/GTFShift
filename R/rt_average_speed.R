@@ -146,17 +146,17 @@ rt_average_speed <- function(
   }
   # > rt_collection_trips_geometries_match_col must be one of the columns in rt_collection and trips_geometries
   if (!rt_collection_trips_geometries_match_col %in% colnames(rt_collection)) {
-    stop(paste("rt_collection_trips_geometries_match_col must be one of the columns in rt_collection. Available columns:", paste(colnames(rt_collection), collapse = ", ")))
+    stop("rt_collection_trips_geometries_match_col must be one of the columns in rt_collection. Available columns: ", toString(colnames(rt_collection)))
   }
   if (!rt_collection_trips_geometries_match_col %in% colnames(trips_geometries)) {
-    stop(paste("rt_collection_trips_geometries_match_col must be one of the columns in trips_geometries. Available columns:", paste(colnames(trips_geometries), collapse = ", ")))
+    stop("rt_collection_trips_geometries_match_col must be one of the columns in trips_geometries. Available columns: ", toString(colnames(trips_geometries)))
   }
 
   # > rt_collection must have trip_id and timestamp columns
   required_cols <- c("trip_id", "timestamp")
   missing_cols <- setdiff(required_cols, colnames(rt_collection))
   if (length(missing_cols) > 0) {
-    stop(paste("rt_collection is missing required columns:", paste(missing_cols, collapse = ", ")))
+    stop("rt_collection is missing required columns: ", toString(missing_cols))
   }
 
   if (!is.null(metric_crs)) {
@@ -177,7 +177,7 @@ rt_average_speed <- function(
     purrr::map_dfr(function(trip_df) {
       # If trip has less than 2 updates, ignore it
       if (nrow(trip_df) < 2) {
-        warning(paste("Trip", trip_df[[rt_collection_trips_geometries_match_col]][[1]], "has less than 2 updates. Ignoring it."))
+        warning("Trip ", trip_df[[rt_collection_trips_geometries_match_col]][[1]], " has less than 2 updates. Ignoring it.")
         return(NULL)
       }
       trip_df <- trip_df |> arrange(.data$timestamp)

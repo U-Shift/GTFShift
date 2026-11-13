@@ -129,7 +129,7 @@ rt_collect_json <- function(
     }
 
     if (!is.na(entity_key) && entity_key != "") {
-      entity_parts <- unlist(strsplit(entity_key, "\\."))
+      entity_parts <- unlist(strsplit(entity_key, ".", fixed = TRUE))
       entities_target <- feed
       for (part in entity_parts) {
         if (!is.null(entities_target) && part %in% names(entities_target)) {
@@ -147,7 +147,7 @@ rt_collect_json <- function(
     # For each field in fields_collect, extract the data and add it to the data frame
     feed_df <- data.frame()
     for (field in fields_collect) {
-      field_parts <- unlist(strsplit(field, "\\."))
+      field_parts <- unlist(strsplit(field, ".", fixed = TRUE))
       field_data <- entities
       for (part in field_parts) {
         if (part %in% names(field_data)) {

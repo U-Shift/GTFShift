@@ -15,7 +15,7 @@ filter_osm_bus_lanes <- function(road_osm) {
     # Based on https://wiki.openstreetmap.org/wiki/Bus_lanes
     if_any(any_of("psv"), ~ .x == "designated") |
       if_any(any_of("highway"), ~ .x == "busway") |
-      if_any(any_of(cols_to_check_access), ~ grepl("designated", .x)) |
+      if_any(any_of(cols_to_check_access), ~ grepl("designated", .x, fixed = TRUE)) |
       if_any(any_of(cols_to_check_count), ~ {
         v <- suppressWarnings(as.numeric(sub(";.*$", "", .x)))
         !is.na(v) & v >= 1
@@ -58,7 +58,7 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
 
   relations_xml <- rosmium::show_content(
     relations_pbf,
-    object_type = c("relation"),
+    object_type = "relation",
     output_format = "xml",
     preview = FALSE,
     spinner = FALSE

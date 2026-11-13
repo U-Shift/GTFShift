@@ -3,21 +3,22 @@ test_that("unify merges two GTFS feeds with default parameters", {
     gtfs1 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(8)
     gtfs2 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(4)
 
-    merge_gtfs_called <- FALSE
+    state <- new.env(parent = emptyenv())
+    state$merge_gtfs_called <- FALSE
     real_merge <- gtfstools::merge_gtfs
 
     testthat::with_mocked_bindings(
         merge_gtfs = function(...) {
-            merge_gtfs_called <<- TRUE
+            state$merge_gtfs_called <- TRUE
             real_merge(...)
         },
         .package = "gtfstools",
         code = {
             unified <- GTFShift::unify(gtfs1, gtfs2)
-            expect_true(merge_gtfs_called)
+            expect_true(state$merge_gtfs_called)
             expect_s3_class(unified, "tidygtfs")
             expect_contains(names(unified), c("agency", "routes", "stops", "trips"))
-            expect_equal(length(unique(unified$agency$agency_id)), 2)
+            expect_length(unique(unified$agency$agency_id), 2)
             expect_contains(unique(unified$agency$agency_id), c("8", "4"))
         }
     )
@@ -75,7 +76,7 @@ test_that("unify stores feed to store_path", {
 
     unified <- GTFShift::unify(gtfs1, gtfs2, store_path = tmp_zip)
     expect_true(file.exists(tmp_zip))
-    testthat::expect_true(file.size(tmp_zip) > 0)
+    testthat::expect_gt(file.size(tmp_zip), 0)
     zip::zip_list(tmp_zip) |>
         dplyr::pull(filename) |>
         testthat::expect_contains(c("agency.txt", "routes.txt", "trips.txt", "stops.txt", "stop_times.txt", "shapes.txt"))
