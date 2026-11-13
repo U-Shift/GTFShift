@@ -42,7 +42,6 @@
 #' summary(gtfs_with_shapes)
 #'
 #' @import dplyr
-#' @importFrom tidyr unnest
 #' @importFrom rlang .data
 #'
 #' @export
@@ -71,7 +70,7 @@ create_shapes_from_stops <- function(gtfs) {
     ) |>
     distinct()
 
-  # Gnerate shape_id
+  # Generate shape_id
   shapes <- shapes_trips |>
     group_by(.data$stop_sequence_str) |>
     reframe(
@@ -81,10 +80,12 @@ create_shapes_from_stops <- function(gtfs) {
       shape_id = paste0("shape-", seq_len(n()))
     )
 
-  # Asssociate trips to shape_id
-  shapes_trips_map <- shapes |>
-    tidyr::unnest(cols = "trip_id") |>
-    select("trip_id", "shape_id") |>
+  # Associate trips to shape_id
+  shapes_trips_map <- data.frame(
+    trip_id = unlist(shapes$trip_id, use.names = FALSE),
+    shape_id = rep(shapes$shape_id, lengths(shapes$trip_id)),
+    stringsAsFactors = FALSE
+  ) |>
     distinct()
   gtfs$trips <-
     gtfs$trips |>

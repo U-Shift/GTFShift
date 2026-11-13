@@ -26,19 +26,15 @@ Imports:
   gtfstools (>= 2.0.0),
   sf,
   tidyselect,
-  tidyr,
   lubridate,
   httr,
   jsonlite,
   dplyr,
   osmdata,
-  stringr,
   callr,
-  purrr,
   rlang,
   xml2,
-  withr,
-  units
+  withr
 Suggests: 
     knitr,
     rmarkdown,

@@ -31,7 +31,6 @@
 #'
 #' @import tidytransit
 #' @import dplyr
-#' @importFrom stringr str_detect regex
 #' @importFrom rlang .data
 #'
 #' @export
@@ -50,11 +49,11 @@ filter_by_route_name <- function(
       if (short_name & exact_match) {
         .data$route_short_name %in% values
       } else if (short_name) {
-        str_detect(.data$route_short_name, regex(pattern, ignore_case = TRUE))
+        grepl(pattern, .data$route_short_name, ignore.case = TRUE)
       } else if (!short_name & exact_match) {
         .data$route_long_name %in% values
       } else {
-        str_detect(.data$route_long_name, regex(pattern, ignore_case = TRUE))
+        grepl(pattern, .data$route_long_name, ignore.case = TRUE)
       }
     )
 

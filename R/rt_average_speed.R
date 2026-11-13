@@ -150,7 +150,6 @@
 #'
 #' @import sf
 #' @import dplyr
-#' @importFrom purrr map_dfr
 #' @import rlang
 #' @importFrom rlang .data
 #'
@@ -223,69 +222,70 @@ rt_average_speed <- function(
   }
 
   # 1. Compute speed for each trip update
-  rt_collection |>
-    group_split(.data$trip_id) |>
-    purrr::map_dfr(function(trip_df) {
-      # If trip has less than 2 updates, ignore it
-      if (nrow(trip_df) < 2) {
-        warning(
-          "Trip ",
-          trip_df[[match_col]][[1]],
-          " has less than 2 updates. Ignoring it."
-        )
-        return(NULL)
-      }
-      trip_df <- trip_df |> arrange(.data$timestamp)
-      trip_geometry <- trips_geometries |>
-        filter(!!sym(match_col) == trip_df[[match_col]][[1]])
-
-      projected <- project_points_along_geometry(
-        geometry = trip_geometry,
-        points = trip_df,
-        geometry_sample_meters = geometry_sample_meters,
-        metric_crs = metric_crs
+  trip_dfs <- rt_collection |>
+    group_split(.data$trip_id)
+  trip_res_list <- lapply(trip_dfs, function(trip_df) {
+    # If trip has less than 2 updates, ignore it
+    if (nrow(trip_df) < 2) {
+      warning(
+        "Trip ",
+        trip_df[[match_col]][[1]],
+        " has less than 2 updates. Ignoring it."
       )
-      trip_df <- trip_df |>
-        dplyr::mutate(
-          closest_on_shape = projected$closest_on_geometry,
-          distance_along_geometry = projected$distance_along_geometry,
-          distance_along_geometry_reversed =
-            projected$distance_along_geometry_reversed,
-          distance_to_closest_on_geometry =
-            projected$distance_to_closest_on_geometry
-        )
-      trip_df <- trip_df |>
-        mutate(
-          time_since_prev_sec = .data$timestamp - lag(.data$timestamp),
-          # When computing distances:
-          # 1. Use absolute value to avoid negative distances
-          # 2. Consider both normal and reversed distances and take minimum
-          distance_since_prev_meters_normal = abs(
-            .data$distance_along_geometry - lag(.data$distance_along_geometry)
-          ),
-          distance_since_prev_meters_reversed = abs(
-            .data$distance_along_geometry -
-              lag(.data$distance_along_geometry_reversed)
-          ),
-          distance_since_prev_meters = pmin(
-            .data$distance_since_prev_meters_normal,
-            .data$distance_since_prev_meters_reversed,
-            na.rm = TRUE
-          ),
-          # Compute speed in km/h
-          speed_kmh = (.data$distance_since_prev_meters / 1000) /
-            (.data$time_since_prev_sec / 3600),
-          distance_since_prev_meters = round(
-            .data$distance_since_prev_meters, 2
-          ),
-          speed_kmh = round(.data$speed_kmh, 2),
-          distance_along_geometry = round(.data$distance_along_geometry, 2)
-        ) |>
-        select(
-          -"distance_since_prev_meters_normal",
-          -"distance_since_prev_meters_reversed"
-        )
+      return(NULL)
+    }
+    trip_df <- trip_df |> arrange(.data$timestamp)
+    trip_geometry <- trips_geometries |>
+      filter(!!sym(match_col) == trip_df[[match_col]][[1]])
 
-      return(trip_df)
-    })
+    projected <- project_points_along_geometry(
+      geometry = trip_geometry,
+      points = trip_df,
+      geometry_sample_meters = geometry_sample_meters,
+      metric_crs = metric_crs
+    )
+    trip_df <- trip_df |>
+      dplyr::mutate(
+        closest_on_shape = projected$closest_on_geometry,
+        distance_along_geometry = projected$distance_along_geometry,
+        distance_along_geometry_reversed =
+          projected$distance_along_geometry_reversed,
+        distance_to_closest_on_geometry =
+          projected$distance_to_closest_on_geometry
+      )
+    trip_df <- trip_df |>
+      mutate(
+        time_since_prev_sec = .data$timestamp - lag(.data$timestamp),
+        # When computing distances:
+        # 1. Use absolute value to avoid negative distances
+        # 2. Consider both normal and reversed distances and take minimum
+        distance_since_prev_meters_normal = abs(
+          .data$distance_along_geometry - lag(.data$distance_along_geometry)
+        ),
+        distance_since_prev_meters_reversed = abs(
+          .data$distance_along_geometry -
+            lag(.data$distance_along_geometry_reversed)
+        ),
+        distance_since_prev_meters = pmin(
+          .data$distance_since_prev_meters_normal,
+          .data$distance_since_prev_meters_reversed,
+          na.rm = TRUE
+        ),
+        # Compute speed in km/h
+        speed_kmh = (.data$distance_since_prev_meters / 1000) /
+          (.data$time_since_prev_sec / 3600),
+        distance_since_prev_meters = round(
+          .data$distance_since_prev_meters, 2
+        ),
+        speed_kmh = round(.data$speed_kmh, 2),
+        distance_along_geometry = round(.data$distance_along_geometry, 2)
+      ) |>
+      select(
+        -"distance_since_prev_meters_normal",
+        -"distance_since_prev_meters_reversed"
+      )
+
+    return(trip_df)
+  })
+  dplyr::bind_rows(trip_res_list)
 }
