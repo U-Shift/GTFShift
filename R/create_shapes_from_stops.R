@@ -3,16 +3,27 @@
 #' @param gtfs tidygtfs. GTFS feed.
 #'
 #' @details
-#' The function builds the shapes.txt file from the stop_times.txt and stops.txt files, by grouping trips with the same stop sequence and assigning them the same shape_id.
-#' The resulting shapes are a simplified version of the original ones, as they do not take into account the actual path followed by the vehicles, but only the stop sequence.
-#' This can be useful for some applications that do not require high precision in the shapes, and can be used as a fallback when the original feed does not include shapes.txt file.
+#' The function builds the shapes.txt file from the stop_times.txt and stops.txt
+#' files, by grouping trips with the same stop sequence and assigning them the
+#' same shape_id.
+#' The resulting shapes are a simplified version of the original ones, as they
+#' do not take into account the actual path followed by the vehicles, but only
+#' the stop sequence.
+#' This can be useful for some applications that do not require high precision
+#' in the shapes, and can be used as a fallback when the original feed does not
+#' include shapes.txt file.
 #'
-#' @returns tidygtfs. The GTFS feed with the shapes table defined and the trips table updated with the matching shape_id.
+#' @returns tidygtfs. The GTFS feed with the shapes table defined and the trips
+#'   table updated with the matching shape_id.
 #'
 #' @examples
 #' # Load GTFS without shapes
 #' gtfs <- tidytransit::read_gtfs(
-#'   system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+#'   system.file(
+#'     "extdata/samples",
+#'     "gtfs_ttsl_sample_no_shapes.zip",
+#'     package = "GTFShift"
+#'   )
 #' )
 #'
 #' summary(gtfs)
@@ -41,19 +52,23 @@ create_shapes_from_stops <- function(gtfs) {
   }
 
   # Get stop_sequence_str for each trip (each will be a different shape)
+  stops_coords <- gtfs$stops |> select("stop_id", "stop_lon", "stop_lat")
   shapes_trips <- gtfs$stop_times |>
     select("trip_id", "stop_id", "stop_sequence") |>
     arrange(.data$trip_id, .data$stop_sequence) |>
-    left_join(gtfs$stops |> select("stop_id", "stop_lon", "stop_lat"), by = "stop_id") |>
+    left_join(stops_coords, by = "stop_id") |>
     group_by(.data$trip_id) |>
     arrange(.data$stop_sequence) |>
-    # Create string with stop_id sequence for each trip, to be used as a key to group trips with the same stop sequence
+    # Create string with stop_id sequence for each trip, to be used as a key
+    # to group trips with the same stop sequence
     mutate(stop_sequence_str = paste(.data$stop_id, collapse = "-")) |>
     ungroup()
 
   # Get unique stop_sequence_str
   shapes_trips_geom <- shapes_trips |>
-    select("stop_sequence_str", "stop_id", "stop_sequence", "stop_lon", "stop_lat") |>
+    select(
+      "stop_sequence_str", "stop_id", "stop_sequence", "stop_lon", "stop_lat"
+    ) |>
     distinct()
 
   # Gnerate shape_id
@@ -67,10 +82,14 @@ create_shapes_from_stops <- function(gtfs) {
     )
 
   # Asssociate trips to shape_id
+  shapes_trips_map <- shapes |>
+    tidyr::unnest(cols = "trip_id") |>
+    select("trip_id", "shape_id") |>
+    distinct()
   gtfs$trips <-
     gtfs$trips |>
     select(-"shape_id") |>
-    left_join(shapes |> tidyr::unnest(cols = "trip_id") |> select("trip_id", "shape_id") |> distinct(), by = "trip_id")
+    left_join(shapes_trips_map, by = "trip_id")
 
   # Gather shape_id and shape geometry (from shapes_trips_geom)
   gtfs$shapes <- shapes |>

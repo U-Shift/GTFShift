@@ -2,8 +2,12 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     trip_geom <- sf::st_sf(
         trip_id = c("T1", "T2"),
         geometry = sf::st_sfc(
-            sf::st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)),
-            sf::st_linestring(matrix(c(0, 100, 1000, 100), ncol = 2, byrow = TRUE)),
+            sf::st_linestring(
+                matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)
+            ),
+            sf::st_linestring(
+                matrix(c(0, 100, 1000, 100), ncol = 2, byrow = TRUE)
+            ),
             crs = 3857
         )
     )
@@ -22,7 +26,12 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     )
 
     expect_warning(
-        res <- GTFShift::rt_average_speed(rt_updates, trip_geom, metric_crs = 3857, geometry_sample_meters = 1),
+        res <- GTFShift::rt_average_speed(
+            rt_updates,
+            trip_geom,
+            metric_crs = 3857,
+            geometry_sample_meters = 1
+        ),
         "Trip UNMATCHED_TRIP has less than 2 updates. Ignoring it."
     )
     expect_s3_class(res, "sf")
@@ -43,7 +52,7 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     )
     expect_contains(names(res), expected_cols)
 
-    # Validate first observation in T1 (timestamp == 1000: previous values and speed are NA)
+    # Validate first observation in T1 (timestamp == 1000: previous NA)
     r_t1_1 <- res[res$trip_id == "T1" & res$timestamp == 1000, ]
     expect_identical(nrow(r_t1_1), 1L)
     expect_identical(r_t1_1$distance_along_geometry, 0)
@@ -53,12 +62,14 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     expect_true(is.na(r_t1_1$distance_since_prev_meters))
     expect_true(is.na(r_t1_1$speed_kmh))
 
-    # Validate second observation in T1 (timestamp == 1060 offset by 10m off line: distance_to_closest_on_geometry == 10)
+    # Validate second observation in T1 (timestamp == 1060 offset by 10m)
     r_t1_2 <- res[res$trip_id == "T1" & res$timestamp == 1060, ]
     expect_identical(nrow(r_t1_2), 1L)
     expect_identical(r_t1_2$time_since_prev_sec, 60)
     expect_equal(r_t1_2$distance_along_geometry, 500, tolerance = 1e-2)
-    expect_equal(r_t1_2$distance_along_geometry_reversed, 500, tolerance = 1e-2)
+    expect_equal(
+        r_t1_2$distance_along_geometry_reversed, 500, tolerance = 1e-2
+    )
     expect_equal(r_t1_2$distance_to_closest_on_geometry, 10, tolerance = 1e-2)
     expect_equal(r_t1_2$distance_since_prev_meters, 500, tolerance = 1e-2)
     expect_equal(r_t1_2$speed_kmh, 30, tolerance = 0.5)
@@ -68,20 +79,27 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     expect_identical(nrow(r_t2_1), 1L)
     expect_true(is.na(r_t2_1$speed_kmh))
 
-    # Validate trip T2 (timestamp == 1140: second update, distance 400m over 60s -> 24 km/h)
+    # Validate trip T2 (timestamp == 1140: 400m over 60s -> 24 km/h)
     r_t2_2 <- res[res$trip_id == "T2" & res$timestamp == 1140, ]
     expect_identical(nrow(r_t2_2), 1L)
     expect_identical(r_t2_2$time_since_prev_sec, 60)
     expect_equal(r_t2_2$distance_since_prev_meters, 400, tolerance = 1e-2)
     expect_equal(r_t2_2$distance_along_geometry, 400, tolerance = 1e-2)
-    expect_equal(r_t2_2$distance_along_geometry_reversed, 600, tolerance = 1e-2)
+    expect_equal(
+        r_t2_2$distance_along_geometry_reversed, 600, tolerance = 1e-2
+    )
     expect_equal(r_t2_2$speed_kmh, 24, tolerance = 0.5)
 })
 
-test_that("rt_average_speed issues warning and ignores trips with less than 2 updates", {
+test_that("rt_average_speed warns and ignores trips with < 2 updates", {
     trip_geom <- sf::st_sf(
         trip_id = "T1",
-        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(
+            sf::st_linestring(
+                matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)
+            ),
+            crs = 3857
+        )
     )
 
     rt_updates_single <- sf::st_sf(
@@ -91,7 +109,9 @@ test_that("rt_average_speed issues warning and ignores trips with less than 2 up
     )
 
     expect_warning(
-        res <- GTFShift::rt_average_speed(rt_updates_single, trip_geom, metric_crs = 3857),
+        res <- GTFShift::rt_average_speed(
+            rt_updates_single, trip_geom, metric_crs = 3857
+        ),
         "Trip T1 has less than 2 updates. Ignoring it."
     )
     expect_identical(nrow(res), 0L)
@@ -100,7 +120,12 @@ test_that("rt_average_speed issues warning and ignores trips with less than 2 up
 test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
     trip_geom <- sf::st_sf(
         trip_id = "T1",
-        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(
+            sf::st_linestring(
+                matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)
+            ),
+            crs = 3857
+        )
     )
 
     rt_updates <- sf::st_sf(
@@ -128,7 +153,12 @@ test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
     # MULTILINESTRING trip geometry
     multiline_geom <- sf::st_sf(
         trip_id = "T1",
-        geometry = sf::st_sfc(sf::st_multilinestring(list(matrix(c(0, 0, 500, 0), ncol = 2, byrow = TRUE))), crs = 3857)
+        geometry = sf::st_sfc(
+            sf::st_multilinestring(
+                list(matrix(c(0, 0, 500, 0), ncol = 2, byrow = TRUE))
+            ),
+            crs = 3857
+        )
     )
     expect_error(
         GTFShift::rt_average_speed(rt_updates, multiline_geom),
@@ -137,24 +167,47 @@ test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
 
     # Missing match column in rt_collection
     expect_error(
-        GTFShift::rt_average_speed(rt_updates, trip_geom, rt_collection_trips_geometries_match_col = "missing_col"),
-        "rt_collection_trips_geometries_match_col must be one of the columns in rt_collection"
+        GTFShift::rt_average_speed(
+            rt_updates,
+            trip_geom,
+            rt_collection_trips_geometries_match_col = "missing_col"
+        ),
+        paste0(
+            "rt_collection_trips_geometries_match_col must be ",
+            "one of the columns in rt_collection"
+        )
     )
 
     # Missing match column in trips_geometries
     trip_geom_other_col <- sf::st_sf(
         other_id = "T1",
-        geometry = sf::st_sfc(sf::st_linestring(matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)), crs = 3857)
+        geometry = sf::st_sfc(
+            sf::st_linestring(
+                matrix(c(0, 0, 1000, 0), ncol = 2, byrow = TRUE)
+            ),
+            crs = 3857
+        )
     )
     expect_error(
-        GTFShift::rt_average_speed(rt_updates, trip_geom_other_col, rt_collection_trips_geometries_match_col = "trip_id"),
-        "rt_collection_trips_geometries_match_col must be one of the columns in trips_geometries"
+        GTFShift::rt_average_speed(
+            rt_updates,
+            trip_geom_other_col,
+            rt_collection_trips_geometries_match_col = "trip_id"
+        ),
+        paste0(
+            "rt_collection_trips_geometries_match_col must be ",
+            "one of the columns in trips_geometries"
+        )
     )
 
     # Missing required timestamp column
     rt_no_time <- sf::st_sf(
         trip_id = c("T1", "T1"),
-        geometry = sf::st_sfc(sf::st_point(c(0, 0)), sf::st_point(c(500, 0)), crs = 3857)
+        geometry = sf::st_sfc(
+            sf::st_point(c(0, 0)),
+            sf::st_point(c(500, 0)),
+            crs = 3857
+        )
     )
     expect_error(
         GTFShift::rt_average_speed(rt_no_time, trip_geom),

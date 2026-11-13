@@ -1,22 +1,38 @@
 #' Extend prioritisation with GTFS-RT based speed metrics
 #'
-#' This function extends lane segment indicators for prioritisation with speed metrics produced with GTFS-RT data.
+#' This function extends lane segment indicators for prioritisation with speed
+#' metrics produced with GTFS-RT data.
 #'
-#' @param lane_prioritisation sf data.frame. Result of \code{GTFShift::prioritise_lanes()}
-#' @param rt_collection sf data.frame. GTFS-RT data collection. Must include \code{speed} column.
-#' @param rt_current_status Character vector (Default \code{c("IN_TRANSIT_TO")}). If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status} in this vector are considered.
-#' @param lane_buffer numeric (Default 15). Buffer distance (in meters) to create around lane segments to capture nearby GTFS-RT points.
-#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to apply lane buffer distances in meters. If NULL, spherical geometry (s2) is used by default.
+#' @param lane_prioritisation sf data.frame. Result of
+#'   \code{GTFShift::prioritise_lanes()}
+#' @param rt_collection sf data.frame. GTFS-RT data collection. Must include
+#'   \code{speed} column.
+#' @param rt_current_status Character vector (Default
+#'   \code{c("IN_TRANSIT_TO")}). If the \code{current_status} column is present
+#'   in the \code{rt_collection} data, only points with \code{current_status} in
+#'   this vector are considered.
+#' @param lane_buffer numeric (Default 15). Buffer distance (in meters) to
+#'   create around lane segments to capture nearby GTFS-RT points.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS
+#'   used to apply lane buffer distances in meters. If NULL, spherical geometry
+#'   (s2) is used by default.
 #'
 #' @details
-#' Extends the \code{lane_prioritisation} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
+#' Extends the \code{lane_prioritisation} data with speed metrics calculated
+#' from the GTFS-RT data points that fall within a buffer around each lane
+#' segment.
 #'
-#' If GTFS-RT data does not provide speed information, it can be inferred from the progression of position updates through time using \code{GTFShift::rt_average_speed()}.
+#' If GTFS-RT data does not provide speed information, it can be inferred from
+#' the progression of position updates through time using
+#' \code{GTFShift::rt_average_speed()}.
 #'
-#' Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
+#' Refer to \code{GTFShift::rt_collect_json()} or
+#' \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data
+#' collection.
 #'
 #'
-#' @returns sf data.frame. Extended lane prioritisation with the following columns:
+#' @returns sf data.frame. Extended lane prioritisation with the following
+#'   columns:
 #' \describe{
 #'   \item{speed_avg}{The average speed of the vehicles on the way.}
 #'   \item{speed_median}{The median speed of the vehicles on the way.}
@@ -33,13 +49,21 @@
 #'   "gtfs_tcb_sample.zip",
 #'   package = "GTFShift"
 #' ))
-#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, "4")
 #'
 #' # Build query and prepare osm extract (possible to use API as alternative)
-#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+#' bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+#' q <- osmdata::opq(bbox = bbox) |>
 #'   osmdata::add_osm_feature(key = "route", value = "bus") |>
-#'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-#' osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
+#'   osmdata::add_osm_feature(
+#'     key = "operator",
+#'     value = "Transportes Colectivos do Barreiro"
+#'   )
+#' osm_file <- system.file(
+#'   "extdata/samples",
+#'   "osmextract_tcb_network.pbf",
+#'   package = "GTFShift"
+#' )
 #'
 #' # Prioritise lanes
 #' lane_prioritisation <- GTFShift::prioritise_lanes(
@@ -83,13 +107,19 @@ rt_extend_prioritisation <- function(
   required_cols <- "way_osm_id"
   missing_cols <- setdiff(required_cols, colnames(lane_prioritisation))
   if (length(missing_cols) > 0) {
-    stop("lane_prioritisation is missing required columns: ", toString(missing_cols))
+    stop(
+      "lane_prioritisation is missing required columns: ",
+      toString(missing_cols)
+    )
   }
   rt_attr_speed <- "speed"
   required_rt_cols <- rt_attr_speed
   missing_rt_cols <- setdiff(required_rt_cols, colnames(rt_collection))
   if (length(missing_rt_cols) > 0) {
-    stop("rt_collection is missing required columns: ", toString(missing_rt_cols))
+    stop(
+      "rt_collection is missing required columns: ",
+      toString(missing_rt_cols)
+    )
   }
   if (!is.null(metric_crs)) {
     metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
@@ -101,23 +131,33 @@ rt_extend_prioritisation <- function(
 
   # Display feedback
   if (!requireNamespace("progress", quietly = TRUE)) {
-    stop("Package 'progress' is required for this function. Install it with: install.packages('progress')")
+    stop(
+      "Package 'progress' is required for this function. ",
+      "Install it with: install.packages('progress')"
+    )
   }
+  pb_fmt <- paste0(
+    "Extending prioritisation with GTFS-RT metrics ",
+    "[:bar] :percent :spin elapsed=:elapsed"
+  )
   pb <- progress::progress_bar$new( # Track progress
-    format = "Extending prioritisation with GTFS-RT metrics [:bar] :percent :spin elapsed=:elapsed",
+    format = pb_fmt,
     clear = FALSE, show_after = 0
   )
   pb$update(0)
 
   # 2. Get only updates IN_TRANSIT
-  if (!is.null(rt_current_status) && "current_status" %in% colnames(rt_collection)) {
+  has_status <- !is.null(rt_current_status) &&
+    "current_status" %in% colnames(rt_collection)
+  if (has_status) {
     rt_collection <- rt_collection |>
       dplyr::filter(.data$current_status %in% rt_current_status)
   }
   pb$update(0.166)
 
   # 3. Get unique lane segments (to optimize spatial join)
-  job <- callr::r_bg(function(lane_prioritisation) { # update spinner while blocking method call
+  # update spinner while blocking method call
+  job <- callr::r_bg(function(lane_prioritisation) {
     requireNamespace("sf", quietly = TRUE)
     lanes_unique <- lane_prioritisation |>
       dplyr::distinct(.data$way_osm_id, .keep_all = TRUE) |>
@@ -132,7 +172,13 @@ rt_extend_prioritisation <- function(
   pb$update(0.333)
 
   # 4. Create buffers in lane segments to overlap with updates
-  job <- callr::r_bg(function(lanes_unique, lane_buffer, metric_crs, rt_collection_crs) { # update spinner while blocking method call
+  # update spinner while blocking method call
+  job <- callr::r_bg(function(
+    lanes_unique,
+    lane_buffer,
+    metric_crs,
+    rt_collection_crs
+  ) {
     if (!is.null(metric_crs)) {
       lanes_unique <- sf::st_transform(lanes_unique, crs = metric_crs)
     }
@@ -148,7 +194,8 @@ rt_extend_prioritisation <- function(
   pb$update(0.5)
 
   # 4. Spatial join between lane buffers and rt_collection points
-  job <- callr::r_bg(function(rt_collection, lane_buffers) { # update spinner while blocking method call
+  # update spinner while blocking method call
+  job <- callr::r_bg(function(rt_collection, lane_buffers) {
     requireNamespace("sf", quietly = TRUE)
     lane_buffers_way <- lane_buffers |> dplyr::select("way_osm_id")
     joined <- sf::st_join(
@@ -167,17 +214,34 @@ rt_extend_prioritisation <- function(
   pb$update(0.666)
 
   # 5. Aggregate speed metrics by way_osm_id
-  job <- callr::r_bg(function(overlap, rt_attr_speed) { # update spinner while blocking method call
+  # update spinner while blocking method call
+  job <- callr::r_bg(function(overlap, rt_attr_speed) {
     requireNamespace("rlang", quietly = TRUE)
     metrics <- overlap |>
       dplyr::group_by(.data$way_osm_id) |>
       dplyr::summarise(
         speed_avg = mean(.data[[rt_attr_speed]], na.rm = TRUE),
         speed_median = stats::median(.data[[rt_attr_speed]], na.rm = TRUE),
-        speed_p15 = stats::quantile(.data[[rt_attr_speed]], probs = 0.15, na.rm = TRUE),
-        speed_p25 = stats::quantile(.data[[rt_attr_speed]], probs = 0.25, na.rm = TRUE),
-        speed_p75 = stats::quantile(.data[[rt_attr_speed]], probs = 0.75, na.rm = TRUE),
-        speed_p85 = stats::quantile(.data[[rt_attr_speed]], probs = 0.85, na.rm = TRUE),
+        speed_p15 = stats::quantile(
+          .data[[rt_attr_speed]],
+          probs = 0.15,
+          na.rm = TRUE
+        ),
+        speed_p25 = stats::quantile(
+          .data[[rt_attr_speed]],
+          probs = 0.25,
+          na.rm = TRUE
+        ),
+        speed_p75 = stats::quantile(
+          .data[[rt_attr_speed]],
+          probs = 0.75,
+          na.rm = TRUE
+        ),
+        speed_p85 = stats::quantile(
+          .data[[rt_attr_speed]],
+          probs = 0.85,
+          na.rm = TRUE
+        ),
         speed_count = dplyr::n()
       ) |>
       dplyr::ungroup()
@@ -191,7 +255,8 @@ rt_extend_prioritisation <- function(
   pb$update(0.833)
 
   # 6. Join speed metrics back to lane_prioritisation
-  job <- callr::r_bg(function(lane_prioritisation, speed_metrics) { # update spinner while blocking method call
+  # update spinner while blocking method call
+  job <- callr::r_bg(function(lane_prioritisation, speed_metrics) {
     requireNamespace("sf", quietly = TRUE)
     extended <- lane_prioritisation |>
       dplyr::left_join(speed_metrics, by = "way_osm_id")

@@ -1,15 +1,18 @@
 #' Classify bus frequency level of service based on HCM
 #'
 #' @param frequencies data.frame. Data frame with frequency information.
-#' @param frequency_col String (Default "frequency"). Name of the column with frequency values.
+#' @param frequency_col String (Default "frequency"). Name of the column with
+#'   frequency values.
 #'
 #' @details
-#' Classifies bus frequency level of service (LOS) based on the Highway Capacity Manual (HCM) 2000 guidelines
-#' on "Service Frequency LOS for Urban Scheduled Transit Service" (Exhibit 27-1).
+#' Classifies bus frequency level of service (LOS) based on the Highway Capacity
+#' Manual (HCM) 2000 guidelines on "Service Frequency LOS for Urban Scheduled
+#' Transit Service" (Exhibit 27-1).
 #'
 #' Refer to \code{vignette("classify")} for more details on this classification.
 #'
-#' @returns data.frame. Input data frame with an additional column \code{frequency_los} indicating the LOS classification.
+#' @returns data.frame. Input data frame with an additional column
+#'   \code{frequency_los} indicating the LOS classification.
 #'
 #' @examples
 #' # Subset GTFS for one route only, for demo purposes

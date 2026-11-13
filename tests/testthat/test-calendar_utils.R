@@ -1,100 +1,134 @@
-test_that("calendar_nextBusinessWednesday computes next Wednesday without network call when country_code is NA", {
+test_that(
+  paste0(
+    "calendar_nextBusinessWednesday computes next Wednesday ",
+    "without network call when country_code is NA"
+  ),
+  {
     start_date <- as.Date("2026-07-20") # Monday
-    next_wed <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = NA)
+    next_wed <- GTFShift::calendar_nextBusinessWednesday(
+      start_date = start_date, country_code = NA
+    )
     expect_identical(next_wed, as.Date("2026-07-22"))
-})
+  }
+)
 
-test_that("calendar_nextBusinessWednesday fetches new year holidays when next Wednesday triggers new year", {
-    # 2026-12-30 is Wednesday. If 2026-12-30 is a holiday, the next Wednesday is 2027-01-06 (new year)
+test_that(
+  paste0(
+    "calendar_nextBusinessWednesday fetches new year holidays ",
+    "when next Wednesday triggers new year"
+  ),
+  {
+    # 2026-12-30 is Wednesday. If 2026-12-30 is a holiday,
+    # the next Wednesday is 2027-01-06 (new year)
     start_date <- as.Date("2026-12-28") # Monday
     state <- new.env(parent = emptyenv())
     state$called_years <- NULL
 
     testthat::with_mocked_bindings(
-        GET = function(url, ...) {
-            # Extract year from URL https://date.nager.at/api/v3/PublicHolidays/{year}/{country}
-            yr <- gsub(".*/PublicHolidays/([0-9]+)/.*", "\\1", url)
-            state$called_years <- c(state$called_years, yr)
+      GET = function(url, ...) {
+        # Extract year from URL
+        # https://date.nager.at/api/v3/PublicHolidays/{year}/{country}
+        yr <- gsub(".*/PublicHolidays/([0-9]+)/.*", "\\1", url)
+        state$called_years <- c(state$called_years, yr)
 
-            content_json <- if (yr == "2026") '[{"date":"2026-12-30"}]' else '[]'
-            structure(
-                list(
-                    status_code = 200,
-                    url = url,
-                    headers = list("Content-Type" = "application/json"),
-                    content = charToRaw(content_json)
-                ),
-                class = "response"
-            )
-        },
-        .package = "httr",
-        code = {
-            next_wed <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT")
-            expect_identical(next_wed, as.Date("2027-01-06"))
+        content_json <- if (yr == "2026") {
+          '[{"date":"2026-12-30"}]'
+        } else {
+          "[]"
         }
+        structure(
+          list(
+            status_code = 200,
+            url = url,
+            headers = list("Content-Type" = "application/json"),
+            content = charToRaw(content_json)
+          ),
+          class = "response"
+        )
+      },
+      .package = "httr",
+      code = {
+        next_wed <- GTFShift::calendar_nextBusinessWednesday(
+          start_date = start_date, country_code = "PT"
+        )
+        expect_identical(next_wed, as.Date("2027-01-06"))
+      }
     )
 
     expect_identical(state$called_years, c("2026", "2027"))
-})
+  }
+)
 
 test_that("calendar_nextBusinessWednesday handles mocked holiday response", {
-    start_date <- as.Date("2026-07-20") # Monday
+  start_date <- as.Date("2026-07-20") # Monday
 
-    testthat::with_mocked_bindings(
-        GET = function(url, ...) {
-            structure(
-                list(
-                    status_code = 200,
-                    url = url,
-                    headers = list("Content-Type" = "application/json"),
-                    content = charToRaw('[{"date":"2026-07-22"}]')
-                ),
-                class = "response"
-            )
-        },
-        .package = "httr",
-        code = {
-            next_wed <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT")
-            expect_identical(next_wed, as.Date("2026-07-29"))
-        }
-    )
+  testthat::with_mocked_bindings(
+    GET = function(url, ...) {
+      structure(
+        list(
+          status_code = 200,
+          url = url,
+          headers = list("Content-Type" = "application/json"),
+          content = charToRaw('[{"date":"2026-07-22"}]')
+        ),
+        class = "response"
+      )
+    },
+    .package = "httr",
+    code = {
+      next_wed <- GTFShift::calendar_nextBusinessWednesday(
+        start_date = start_date, country_code = "PT"
+      )
+      expect_identical(next_wed, as.Date("2026-07-29"))
+    }
+  )
 })
 
-test_that("calendar_nextBusinessWednesday fails gracefully when API does not respond with status 200 or is unreachable", {
+test_that(
+  paste0(
+    "calendar_nextBusinessWednesday fails gracefully when API ",
+    "does not respond with status 200 or is unreachable"
+  ),
+  {
     start_date <- as.Date("2026-07-20") # Monday
 
     testthat::with_mocked_bindings(
-        GET = function(url, ...) {
-            structure(
-                list(
-                    status_code = 500,
-                    url = url
-                ),
-                class = "response"
-            )
-        },
-        .package = "httr",
-        code = {
-            expect_message(
-                res <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT"),
-                "Internet resource unavailable"
-            )
-            expect_identical(res, as.Date("2026-07-22"))
-        }
+      GET = function(url, ...) {
+        structure(
+          list(
+            status_code = 500,
+            url = url
+          ),
+          class = "response"
+        )
+      },
+      .package = "httr",
+      code = {
+        expect_message(
+          res <- GTFShift::calendar_nextBusinessWednesday(
+            start_date = start_date, country_code = "PT"
+          ),
+          "Internet resource unavailable"
+        )
+        expect_identical(res, as.Date("2026-07-22"))
+      }
     )
 
     # When network fails completely (e.g. timeout / connection refused)
     testthat::with_mocked_bindings(
-        GET = function(url, ...) {
-            stop("Connection timed out")
-        },
-        .package = "httr",
-        code = {
-            expect_message(
-                res <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT"),
-                "Internet resource unavailable"
-            )
-            expect_identical(res, as.Date("2026-07-22"))
-        }
+      GET = function(url, ...) {
+        stop("Connection timed out")
+      },
+      .package = "httr",
+      code = {
+        expect_message(
+          res <- GTFShift::calendar_nextBusinessWednesday(
+            start_date = start_date, country_code = "PT"
+          ),
+          "Internet resource unavailable"
+        )
+        expect_identical(res, as.Date("2026-07-22"))
+      }
     )
-})
+  }
+)

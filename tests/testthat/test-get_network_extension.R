@@ -1,27 +1,46 @@
-test_that("get_network_extension calculates network route extension in meters", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
-  gtfs <- GTFShift::load_feed(sample_file)
+test_that(
+  "get_network_extension calculates network route extension in meters",
+  {
+    sample_file <- system.file(
+      "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    )
+    gtfs <- GTFShift::load_feed(sample_file)
 
-  ref_date <- gtfs$calendar$start_date[1]
+    ref_date <- gtfs$calendar$start_date[1]
 
-  ext <- GTFShift::get_network_extension(gtfs, date = ref_date, metric_crs = 3857)
-  expect_true(is.numeric(ext) || inherits(ext, "units"))
-  expect_gt(as.numeric(ext), 0)
-})
+    ext <- GTFShift::get_network_extension(
+      gtfs, date = ref_date, metric_crs = 3857
+    )
+    expect_true(is.numeric(ext) || inherits(ext, "units"))
+    expect_gt(as.numeric(ext), 0)
+  }
+)
 
 test_that("get_network_extension throws error for invalid route_identifier", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+  sample_file <- system.file(
+    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+  )
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 
   expect_error(
-    GTFShift::get_network_extension(gtfs, route_identifier = "invalid_id", date = ref_date, metric_crs = 3857),
-    "route_identifier should be one of: route_id, route_short_name or route_long_name"
+    GTFShift::get_network_extension(
+      gtfs,
+      route_identifier = "invalid_id",
+      date = ref_date,
+      metric_crs = 3857
+    ),
+    paste0(
+      "route_identifier should be one of: ",
+      "route_id, route_short_name or route_long_name"
+    )
   )
 })
 
 test_that("get_network_extension throws error for invalid metric_crs", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+  sample_file <- system.file(
+    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+  )
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 
@@ -32,7 +51,9 @@ test_that("get_network_extension throws error for invalid metric_crs", {
 })
 
 test_that("get_network_extension works when metric_crs is default (NULL)", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+  sample_file <- system.file(
+    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+  )
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 
@@ -44,7 +65,9 @@ test_that("get_network_extension works when metric_crs is default (NULL)", {
 })
 
 test_that("get_network_extension works with parameter variations", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+  sample_file <- system.file(
+    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+  )
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 

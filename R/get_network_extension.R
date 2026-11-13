@@ -3,16 +3,27 @@
 #' Get total extension of GTFS feed routes
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param route_identifier String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.
-#' @param direction_wise Boolean (Default \code{TRUE}). If TRUE, extension considers sum of both directions. Otherwise, only one direction is considered.
-#' @param unified Boolean (Default \code{FALSE}). If TRUE, overlapping route segments are only counted once in the total extension.
-#' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
-#' @param use_osm_routes osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.
-#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to compute route lengths in meters. If NULL, spherical geometry (s2) is used by default.
+#' @param route_identifier String. (Default \code{"route_id"}). routes.txt
+#'   attribute that identifies routes. Accepted values: route_id,
+#'   route_short_name, route_long_name.
+#' @param direction_wise Boolean (Default \code{TRUE}). If TRUE, extension
+#'   considers sum of both directions. Otherwise, only one direction is
+#'   considered.
+#' @param unified Boolean (Default \code{FALSE}). If TRUE, overlapping route
+#'   segments are only counted once in the total extension.
+#' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
+#'   Reference date to consider when analyzing the GTFS file.
+#' @param use_osm_routes osmdata::opq (Default NA). If overpass query for
+#'   transit network is defined, analysis is performed considering OSM route
+#'   geometry, using \code{GTFShift::osm_shapes_to_routes}.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS
+#'   used to compute route lengths in meters. If NULL, spherical geometry (s2)
+#'   is used by default.
 #'
 #' @details
-#' This method calculates the sum of the GTFS feed routes length, considering, for each, the shape of the variant with the highest frequency for the given date
-#' (using \code{GTFShift::get_route_frequency_hourly()}).
+#' This method calculates the sum of the GTFS feed routes length, considering,
+#' for each, the shape of the variant with the highest frequency for the given
+#' date (using \code{GTFShift::get_route_frequency_hourly()}).
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
 #' @returns Numeric. The routes extension, in meters.
@@ -47,8 +58,12 @@ get_network_extension <- function(
   metric_crs = NULL
 ) {
   # 0. Validations
-  if (!(route_identifier %in% c("route_id", "route_short_name", "route_long_name"))) {
-    stop("route_identifier should be one of: route_id, route_short_name or route_long_name")
+  valid_ids <- c("route_id", "route_short_name", "route_long_name")
+  if (!(route_identifier %in% valid_ids)) {
+    stop(
+      "route_identifier should be one of: ",
+      "route_id, route_short_name or route_long_name"
+    )
   }
   if (!is.null(metric_crs)) {
     metric_crs <- suppressWarnings(sf::st_crs(metric_crs))
@@ -58,7 +73,12 @@ get_network_extension <- function(
   }
 
   # Compute hourly frequencies for each route
-  network <- gtfs |> GTFShift::get_route_frequency_hourly(date = date, use_osm_routes = use_osm_routes, overline = FALSE)
+  network <- gtfs |>
+    GTFShift::get_route_frequency_hourly(
+      date = date,
+      use_osm_routes = use_osm_routes,
+      overline = FALSE
+    )
 
   # Get unique shapes
   shapes_unique <- network |>
@@ -77,9 +97,13 @@ get_network_extension <- function(
   # Get shape with max frequencies per route
   network_redux_max <- network_redux |>
     # Get max frequency shape per route (and direction, if direction_wise=TRUE)
-    group_by(.data[[route_identifier]], .data$shape_id, !!!if (direction_wise) rlang::syms("direction_id")) |>
+    group_by(
+      .data[[route_identifier]],
+      .data$shape_id,
+      !!!if (direction_wise) rlang::syms("direction_id")
+    ) |>
     summarise(frequency_max = max(.data$frequency_day)) |>
-    # Get shape with max frequency per route (and direction, if direction_wise=TRUE)
+    # Get shape with max frequency per route (and direction, if direction_wise)
     group_by(
       .data[[route_identifier]],
       !!!if (direction_wise) rlang::syms("direction_id")
@@ -97,12 +121,16 @@ get_network_extension <- function(
   }
 
   geom_col <- st_geometry(network_redux_shapes)
-  network_redux_shapes <- network_redux_shapes |> mutate(length = st_length(geom_col))
+  network_redux_shapes <- network_redux_shapes |>
+    mutate(length = st_length(geom_col))
 
   # Compute unified network extension
   if (unified) {
     if (!requireNamespace("stplanr", quietly = TRUE)) {
-      stop("Package 'stplanr' is required when unified=TRUE. Install it with: install.packages('stplanr')")
+      stop(
+        "Package 'stplanr' is required when unified=TRUE. ",
+        "Install it with: install.packages('stplanr')"
+      )
     }
     network_union <- network_redux_shapes |>
       st_union() |>

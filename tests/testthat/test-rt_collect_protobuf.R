@@ -1,4 +1,4 @@
-test_that("rt_collect_protobuf decodes protobuf and passes to rt_collect_json via mocks", {
+test_that("rt_collect_protobuf decodes protobuf and passes via mocks", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     pb_file <- withr::local_tempfile(fileext = ".pb")
     file.create(pb_file)
@@ -11,7 +11,12 @@ test_that("rt_collect_protobuf decodes protobuf and passes to rt_collect_json vi
         code = {
             testthat::with_mocked_bindings(
                 rt_collect_json = function(...) {
-                    write.table(data.frame(id = "1"), file = dest_file, sep = ",", row.names = FALSE)
+                    write.table(
+                        data.frame(id = "1"),
+                        file = dest_file,
+                        sep = ",",
+                        row.names = FALSE
+                    )
                 },
                 .package = "GTFShift",
                 code = {
@@ -63,12 +68,19 @@ test_that("headers are passed and httr is mocked", {
             testthat::with_mocked_bindings(
                 readProtoFiles = function(...) TRUE,
                 P = function(...) TRUE,
-                read = function(...) structure(list(id = "1"), class = "Message"),
+                read = function(...) {
+                    structure(list(id = "1"), class = "Message")
+                },
                 .package = "RProtoBuf",
                 code = {
                     testthat::with_mocked_bindings(
                         rt_collect_json = function(...) {
-                            write.table(data.frame(id = "1"), file = dest_file, sep = ",", row.names = FALSE)
+                            write.table(
+                                data.frame(id = "1"),
+                                file = dest_file,
+                                sep = ",",
+                                row.names = FALSE
+                            )
                         },
                         .package = "GTFShift",
                         code = {
@@ -104,7 +116,12 @@ test_that("parameter variation: log_file", {
         code = {
             testthat::with_mocked_bindings(
                 rt_collect_json = function(...) {
-                    write.table(data.frame(id = "1"), file = dest_file, sep = ",", row.names = FALSE)
+                    write.table(
+                        data.frame(id = "1"),
+                        file = dest_file,
+                        sep = ",",
+                        row.names = FALSE
+                    )
                 },
                 .package = "GTFShift",
                 code = {
@@ -121,8 +138,14 @@ test_that("parameter variation: log_file", {
 
     expect_true(file.exists(log_file))
     log_content <- readLines(log_file)
-    expect_true(any(grepl("Starting GTFS-RT data collection", log_content, fixed = TRUE)))
-    expect_true(any(grepl("Iteration 1 completed", log_content, fixed = TRUE)))
+    expect_true(
+        any(grepl(
+            "Starting GTFS-RT data collection", log_content, fixed = TRUE
+        ))
+    )
+    expect_true(
+        any(grepl("Iteration 1 completed", log_content, fixed = TRUE))
+    )
 })
 
 test_that("test incrementality in response", {
@@ -130,9 +153,15 @@ test_that("test incrementality in response", {
     pb_file <- withr::local_tempfile(fileext = ".pb")
     file.create(pb_file)
 
-    msg_header <- structure(list(timestamp = 1700000000, incrementality = "FULL_DATASET"), class = "Message")
+    msg_header <- structure(
+        list(timestamp = 1700000000, incrementality = "FULL_DATASET"),
+        class = "Message"
+    )
     msg_entity <- list(structure(list(id = "1"), class = "Message"))
-    feed_msg <- structure(list(header = msg_header, entity = msg_entity), class = "Message")
+    feed_msg <- structure(
+        list(header = msg_header, entity = msg_entity),
+        class = "Message"
+    )
 
     testthat::with_mocked_bindings(
         readProtoFiles = function(...) TRUE,
@@ -185,14 +214,16 @@ test_that("scrape_interval performs at least 3 requests", {
         }
     )
 
-    elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+    elapsed_time <- as.numeric(
+        difftime(Sys.time(), start_time, units = "secs")
+    )
     expect_identical(state$request_count, 4)
     res_df <- read.csv(dest_file)
     expect_identical(nrow(res_df), 3L)
     expect_gte(elapsed_time, 3)
 })
 
-test_that("rt_collect_protobuf fails gracefully with informative message when internet resource is unavailable", {
+test_that("rt_collect_protobuf fails gracefully when resource unavailable", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     log_file <- withr::local_tempfile(fileext = ".log")
     URL <- "http://example.com/unavailable.pb"
@@ -216,7 +247,13 @@ test_that("rt_collect_protobuf fails gracefully with informative message when in
             expect_null(res)
             expect_false(file.exists(dest_file))
             expect_true(file.exists(log_file))
-            expect_true(any(grepl("Internet resource unavailable", readLines(log_file), fixed = TRUE)))
+            expect_true(
+                any(grepl(
+                    "Internet resource unavailable",
+                    readLines(log_file),
+                    fixed = TRUE
+                ))
+            )
         }
     )
 
@@ -243,12 +280,18 @@ test_that("rt_collect_protobuf fails gracefully with informative message when in
             )
             expect_null(res)
             expect_false(file.exists(dest_file))
-            expect_true(any(grepl("Internet resource unavailable", readLines(log_file2), fixed = TRUE)))
+            expect_true(
+                any(grepl(
+                    "Internet resource unavailable",
+                    readLines(log_file2),
+                    fixed = TRUE
+                ))
+            )
         }
     )
 })
 
-test_that("rt_collect_protobuf retries when resource temporarily fails in loop mode", {
+test_that("rt_collect_protobuf retries when resource fails in loop mode", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     URL <- "http://example.com/retry.pb"
     state <- new.env(parent = emptyenv())
@@ -281,7 +324,12 @@ test_that("rt_collect_protobuf retries when resource temporarily fails in loop m
                 code = {
                     testthat::with_mocked_bindings(
                         rt_collect_json = function(...) {
-                            write.table(data.frame(id = "1"), file = dest_file, sep = ",", row.names = FALSE)
+                            write.table(
+                                data.frame(id = "1"),
+                                file = dest_file,
+                                sep = ",",
+                                row.names = FALSE
+                            )
                         },
                         .package = "GTFShift",
                         code = {

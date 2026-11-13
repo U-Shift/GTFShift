@@ -1,5 +1,7 @@
 test_that("unify merges two GTFS feeds with default parameters", {
-    sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
+    sample_file <- system.file(
+        "extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift"
+    )
     gtfs1 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(8)
     gtfs2 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(4)
 
@@ -17,7 +19,10 @@ test_that("unify merges two GTFS feeds with default parameters", {
             unified <- GTFShift::unify(gtfs1, gtfs2)
             expect_true(state$merge_gtfs_called)
             expect_s3_class(unified, "tidygtfs")
-            expect_contains(names(unified), c("agency", "routes", "stops", "trips"))
+            expect_contains(
+                names(unified),
+                c("agency", "routes", "stops", "trips")
+            )
             expect_length(unique(unified$agency$agency_id), 2)
             expect_contains(unique(unified$agency$agency_id), c("8", "4"))
         }
@@ -25,7 +30,9 @@ test_that("unify merges two GTFS feeds with default parameters", {
 })
 
 test_that("unify supports prefix = TRUE", {
-    sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
+    sample_file <- system.file(
+        "extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift"
+    )
     gtfs1 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(8)
     gtfs2 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(4)
 
@@ -47,8 +54,10 @@ test_that("unify supports prefix = TRUE", {
     expect_true(any(grepl("^4_", unified_prefix$calendar$service_id)))
 })
 
-test_that("unify supports create_transfers = TRUE with custom transfer_distance and transfer_time", {
-    sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
+test_that("unify supports create_transfers = TRUE with custom parameters", {
+    sample_file <- system.file(
+        "extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift"
+    )
     gtfs1 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(8)
     gtfs2 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(4)
 
@@ -67,7 +76,9 @@ test_that("unify supports create_transfers = TRUE with custom transfer_distance 
 })
 
 test_that("unify stores feed to store_path", {
-    sample_file <- system.file("extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift")
+    sample_file <- system.file(
+        "extdata/samples", "gtfs_merged_sample.zip", package = "GTFShift"
+    )
     gtfs1 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(8)
     gtfs2 <- GTFShift::load_feed(sample_file) |> GTFShift::filter_by_agency(4)
 
@@ -79,7 +90,12 @@ test_that("unify stores feed to store_path", {
     testthat::expect_gt(file.size(tmp_zip), 0)
     zip::zip_list(tmp_zip) |>
         dplyr::pull(filename) |>
-        testthat::expect_contains(c("agency.txt", "routes.txt", "trips.txt", "stops.txt", "stop_times.txt", "shapes.txt"))
+        testthat::expect_contains(
+            c(
+                "agency.txt", "routes.txt", "trips.txt",
+                "stops.txt", "stop_times.txt", "shapes.txt"
+            )
+        )
 
     # Clean up
     unlink(tmp_dir, recursive = TRUE)

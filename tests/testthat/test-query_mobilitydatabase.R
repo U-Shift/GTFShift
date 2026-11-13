@@ -80,7 +80,10 @@ test_that("query_mobilitydatabase successfully queries with access token", {
         http_error = function(x) FALSE,
         .package = "GTFShift",
         code = {
-          df <- GTFShift::query_mobilitydatabase(access_token = "mock_access_token", country_code = "PT")
+          df <- GTFShift::query_mobilitydatabase(
+            access_token = "mock_access_token",
+            country_code = "PT"
+          )
           expect_s3_class(df, "data.frame")
           expect_identical(nrow(df), 1L)
           expect_identical(df$id[1], "feed_1")
@@ -95,55 +98,63 @@ test_that("query_mobilitydatabase successfully queries with access token", {
   )
 })
 
-test_that("query_mobilitydatabase fetches access token using refresh token when access_token is missing", {
-  mock_resp_post <- create_mock_response(status_code = 200)
-  mock_resp_get <- create_mock_response(status_code = 200)
+test_that(
+  "query_mobilitydatabase fetches access token using refresh token",
+  {
+    mock_resp_post <- create_mock_response(status_code = 200)
+    mock_resp_get <- create_mock_response(status_code = 200)
 
-  state <- new.env(parent = emptyenv())
-  state$post_called <- FALSE
-  state$get_called <- FALSE
+    state <- new.env(parent = emptyenv())
+    state$post_called <- FALSE
+    state$get_called <- FALSE
 
-  testthat::with_mocked_bindings(
-    POST = function(url, body, ...) {
-      state$post_called <- TRUE
-      expect_identical(url, "https://api.mobilitydatabase.org/v1/tokens")
-      expect_true(grepl("mock_refresh_token", body, fixed = TRUE))
-      return(mock_resp_post)
-    },
-    GET = function(url, query, ...) {
-      state$get_called <- TRUE
-      expect_identical(url, "https://api.mobilitydatabase.org/v1/gtfs_feeds")
-      return(mock_resp_get)
-    },
-    .package = "GTFShift",
-    code = {
-      testthat::with_mocked_bindings(
-        content = function(x, ...) {
-          if (state$get_called) {
-            return(list(
-              list(
-                id = "feed_2",
-                provider = "Provider 2",
-                status = "active"
-              )
-            ))
-          } else {
-            return(list(access_token = "new_access_token_from_refresh"))
+    testthat::with_mocked_bindings(
+      POST = function(url, body, ...) {
+        state$post_called <- TRUE
+        expect_identical(url, "https://api.mobilitydatabase.org/v1/tokens")
+        expect_true(grepl("mock_refresh_token", body, fixed = TRUE))
+        return(mock_resp_post)
+      },
+      GET = function(url, query, ...) {
+        state$get_called <- TRUE
+        expect_identical(
+          url,
+          "https://api.mobilitydatabase.org/v1/gtfs_feeds"
+        )
+        return(mock_resp_get)
+      },
+      .package = "GTFShift",
+      code = {
+        testthat::with_mocked_bindings(
+          content = function(x, ...) {
+            if (state$get_called) {
+              return(list(
+                list(
+                  id = "feed_2",
+                  provider = "Provider 2",
+                  status = "active"
+                )
+              ))
+            } else {
+              return(list(access_token = "new_access_token_from_refresh"))
+            }
+          },
+          http_error = function(x) FALSE,
+          .package = "GTFShift",
+          code = {
+            df <- GTFShift::query_mobilitydatabase(
+              refresh_token = "mock_refresh_token"
+            )
+            expect_true(state$post_called)
+            expect_true(state$get_called)
+            expect_identical(nrow(df), 1L)
+            expect_identical(df$id[1], "feed_2")
           }
-        },
-        http_error = function(x) FALSE,
-        .package = "GTFShift",
-        code = {
-          df <- GTFShift::query_mobilitydatabase(refresh_token = "mock_refresh_token")
-          expect_true(state$post_called)
-          expect_true(state$get_called)
-          expect_identical(nrow(df), 1L)
-          expect_identical(df$id[1], "feed_2")
-        }
-      )
-    }
-  )
-})
+        )
+      }
+    )
+  }
+)
 
 test_that("query_mobilitydatabase handles HTTP errors when getting feeds", {
   mock_resp <- create_mock_response(status_code = 401)
@@ -160,7 +171,10 @@ test_that("query_mobilitydatabase handles HTTP errors when getting feeds", {
         code = {
           expect_error(
             GTFShift::query_mobilitydatabase(access_token = "invalid_token"),
-            "Mobility database bad response: Client error: \\(401\\) Unauthorized"
+            paste0(
+              "Mobility database bad response: ",
+              "Client error: \\(401\\) Unauthorized"
+            )
           )
         }
       )
@@ -168,34 +182,47 @@ test_that("query_mobilitydatabase handles HTTP errors when getting feeds", {
   )
 })
 
-test_that("query_mobilitydatabase handles HTTP errors during refresh token exchange", {
-  mock_resp_post <- create_mock_response(status_code = 400)
+test_that(
+  "query_mobilitydatabase handles HTTP errors during refresh token exchange",
+  {
+    mock_resp_post <- create_mock_response(status_code = 400)
 
-  testthat::with_mocked_bindings(
-    POST = function(url, ...) mock_resp_post,
-    .package = "httr",
-    code = {
-      testthat::with_mocked_bindings(
-        content = function(x, ...) list(detail = "Invalid refresh token"),
-        http_error = function(x) TRUE,
-        http_status = function(x) "Client error: (400) Bad Request",
-        .package = "GTFShift",
-        code = {
-          expect_error(
-            GTFShift::query_mobilitydatabase(refresh_token = "bad_refresh_token"),
-            "Mobility database bad response: Client error: \\(400\\) Bad Request"
-          )
-        }
-      )
-    }
-  )
-})
+    testthat::with_mocked_bindings(
+      POST = function(url, ...) mock_resp_post,
+      .package = "httr",
+      code = {
+        testthat::with_mocked_bindings(
+          content = function(x, ...) list(detail = "Invalid refresh token"),
+          http_error = function(x) TRUE,
+          http_status = function(x) "Client error: (400) Bad Request",
+          .package = "GTFShift",
+          code = {
+            expect_error(
+              GTFShift::query_mobilitydatabase(
+                refresh_token = "bad_refresh_token"
+              ),
+              paste0(
+                "Mobility database bad response: ",
+                "Client error: \\(400\\) Bad Request"
+              )
+            )
+          }
+        )
+      }
+    )
+  }
+)
 
 test_that("query_mobilitydatabase formats bbox parameter correctly", {
   mock_resp <- create_mock_response(status_code = 200)
 
   bbox_obj <- structure(
-    list(ymin = list(38.7), ymax = list(38.8), xmin = list(-9.2), xmax = list(-9.1)),
+    list(
+      ymin = list(38.7),
+      ymax = list(38.8),
+      xmin = list(-9.2),
+      xmax = list(-9.1)
+    ),
     class = "bbox"
   )
 
@@ -212,7 +239,10 @@ test_that("query_mobilitydatabase formats bbox parameter correctly", {
         http_error = function(x) FALSE,
         .package = "GTFShift",
         code = {
-          df <- GTFShift::query_mobilitydatabase(access_token = "token", bbox = bbox_obj)
+          df <- GTFShift::query_mobilitydatabase(
+            access_token = "token",
+            bbox = bbox_obj
+          )
           expect_identical(nrow(df), 0L)
         }
       )

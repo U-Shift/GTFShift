@@ -42,9 +42,14 @@ Data classification helps to categorize transit data into meaningful groups base
 
 ```{r}
 # Get GTFS from library GTFS database for Portugal
-data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+data <- read.csv(
+  system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift")
+)
 gtfs_id <- "barreiro"
-gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FALSE)
+gtfs <- GTFShift::load_feed(
+  data$URL[data$ID == gtfs_id],
+  create_transfers = FALSE
+)
 ```
 
 # Bus frequency LOS

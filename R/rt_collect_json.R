@@ -2,16 +2,24 @@
 #'
 #'
 #' @param gtfs_rt_url String. URL of the GTFS-RT feed in JSON format.
-#' @param destination_file String. File to save the downloaded GTFS-RT data. Content is appended in each iteration.
-#' @param header_key String (Default "header"). Key in the JSON corresponding to the feed header. Set to NA if not present.
-#' @param entity_key String (Default "entity"). Key in the JSON corresponding to the feed entities. Set to NA if response is a flat list. Use "." for nested keys.
-#' @param fields_collect Character vector. Fields to extract from each entity in the feed. Use "." for nested keys.
-#' @param scrape_interval Integer (Default 60). Interval in seconds between each download. Negative to run only once.
+#' @param destination_file String. File to save the downloaded GTFS-RT data.
+#'   Content is appended in each iteration.
+#' @param header_key String (Default "header"). Key in the JSON corresponding to
+#'   the feed header. Set to NA if not present.
+#' @param entity_key String (Default "entity"). Key in the JSON corresponding to
+#'   the feed entities. Set to NA if response is a flat list. Use "." for nested
+#'   keys.
+#' @param fields_collect Character vector. Fields to extract from each entity in
+#'   the feed. Use "." for nested keys.
+#' @param scrape_interval Integer (Default 60). Interval in seconds between each
+#'   download. Negative to run only once.
 #' @param log_file String (Optional). Path to a log file to save download logs.
-#' @param headers Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.
+#' @param headers Named list or character vector (Optional). Custom HTTP headers
+#'   for credentials when accessing the GTFS-RT feed URL.
 #'
 #' @details
-#' Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
+#' Downloads GTFS-RT data from the specified URL at regular intervals and saves
+#' them to the destination file.
 #'
 #' This function will run indefinitely until manually stopped (CTRL + C).
 #'
@@ -19,7 +27,11 @@
 #'
 #' @examples
 #' # Sample GTFS-RT JSON file
-#' sample_json <- system.file("extdata/samples", "gtfs_rt_sample.json", package = "GTFShift")
+#' sample_json <- system.file(
+#'   "extdata/samples",
+#'   "gtfs_rt_sample.json",
+#'   package = "GTFShift"
+#' )
 #' destination_file <- withr::local_tempfile(fileext = ".csv")
 #'
 #' # Collect data
@@ -46,18 +58,36 @@
 #'
 #' @export
 rt_collect_json <- function(
-  gtfs_rt_url, destination_file,
+  gtfs_rt_url,
+  destination_file,
   header_key = "header", # Optional
   entity_key = "entity",
-  fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
-  scrape_interval = 60, log_file = NA, headers = NULL
+  fields_collect = c(
+    "id",
+    "vehicle.trip.trip_id",
+    "vehicle.position.latitude",
+    "vehicle.position.longitude",
+    "vehicle.position.speed",
+    "vehicle.timestamp",
+    "vehicle.current_status",
+    "vehicle.current_stop_sequence",
+    "vehicle.stop_id"
+  ),
+  scrape_interval = 60,
+  log_file = NA,
+  headers = NULL
 ) {
   # Log script start
-  m <- sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
+  now_str <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+  m <- sprintf(
+    "[%s] Starting GTFS-RT data collection from %s",
+    now_str,
+    gtfs_rt_url
+  )
   message(m)
   if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
-  # Each scrape_interval seconds, download the GTFS-RT feed and save it to the destination folder
+  # Each scrape_interval seconds, download the GTFS-RT feed and save it
   count <- 0
   repeat {
     count <- count + 1
@@ -85,33 +115,48 @@ rt_collect_json <- function(
           format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url, status_err
         )
         message(m_err)
-        if (!is.na(log_file)) cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+        if (!is.na(log_file)) {
+          cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+        }
         feed <- NULL
       } else {
         feed <- tryCatch(
-          jsonlite::fromJSON(httr::content(res, as = "text", encoding = "UTF-8")),
+          jsonlite::fromJSON(
+            httr::content(res, as = "text", encoding = "UTF-8")
+          ),
           error = function(e) {
             m_err <- sprintf(
               "[%s] Failed to parse JSON from %s: %s",
               format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url, e$message
             )
             message(m_err)
-            if (!is.na(log_file)) cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+            if (!is.na(log_file)) {
+              cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+            }
             NULL
           }
         )
       }
     } else {
+      net_err_pat <- paste0(
+        "cannot open the connection|HTTP status|",
+        "Could not resolve|Timeout|Failed to connect"
+      )
       feed <- tryCatch(
         suppressWarnings(jsonlite::fromJSON(gtfs_rt_url)),
         error = function(e) {
-          if (grepl("^http", gtfs_rt_url) && grepl("cannot open the connection|HTTP status|Could not resolve|Timeout|Failed to connect", e$message, ignore.case = TRUE)) {
+          if (
+            grepl("^http", gtfs_rt_url) &&
+              grepl(net_err_pat, e$message, ignore.case = TRUE)
+          ) {
             m_err <- sprintf(
               "[%s] Internet resource unavailable at %s (%s).",
               format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url, e$message
             )
             message(m_err)
-            if (!is.na(log_file)) cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+            if (!is.na(log_file)) {
+              cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+            }
             NULL
           } else {
             stop(e)
@@ -144,7 +189,7 @@ rt_collect_json <- function(
       entities <- feed
     }
 
-    # For each field in fields_collect, extract the data and add it to the data frame
+    # Extract each field in fields_collect and add it to the data frame
     feed_df <- data.frame()
     for (field in fields_collect) {
       field_parts <- unlist(strsplit(field, ".", fixed = TRUE))
@@ -175,12 +220,13 @@ rt_collect_json <- function(
       }
     }
 
+    # only write header if file is new
     write.table(
       feed_df,
       file = destination_file,
       sep = ",",
       row.names = FALSE,
-      col.names = !file.exists(destination_file), # only write header if file is new
+      col.names = !file.exists(destination_file),
       append = file.exists(destination_file)
     )
 
@@ -194,7 +240,10 @@ rt_collect_json <- function(
     }
     interval_start <- Sys.time()
     if (!requireNamespace("progress", quietly = TRUE)) {
-      stop("Package 'progress' is required for interval sleeping display. Install it with: install.packages('progress')")
+      stop(
+        "Package 'progress' is required for interval sleeping display. ",
+        "Install it with: install.packages('progress')"
+      )
     }
     pb <- progress::progress_bar$new( # Track progress
       format = "Sleeping [:bar] :percent :spin elapsed=:elapsed",
@@ -202,7 +251,9 @@ rt_collect_json <- function(
     )
     pb$update(0)
     repeat {
-      elapsed_time <- as.numeric(difftime(Sys.time(), interval_start, units = "secs"))
+      elapsed_time <- as.numeric(
+        difftime(Sys.time(), interval_start, units = "secs")
+      )
       if (elapsed_time >= scrape_interval) break
       pb$update(min(elapsed_time / scrape_interval, 1))
       Sys.sleep(0.1)

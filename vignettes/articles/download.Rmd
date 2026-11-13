@@ -64,9 +64,12 @@ It queries the `/v1/gtfs_feeds` API endpoint, returning a list of GTFS feeds wit
 To use it, an access token must be provided. It can be obtained for free at Mobility Database [website](https://mobilitydatabase.org/account).
 
 ```{r eval = nzchar(Sys.getenv("MOBILITY_DATABASE"))}
-aml <- sf::st_read("https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg", quiet = TRUE) |> sf::st_bbox()
+aml <- sf::st_read(
+  "https://github.com/U-Shift/MQAT/raw/refs/heads/main/geo/MUNICIPIOSgeo.gpkg",
+  quiet = TRUE
+) |> sf::st_bbox()
 
-# usethis::edit_r_environ() # to set MOBILITY_DATABASE variable for this code chunk to work
+# usethis::edit_r_environ() # set MOBILITY_DATABASE for this chunk to work
 feeds <- GTFShift::query_mobilitydatabase(
   refresh_token = Sys.getenv("MOBILITY_DATABASE"),
   bounding_filter_method = "completely_enclosed",
@@ -80,7 +83,10 @@ feeds_active <- feeds |>
 feeds_active |>
   head()
 
-gtfs <- GTFShift::load_feed(feeds_active$producer_url[2], create_transfers = FALSE)
+gtfs <- GTFShift::load_feed(
+  feeds_active$producer_url[2],
+  create_transfers = FALSE
+)
 summary(gtfs)
 ```
 
@@ -97,10 +103,13 @@ This library offers a small database with a compilation of GTFS files for Portug
 
 
 ```{r message=TRUE, warning=FALSE}
-data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+data <- read.csv(
+  system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift")
+)
 head(data)
 
-gtfs <- GTFShift::load_feed(data$URL[1], create_transfers = FALSE) # example with CP - trains
+# example with CP - trains
+gtfs <- GTFShift::load_feed(data$URL[1], create_transfers = FALSE)
 summary(gtfs)
 ```
 

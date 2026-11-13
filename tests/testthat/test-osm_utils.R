@@ -80,88 +80,94 @@ make_mock_pb <- function() {
 }
 
 test_that("get_osm_relations parses relations with regex feature operator ~", {
+  mock_xml_file <- setup_mock_xml()
+  on.exit(unlink(mock_xml_file), add = TRUE)
+
+  testthat::with_mocked_bindings(
+    r_bg = function(...) make_mock_bg_job(),
+    .package = "callr",
+    code = {
+      testthat::with_mocked_bindings(
+        show_content = function(...) mock_xml_file,
+        .package = "rosmium",
+        code = {
+          res_regex <- get_osm_relations(
+            osm_file = "dummy.pbf",
+            q = list(features = '["ref"~"701"]'),
+            pb = make_mock_pb(),
+            osm_route_type = "bus"
+          )
+
+          expect_s3_class(res_regex, "data.frame")
+          # 2 members from rel 100, 2 members from rel 700
+          expect_identical(nrow(res_regex), 4L)
+          expect_identical(unique(res_regex$relation_osm_id), c("100", "700"))
+        }
+      )
+    }
+  )
+})
+
+test_that(
+  "get_osm_relations parses relations with exact equality feature operator =",
+  {
     mock_xml_file <- setup_mock_xml()
     on.exit(unlink(mock_xml_file), add = TRUE)
 
     testthat::with_mocked_bindings(
-        r_bg = function(...) make_mock_bg_job(),
-        .package = "callr",
-        code = {
-            testthat::with_mocked_bindings(
-                show_content = function(...) mock_xml_file,
-                .package = "rosmium",
-                code = {
-                    res_regex <- get_osm_relations(
-                        osm_file = "dummy.pbf",
-                        q = list(features = '["ref"~"701"]'),
-                        pb = make_mock_pb(),
-                        osm_route_type = "bus"
-                    )
-
-                    expect_s3_class(res_regex, "data.frame")
-                    expect_identical(nrow(res_regex), 4L) # 2 members from rel 100, 2 members from rel 700
-                    expect_identical(unique(res_regex$relation_osm_id), c("100", "700"))
-                }
+      r_bg = function(...) make_mock_bg_job(),
+      .package = "callr",
+      code = {
+        testthat::with_mocked_bindings(
+          show_content = function(...) mock_xml_file,
+          .package = "rosmium",
+          code = {
+            res_exact <- get_osm_relations(
+              osm_file = "dummy.pbf",
+              q = list(features = '["ref"="701exact"]'),
+              pb = make_mock_pb(),
+              osm_route_type = "bus"
             )
-        }
+
+            expect_s3_class(res_exact, "data.frame")
+            expect_identical(nrow(res_exact), 2L)
+            expect_identical(unique(res_exact$relation_osm_id), "700")
+          }
+        )
+      }
     )
-})
-
-test_that("get_osm_relations parses relations with exact equality feature operator =", {
-    mock_xml_file <- setup_mock_xml()
-    on.exit(unlink(mock_xml_file), add = TRUE)
-
-    testthat::with_mocked_bindings(
-        r_bg = function(...) make_mock_bg_job(),
-        .package = "callr",
-        code = {
-            testthat::with_mocked_bindings(
-                show_content = function(...) mock_xml_file,
-                .package = "rosmium",
-                code = {
-                    res_exact <- get_osm_relations(
-                        osm_file = "dummy.pbf",
-                        q = list(features = '["ref"="701exact"]'),
-                        pb = make_mock_pb(),
-                        osm_route_type = "bus"
-                    )
-
-                    expect_s3_class(res_exact, "data.frame")
-                    expect_identical(nrow(res_exact), 2L)
-                    expect_identical(unique(res_exact$relation_osm_id), "700")
-                }
-            )
-        }
-    )
-})
+  }
+)
 
 test_that("get_osm_relations returns empty data frame when no features match", {
-    mock_xml_file <- setup_mock_xml()
-    on.exit(unlink(mock_xml_file), add = TRUE)
+  mock_xml_file <- setup_mock_xml()
+  on.exit(unlink(mock_xml_file), add = TRUE)
 
-    testthat::with_mocked_bindings(
-        r_bg = function(...) make_mock_bg_job(),
-        .package = "callr",
+  testthat::with_mocked_bindings(
+    r_bg = function(...) make_mock_bg_job(),
+    .package = "callr",
+    code = {
+      testthat::with_mocked_bindings(
+        show_content = function(...) mock_xml_file,
+        .package = "rosmium",
         code = {
-            testthat::with_mocked_bindings(
-                show_content = function(...) mock_xml_file,
-                .package = "rosmium",
-                code = {
-                    res_none <- get_osm_relations(
-                        osm_file = "dummy.pbf",
-                        q = list(features = '["ref"="nonexistent"]'),
-                        pb = make_mock_pb(),
-                        osm_route_type = "bus"
-                    )
+          res_none <- get_osm_relations(
+            osm_file = "dummy.pbf",
+            q = list(features = '["ref"="nonexistent"]'),
+            pb = make_mock_pb(),
+            osm_route_type = "bus"
+          )
 
-                    expect_identical(nrow(res_none), 0L)
-                }
-            )
+          expect_identical(nrow(res_none), 0L)
         }
-    )
+      )
+    }
+  )
 })
 
-test_that("get_osm_relations correctly forwards custom osm_route_type parameter", {
+test_that(
+  "get_osm_relations correctly forwards custom osm_route_type parameter",
+  {
     mock_xml_file <- setup_mock_xml()
     on.exit(unlink(mock_xml_file), add = TRUE)
 
@@ -169,39 +175,45 @@ test_that("get_osm_relations correctly forwards custom osm_route_type parameter"
     state$passed_filter <- NULL
 
     testthat::with_mocked_bindings(
-        r_bg = function(func, args, ...) {
-            # Capture filter string passed to rosmium::tags_filter in r_bg call
-            state$passed_filter <- args[[3]]
-            make_mock_bg_job()
-        },
-        .package = "callr",
-        code = {
-            testthat::with_mocked_bindings(
-                show_content = function(...) mock_xml_file,
-                .package = "rosmium",
-                code = {
-                    res <- get_osm_relations(
-                        osm_file = "dummy.pbf",
-                        q = list(features = '["ref"~"701"]'),
-                        pb = make_mock_pb(),
-                        osm_route_type = "train"
-                    )
-
-                    expect_identical(state$passed_filter, "train")
-                    expect_s3_class(res, "data.frame")
-                    expect_identical(nrow(res), 4L)
-                }
+      r_bg = function(func, args, ...) {
+        # Capture filter string passed to rosmium::tags_filter in r_bg call
+        state$passed_filter <- args[[3]]
+        make_mock_bg_job()
+      },
+      .package = "callr",
+      code = {
+        testthat::with_mocked_bindings(
+          show_content = function(...) mock_xml_file,
+          .package = "rosmium",
+          code = {
+            res <- get_osm_relations(
+              osm_file = "dummy.pbf",
+              q = list(features = '["ref"~"701"]'),
+              pb = make_mock_pb(),
+              osm_route_type = "train"
             )
-        }
+
+            expect_identical(state$passed_filter, "train")
+            expect_s3_class(res, "data.frame")
+            expect_identical(nrow(res), 4L)
+          }
+        )
+      }
     )
-})
+  }
+)
 
 test_that("prepare_osm_file handles NULL and non-existent files", {
-    expect_null(prepare_osm_file(NULL))
-    expect_identical(prepare_osm_file("non_existent.pbf"), "non_existent.pbf")
+  expect_null(prepare_osm_file(NULL))
+  expect_identical(prepare_osm_file("non_existent.pbf"), "non_existent.pbf")
 })
 
-test_that("prepare_osm_file returns original path when file is in writable directory outside library", {
+test_that(
+  paste0(
+    "prepare_osm_file returns original path when file ",
+    "is in writable directory outside library"
+  ),
+  {
     temp_dir <- file.path(tempdir(), "test_writable_dir")
     dir.create(temp_dir, showWarnings = FALSE)
     test_file <- file.path(temp_dir, "test.pbf")
@@ -210,25 +222,29 @@ test_that("prepare_osm_file returns original path when file is in writable direc
 
     res <- prepare_osm_file(test_file)
     expect_identical(res, test_file)
-})
+  }
+)
 
-test_that("prepare_osm_file copies file to tempdir when directory is read-only", {
+test_that(
+  "prepare_osm_file copies file to tempdir when directory is read-only",
+  {
     temp_dir <- file.path(tempdir(), "test_ro_dir")
     dir.create(temp_dir, showWarnings = FALSE)
     test_file <- file.path(temp_dir, "test_ro.pbf")
     cat("test content", file = test_file)
     Sys.chmod(temp_dir, "0555")
     on.exit({
-        Sys.chmod(temp_dir, "0755")
-        unlink(temp_dir, recursive = TRUE)
-        unlink(file.path(tempdir(), "test_ro.pbf"))
+      Sys.chmod(temp_dir, "0755")
+      unlink(temp_dir, recursive = TRUE)
+      unlink(file.path(tempdir(), "test_ro.pbf"))
     }, add = TRUE)
 
     res <- prepare_osm_file(test_file)
     expect_true(startsWith(res, tempdir()))
     expect_identical(basename(res), "test_ro.pbf")
     expect_true(file.exists(res))
-})
+  }
+)
 
 
 
