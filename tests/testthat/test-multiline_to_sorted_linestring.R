@@ -7,7 +7,7 @@ test_that("multiline_to_sorted_linestring sorts multilinestring into linestring"
 
     res <- GTFShift::multiline_to_sorted_linestring(mls_sf, metric_crs = 3857)
     expect_s3_class(res, "sfc")
-    expect_equal(sf::st_geometry_type(res)[1], factor("LINESTRING", levels = levels(sf::st_geometry_type(res))))
+    expect_identical(sf::st_geometry_type(res)[1], factor("LINESTRING", levels = levels(sf::st_geometry_type(res))))
 })
 
 test_that("multiline_to_sorted_linestring works when default metric_crs (NULL) is used", {
@@ -53,8 +53,8 @@ test_that("multiline_to_sorted_linestring parameter variation with guiding point
     coords <- unname(sf::st_coordinates(res))
 
     # Should start near (0,0) and end near (2,0)
-    expect_equal(coords[1, 1:2], c(0, 0))
-    expect_equal(coords[nrow(coords), 1:2], c(2, 0))
+    expect_identical(coords[1, 1:2], c(0, 0))
+    expect_identical(coords[nrow(coords), 1:2], c(2, 0))
 })
 
 test_that("multiline_to_sorted_linestring discards line segments farther than current + next length", {
@@ -69,9 +69,9 @@ test_that("multiline_to_sorted_linestring discards line segments farther than cu
     coords <- unname(sf::st_coordinates(res))
 
     # Discards the far segment and retains only the first segment
-    expect_equal(nrow(coords), 2)
-    expect_equal(coords[1, 1:2], c(0, 0))
-    expect_equal(coords[2, 1:2], c(1, 0))
+    expect_identical(nrow(coords), 2L)
+    expect_identical(coords[1, 1:2], c(0, 0))
+    expect_identical(coords[2, 1:2], c(1, 0))
 })
 
 test_that("multiline_to_sorted_linestring orient start line when start_point is closer to remaining lines", {
@@ -84,8 +84,8 @@ test_that("multiline_to_sorted_linestring orient start line when start_point is 
 
     res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
     coords <- unname(sf::st_coordinates(res))
-    expect_equal(coords[1, 1:2], c(0, 0))
-    expect_equal(coords[nrow(coords), 1:2], c(2, 0))
+    expect_identical(coords[1, 1:2], c(0, 0))
+    expect_identical(coords[nrow(coords), 1:2], c(2, 0))
 })
 
 test_that("multiline_to_sorted_linestring orient start line with second_point tie break", {
@@ -99,7 +99,7 @@ test_that("multiline_to_sorted_linestring orient start line with second_point ti
 
     res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
     coords <- unname(sf::st_coordinates(res))
-    expect_equal(coords[1, 1:2], c(2, 0))
+    expect_identical(coords[1, 1:2], c(2, 0))
 })
 
 test_that("multiline_to_sorted_linestring excludes identical duplicate remaining segments", {
@@ -112,7 +112,7 @@ test_that("multiline_to_sorted_linestring excludes identical duplicate remaining
 
     res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
     coords <- unname(sf::st_coordinates(res))
-    expect_equal(nrow(coords), 2)
+    expect_identical(nrow(coords), 2L)
 })
 
 test_that("multiline_to_sorted_linestring tie-breaks candidate selection using next_point proximity", {

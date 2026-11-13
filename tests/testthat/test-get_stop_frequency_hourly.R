@@ -37,5 +37,5 @@ test_that("get_stop_frequency_hourly calculates stop departures per hour", {
         dplyr::filter(hour %in% calculated_stop_freq$hour) |>
         dplyr::arrange(hour)
 
-    expect_equal(calculated_stop_freq$frequency, expected_stop_freq$expected_freq)
+    expect_identical(calculated_stop_freq$frequency, expected_stop_freq$expected_freq)
 })

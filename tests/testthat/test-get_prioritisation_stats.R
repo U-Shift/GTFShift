@@ -17,20 +17,20 @@ test_that("get_prioritisation_stats calculates summary statistics without speed_
 
     # Internal length mutation: feature 1 = 100m, feature 2 = 200m
     # extension: total length = 300m
-    expect_equal(stats$extension, 300)
+    expect_identical(stats$extension, 300)
     # extension_bus_lane: only feature 1 is bus lane -> 100m
-    expect_equal(stats$extension_bus_lane, 100)
+    expect_identical(stats$extension_bus_lane, 100)
 
     # Weighted mean by length (weights: 100 and 200, total = 300):
     # n_lanes_circulation: (2*100 + 4*200) / 300 = (200 + 800) / 300 = 10/3
-    expect_equal(stats$n_lanes_circulation_avg, 10 / 3)
-    expect_equal(stats$n_lanes_circulation_min, 2)
-    expect_equal(stats$n_lanes_circulation_max, 4)
+    expect_identical(stats$n_lanes_circulation_avg, 10 / 3)
+    expect_identical(stats$n_lanes_circulation_min, 2)
+    expect_identical(stats$n_lanes_circulation_max, 4)
 
     # n_lanes_parking: (1*100 + 3*200) / 300 = (100 + 600) / 300 = 7/3
-    expect_equal(stats$n_lanes_parking_avg, 7 / 3)
-    expect_equal(stats$n_lanes_parking_min, 1)
-    expect_equal(stats$n_lanes_parking_max, 3)
+    expect_identical(stats$n_lanes_parking_avg, 7 / 3)
+    expect_identical(stats$n_lanes_parking_min, 1)
+    expect_identical(stats$n_lanes_parking_max, 3)
 
     # Validate that speed metrics are NOT present when speed_avg column is missing
     expect_false(any(c("speed_avg", "speed_min", "speed_max") %in% names(stats)))
@@ -56,19 +56,19 @@ test_that("get_prioritisation_stats calculates speed metrics when speed_avg colu
     expect_contains(names(stats), c("speed_avg", "speed_min", "speed_max"))
 
     # speed_avg weighted by frequency: (30*10 + 50*5) / 15 = 550 / 15 = 36.66667
-    expect_equal(stats$speed_avg, (30 * 10 + 50 * 5) / 15)
-    expect_equal(stats$speed_min, 30)
-    expect_equal(stats$speed_max, 50)
+    expect_identical(stats$speed_avg, (30 * 10 + 50 * 5) / 15)
+    expect_identical(stats$speed_min, 30)
+    expect_identical(stats$speed_max, 50)
 
     # n_lanes_circulation weighted by frequency: (2*10 + 3*5) / 15 = 35 / 15 = 7/3
-    expect_equal(stats$n_lanes_circulation_avg, 35 / 15)
-    expect_equal(stats$n_lanes_circulation_min, 2)
-    expect_equal(stats$n_lanes_circulation_max, 3)
+    expect_identical(stats$n_lanes_circulation_avg, 35 / 15)
+    expect_identical(stats$n_lanes_circulation_min, 2)
+    expect_identical(stats$n_lanes_circulation_max, 3)
 
     # n_lanes_parking weighted by frequency: (1*10 + 0*5) / 15 = 10 / 15 = 2/3
-    expect_equal(stats$n_lanes_parking_avg, 10 / 15)
-    expect_equal(stats$n_lanes_parking_min, 0)
-    expect_equal(stats$n_lanes_parking_max, 1)
+    expect_identical(stats$n_lanes_parking_avg, 10 / 15)
+    expect_identical(stats$n_lanes_parking_min, 0)
+    expect_identical(stats$n_lanes_parking_max, 1)
 })
 
 test_that("get_prioritisation_stats works when metric_crs is default (NULL)", {
@@ -87,7 +87,7 @@ test_that("get_prioritisation_stats works when metric_crs is default (NULL)", {
     expect_no_warning(
         stats <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length")
     )
-    expect_equal(stats$extension, 200)
+    expect_identical(stats$extension, 200)
 })
 
 test_that("get_prioritisation_stats stops on invalid weight or metric_crs", {
@@ -134,14 +134,14 @@ test_that("get_prioritisation_stats calculates stats using weight = 'length' vs 
     # 1) Weight by length (weights: 100 and 300, total = 400)
     stats_length <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length", metric_crs = 3857)
     # speed_avg: (20*100 + 60*300) / 400 = (2000 + 18000) / 400 = 50
-    expect_equal(stats_length$speed_avg, 50)
+    expect_identical(stats_length$speed_avg, 50)
     # n_lanes_circulation_avg: (2*100 + 4*300) / 400 = (200 + 1200) / 400 = 3.5
     expect_equal(stats_length$n_lanes_circulation_avg, 3.5)
 
     # 2) Weight by frequency (weights: 30 and 10, total = 40)
     stats_freq <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "frequency", metric_crs = 3857)
     # speed_avg: (20*30 + 60*10) / 40 = (600 + 600) / 40 = 30
-    expect_equal(stats_freq$speed_avg, 30)
+    expect_identical(stats_freq$speed_avg, 30)
     # n_lanes_circulation_avg: (2*30 + 4*10) / 40 = (60 + 40) / 40 = 2.5
     expect_equal(stats_freq$n_lanes_circulation_avg, 2.5)
 })

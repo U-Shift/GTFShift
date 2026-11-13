@@ -21,8 +21,8 @@ test_that("osm_bus_lanes queries and filters bus lanes using mocked osmextract",
             bbox <- sf::st_bbox(sf::st_sfc(sf::st_point(c(0, 0)), crs = 4326))
             res <- GTFShift::osm_bus_lanes(bbox, osm_file = "dummy.pbf")
             expect_s3_class(res, "sf")
-            expect_equal(nrow(res), 1)
-            expect_equal(res[["osm:id"]][1], "1")
+            expect_identical(nrow(res), 1L)
+            expect_identical(res[["osm:id"]][1], "1")
             expect_false("2" %in% res[["osm:id"]])
         }
     )
@@ -51,8 +51,8 @@ test_that("osm_bus_lanes queries bus lanes when osm_file = NULL using mocked osm
             bbox <- sf::st_bbox(sf::st_sfc(sf::st_point(c(0, 0)), crs = 4326))
             res <- GTFShift::osm_bus_lanes(bbox, osm_file = NULL)
             expect_s3_class(res, "sf")
-            expect_equal(nrow(res), 1)
-            expect_equal(res$osm_id[1], "1")
+            expect_identical(nrow(res), 1L)
+            expect_identical(res$osm_id[1], "1")
             expect_false("2" %in% res$osm_id)
         }
     )

@@ -17,10 +17,10 @@ test_that("create_shapes_from_stops constructs shape geometries from stop sequen
     shape_points_count <- sum(res_gtfs$shapes$shape_id == target_shape_id)
     trip_stops_count <- sum(gtfs$stop_times$trip_id == matching_trip_id)
 
-    expect_equal(shape_points_count, trip_stops_count)
+    expect_identical(shape_points_count, trip_stops_count)
 
     # Make sure trips table has shape_id, but keeps other columns
-    expect_equal(sort(unique(res_gtfs$trips$shape_id)), sort(unique(res_gtfs$shapes$shape_id)))
+    expect_identical(sort(unique(res_gtfs$trips$shape_id)), sort(unique(res_gtfs$shapes$shape_id)))
     expect_equivalent(sort(colnames(res_gtfs$trips)), sort(unique(colnames(gtfs$trips), "shape_id")))
-    expect_equal(nrow(gtfs$trips), nrow(res_gtfs$trips))
+    expect_identical(nrow(gtfs$trips), nrow(res_gtfs$trips))
 })

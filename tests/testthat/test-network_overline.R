@@ -24,7 +24,7 @@ test_that("network_overline aggregates lines onto target network", {
 
     expect_s3_class(res, "sf")
     expect_contains(names(res), "frequency")
-    expect_equal(res$frequency, sum(lines_sf$frequency)) # Expecting the sum of frequencies
+    expect_identical(res$frequency, sum(lines_sf$frequency)) # Expecting the sum of frequencies
     })
 
 test_that("network_overline works when metric_crs is default (NULL)", {
@@ -46,7 +46,7 @@ test_that("network_overline works when metric_crs is default (NULL)", {
         )
     })
     expect_s3_class(res, "sf")
-    expect_equal(res$frequency, 5)
+    expect_identical(res$frequency, 5)
 })
 
 test_that("network_overline stops on invalid metric_crs", {
@@ -100,6 +100,6 @@ test_that("network_overline handles parameter variations (target_network_split, 
 
     expect_s3_class(res_max, "sf")
     expect_contains(names(res_max), "frequency")
-    expect_equal(nrow(res_max), 4) # Expecting 4 segments after splitting
+    expect_identical(nrow(res_max), 4L) # Expecting 4 segments after splitting
     expect_contains(res_max$frequency, c(10, 20))
 })

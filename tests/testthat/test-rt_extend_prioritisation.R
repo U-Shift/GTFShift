@@ -25,22 +25,22 @@ test_that("rt_extend_prioritisation extends lane prioritisation with speed metri
     expect_contains(names(res), c("speed_avg", "speed_median", "speed_p15", "speed_p25", "speed_p75", "speed_p85", "speed_count"))
 
     # For w1: speeds 10 and 20 (point 3 at 80 is STOPPED_AT so filtered out)
-    expect_equal(res$speed_avg[res$way_osm_id == "w1"], 15)
-    expect_equal(res$speed_median[res$way_osm_id == "w1"], 15)
+    expect_identical(res$speed_avg[res$way_osm_id == "w1"], 15)
+    expect_identical(res$speed_median[res$way_osm_id == "w1"], 15)
     expect_equal(unname(res$speed_p15[res$way_osm_id == "w1"]), 11.5)
     expect_equal(unname(res$speed_p25[res$way_osm_id == "w1"]), 12.5)
     expect_equal(unname(res$speed_p75[res$way_osm_id == "w1"]), 17.5)
     expect_equal(unname(res$speed_p85[res$way_osm_id == "w1"]), 18.5)
-    expect_equal(res$speed_count[res$way_osm_id == "w1"], 2)
+    expect_identical(res$speed_count[res$way_osm_id == "w1"], 2)
 
     # For w2: speed 40
-    expect_equal(res$speed_avg[res$way_osm_id == "w2"], 40)
-    expect_equal(res$speed_median[res$way_osm_id == "w2"], 40)
-    expect_equal(unname(res$speed_p15[res$way_osm_id == "w2"]), 40)
-    expect_equal(unname(res$speed_p25[res$way_osm_id == "w2"]), 40)
-    expect_equal(unname(res$speed_p75[res$way_osm_id == "w2"]), 40)
-    expect_equal(unname(res$speed_p85[res$way_osm_id == "w2"]), 40)
-    expect_equal(res$speed_count[res$way_osm_id == "w2"], 1)
+    expect_identical(res$speed_avg[res$way_osm_id == "w2"], 40)
+    expect_identical(res$speed_median[res$way_osm_id == "w2"], 40)
+    expect_identical(unname(res$speed_p15[res$way_osm_id == "w2"]), 40)
+    expect_identical(unname(res$speed_p25[res$way_osm_id == "w2"]), 40)
+    expect_identical(unname(res$speed_p75[res$way_osm_id == "w2"]), 40)
+    expect_identical(unname(res$speed_p85[res$way_osm_id == "w2"]), 40)
+    expect_identical(res$speed_count[res$way_osm_id == "w2"], 1)
 })
 
 test_that("rt_extend_prioritisation accurately computes speed_p15 and speed_p85 with multiple observations and NA values", {
@@ -77,7 +77,7 @@ test_that("rt_extend_prioritisation accurately computes speed_p15 and speed_p85 
     expect_equal(unname(res$speed_p25[res$way_osm_id == "w1"]), 32.5)
     expect_equal(unname(res$speed_p75[res$way_osm_id == "w1"]), 77.5)
     expect_equal(unname(res$speed_p85[res$way_osm_id == "w1"]), 86.5)
-    expect_equal(res$speed_count[res$way_osm_id == "w1"], 10)
+    expect_identical(res$speed_count[res$way_osm_id == "w1"], 10)
 
     # Verify monotonic percentile relationships: p15 <= p25 <= median <= p75 <= p85
     expect_lte(res$speed_p15[res$way_osm_id == "w1"], res$speed_p25[res$way_osm_id == "w1"])
@@ -88,7 +88,7 @@ test_that("rt_extend_prioritisation accurately computes speed_p15 and speed_p85 
     # w2 percentiles with NA: speeds c(20, 40, 60) -> 15% is 26, 85% is 54
     expect_equal(unname(res$speed_p15[res$way_osm_id == "w2"]), 26.0)
     expect_equal(unname(res$speed_p85[res$way_osm_id == "w2"]), 54.0)
-    expect_equal(res$speed_count[res$way_osm_id == "w2"], 4)
+    expect_identical(res$speed_count[res$way_osm_id == "w2"], 4)
 
     # w_empty: no points captured -> speed_p15 and speed_p85 are NA
     expect_true(is.na(res$speed_p15[res$way_osm_id == "w_empty"]))
@@ -111,7 +111,7 @@ test_that("rt_extend_prioritisation works when metric_crs is default (NULL)", {
     expect_no_warning(
         res <- GTFShift::rt_extend_prioritisation(lanes_sf, rt_points)
     )
-    expect_equal(res$speed_avg[1], 25)
+    expect_identical(res$speed_avg[1], 25)
 })
 
 test_that("rt_extend_prioritisation stops when lane_prioritisation is missing way_osm_id column", {

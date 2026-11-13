@@ -76,11 +76,11 @@ test_that("load_feed passes custom parameters to gtfsrouter::gtfs_transfer_table
                 transfer_street_routing = FALSE
             )
             expect_true(state$transfer_table_called)
-            expect_equal(state$captured_d_limit, 600)
-            expect_equal(state$captured_min_transfer_time, 240)
+            expect_identical(state$captured_d_limit, 600)
+            expect_identical(state$captured_min_transfer_time, 240)
             expect_false(state$captured_network_times)
             expect_contains(names(res), "transfers")
-            expect_equal(nrow(res$transfers), 1)
+            expect_identical(nrow(res$transfers), 1L)
         }
     )
 })
@@ -92,7 +92,7 @@ test_that("clean empty stop_times", {
     location <- withr::local_tempfile(fileext = ".zip")
     tidytransit::write_gtfs(gtfs, location)
     testthat::expect_warning(gtfs_new <- GTFShift::load_feed(location), "interpolated .* stop times with missing times")
-    testthat::expect_equal(nrow(gtfs_new$stop_times), nrow(gtfs$stop_times))
+    testthat::expect_identical(nrow(gtfs_new$stop_times), nrow(gtfs$stop_times))
     testthat::expect_false(anyNA(gtfs_new$stop_times$arrival_time))
 })
 
@@ -109,7 +109,7 @@ test_that("load_feed interpolates missing intermediate stop times", {
     tidytransit::write_gtfs(gtfs, location)
 
     testthat::expect_warning(gtfs_new <- GTFShift::load_feed(location), "interpolated .* stop times with missing times")
-    testthat::expect_equal(nrow(gtfs_new$stop_times), nrow(gtfs$stop_times))
+    testthat::expect_identical(nrow(gtfs_new$stop_times), nrow(gtfs$stop_times))
     testthat::expect_false(anyNA(gtfs_new$stop_times$arrival_time))
     testthat::expect_false(anyNA(gtfs_new$stop_times$departure_time))
 })
@@ -122,7 +122,7 @@ test_that("load_feed removes duplicates across tables", {
     tidytransit::write_gtfs(gtfs, location)
 
     gtfs_new <- GTFShift::load_feed(location)
-    testthat::expect_equal(nrow(gtfs_new$agency), 1)
+    testthat::expect_identical(nrow(gtfs_new$agency), 1L)
 })
 
 test_that("load_feed removes unused IDs across tables", {
@@ -196,6 +196,6 @@ test_that("headers set when calling remote gtfs url", {
         }
     )
 
-    expect_equal(state$captured_url, URL)
-    expect_equal(state$captured_headers, headers)
+    expect_identical(state$captured_url, URL)
+    expect_identical(state$captured_headers, headers)
 })

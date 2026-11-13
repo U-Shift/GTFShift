@@ -7,5 +7,5 @@ test_that("create_calendar generates calendar table from calendar_dates", {
     expect_contains(names(cal), c("service_id", "monday", "tuesday", "start_date", "end_date"))
 
     service_ids <- gtfs$calendar_dates |> filter(exception_type == 1) |> pull(service_id) |> unique()
-    expect_equal(sort(unique(cal$service_id)), sort(service_ids))
+    expect_identical(sort(unique(cal$service_id)), sort(service_ids))
 })

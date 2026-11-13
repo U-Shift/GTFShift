@@ -19,7 +19,7 @@ test_that("filter_by_modes filters routes by mode code", {
     gtfs_multi <- GTFShift::filter_by_modes(gtfs, modes = list(3, 4))
     expect_contains(class(gtfs_multi), "tidygtfs")
     expect_true(all(gtfs_multi$routes$route_type %in% c(3, 4)))
-    expect_equal(nrow(gtfs_multi$routes), nrow(gtfs_bus$routes) + nrow(gtfs_ferry$routes))
+    expect_identical(nrow(gtfs_multi$routes), nrow(gtfs_bus$routes) + nrow(gtfs_ferry$routes))
 })
 
 test_that("filter_by_modes returns empty feed when no routes match mode code", {
@@ -29,6 +29,6 @@ test_that("filter_by_modes returns empty feed when no routes match mode code", {
     # Mode 999 does not exist in sample
     gtfs_empty <- GTFShift::filter_by_modes(gtfs, modes = list(999))
     expect_contains(class(gtfs_empty), "tidygtfs")
-    expect_equal(nrow(gtfs_empty$routes), 0)
-    expect_equal(nrow(gtfs_empty$trips), 0)
+    expect_identical(nrow(gtfs_empty$routes), 0L)
+    expect_identical(nrow(gtfs_empty$trips), 0L)
 })

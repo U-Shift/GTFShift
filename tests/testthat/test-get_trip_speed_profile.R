@@ -16,7 +16,7 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
     res <- GTFShift::get_trip_speed_profile(df)
 
     expect_s3_class(res, "data.frame")
-    expect_equal(nrow(res), 2)
+    expect_identical(nrow(res), 2L)
     expected_cols <- c(
         "trip_id", "route_id", "day",
         "timestamp_min", "timestamp_max",
@@ -30,10 +30,10 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
 
     # Trip T1 checks
     r_t1 <- res[res$trip_id == "T1", ]
-    expect_equal(r_t1$route_id, "R1")
-    expect_equal(r_t1$day, as.Date("1970-01-01"))
-    expect_equal(r_t1$timestamp_min, 1000)
-    expect_equal(r_t1$timestamp_max, 1240)
+    expect_identical(r_t1$route_id, "R1")
+    expect_identical(r_t1$day, as.Date("1970-01-01"))
+    expect_identical(r_t1$timestamp_min, 1000)
+    expect_identical(r_t1$timestamp_max, 1240)
     expect_equal(r_t1$commercial_speed, 22.5)
     expect_equal(r_t1$commercial_speed_alt, 27.0)
     # T1 valid speeds: c(18, 24, 30, 18)
@@ -46,8 +46,8 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
     expect_equal(r_t1$speed_p75, 25.5)
     expect_equal(r_t1$speed_p85, 27.3)
     expect_equal(r_t1$speed_iqr, 7.5)
-    expect_equal(r_t1$speed_count, 4)
-    expect_equal(r_t1$n_updates, 5)
+    expect_identical(r_t1$speed_count, 4)
+    expect_identical(r_t1$n_updates, 5)
 
     # Monotonicity of percentiles
     expect_lte(r_t1$speed_p15, r_t1$speed_p25)
@@ -57,8 +57,8 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
 
     # Trip T2 checks
     r_t2 <- res[res$trip_id == "T2", ]
-    expect_equal(r_t2$timestamp_min, 2000)
-    expect_equal(r_t2$timestamp_max, 2200)
+    expect_identical(r_t2$timestamp_min, 2000)
+    expect_identical(r_t2$timestamp_max, 2200)
     expect_equal(r_t2$commercial_speed, 32.4)
     expect_equal(r_t2$commercial_speed_alt, 32.4)
     # T2 valid speeds: c(28.8, 28.8, 36, 36)
@@ -66,19 +66,19 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
     expect_equal(r_t2$speed_median, 32.4)
     expect_equal(r_t2$speed_min, 28.8)
     expect_equal(r_t2$speed_max, 36.0)
-    expect_equal(r_t2$speed_count, 4)
-    expect_equal(r_t2$n_updates, 5)
+    expect_identical(r_t2$speed_count, 4)
+    expect_identical(r_t2$n_updates, 5)
 
     # Check global_summary attribute
     global_sum <- attr(res, "global_summary")
     expect_s3_class(global_sum, "data.frame")
-    expect_equal(nrow(global_sum), 1)
-    expect_equal(global_sum$timestamp_min, 1000)
-    expect_equal(global_sum$timestamp_max, 2200)
+    expect_identical(nrow(global_sum), 1L)
+    expect_identical(global_sum$timestamp_min, 1000)
+    expect_identical(global_sum$timestamp_max, 2200)
     expect_equal(global_sum$commercial_speed, 27.45) # mean of 22.5 and 32.4
     expect_equal(global_sum$commercial_speed_alt, 29.7) # mean of 27.0 and 32.4
-    expect_equal(global_sum$speed_count, 8)
-    expect_equal(global_sum$n_updates, 10)
+    expect_identical(global_sum$speed_count, 8)
+    expect_identical(global_sum$n_updates, 10)
 })
 
 test_that("get_trip_speed_profile supports custom aggregation columns in 'by'", {
@@ -93,36 +93,36 @@ test_that("get_trip_speed_profile supports custom aggregation columns in 'by'", 
 
     # 1. Grouping by route_id and day (collapsing multiple trips into one group)
     res_route <- GTFShift::get_trip_speed_profile(df, by = c("route_id", "day"))
-    expect_equal(nrow(res_route), 1)
-    expect_equal(res_route$route_id, "R1")
+    expect_identical(nrow(res_route), 1L)
+    expect_identical(res_route$route_id, "R1")
     # Commercial speeds should be averaged across the two trips
     expect_equal(res_route$commercial_speed, 27.45)
     expect_equal(res_route$commercial_speed_alt, 29.7)
-    expect_equal(res_route$n_updates, 10)
-    expect_equal(res_route$speed_count, 8)
+    expect_identical(res_route$n_updates, 10)
+    expect_identical(res_route$speed_count, 8)
 
     # 2. Grouping solely by trip_id
     res_trip <- GTFShift::get_trip_speed_profile(df, by = "trip_id")
-    expect_equal(nrow(res_trip), 2)
+    expect_identical(nrow(res_trip), 2L)
     expect_false("route_id" %in% names(res_trip))
     expect_false("day" %in% names(res_trip))
     expect_equal(res_trip$commercial_speed, c(22.5, 32.4))
 
     # 3. by = NULL (whole dataset evaluated without grouping)
     res_null <- GTFShift::get_trip_speed_profile(df, by = NULL)
-    expect_equal(nrow(res_null), 1)
+    expect_identical(nrow(res_null), 1L)
     expect_equal(res_null$commercial_speed, 27.45)
-    expect_equal(res_null$n_updates, 10)
+    expect_identical(res_null$n_updates, 10)
 
     # 4. by = character(0)
     res_char0 <- GTFShift::get_trip_speed_profile(df, by = character(0))
-    expect_equal(nrow(res_char0), 1)
+    expect_identical(nrow(res_char0), 1L)
     expect_equal(res_char0$commercial_speed, 27.45)
 
     # 5. Default by when route_id is missing: keeps available columns (trip_id and derived day)
     df_no_route <- df[, c("trip_id", "timestamp", "distance_along_geometry", "distance_along_geometry_reversed", "speed_kmh")]
     res_default_partial <- GTFShift::get_trip_speed_profile(df_no_route)
-    expect_equal(nrow(res_default_partial), 2)
+    expect_identical(nrow(res_default_partial), 2L)
     expect_contains(names(res_default_partial), c("trip_id", "day"))
     expect_false("route_id" %in% names(res_default_partial))
 })
@@ -139,7 +139,7 @@ test_that("get_trip_speed_profile derives day column from different timestamp ty
         speed_kmh = c(NA, 15, 15, 15)
     )
     res_posix <- GTFShift::get_trip_speed_profile(df_posix)
-    expect_equal(res_posix$day, as.Date("2024-05-01"))
+    expect_identical(res_posix$day, as.Date("2024-05-01"))
     expect_equal(res_posix$commercial_speed, 15.0)
     expect_equal(res_posix$commercial_speed_alt, 15.0)
 
@@ -153,7 +153,7 @@ test_that("get_trip_speed_profile derives day column from different timestamp ty
         speed_kmh = c(NA, 4.17, 4.17, 4.17)
     )
     res_date <- GTFShift::get_trip_speed_profile(df_date)
-    expect_equal(res_date$day, as.Date(c("2024-06-01", "2024-06-02", "2024-06-03", "2024-06-04")))
+    expect_identical(res_date$day, as.Date(c("2024-06-01", "2024-06-02", "2024-06-03", "2024-06-04")))
 
     res_date_trip <- GTFShift::get_trip_speed_profile(df_date, by = "trip_id")
     expect_equal(res_date_trip$commercial_speed, 4.17)
@@ -162,7 +162,7 @@ test_that("get_trip_speed_profile derives day column from different timestamp ty
     df_custom_day <- df_posix
     df_custom_day$day <- as.Date("2020-01-01")
     res_custom_day <- GTFShift::get_trip_speed_profile(df_custom_day)
-    expect_equal(res_custom_day$day, as.Date("2020-01-01"))
+    expect_identical(res_custom_day$day, as.Date("2020-01-01"))
 })
 
 test_that("get_trip_speed_profile drops geometry from sf objects", {
@@ -197,8 +197,8 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
     expect_true(is.na(res_n1$speed_sd))
     expect_true(is.na(res_n1$speed_var))
     expect_equal(res_n1$speed_avg, 25.0)
-    expect_equal(res_n1$speed_count, 1)
-    expect_equal(res_n1$n_updates, 1)
+    expect_identical(res_n1$speed_count, 1)
+    expect_identical(res_n1$n_updates, 1)
 
     # 2 updates: commercial_speed valid, commercial_speed_alt NA
     df_n2 <- data.frame(
@@ -289,10 +289,10 @@ test_that("get_trip_speed_profile handles unordered updates, zero/negative elaps
 
     res_sorted <- GTFShift::get_trip_speed_profile(df_sorted, by = "trip_id")
     res_scrambled <- GTFShift::get_trip_speed_profile(df_scrambled, by = "trip_id")
-    expect_equal(res_scrambled$timestamp_min, res_sorted$timestamp_min)
-    expect_equal(res_scrambled$timestamp_max, res_sorted$timestamp_max)
-    expect_equal(res_scrambled$commercial_speed, res_sorted$commercial_speed)
-    expect_equal(res_scrambled$commercial_speed_alt, res_sorted$commercial_speed_alt)
+    expect_identical(res_scrambled$timestamp_min, res_sorted$timestamp_min)
+    expect_identical(res_scrambled$timestamp_max, res_sorted$timestamp_max)
+    expect_identical(res_scrambled$commercial_speed, res_sorted$commercial_speed)
+    expect_identical(res_scrambled$commercial_speed_alt, res_sorted$commercial_speed_alt)
 
     # 2. Zero or negative time difference yields NA commercial speed
     df_zero_time <- data.frame(
@@ -364,7 +364,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
     expect_equal(res_inf$speed_avg, 30.0)
     expect_equal(res_inf$speed_min, 20.0)
     expect_equal(res_inf$speed_max, 40.0)
-    expect_equal(res_inf$speed_count, 2)
+    expect_identical(res_inf$speed_count, 2)
 
     # 2. All speeds NA
     df_all_na <- data.frame(
@@ -375,7 +375,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
         speed_kmh = c(NA_real_, NA_real_)
     )
     res_all_na <- GTFShift::get_trip_speed_profile(df_all_na, by = "trip_id")
-    expect_equal(res_all_na$speed_count, 0)
+    expect_identical(res_all_na$speed_count, 0)
     expect_true(is.na(res_all_na$speed_avg))
     expect_true(is.na(res_all_na$speed_median))
     expect_true(is.na(res_all_na$speed_sd))
@@ -397,7 +397,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
         distance_along_geometry_reversed = c(500, 0)
     )
     res_no_speed <- GTFShift::get_trip_speed_profile(df_no_speed, by = "trip_id")
-    expect_equal(res_no_speed$speed_count, 0)
+    expect_identical(res_no_speed$speed_count, 0)
     expect_true(is.na(res_no_speed$speed_avg))
     expect_equal(res_no_speed$commercial_speed, 30.0)
 
@@ -417,7 +417,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
     )
     expect_equal(res_custom$commercial_speed, 30.0)
     expect_equal(res_custom$speed_avg, 30.0)
-    expect_equal(res_custom$speed_count, 3)
+    expect_identical(res_custom$speed_count, 3)
 
     # 5. Grouped data.frame input is ungrouped properly
     df_grouped <- dplyr::group_by(df_inf, trip_id)
@@ -494,9 +494,9 @@ test_that("get_trip_speed_profile integrates seamlessly with rt_average_speed ou
 
     expect_s3_class(profile, "data.frame")
     expect_false(inherits(profile, "sf"))
-    expect_equal(nrow(profile), 2)
-    expect_equal(profile$trip_id, c("T1", "T2"))
-    expect_equal(profile$route_id, c("R1", "R1"))
+    expect_identical(nrow(profile), 2L)
+    expect_identical(profile$trip_id, c("T1", "T2"))
+    expect_identical(profile$route_id, c("R1", "R1"))
     expect_false(anyNA(profile$commercial_speed))
     expect_false(anyNA(profile$commercial_speed_alt))
     expect_false(anyNA(profile$speed_avg))
@@ -506,8 +506,8 @@ test_that("get_trip_speed_profile integrates seamlessly with rt_average_speed ou
     # Global summary check
     global_summary <- attr(profile, "global_summary")
     expect_s3_class(global_summary, "data.frame")
-    expect_equal(nrow(global_summary), 1)
-    expect_equal(global_summary$n_updates, 8)
+    expect_identical(nrow(global_summary), 1L)
+    expect_identical(global_summary$n_updates, 8)
 })
 
 test_that("get_trip_speed_profile accommodates circular geometries by taking max of normal and reversed distances", {

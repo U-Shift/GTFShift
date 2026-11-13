@@ -11,7 +11,7 @@ test_that("create_shapes_from_sf generates shapes from sf object", {
     shapes_df <- GTFShift::create_shapes_from_sf(sf_line, gtfs, metric_crs = 3857)
     expect_contains(names(shapes_df), c("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence"))
     expect_gt(nrow(shapes_df), 1)
-    expect_equal(shapes_df$shape_id[1], target_shape_id)
+    expect_identical(shapes_df$shape_id[1], target_shape_id)
 })
 
 test_that("create_shapes_from_sf calculates shape_dist_traveled when shape_dist_traveled = TRUE", {
@@ -35,7 +35,7 @@ test_that("create_shapes_from_sf calculates shape_dist_traveled when shape_dist_
     shapes_df <- GTFShift::create_shapes_from_sf(sf_lines, gtfs, metric_crs = 3857, shape_dist_traveled = TRUE)
     expect_contains(names(shapes_df), c("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled"))
     expect_false(anyNA(shapes_df$shape_dist_traveled))
-    expect_equal(shapes_df$shape_dist_traveled[1], 0)
+    expect_identical(shapes_df$shape_dist_traveled[1], 0)
     expect_equal(shapes_df$shape_dist_traveled[2], expected_dist, tolerance = 1e-3)
 
     # Validate that unmatched_shape_id was ignored and not present in shapes_df
@@ -56,7 +56,7 @@ test_that("create_shapes_from_sf works when metric_crs is default (NULL)", {
         shapes_df <- GTFShift::create_shapes_from_sf(sf_line, gtfs, shape_dist_traveled = TRUE)
     )
     expect_contains(names(shapes_df), c("shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled"))
-    expect_equal(shapes_df$shape_dist_traveled[1], 0)
+    expect_identical(shapes_df$shape_dist_traveled[1], 0)
     expect_equal(shapes_df$shape_dist_traveled[2], as.numeric(sf::st_length(sf_line[1, ])), tolerance = 1e-3)
 })
 

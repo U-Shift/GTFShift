@@ -83,9 +83,9 @@ test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overp
             })
             expect_s3_class(res, "sf")
             expect_contains(names(res), c("shape_id", "osm_id", "geometry"))
-            expect_equal(nrow(res), 1)
-            expect_equal(res$shape_id, target_shape_id)
-            expect_equal(res$osm_id, "rel_1")
+            expect_identical(nrow(res), 1L)
+            expect_identical(res$shape_id, target_shape_id)
+            expect_identical(res$osm_id, "rel_1")
         }
     )
 })
@@ -144,9 +144,9 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
                     })
                     expect_s3_class(res, "sf")
                     expect_contains(names(res), c("shape_id", "osm_id", "way_osm_id", "lanes", "maxspeed", "geometry"))
-                    expect_equal(res$way_osm_id, "w1")
-                    expect_equal(res$lanes, "2")
-                    expect_equal(res$maxspeed, "50")
+                    expect_identical(res$way_osm_id, "w1")
+                    expect_identical(res$lanes, "2")
+                    expect_identical(res$maxspeed, "50")
                 }
             )
         }
@@ -225,9 +225,9 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file = NULL extracts wa
             })
             expect_s3_class(res, "sf")
             expect_contains(names(res), c("shape_id", "osm_id", "way_osm_id", "lanes", "maxspeed", "geometry"))
-            expect_equal(res$way_osm_id, "w1")
-            expect_equal(res$lanes, "3")
-            expect_equal(res$maxspeed, "60")
+            expect_identical(res$way_osm_id, "w1")
+            expect_identical(res$lanes, "3")
+            expect_identical(res$maxspeed, "60")
         }
     )
 })

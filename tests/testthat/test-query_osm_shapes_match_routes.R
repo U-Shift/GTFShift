@@ -94,8 +94,8 @@ test_that("osm_shapes_match_routes executes matching flow with osm_file provided
 
                     expect_s3_class(res, "sf")
                     expect_contains(names(res), c("route_id", "shape_id", "osm_id", "distance_diff", "points_diff", "stops_diff", "geometry"))
-                    expect_equal(res$osm_id[1], "rel_1")
-                    expect_equal(res$shape_id[1], fx$target_shape_id)
+                    expect_identical(res$osm_id[1], "rel_1")
+                    expect_identical(res$shape_id[1], fx$target_shape_id)
 
                     expect_true(file.exists(log_tmp))
                     log_lines <- readLines(log_tmp)
@@ -161,7 +161,7 @@ test_that("osm_shapes_match_routes executes matching flow when osm_file is NULL 
 
             expect_s3_class(res, "sf")
             expect_contains(names(res), c("route_id", "shape_id", "osm_id", "geometry"))
-            expect_equal(res$osm_id[1], "rel_1")
+            expect_identical(res$osm_id[1], "rel_1")
 
             expect_true(file.exists(log_tmp))
             log_lines <- readLines(log_tmp)
@@ -358,7 +358,7 @@ test_that("osm_shapes_match_routes works when metric_crs is default (NULL)", {
                         )
                     )
                     expect_s3_class(res, "sf")
-                    expect_equal(res$osm_id[1], "rel_1")
+                    expect_identical(res$osm_id[1], "rel_1")
                     expect_true(file.exists(log_tmp))
                 }
             )
@@ -425,7 +425,7 @@ test_that("osm_shapes_match_routes handles unsorted stops and osm_stop_order_rel
                         osm_stop_order_relaxed = TRUE
                     ))
                     expect_s3_class(res, "sf")
-                    expect_equal(nrow(res), 1)
+                    expect_identical(nrow(res), 1L)
                 }
             )
         }
@@ -469,7 +469,7 @@ test_that("osm_shapes_match_routes returns empty result when !osm_stop_order_rel
                         osm_stop_order_relaxed = FALSE
                     ))
                     expect_s3_class(res, "sf")
-                    expect_equal(nrow(res), 0)
+                    expect_identical(nrow(res), 0L)
                 }
             )
         }
@@ -656,7 +656,7 @@ test_that("osm_shapes_match_routes handles GTFS route with no trips or shapes (n
                         osm_file = "dummy.pbf",
                         metric_crs = 3857
                     ))
-                    expect_equal(nrow(res), 0)
+                    expect_identical(nrow(res), 0L)
                 }
             )
         }

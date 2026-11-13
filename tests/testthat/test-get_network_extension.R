@@ -90,6 +90,6 @@ test_that("get_network_extension works with parameter variations", {
     date = ref_date,
     metric_crs = "EPSG:3857"
   )
-  expect_equal(as.numeric(ext_epsg_str), as.numeric(ext_non_unified))
+  expect_identical(as.numeric(ext_epsg_str), as.numeric(ext_non_unified))
 })
 
