@@ -122,7 +122,7 @@ test_that("parameter variation: entity_key custom and NA", {
 
     res_df1 <- read.csv(dest_file1)
     expect_identical(nrow(res_df1), 1L)
-    expect_identical(res_df1$id, 99)
+    expect_identical(res_df1$id, 99L)
 
     # NA entity key (flat list)
     dest_file2 <- withr::local_tempfile(fileext = ".csv")
@@ -144,7 +144,7 @@ test_that("parameter variation: entity_key custom and NA", {
 
     res_df2 <- read.csv(dest_file2)
     expect_identical(nrow(res_df2), 1L)
-    expect_identical(res_df2$id, 100)
+    expect_identical(res_df2$id, 100L)
 })
 
 test_that("test incrementality in response", {
