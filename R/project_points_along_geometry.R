@@ -67,7 +67,6 @@
 #'
 #' head(points_projected)
 #'
-#' @importFrom units set_units
 #' @export
 project_points_along_geometry <- function(
   geometry,
@@ -164,9 +163,8 @@ project_points_along_geometry <- function(
 
   line_len_m <- as.numeric(sf::st_length(geometry_metric))
   if (isTRUE(sf::st_is_longlat(geometry_metric))) {
-    max_len <- units::set_units(geometry_sample_meters, "m")
     geometry_sampled <- sf::st_segmentize(
-      geometry_metric, dfMaxLength = max_len
+      geometry_metric, dfMaxLength = geometry_sample_meters
     )
     geometry_sampled_points <- sf::st_cast(geometry_sampled, "POINT")
     if (length(geometry_sampled_points) > 1) {

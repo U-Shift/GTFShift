@@ -55,7 +55,6 @@ importFrom(jsonlite,
   fromJSON,
   write_json
 )
-importFrom(purrr,map_dfr)
 importFrom(rlang,.data)
 importFrom(stats,
   IQR,
@@ -66,13 +65,7 @@ importFrom(stats,
   var,
   weighted.mean
 )
-importFrom(stringr,
-  regex,
-  str_detect
-)
-importFrom(tidyr,unnest)
 importFrom(tidyselect,any_of)
-importFrom(units,set_units)
 importFrom(utils,
   head,
   tail,
