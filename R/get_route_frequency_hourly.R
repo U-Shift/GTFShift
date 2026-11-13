@@ -1,36 +1,59 @@
 #' Get aggregated frequency per hour for each bus route
 #'
-#' For each route, returns the number of departures aggregated per hour and direction.
+#' For each route, returns the number of departures aggregated per hour and
+#' direction.
 #'
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.
-#' @param use_osm_routes osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes()}.
-#' @param overline Boolean (Default FALSE). If TRUE, routes are aggregated using \code{stplanr::overline2()}, overlapping lines and converting them into a single route network.
+#' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
+#'   Reference date to consider when analyzing the GTFS file.
+#' @param use_osm_routes osmdata::opq (Default NA). If overpass query for
+#'   transit network is defined, analysis is performed considering OSM route
+#'   geometry, using \code{GTFShift::osm_shapes_to_routes()}.
+#' @param overline Boolean (Default FALSE). If TRUE, routes are aggregated using
+#'   \code{stplanr::overline2()}, overlapping lines and converting them into a
+#'   single route network.
 #'
 #' @details
-#' This method analyses the GTFS feed for a representative day, generating for each route the number of services aggregated per hour and direction.
-#' It assumes the time of departure at the first stop as a reference for each trip geometry.
+#' This method analyses the GTFS feed for a representative day, generating for
+#' each route the number of services aggregated per hour and direction.
+#' It assumes the time of departure at the first stop as a reference for each
+#' trip geometry.
 #'
-#' By default, it estimates the next business Wednesday, relevant for the peak hour.
+#' By default, it estimates the next business Wednesday, relevant for the peak
+#' hour.
 #'
-#' The \code{overline} parameter enables the aggregation of bus routes that share common line segments, returning a sum of frequencies per road segment, using \code{stplanr::overline2()}.
+#' The \code{overline} parameter enables the aggregation of bus routes that
+#' share common line segments, returning a sum of frequencies per road segment,
+#' using \code{stplanr::overline2()}.
 #'
-#' Optionally, using \code{use_osm_routes} parameter, it retrieves the geometries from OpenStreetMap by matching the tag \code{gtfs:shape_id}, overwriting the original GTFS \code{shapes.txt}.
-#' This is particularly useful if the GTFS shapes do not share the same geometry. For instance, if the edges of the lines do not overlap or do not follow the same route-over-the-road – which is very common, even besides \href{https://gtfs.org/documentation/schedule/schedule-best-practices/#shapestxt}{GTFS recommendation} – geometries might not be aggregated correctly, causing inconsistent results.
-#' By relying on a common road network, such as OSM, it is possible to overcome this issue and aggregate the bus routes correctly.
+#' Optionally, using \code{use_osm_routes} parameter, it retrieves the
+#' geometries from OpenStreetMap by matching the tag \code{gtfs:shape_id},
+#' overwriting the original GTFS \code{shapes.txt}.
+#' This is particularly useful if the GTFS shapes do not share the same
+#' geometry. For instance, if the edges of the lines do not overlap or do not
+#' follow the same route-over-the-road – which is very common, even besides
+#' \href{https://gtfs.org/documentation/schedule/schedule-best-practices/#shapestxt}{GTFS recommendation} % # nolint
+#' – geometries might not be aggregated correctly, causing inconsistent results.
+#' By relying on a common road network, such as OSM, it is possible to overcome
+#' this issue and aggregate the bus routes correctly.
 #'
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
-#' Adapted from \href{https://web.archive.org/web/20201223060409/https://github.com/Bondify/GTFS_in_R/}{github.com/Bondify/GTFS_in_R}.
+#' Adapted from
+#' \href{https://web.archive.org/web/20201223060409/https://github.com/Bondify/GTFS_in_R/}{github.com/Bondify/GTFS_in_R}. % # nolint
 #'
-#' @returns sf data.frame. Hourly route frequencies, with the following columns (the first three are only present if \code{overline=FALSE}):
+#' @returns sf data.frame. Hourly route frequencies, with the following columns
+#'   (the first three are only present if \code{overline=FALSE}):
 #' \describe{
 #'   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
-#'   \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
+#'   \item{route_short_name}{The \code{route_short_name} attribute from
+#'     \code{routes.txt} file.}
 #'   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
-#'   \item{direction_id}{The \code{direction_id} attribute from \code{trips.txt} file (if attribute present in GTFS feed).}
+#'   \item{direction_id}{The \code{direction_id} attribute from \code{trips.txt}
+#'     file (if attribute present in GTFS feed).}
 #'   \item{hour}{The hour for which the frequency applies (24 hour format).}
-#'   \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+#'   \item{frequency}{The number of services for the route that depart from the
+#'     first stop for the corresponding 60 minutes period.}
 #'   \item{geometry}{The route shape.}
 #' }
 #'
@@ -88,8 +111,8 @@ get_route_frequency_hourly <- function(
   stop_times <- gtfs_date$stop_times
 
   stop_times <- stop_times |>
-    left_join(trips, by="trip_id") |>
-    left_join(routes, by="route_id") |>
+    left_join(trips, by = "trip_id") |>
+    left_join(routes, by = "route_id") |>
     select(any_of(c(
       "route_id",
       "route_short_name",
@@ -111,19 +134,24 @@ get_route_frequency_hourly <- function(
     mutate(hour = lubridate::hour(.data$departure_time))
 
   freq_data <- stop_times |>
-    group_by(across(any_of(c("route_id", "shape_id", "route_short_name", "direction_id", "hour")))) |>
+    group_by(across(any_of(c(
+      "route_id", "shape_id", "route_short_name", "direction_id", "hour"
+    )))) |>
     summarize(frequency = n()) |>
     ungroup()
 
   routes_freq <-
     freq_data |>
-    inner_join(shapes, by="shape_id") |>
+    inner_join(shapes, by = "shape_id") |>
     st_as_sf()
 
   # Overline?
   if (overline) {
     if (!requireNamespace("stplanr", quietly = TRUE)) {
-      stop("Package 'stplanr' is required when overline=TRUE. Install it with: install.packages('stplanr')")
+      stop(
+        "Package 'stplanr' is required when overline=TRUE. ",
+        "Install it with: install.packages('stplanr')"
+      )
     }
     routes_freq_all <- data.frame()
     for (h in unique(routes_freq$hour)) { # hours of the day

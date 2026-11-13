@@ -1,19 +1,27 @@
-test_that("get_prioritisation_stats calculates summary statistics without speed_avg", {
+test_that(
+  "get_prioritisation_stats calculates summary statistics without speed_avg",
+  {
+    l1 <- sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE))
+    l2 <- sf::st_linestring(matrix(c(100, 0, 300, 0), ncol = 2, byrow = TRUE))
     prioritisation_df <- sf::st_sf(
-        is_bus_lane = c(TRUE, FALSE),
-        frequency = c(10, 5),
-        n_lanes_circulation = c(2, 4),
-        n_lanes_parking = c(1, 3),
-        geometry = sf::st_sfc(
-            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)), # 100 m
-            sf::st_linestring(matrix(c(100, 0, 300, 0), ncol = 2, byrow = TRUE)), # 200 m
-            crs = 3857
-        )
+      is_bus_lane = c(TRUE, FALSE),
+      frequency = c(10, 5),
+      n_lanes_circulation = c(2, 4),
+      n_lanes_parking = c(1, 3),
+      geometry = sf::st_sfc(l1, l2, crs = 3857)
     )
 
-    stats <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length", metric_crs = 3857)
+    stats <- GTFShift::get_prioritisation_stats(
+      prioritisation_df, weight = "length", metric_crs = 3857
+    )
     expect_type(stats, "list")
-    expect_contains(names(stats), c("extension", "extension_bus_lane", "n_lanes_circulation_avg", "n_lanes_parking_avg"))
+    expect_contains(
+      names(stats),
+      c(
+        "extension", "extension_bus_lane",
+        "n_lanes_circulation_avg", "n_lanes_parking_avg"
+      )
+    )
 
     # Internal length mutation: feature 1 = 100m, feature 2 = 200m
     # extension: total length = 300m
@@ -32,116 +40,135 @@ test_that("get_prioritisation_stats calculates summary statistics without speed_
     expect_identical(stats$n_lanes_parking_min, 1)
     expect_identical(stats$n_lanes_parking_max, 3)
 
-    # Validate that speed metrics are NOT present when speed_avg column is missing
-    expect_false(any(c("speed_avg", "speed_min", "speed_max") %in% names(stats)))
-})
+    # Validate that speed metrics are NOT present when speed_avg is missing
+    expect_false(
+      any(c("speed_avg", "speed_min", "speed_max") %in% names(stats))
+    )
+  }
+)
 
-test_that("get_prioritisation_stats calculates speed metrics when speed_avg column is present", {
+test_that(
+  paste0(
+    "get_prioritisation_stats calculates speed metrics ",
+    "when speed_avg column is present"
+  ),
+  {
+    l1 <- sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE))
+    l2 <- sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE))
     prioritisation_df <- sf::st_sf(
-        is_bus_lane = c(TRUE, FALSE),
-        frequency = c(10, 5),
-        speed_avg = c(30, 50),
-        n_lanes_circulation = c(2, 3),
-        n_lanes_parking = c(1, 0),
-        geometry = sf::st_sfc(
-            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
-            crs = 3857
-        )
+      is_bus_lane = c(TRUE, FALSE),
+      frequency = c(10, 5),
+      speed_avg = c(30, 50),
+      n_lanes_circulation = c(2, 3),
+      n_lanes_parking = c(1, 0),
+      geometry = sf::st_sfc(l1, l2, crs = 3857)
     )
 
     # Test with weight = "frequency" (weights: 10 and 5, total = 15)
-    stats <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "frequency", metric_crs = 3857)
+    stats <- GTFShift::get_prioritisation_stats(
+      prioritisation_df, weight = "frequency", metric_crs = 3857
+    )
     expect_type(stats, "list")
     expect_contains(names(stats), c("speed_avg", "speed_min", "speed_max"))
 
-    # speed_avg weighted by frequency: (30*10 + 50*5) / 15 = 550 / 15 = 36.66667
+    # speed_avg weighted by frequency: (30*10 + 50*5) / 15 = 550 / 15
     expect_identical(stats$speed_avg, (30 * 10 + 50 * 5) / 15)
     expect_identical(stats$speed_min, 30)
     expect_identical(stats$speed_max, 50)
 
-    # n_lanes_circulation weighted by frequency: (2*10 + 3*5) / 15 = 35 / 15 = 7/3
+    # n_lanes_circulation weighted by frequency: (2*10 + 3*5) / 15 = 35 / 15
     expect_identical(stats$n_lanes_circulation_avg, 35 / 15)
     expect_identical(stats$n_lanes_circulation_min, 2)
     expect_identical(stats$n_lanes_circulation_max, 3)
 
-    # n_lanes_parking weighted by frequency: (1*10 + 0*5) / 15 = 10 / 15 = 2/3
+    # n_lanes_parking weighted by frequency: (1*10 + 0*5) / 15 = 10 / 15
     expect_identical(stats$n_lanes_parking_avg, 10 / 15)
     expect_identical(stats$n_lanes_parking_min, 0)
     expect_identical(stats$n_lanes_parking_max, 1)
-})
+  }
+)
 
 test_that("get_prioritisation_stats works when metric_crs is default (NULL)", {
-    prioritisation_df <- sf::st_sf(
-        is_bus_lane = c(TRUE, FALSE),
-        frequency = c(10, 5),
-        n_lanes_circulation = c(2, 3),
-        n_lanes_parking = c(1, 0),
-        geometry = sf::st_sfc(
-            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
-            crs = 3857
-        )
-    )
+  l1 <- sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE))
+  l2 <- sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE))
+  prioritisation_df <- sf::st_sf(
+    is_bus_lane = c(TRUE, FALSE),
+    frequency = c(10, 5),
+    n_lanes_circulation = c(2, 3),
+    n_lanes_parking = c(1, 0),
+    geometry = sf::st_sfc(l1, l2, crs = 3857)
+  )
 
-    expect_no_warning(
-        stats <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length")
+  expect_no_warning(
+    stats <- GTFShift::get_prioritisation_stats(
+      prioritisation_df, weight = "length"
     )
-    expect_identical(stats$extension, 200)
+  )
+  expect_identical(stats$extension, 200)
 })
 
 test_that("get_prioritisation_stats stops on invalid weight or metric_crs", {
-    prioritisation_df <- sf::st_sf(
-        is_bus_lane = c(TRUE, FALSE),
-        frequency = c(10, 5),
-        n_lanes_circulation = c(2, 3),
-        n_lanes_parking = c(1, 0),
-        geometry = sf::st_sfc(
-            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE)),
-            crs = 3857
-        )
-    )
+  l1 <- sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE))
+  l2 <- sf::st_linestring(matrix(c(100, 0, 200, 0), ncol = 2, byrow = TRUE))
+  prioritisation_df <- sf::st_sf(
+    is_bus_lane = c(TRUE, FALSE),
+    frequency = c(10, 5),
+    n_lanes_circulation = c(2, 3),
+    n_lanes_parking = c(1, 0),
+    geometry = sf::st_sfc(l1, l2, crs = 3857)
+  )
 
-    # Invalid weight choice
-    expect_error(
-        GTFShift::get_prioritisation_stats(prioritisation_df, weight = "invalid_weight", metric_crs = 3857)
+  # Invalid weight choice
+  expect_error(
+    GTFShift::get_prioritisation_stats(
+      prioritisation_df, weight = "invalid_weight", metric_crs = 3857
     )
+  )
 
-    # Invalid CRS
-    expect_error(
-        GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length", metric_crs = NA),
-        "metric_crs should be a valid CRS value"
-    )
+  # Invalid CRS
+  expect_error(
+    GTFShift::get_prioritisation_stats(
+      prioritisation_df, weight = "length", metric_crs = NA
+    ),
+    "metric_crs should be a valid CRS value"
+  )
 })
 
-test_that("get_prioritisation_stats calculates stats using weight = 'length' vs weight = 'frequency'", {
-    # Feature 1: length = 100m, frequency = 30, speed_avg = 20, n_lanes_circulation = 2
-    # Feature 2: length = 300m, frequency = 10, speed_avg = 60, n_lanes_circulation = 4
+test_that(
+  paste0(
+    "get_prioritisation_stats calculates stats using ",
+    "weight = 'length' vs weight = 'frequency'"
+  ),
+  {
+    # Feature 1: length = 100m, frequency = 30, speed_avg = 20, lanes = 2
+    # Feature 2: length = 300m, frequency = 10, speed_avg = 60, lanes = 4
+    l1 <- sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE))
+    l2 <- sf::st_linestring(matrix(c(100, 0, 400, 0), ncol = 2, byrow = TRUE))
     prioritisation_df <- sf::st_sf(
-        is_bus_lane = c(TRUE, FALSE),
-        frequency = c(30, 10),
-        speed_avg = c(20, 60),
-        n_lanes_circulation = c(2, 4),
-        n_lanes_parking = c(1, 3),
-        geometry = sf::st_sfc(
-            sf::st_linestring(matrix(c(0, 0, 100, 0), ncol = 2, byrow = TRUE)),
-            sf::st_linestring(matrix(c(100, 0, 400, 0), ncol = 2, byrow = TRUE)),
-            crs = 3857
-        )
+      is_bus_lane = c(TRUE, FALSE),
+      frequency = c(30, 10),
+      speed_avg = c(20, 60),
+      n_lanes_circulation = c(2, 4),
+      n_lanes_parking = c(1, 3),
+      geometry = sf::st_sfc(l1, l2, crs = 3857)
     )
 
     # 1) Weight by length (weights: 100 and 300, total = 400)
-    stats_length <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "length", metric_crs = 3857)
+    stats_length <- GTFShift::get_prioritisation_stats(
+      prioritisation_df, weight = "length", metric_crs = 3857
+    )
     # speed_avg: (20*100 + 60*300) / 400 = (2000 + 18000) / 400 = 50
     expect_identical(stats_length$speed_avg, 50)
-    # n_lanes_circulation_avg: (2*100 + 4*300) / 400 = (200 + 1200) / 400 = 3.5
+    # n_lanes_circulation_avg: (2*100 + 4*300) / 400 = 1400 / 400 = 3.5
     expect_equal(stats_length$n_lanes_circulation_avg, 3.5)
 
     # 2) Weight by frequency (weights: 30 and 10, total = 40)
-    stats_freq <- GTFShift::get_prioritisation_stats(prioritisation_df, weight = "frequency", metric_crs = 3857)
+    stats_freq <- GTFShift::get_prioritisation_stats(
+      prioritisation_df, weight = "frequency", metric_crs = 3857
+    )
     # speed_avg: (20*30 + 60*10) / 40 = (600 + 600) / 40 = 30
     expect_identical(stats_freq$speed_avg, 30)
-    # n_lanes_circulation_avg: (2*30 + 4*10) / 40 = (60 + 40) / 40 = 2.5
+    # n_lanes_circulation_avg: (2*30 + 4*10) / 40 = 100 / 40 = 2.5
     expect_equal(stats_freq$n_lanes_circulation_avg, 2.5)
-})
+  }
+)

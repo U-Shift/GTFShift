@@ -1,8 +1,16 @@
-test_that("rt_collect_json extracts JSON feed data and appends to CSV destination", {
+test_that("rt_collect_json extracts JSON feed data and appends to CSV", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     parsed_json <- list(
         header = list(timestamp = 1700000000),
-        entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
+        entity = list(
+            list(
+                id = "1",
+                vehicle = list(
+                    trip = list(trip_id = "t1"),
+                    position = list(latitude = 41.1, longitude = -8.6)
+                )
+            )
+        )
     )
 
     testthat::with_mocked_bindings(
@@ -33,7 +41,15 @@ test_that("headers are passed and httr is mocked", {
 
     parsed_json <- list(
         header = list(timestamp = 1700000000),
-        entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
+        entity = list(
+            list(
+                id = "1",
+                vehicle = list(
+                    trip = list(trip_id = "t1"),
+                    position = list(latitude = 41.1, longitude = -8.6)
+                )
+            )
+        )
     )
 
     testthat::with_mocked_bindings(
@@ -77,7 +93,15 @@ test_that("parameter variation: log_file", {
     log_file <- withr::local_tempfile(fileext = ".log")
     parsed_json <- list(
         header = list(timestamp = 1700000000),
-        entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
+        entity = list(
+            list(
+                id = "1",
+                vehicle = list(
+                    trip = list(trip_id = "t1"),
+                    position = list(latitude = 41.1, longitude = -8.6)
+                )
+            )
+        )
     )
 
     testthat::with_mocked_bindings(
@@ -95,8 +119,14 @@ test_that("parameter variation: log_file", {
 
     expect_true(file.exists(log_file))
     log_content <- readLines(log_file)
-    expect_true(any(grepl("Starting GTFS-RT data collection", log_content, fixed = TRUE)))
-    expect_true(any(grepl("Iteration 1 completed", log_content, fixed = TRUE)))
+    expect_true(
+        any(grepl(
+            "Starting GTFS-RT data collection", log_content, fixed = TRUE
+        ))
+    )
+    expect_true(
+        any(grepl("Iteration 1 completed", log_content, fixed = TRUE))
+    )
 })
 
 test_that("parameter variation: entity_key custom and NA", {
@@ -104,7 +134,15 @@ test_that("parameter variation: entity_key custom and NA", {
     dest_file1 <- withr::local_tempfile(fileext = ".csv")
     parsed_json_custom <- list(
         header = list(timestamp = 1700000000),
-        custom_entities = list(list(id = "99", vehicle = list(trip = list(trip_id = "t99"), position = list(latitude = 40.0, longitude = -8.0))))
+        custom_entities = list(
+            list(
+                id = "99",
+                vehicle = list(
+                    trip = list(trip_id = "t99"),
+                    position = list(latitude = 40.0, longitude = -8.0)
+                )
+            )
+        )
     )
 
     testthat::with_mocked_bindings(
@@ -126,7 +164,12 @@ test_that("parameter variation: entity_key custom and NA", {
 
     # NA entity key (flat list)
     dest_file2 <- withr::local_tempfile(fileext = ".csv")
-    parsed_json_flat <- data.frame(id = "100", vehicle.trip.trip_id = "t100", vehicle.position.latitude = 42.0, vehicle.position.longitude = -8.5)
+    parsed_json_flat <- data.frame(
+        id = "100",
+        vehicle.trip.trip_id = "t100",
+        vehicle.position.latitude = 42.0,
+        vehicle.position.longitude = -8.5
+    )
 
     testthat::with_mocked_bindings(
         fromJSON = function(...) parsed_json_flat,
@@ -150,8 +193,18 @@ test_that("parameter variation: entity_key custom and NA", {
 test_that("test incrementality in response", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     parsed_json <- list(
-        header = list(timestamp = 1700000000, incrementality = "FULL_DATASET"),
-        entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
+        header = list(
+            timestamp = 1700000000, incrementality = "FULL_DATASET"
+        ),
+        entity = list(
+            list(
+                id = "1",
+                vehicle = list(
+                    trip = list(trip_id = "t1"),
+                    position = list(latitude = 41.1, longitude = -8.6)
+                )
+            )
+        )
     )
 
     testthat::with_mocked_bindings(
@@ -175,7 +228,15 @@ test_that("scrape_interval performs at least 3 requests", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     parsed_json <- list(
         header = list(timestamp = 1700000000),
-        entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
+        entity = list(
+            list(
+                id = "1",
+                vehicle = list(
+                    trip = list(trip_id = "t1"),
+                    position = list(latitude = 41.1, longitude = -8.6)
+                )
+            )
+        )
     )
 
     state <- new.env(parent = emptyenv())
@@ -203,14 +264,16 @@ test_that("scrape_interval performs at least 3 requests", {
         }
     )
 
-    elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+    elapsed_time <- as.numeric(
+        difftime(Sys.time(), start_time, units = "secs")
+    )
     expect_identical(state$request_count, 4)
     res_df <- read.csv(dest_file)
     expect_identical(nrow(res_df), 3L)
     expect_gte(elapsed_time, 3)
 })
 
-test_that("rt_collect_json fails gracefully with informative message when internet resource is unavailable", {
+test_that("rt_collect_json fails gracefully when resource is unavailable", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     log_file <- withr::local_tempfile(fileext = ".log")
     URL <- "http://example.com/unavailable.json"
@@ -218,7 +281,10 @@ test_that("rt_collect_json fails gracefully with informative message when intern
     # Connection error without headers (with log_file)
     testthat::with_mocked_bindings(
         fromJSON = function(...) {
-            stop("cannot open the connection to 'http://example.com/unavailable.json'")
+            stop(
+                "cannot open the connection to ",
+                "'http://example.com/unavailable.json'"
+            )
         },
         .package = "jsonlite",
         code = {
@@ -234,7 +300,13 @@ test_that("rt_collect_json fails gracefully with informative message when intern
             expect_null(res)
             expect_false(file.exists(dest_file))
             expect_true(file.exists(log_file))
-            expect_true(any(grepl("Internet resource unavailable", readLines(log_file), fixed = TRUE)))
+            expect_true(
+                any(grepl(
+                    "Internet resource unavailable",
+                    readLines(log_file),
+                    fixed = TRUE
+                ))
+            )
         }
     )
 
@@ -257,7 +329,13 @@ test_that("rt_collect_json fails gracefully with informative message when intern
                 "Internet resource unavailable"
             )
             expect_null(res)
-            expect_true(any(grepl("Internet resource unavailable", readLines(log_file2), fixed = TRUE)))
+            expect_true(
+                any(grepl(
+                    "Internet resource unavailable",
+                    readLines(log_file2),
+                    fixed = TRUE
+                ))
+            )
         }
     )
 
@@ -284,7 +362,13 @@ test_that("rt_collect_json fails gracefully with informative message when intern
             )
             expect_null(res)
             expect_false(file.exists(dest_file))
-            expect_true(any(grepl("Internet resource unavailable", readLines(log_file3), fixed = TRUE)))
+            expect_true(
+                any(grepl(
+                    "Internet resource unavailable",
+                    readLines(log_file3),
+                    fixed = TRUE
+                ))
+            )
         }
     )
 
@@ -317,28 +401,45 @@ test_that("rt_collect_json fails gracefully with informative message when intern
                         "Failed to parse JSON"
                     )
                     expect_null(res)
-                    expect_true(any(grepl("Failed to parse JSON", readLines(log_file4), fixed = TRUE)))
+                    expect_true(
+                        any(grepl(
+                            "Failed to parse JSON",
+                            readLines(log_file4),
+                            fixed = TRUE
+                        ))
+                    )
                 }
             )
         }
     )
 })
 
-test_that("rt_collect_json retries when resource temporarily fails in loop mode", {
+test_that("rt_collect_json retries when resource fails in loop mode", {
     dest_file <- withr::local_tempfile(fileext = ".csv")
     URL <- "http://example.com/retry.json"
     state <- new.env(parent = emptyenv())
     state$req_count <- 0
     parsed_json <- list(
         header = list(timestamp = 1700000000),
-        entity = list(list(id = "1", vehicle = list(trip = list(trip_id = "t1"), position = list(latitude = 41.1, longitude = -8.6))))
+        entity = list(
+            list(
+                id = "1",
+                vehicle = list(
+                    trip = list(trip_id = "t1"),
+                    position = list(latitude = 41.1, longitude = -8.6)
+                )
+            )
+        )
     )
 
     testthat::with_mocked_bindings(
         fromJSON = function(...) {
             state$req_count <- state$req_count + 1
             if (state$req_count == 1) {
-                stop("cannot open the connection to 'http://example.com/retry.json'")
+                stop(
+                    "cannot open the connection to ",
+                    "'http://example.com/retry.json'"
+                )
             }
             if (state$req_count == 2) {
                 return(parsed_json)

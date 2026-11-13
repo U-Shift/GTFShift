@@ -1,67 +1,89 @@
-test_that("multiline_to_sorted_linestring sorts multilinestring into linestring", {
+test_that(
+  "multiline_to_sorted_linestring sorts multilinestring into linestring",
+  {
     mls <- sf::st_multilinestring(list(
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
-        matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE)
+      matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
+      matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
 
     res <- GTFShift::multiline_to_sorted_linestring(mls_sf, metric_crs = 3857)
     expect_s3_class(res, "sfc")
-    expect_identical(sf::st_geometry_type(res)[1], factor("LINESTRING", levels = levels(sf::st_geometry_type(res))))
-})
+    expect_identical(
+      sf::st_geometry_type(res)[1],
+      factor("LINESTRING", levels = levels(sf::st_geometry_type(res)))
+    )
+  }
+)
 
-test_that("multiline_to_sorted_linestring works when default metric_crs (NULL) is used", {
+test_that(
+  "multiline_to_sorted_linestring works when default metric_crs (NULL) is used",
+  {
     mls <- sf::st_multilinestring(list(
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
-        matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE)
+      matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
+      matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
 
     expect_no_warning(
-        res <- GTFShift::multiline_to_sorted_linestring(mls_sf)
+      res <- GTFShift::multiline_to_sorted_linestring(mls_sf)
     )
     expect_s3_class(res, "sfc")
-})
+  }
+)
 
-test_that("multiline_to_sorted_linestring stops when metric_crs is invalid NA", {
+test_that(
+  "multiline_to_sorted_linestring stops when metric_crs is invalid NA",
+  {
     mls <- sf::st_multilinestring(list(
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE)
+      matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
 
     expect_error(
-        GTFShift::multiline_to_sorted_linestring(mls_sf, metric_crs = NA),
-        "metric_crs should be a valid CRS value"
+      GTFShift::multiline_to_sorted_linestring(mls_sf, metric_crs = NA),
+      "metric_crs should be a valid CRS value"
     )
-})
+  }
+)
 
-test_that("multiline_to_sorted_linestring parameter variation with guiding points", {
+test_that(
+  "multiline_to_sorted_linestring parameter variation with guiding points",
+  {
     # Line 1: (1, 0) to (2, 0), Line 2: (0, 0) to (1, 0)
     mls <- sf::st_multilinestring(list(
-        matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE),
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE)
+      matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE),
+      matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
 
     pts <- sf::st_sfc(
-        sf::st_point(c(0, 0)),
-        sf::st_point(c(2, 0)),
-        crs = 4326
+      sf::st_point(c(0, 0)),
+      sf::st_point(c(2, 0)),
+      crs = 4326
     )
 
-    res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
+    res <- GTFShift::multiline_to_sorted_linestring(
+      mls_sf, points = pts, metric_crs = 3857
+    )
     coords <- unname(sf::st_coordinates(res))
 
     # Should start near (0,0) and end near (2,0)
     expect_equal(coords[1, 1:2], c(0, 0), tolerance = 1e-6)
     expect_equal(coords[nrow(coords), 1:2], c(2, 0), tolerance = 1e-6)
-})
+  }
+)
 
-test_that("multiline_to_sorted_linestring discards line segments farther than current + next length", {
-    # Line 1: (0, 0) to (1, 0), Line 2: (100, 0) to (101, 0) (way too far, length=1, dist=99)
+test_that(
+  paste0(
+    "multiline_to_sorted_linestring discards line segments ",
+    "farther than current + next length"
+  ),
+  {
+    # Line 1: (0, 0) to (1, 0), Line 2: (100, 0) to (101, 0)
     mls <- sf::st_multilinestring(list(
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
-        matrix(c(100, 0, 101, 0), ncol = 2, byrow = TRUE)
+      matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
+      matrix(c(100, 0, 101, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
 
@@ -72,76 +94,110 @@ test_that("multiline_to_sorted_linestring discards line segments farther than cu
     expect_identical(nrow(coords), 2L)
     expect_equal(coords[1, 1:2], c(0, 0), tolerance = 1e-6)
     expect_equal(coords[2, 1:2], c(1, 0), tolerance = 1e-6)
-})
+  }
+)
 
-test_that("multiline_to_sorted_linestring orient start line when start_point is closer to remaining lines", {
+test_that(
+  paste0(
+    "multiline_to_sorted_linestring orient start line ",
+    "when start_point is closer to remaining lines"
+  ),
+  {
     mls <- sf::st_multilinestring(list(
-        matrix(c(1, 0, 0, 0), ncol = 2, byrow = TRUE),
-        matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE)
+      matrix(c(1, 0, 0, 0), ncol = 2, byrow = TRUE),
+      matrix(c(1, 0, 2, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
     pts <- sf::st_sfc(sf::st_point(c(0, 0)), crs = 4326)
 
-    res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
+    res <- GTFShift::multiline_to_sorted_linestring(
+      mls_sf, points = pts, metric_crs = 3857
+    )
     coords <- unname(sf::st_coordinates(res))
     expect_equal(coords[1, 1:2], c(0, 0), tolerance = 1e-6)
     expect_equal(coords[nrow(coords), 1:2], c(2, 0), tolerance = 1e-6)
-})
+  }
+)
 
-test_that("multiline_to_sorted_linestring orient start line with second_point tie break", {
+test_that(
+  "multiline_to_sorted_linestring orient start line with tie break",
+  {
     mls <- sf::st_multilinestring(list(
-        matrix(c(0, 0, 2, 0), ncol = 2, byrow = TRUE),
-        matrix(c(-1, 0, 0, 0), ncol = 2, byrow = TRUE),
-        matrix(c(2, 0, 3, 0), ncol = 2, byrow = TRUE)
+      matrix(c(0, 0, 2, 0), ncol = 2, byrow = TRUE),
+      matrix(c(-1, 0, 0, 0), ncol = 2, byrow = TRUE),
+      matrix(c(2, 0, 3, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
-    pts <- sf::st_sfc(sf::st_point(c(1, 0)), sf::st_point(c(0, 0)), crs = 4326)
+    pts <- sf::st_sfc(
+      sf::st_point(c(1, 0)), sf::st_point(c(0, 0)), crs = 4326
+    )
 
-    res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
+    res <- GTFShift::multiline_to_sorted_linestring(
+      mls_sf, points = pts, metric_crs = 3857
+    )
     coords <- unname(sf::st_coordinates(res))
     expect_equal(coords[1, 1:2], c(2, 0), tolerance = 1e-6)
-})
+  }
+)
 
-test_that("multiline_to_sorted_linestring excludes identical duplicate remaining segments", {
+test_that(
+  paste0(
+    "multiline_to_sorted_linestring excludes identical ",
+    "duplicate remaining segments"
+  ),
+  {
     mls <- sf::st_multilinestring(list(
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE)
+      matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
+      matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
     pts <- sf::st_sfc(sf::st_point(c(0, 0)), crs = 4326)
 
-    res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
+    res <- GTFShift::multiline_to_sorted_linestring(
+      mls_sf, points = pts, metric_crs = 3857
+    )
     coords <- unname(sf::st_coordinates(res))
     expect_identical(nrow(coords), 2L)
-})
+  }
+)
 
-test_that("multiline_to_sorted_linestring tie-breaks candidate selection using next_point proximity", {
+test_that(
+  paste0(
+    "multiline_to_sorted_linestring tie-breaks candidate selection ",
+    "using next_point proximity"
+  ),
+  {
     # Line 1: (0, 0) to (1, 0)
     # Candidate A: (1, 0) to (1, 1)
     # Candidate B: (1, 0) to (1, -2)
     mls <- sf::st_multilinestring(list(
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
-        matrix(c(1, 0, 1, -2), ncol = 2, byrow = TRUE),
-        matrix(c(1, 0, 1, 1), ncol = 2, byrow = TRUE)
+      matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
+      matrix(c(1, 0, 1, -2), ncol = 2, byrow = TRUE),
+      matrix(c(1, 0, 1, 1), ncol = 2, byrow = TRUE)
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
-    pts <- sf::st_sfc(sf::st_point(c(0, 0)), sf::st_point(c(1, 1)), crs = 4326)
+    pts <- sf::st_sfc(
+      sf::st_point(c(0, 0)), sf::st_point(c(1, 1)), crs = 4326
+    )
 
-    res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
+    res <- GTFShift::multiline_to_sorted_linestring(
+      mls_sf, points = pts, metric_crs = 3857
+    )
     expect_s3_class(res, "sfc")
     coords <- unname(sf::st_coordinates(res))
     expect_gte(nrow(coords), 3)
-})
+  }
+)
 
 test_that("multiline_to_sorted_linestring handles circular ring line segment", {
-    # Line 1: (0, 0) to (1, 0)
-    # Line 2 (Circular ring): (1, 0) -> (2, 1) -> (2, -1) -> (1, 0)
-    mls <- sf::st_multilinestring(list(
-        matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
-        matrix(c(1, 0, 2, 1, 2, -1, 1, 0), ncol = 2, byrow = TRUE)
-    ))
-    mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
+  # Line 1: (0, 0) to (1, 0)
+  # Line 2 (Circular ring): (1, 0) -> (2, 1) -> (2, -1) -> (1, 0)
+  mls <- sf::st_multilinestring(list(
+    matrix(c(0, 0, 1, 0), ncol = 2, byrow = TRUE),
+    matrix(c(1, 0, 2, 1, 2, -1, 1, 0), ncol = 2, byrow = TRUE)
+  ))
+  mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
 
-    res <- GTFShift::multiline_to_sorted_linestring(mls_sf, metric_crs = 3857)
-    expect_s3_class(res, "sfc")
+  res <- GTFShift::multiline_to_sorted_linestring(mls_sf, metric_crs = 3857)
+  expect_s3_class(res, "sfc")
 })

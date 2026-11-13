@@ -2,7 +2,10 @@
 #
 #'
 #' @param bbox bbox. Area from which to export bus lanes.
-#' @param osm_file character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.
+#' @param osm_file character (Optional). Location of OSM extract file with
+#'   \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more
+#'   details. If not provided OSM Overpass API is called through
+#'   \code{osmdata::osmdata_sf()}.
 #'
 #' @details
 #' Exports roads tagged as designated bus lanes on OpenStreetMap for given area.
@@ -38,14 +41,23 @@
 osm_bus_lanes <- function(bbox, osm_file = NULL) {
   if (!is.null(osm_file)) {
     osm_file <- prepare_osm_file(osm_file)
-    highways_base <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE)
+    highways_base <- osmextract::oe_read(
+      osm_file,
+      boundary = bbox,
+      quiet = TRUE
+    )
     highways_cols <- osmextract::oe_get_keys(highways_base)
     cols_to_check <- c(
       grep("psv:lanes|bus:lanes", highways_cols, value = TRUE),
       grep("lanes:psv|lanes:bus", highways_cols, value = TRUE),
       "psv"
     )
-    road_osm <- osmextract::oe_read(osm_file, boundary = bbox, quiet = TRUE, extra_tags = cols_to_check)
+    road_osm <- osmextract::oe_read(
+      osm_file,
+      boundary = bbox,
+      quiet = TRUE,
+      extra_tags = cols_to_check
+    )
     names(road_osm) <- gsub("_", ":", names(road_osm), fixed = TRUE)
   } else {
     road_osm <- opq(bbox) |> # uses osmdata package, to extract only with BB

@@ -2,14 +2,19 @@
 #'
 #'
 #' @param gtfs_rt_url String. URL of the Protocol Buffers GTFS-RT feed.
-#' @param destination_file String. File to save the downloaded GTFS-RT data. Content is appended in each iteration.
-#' @param fields_collect Character vector. Fields to extract from each entity in the feed.
-#' @param scrape_interval Integer (Default 60). Interval in seconds between each download. Negative to run only once.
+#' @param destination_file String. File to save the downloaded GTFS-RT data.
+#'   Content is appended in each iteration.
+#' @param fields_collect Character vector. Fields to extract from each entity in
+#'   the feed.
+#' @param scrape_interval Integer (Default 60). Interval in seconds between each
+#'   download. Negative to run only once.
 #' @param log_file String (Optional). Path to a log file to save download logs.
-#' @param headers Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.
+#' @param headers Named list or character vector (Optional). Custom HTTP headers
+#'   for credentials when accessing the GTFS-RT feed URL.
 #'
 #' @details
-#' Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
+#' Downloads GTFS-RT data from the specified URL at regular intervals and saves
+#' them to the destination file.
 #'
 #' This function will run indefinitely until manually stopped (CTRL + C).
 #'
@@ -17,7 +22,11 @@
 #'
 #' @examples
 #' # Sample GTFS-RT Protobuf file
-#' sample_pb <- system.file("extdata/samples", "gtfs_rt_sample.pb", package = "GTFShift")
+#' sample_pb <- system.file(
+#'   "extdata/samples",
+#'   "gtfs_rt_sample.pb",
+#'   package = "GTFShift"
+#' )
 #' destination_file <- withr::local_tempfile(fileext = ".csv")
 #'
 #' # Collect data
@@ -42,16 +51,34 @@
 #' @importFrom stats setNames
 #' @export
 rt_collect_protobuf <- function(
-  gtfs_rt_url, destination_file,
-  fields_collect = c("id", "vehicle.trip.trip_id", "vehicle.position.latitude", "vehicle.position.longitude", "vehicle.position.speed", "vehicle.timestamp", "vehicle.current_status", "vehicle.current_stop_sequence", "vehicle.stop_id"),
-  scrape_interval = 60, log_file = NA, headers = NULL
+  gtfs_rt_url,
+  destination_file,
+  fields_collect = c(
+    "id",
+    "vehicle.trip.trip_id",
+    "vehicle.position.latitude",
+    "vehicle.position.longitude",
+    "vehicle.position.speed",
+    "vehicle.timestamp",
+    "vehicle.current_status",
+    "vehicle.current_stop_sequence",
+    "vehicle.stop_id"
+  ),
+  scrape_interval = 60,
+  log_file = NA,
+  headers = NULL
 ) {
   # Log script start
-  m <- sprintf("[%s] Starting GTFS-RT data collection from %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url)
+  now_str <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+  m <- sprintf(
+    "[%s] Starting GTFS-RT data collection from %s",
+    now_str,
+    gtfs_rt_url
+  )
   message(m)
   if (!is.na(log_file)) cat(paste(m, "\n"), file = log_file, append = TRUE)
 
-  # Each scrape_interval seconds, download the GTFS-RT feed and save it to the destination folder
+  # Each scrape_interval seconds, download the GTFS-RT feed and save it
   count <- 0
   repeat {
     count <- count + 1
@@ -59,14 +86,26 @@ rt_collect_protobuf <- function(
 
     # Load protobuf
     if (!requireNamespace("RProtoBuf", quietly = TRUE)) {
-      stop("Package 'RProtoBuf' is required for this function. Install it with: install.packages('RProtoBuf')")
+      stop(
+        "Package 'RProtoBuf' is required for this function. ",
+        "Install it with: install.packages('RProtoBuf')"
+      )
     }
-    RProtoBuf::readProtoFiles((system.file("extdata", "gtfs-realtime.proto", package = "GTFShift")))
+    proto_file <- system.file(
+      "extdata",
+      "gtfs-realtime.proto",
+      package = "GTFShift"
+    )
+    RProtoBuf::readProtoFiles(proto_file)
     if (grepl("^http", gtfs_rt_url)) {
       temp_pb <- withr::local_tempfile(fileext = ".pb")
       res <- tryCatch(
         if (!is.null(headers)) {
-          httr::GET(gtfs_rt_url, httr::add_headers(.headers = headers), httr::write_disk(temp_pb, overwrite = TRUE))
+          httr::GET(
+            gtfs_rt_url,
+            httr::add_headers(.headers = headers),
+            httr::write_disk(temp_pb, overwrite = TRUE)
+          )
         } else {
           httr::GET(gtfs_rt_url, httr::write_disk(temp_pb, overwrite = TRUE))
         },
@@ -90,7 +129,9 @@ rt_collect_protobuf <- function(
           format(Sys.time(), "%Y-%m-%d %H:%M:%S"), gtfs_rt_url, status_err
         )
         message(m_err)
-        if (!is.na(log_file)) cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+        if (!is.na(log_file)) {
+          cat(paste(m_err, "\n"), file = log_file, append = TRUE)
+        }
         if (scrape_interval < 0) {
           return(invisible(NULL))
         }
@@ -164,7 +205,10 @@ rt_collect_protobuf <- function(
     }
     interval_start <- Sys.time()
     if (!requireNamespace("progress", quietly = TRUE)) {
-      stop("Package 'progress' is required for this function. Install it with: install.packages('progress')")
+      stop(
+        "Package 'progress' is required for this function. ",
+        "Install it with: install.packages('progress')"
+      )
     }
     pb <- progress::progress_bar$new( # Track progress
       format = "Sleeping [:bar] :percent :spin elapsed=:elapsed",
@@ -172,7 +216,9 @@ rt_collect_protobuf <- function(
     )
     pb$update(0)
     repeat {
-      elapsed_time <- as.numeric(difftime(Sys.time(), interval_start, units = "secs"))
+      elapsed_time <- as.numeric(
+        difftime(Sys.time(), interval_start, units = "secs")
+      )
       if (elapsed_time >= scrape_interval) break
       pb$update(min(elapsed_time / scrape_interval, 1))
       Sys.sleep(0.1)

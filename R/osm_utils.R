@@ -8,14 +8,25 @@
 #'
 #' @noRd
 filter_osm_bus_lanes <- function(road_osm) {
-  cols_to_check_access <- grep("psv:lanes|bus:lanes", names(road_osm), value = TRUE)
-  cols_to_check_count <- grep("lanes:psv|lanes:bus", names(road_osm), value = TRUE)
+  cols_to_check_access <- grep(
+    "psv:lanes|bus:lanes",
+    names(road_osm),
+    value = TRUE
+  )
+  cols_to_check_count <- grep(
+    "lanes:psv|lanes:bus",
+    names(road_osm),
+    value = TRUE
+  )
 
   osm_lanes <- road_osm |> filter(
     # Based on https://wiki.openstreetmap.org/wiki/Bus_lanes
     if_any(any_of("psv"), ~ .x == "designated") |
       if_any(any_of("highway"), ~ .x == "busway") |
-      if_any(any_of(cols_to_check_access), ~ grepl("designated", .x, fixed = TRUE)) |
+      if_any(
+        any_of(cols_to_check_access),
+        ~ grepl("designated", .x, fixed = TRUE)
+      ) |
       if_any(any_of(cols_to_check_count), ~ {
         v <- suppressWarnings(as.numeric(sub(";.*$", "", .x)))
         !is.na(v) & v >= 1
@@ -26,22 +37,35 @@ filter_osm_bus_lanes <- function(road_osm) {
 }
 
 
-#' Get OSM relations and elements (ways and nodes) tagged as part of route relations
+#' Get OSM relations and elements (ways and nodes) tagged as part of route
+#' relations
 #'
 #' @param osm_file character. Path to OSM file.
 #' @param pb progress bar object.
-#' @param pb_update_1 numeric. Value to add to progress bar when progress at 1/4.
-#' @param pb_update_2 numeric. Value to add to progress bar when progress at 2/4.
-#' @param pb_update_3 numeric. Value to add to progress bar when progress at 3/4.
-#' @param pb_update_4 numeric. Value to add to progress bar when progress at 4/4.
+#' @param pb_update_1 numeric. Value to add to progress bar when progress 1/4.
+#' @param pb_update_2 numeric. Value to add to progress bar when progress 2/4.
+#' @param pb_update_3 numeric. Value to add to progress bar when progress 3/4.
+#' @param pb_update_4 numeric. Value to add to progress bar when progress 4/4.
 #'
-#' @returns data.frame. OSM relations ways and nodes (with relation attributes) data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`, `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
+#' @returns data.frame. OSM relations ways and nodes (with relation attributes)
+#'   data frame with columns: `relation_osm_id`, `type`, `osm_id`, `role`,
+#'   `gtfs:shape_id`, `gtfs:route_id`, `name`, `ref`, `roundtrip`
 #'
 #' @noRd
-get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update_1 = 0.25, pb_update_2 = 0.5, pb_update_3 = 0.75, pb_update_4 = 1) {
+get_osm_relations <- function(
+  osm_file,
+  q,
+  pb,
+  osm_route_type = "bus",
+  pb_update_1 = 0.25,
+  pb_update_2 = 0.5,
+  pb_update_3 = 0.75,
+  pb_update_4 = 1
+) {
   relations_pbf <- withr::local_tempfile(fileext = ".osm.pbf")
 
-  job <- callr::r_bg(function(relations_pbf, osm_file, osm_route_type) { # update spinner while blocking method call
+  # update spinner while blocking method call
+  job <- callr::r_bg(function(relations_pbf, osm_file, osm_route_type) {
     return(rosmium::tags_filter(
       osm_file,
       sprintf("nwr/route=%s", osm_route_type),
@@ -73,7 +97,10 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
   # > Extract filter criteria from q$features
   features_str <- q$features
   feature_regex <- '\\["([^"]+)"([=~])"([^"]+)"\\]'
-  feature_matches <- regmatches(features_str, gregexpr(feature_regex, features_str))[[1]]
+  feature_matches <- regmatches(
+    features_str,
+    gregexpr(feature_regex, features_str)
+  )[[1]]
   parsed_features <- lapply(feature_matches, function(f) {
     m <- regexec(feature_regex, f)
     parts <- regmatches(f, m)[[1]]
@@ -83,10 +110,12 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
   pb$update(pb_update_3)
   relations_data <- lapply(seq_along(relations), function(rel_n) {
     rel <- relations[[rel_n]]
-    pb$update(min(
-      round(pb_update_3 + ((pb_update_4 - pb_update_3) * rel_n / length(relations)), digits = 2),
-      ifelse(rel_n < length(relations), 0.99, 1) # Prevent 0.9999 rounding to 1 before reaching last
-    ))
+    prog_val <- round(
+      pb_update_3 + ((pb_update_4 - pb_update_3) * rel_n / length(relations)),
+      digits = 2
+    )
+    # Prevent 0.9999 rounding to 1 before reaching last
+    pb$update(min(prog_val, ifelse(rel_n < length(relations), 0.99, 1)))
     tags <- xml2::xml_find_all(rel, ".//tag")
     tag_keys <- xml2::xml_attr(tags, "k")
     tag_vals <- xml2::xml_attr(tags, "v")
@@ -111,9 +140,16 @@ get_osm_relations <- function(osm_file, q, pb, osm_route_type = "bus", pb_update
       return(NULL)
     }
 
-    members <- xml2::xml_find_all(rel, ".//member[@type='way' or @type='node']")
+    members <- xml2::xml_find_all(
+      rel,
+      ".//member[@type='way' or @type='node']"
+    )
     members_type <- xml2::xml_attr(members, "type")
-    if (length(members) == 0 | !any(members_type == "way") | !any(members_type == "node")) {
+    if (
+      length(members) == 0 |
+        !any(members_type == "way") |
+        !any(members_type == "node")
+    ) {
       return(NULL)
     }
 
@@ -151,11 +187,18 @@ prepare_osm_file <- function(osm_file) {
   dir_writable <- file.access(dirname(osm_file), 2) == 0
   lib_paths <- normalizePath(.libPaths(), winslash = "/", mustWork = FALSE)
   norm_path <- normalizePath(osm_file, winslash = "/", mustWork = FALSE)
-  in_lib <- any(vapply(lib_paths, function(lp) startsWith(norm_path, lp), logical(1)))
+  in_lib <- any(vapply(
+    lib_paths,
+    function(lp) startsWith(norm_path, lp),
+    logical(1)
+  ))
 
   if (!dir_writable || in_lib) {
     temp_file <- file.path(tempdir(), basename(osm_file))
-    if (!file.exists(temp_file) || file.info(osm_file)$mtime > file.info(temp_file)$mtime) {
+    if (
+      !file.exists(temp_file) ||
+        file.info(osm_file)$mtime > file.info(temp_file)$mtime
+    ) {
       file.copy(osm_file, temp_file, overwrite = TRUE)
     }
     return(temp_file)

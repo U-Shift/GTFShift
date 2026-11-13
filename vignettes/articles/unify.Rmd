@@ -42,10 +42,15 @@ Public transit analysis takes advantage of the standardized GTFS format. However
 
 ```{r eval=FALSE}
 # Get GTFS from library GTFS database for Portugal
-data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+data <- read.csv(
+  system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift")
+)
 
 gtfs_list <- lapply(c("barreiro", "fertagus"), function(ID) {
-  feed <- GTFShift::load_feed(data$URL[data$ID == ID], create_transfers = FALSE)
+  feed <- GTFShift::load_feed(
+    data$URL[data$ID == ID],
+    create_transfers = FALSE
+  )
   summary(feed)
   return(feed)
 })
@@ -54,13 +59,19 @@ gtfs_list <- lapply(c("barreiro", "fertagus"), function(ID) {
 ```{r echo=FALSE}
 # FIx for https://github.com/U-Shift/GTFShift/issues/81
 # Get GTFS from library GTFS database for Portugal
-data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+data <- read.csv(
+  system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift")
+)
 
 gtfs_list <- lapply(c("barreiro", "fertagus"), function(ID) {
-  feed <- GTFShift::load_feed(data$URL[data$ID == ID], create_transfers = FALSE)
-   # If feed has columns start_pickup_drop_off_window and end_pickup_drop_off_window, remove them (they are not supported by gtfsrouter)
+  feed <- GTFShift::load_feed(
+    data$URL[data$ID == ID],
+    create_transfers = FALSE
+  )
+  # Remove start/end_pickup_drop_off_window (not supported by gtfsrouter)
   if ("start_pickup_drop_off_window" %in% names(feed$stop_times)) {
-    feed$stop_times <- feed$stop_times |> select(-start_pickup_drop_off_window, -end_pickup_drop_off_window)
+    feed$stop_times <- feed$stop_times |>
+      select(-start_pickup_drop_off_window, -end_pickup_drop_off_window)
   }
   summary(feed)
   return(feed)
@@ -74,7 +85,11 @@ The unification is performed through `GTFShift::unify()`, producing a single GTF
 
 ```{r}
 # Perform unification
-gtfs_united <- GTFShift::unify(gtfs_list[[1]], gtfs_list[[2]], create_transfers = TRUE)
+gtfs_united <- GTFShift::unify(
+  gtfs_list[[1]],
+  gtfs_list[[2]],
+  create_transfers = TRUE
+)
 
 summary(gtfs_united)
 
@@ -100,7 +115,12 @@ shapes_sf <- tidytransit::shapes_as_sf(gtfs_united$shapes) |>
   filter(!is.na(agency_id))
 ```
 ```{r, cache=FALSE}
-mapview::mapview(shapes_sf, zcol = "agency_name", legend = TRUE, layer.name="Agency")
+mapview::mapview(
+  shapes_sf,
+  zcol = "agency_name",
+  legend = TRUE,
+  layer.name = "Agency"
+)
 ```
 
 </div>
@@ -121,7 +141,12 @@ stops_sf <- tidytransit::stops_as_sf(gtfs_united$stops) |>
   filter(!is.na(agency_id))
 ```
 ```{r, cache=FALSE}
-mapview::mapview(stops_sf, zcol = "agency_name", legend = TRUE, layer.name="Agency")
+mapview::mapview(
+  stops_sf,
+  zcol = "agency_name",
+  legend = TRUE,
+  layer.name = "Agency"
+)
 ```
 
 </div>

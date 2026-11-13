@@ -33,9 +33,14 @@ compute the cumulative distance along the shape (`shape_dist_traveled`), an opti
 
 ```{r eval=FALSE}
 # Get GTFS from library GTFS database for Portugal
-data <- read.csv(system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift"))
+data <- read.csv(
+    system.file("extdata", "gtfs_sources_pt.csv", package = "GTFShift")
+)
 gtfs_id <- "lisboa"
-gtfs <- GTFShift::load_feed(data$URL[data$ID == gtfs_id], create_transfers = FALSE)
+gtfs <- GTFShift::load_feed(
+    data$URL[data$ID == gtfs_id],
+    create_transfers = FALSE
+)
 
 # Build OSM query
 library(osmdata)
@@ -52,7 +57,10 @@ gtfs_trips_with_osm_geometry <- gtfs$trips |>
     filter(shape_id %in% osm_shape_ids) |>
     pull(trip_id) |>
     unique()
-gtfs <- tidytransit::filter_feed_by_trips(gtfs, trip_ids = gtfs_trips_with_osm_geometry)
+gtfs <- tidytransit::filter_feed_by_trips(
+    gtfs,
+    trip_ids = gtfs_trips_with_osm_geometry
+)
 
 # Convert OSM geometries to LINESTRING objects
 shapes_osm <- GTFShift::create_shapes_from_sf(shapes_geometry_osm, gtfs)
