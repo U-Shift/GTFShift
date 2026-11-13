@@ -5,7 +5,7 @@ test_that("filter_by_route_name filters by short name exact match", {
     short_target <- gtfs$routes$route_short_name[1]
     gtfs_short_exact <- GTFShift::filter_by_route_name(gtfs, values = list(short_target), short_name = TRUE, exact_match = TRUE)
     expect_contains(class(gtfs_short_exact), "tidygtfs")
-    expect_equal(unique(gtfs_short_exact$routes$route_short_name), short_target)
+    expect_identical(unique(gtfs_short_exact$routes$route_short_name), short_target)
 })
 
 test_that("filter_by_route_name filters by short name partial match", {
@@ -26,7 +26,7 @@ test_that("filter_by_route_name filters by long name exact match", {
     long_target <- gtfs$routes$route_long_name[1]
     gtfs_long_exact <- GTFShift::filter_by_route_name(gtfs, values = list(long_target), short_name = FALSE, exact_match = TRUE)
     expect_contains(class(gtfs_long_exact), "tidygtfs")
-    expect_equal(unique(gtfs_long_exact$routes$route_long_name), long_target)
+    expect_identical(unique(gtfs_long_exact$routes$route_long_name), long_target)
 })
 
 test_that("filter_by_route_name filters by long name partial match", {

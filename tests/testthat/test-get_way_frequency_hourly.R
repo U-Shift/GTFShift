@@ -36,8 +36,8 @@ test_that("get_way_frequency_hourly calculates way frequencies with mocked osm_s
                 dplyr::group_by(hour) |>
                 dplyr::summarise(total_freq = sum(frequency))
 
-            expect_equal(way_freq_by_hour$total_freq, expected_freq_by_hour$total_freq)
-            expect_equal(way_freq_by_hour$hour, expected_freq_by_hour$hour)
+            expect_identical(way_freq_by_hour$total_freq, expected_freq_by_hour$total_freq)
+            expect_identical(way_freq_by_hour$hour, expected_freq_by_hour$hour)
         }
     )
 })

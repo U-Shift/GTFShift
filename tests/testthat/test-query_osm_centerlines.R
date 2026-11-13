@@ -139,7 +139,7 @@ test_that("osm_centerlines passes osm_file parameter to python call", {
                 .package = "sf",
                 code = {
                     res <- GTFShift::osm_centerlines(osm_file = "path/to/region.osm.pbf", venv = "mock_env")
-                    expect_equal(state$received_osm_file, "path/to/region.osm.pbf")
+                    expect_identical(state$received_osm_file, "path/to/region.osm.pbf")
                     expect_s3_class(res, "sf")
                 }
             )

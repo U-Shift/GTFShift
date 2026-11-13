@@ -1,7 +1,7 @@
 test_that("calendar_nextBusinessWednesday computes next Wednesday without network call when country_code is NA", {
     start_date <- as.Date("2026-07-20") # Monday
     next_wed <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = NA)
-    expect_equal(next_wed, as.Date("2026-07-22"))
+    expect_identical(next_wed, as.Date("2026-07-22"))
 })
 
 test_that("calendar_nextBusinessWednesday fetches new year holidays when next Wednesday triggers new year", {
@@ -30,11 +30,11 @@ test_that("calendar_nextBusinessWednesday fetches new year holidays when next We
         .package = "httr",
         code = {
             next_wed <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT")
-            expect_equal(next_wed, as.Date("2027-01-06"))
+            expect_identical(next_wed, as.Date("2027-01-06"))
         }
     )
 
-    expect_equal(state$called_years, c("2026", "2027"))
+    expect_identical(state$called_years, c("2026", "2027"))
 })
 
 test_that("calendar_nextBusinessWednesday handles mocked holiday response", {
@@ -55,7 +55,7 @@ test_that("calendar_nextBusinessWednesday handles mocked holiday response", {
         .package = "httr",
         code = {
             next_wed <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT")
-            expect_equal(next_wed, as.Date("2026-07-29"))
+            expect_identical(next_wed, as.Date("2026-07-29"))
         }
     )
 })
@@ -79,7 +79,7 @@ test_that("calendar_nextBusinessWednesday fails gracefully when API does not res
                 res <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT"),
                 "Internet resource unavailable"
             )
-            expect_equal(res, as.Date("2026-07-22"))
+            expect_identical(res, as.Date("2026-07-22"))
         }
     )
 
@@ -94,7 +94,7 @@ test_that("calendar_nextBusinessWednesday fails gracefully when API does not res
                 res <- GTFShift::calendar_nextBusinessWednesday(start_date = start_date, country_code = "PT"),
                 "Internet resource unavailable"
             )
-            expect_equal(res, as.Date("2026-07-22"))
+            expect_identical(res, as.Date("2026-07-22"))
         }
     )
 })

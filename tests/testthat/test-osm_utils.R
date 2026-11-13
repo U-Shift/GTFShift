@@ -12,8 +12,8 @@ test_that("filter_osm_bus_lanes correctly filters bus lane features", {
     )
 
     filtered <- filter_osm_bus_lanes(road_osm)
-    expect_equal(nrow(filtered), 2)
-    expect_equal(filtered$osm_id, c("1", "3"))
+    expect_identical(nrow(filtered), 2L)
+    expect_identical(filtered$osm_id, c("1", "3"))
 })
 
 setup_mock_xml <- function(env = parent.frame()) {
@@ -99,8 +99,8 @@ test_that("get_osm_relations parses relations with regex feature operator ~", {
                     )
 
                     expect_s3_class(res_regex, "data.frame")
-                    expect_equal(nrow(res_regex), 4) # 2 members from rel 100, 2 members from rel 700
-                    expect_equal(unique(res_regex$relation_osm_id), c("100", "700"))
+                    expect_identical(nrow(res_regex), 4L) # 2 members from rel 100, 2 members from rel 700
+                    expect_identical(unique(res_regex$relation_osm_id), c("100", "700"))
                 }
             )
         }
@@ -127,8 +127,8 @@ test_that("get_osm_relations parses relations with exact equality feature operat
                     )
 
                     expect_s3_class(res_exact, "data.frame")
-                    expect_equal(nrow(res_exact), 2)
-                    expect_equal(unique(res_exact$relation_osm_id), "700")
+                    expect_identical(nrow(res_exact), 2L)
+                    expect_identical(unique(res_exact$relation_osm_id), "700")
                 }
             )
         }
@@ -154,7 +154,7 @@ test_that("get_osm_relations returns empty data frame when no features match", {
                         osm_route_type = "bus"
                     )
 
-                    expect_equal(nrow(res_none), 0)
+                    expect_identical(nrow(res_none), 0L)
                 }
             )
         }
@@ -187,9 +187,9 @@ test_that("get_osm_relations correctly forwards custom osm_route_type parameter"
                         osm_route_type = "train"
                     )
 
-                    expect_equal(state$passed_filter, "train")
+                    expect_identical(state$passed_filter, "train")
                     expect_s3_class(res, "data.frame")
-                    expect_equal(nrow(res), 4)
+                    expect_identical(nrow(res), 4L)
                 }
             )
         }
@@ -198,7 +198,7 @@ test_that("get_osm_relations correctly forwards custom osm_route_type parameter"
 
 test_that("prepare_osm_file handles NULL and non-existent files", {
     expect_null(prepare_osm_file(NULL))
-    expect_equal(prepare_osm_file("non_existent.pbf"), "non_existent.pbf")
+    expect_identical(prepare_osm_file("non_existent.pbf"), "non_existent.pbf")
 })
 
 test_that("prepare_osm_file returns original path when file is in writable directory outside library", {
@@ -209,7 +209,7 @@ test_that("prepare_osm_file returns original path when file is in writable direc
     on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
 
     res <- prepare_osm_file(test_file)
-    expect_equal(res, test_file)
+    expect_identical(res, test_file)
 })
 
 test_that("prepare_osm_file copies file to tempdir when directory is read-only", {
@@ -226,7 +226,7 @@ test_that("prepare_osm_file copies file to tempdir when directory is read-only",
 
     res <- prepare_osm_file(test_file)
     expect_true(startsWith(res, tempdir()))
-    expect_equal(basename(res), "test_ro.pbf")
+    expect_identical(basename(res), "test_ro.pbf")
     expect_true(file.exists(res))
 })
 

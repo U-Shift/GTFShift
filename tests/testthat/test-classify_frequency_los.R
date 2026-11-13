@@ -3,5 +3,5 @@ test_that("classify_frequency_los assigns correct HCM level of service categorie
     res <- GTFShift::classify_frequency_los(df)
 
     expect_contains(names(res), "frequency_los")
-    expect_equal(res$frequency_los, c("F", "E", "D", "C", "B", "A"))
+    expect_identical(res$frequency_los, c("F", "E", "D", "C", "B", "A"))
 })

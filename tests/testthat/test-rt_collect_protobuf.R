@@ -85,8 +85,8 @@ test_that("headers are passed and httr is mocked", {
         }
     )
 
-    expect_equal(state$captured_url, URL)
-    expect_equal(state$captured_headers, headers)
+    expect_identical(state$captured_url, URL)
+    expect_identical(state$captured_headers, headers)
     expect_true(file.exists(dest_file))
 })
 
@@ -150,7 +150,7 @@ test_that("test incrementality in response", {
 
     res_df <- read.csv(dest_file)
     expect_true("feed_incrementality" %in% names(res_df))
-    expect_equal(res_df$feed_incrementality, "FULL_DATASET")
+    expect_identical(res_df$feed_incrementality, "FULL_DATASET")
 })
 
 test_that("scrape_interval performs at least 3 requests", {
@@ -186,9 +186,9 @@ test_that("scrape_interval performs at least 3 requests", {
     )
 
     elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-    expect_equal(state$request_count, 4)
+    expect_identical(state$request_count, 4)
     res_df <- read.csv(dest_file)
-    expect_equal(nrow(res_df), 3)
+    expect_identical(nrow(res_df), 3L)
     expect_gte(elapsed_time, 3)
 })
 

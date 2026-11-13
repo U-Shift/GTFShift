@@ -19,7 +19,7 @@ test_that("rt_collect_json extracts JSON feed data and appends to CSV destinatio
 
     expect_true(file.exists(dest_file))
     res_df <- read.csv(dest_file)
-    expect_equal(nrow(res_df), 1)
+    expect_identical(nrow(res_df), 1L)
 })
 
 test_that("headers are passed and httr is mocked", {
@@ -65,11 +65,11 @@ test_that("headers are passed and httr is mocked", {
         }
     )
 
-    expect_equal(state$captured_url, URL)
-    expect_equal(state$captured_headers, headers)
+    expect_identical(state$captured_url, URL)
+    expect_identical(state$captured_headers, headers)
     expect_true(file.exists(dest_file))
     res_df <- read.csv(dest_file)
-    expect_equal(nrow(res_df), 1)
+    expect_identical(nrow(res_df), 1L)
 })
 
 test_that("parameter variation: log_file", {
@@ -121,8 +121,8 @@ test_that("parameter variation: entity_key custom and NA", {
     )
 
     res_df1 <- read.csv(dest_file1)
-    expect_equal(nrow(res_df1), 1)
-    expect_equal(res_df1$id, 99)
+    expect_identical(nrow(res_df1), 1L)
+    expect_identical(res_df1$id, 99)
 
     # NA entity key (flat list)
     dest_file2 <- withr::local_tempfile(fileext = ".csv")
@@ -143,8 +143,8 @@ test_that("parameter variation: entity_key custom and NA", {
     )
 
     res_df2 <- read.csv(dest_file2)
-    expect_equal(nrow(res_df2), 1)
-    expect_equal(res_df2$id, 100)
+    expect_identical(nrow(res_df2), 1L)
+    expect_identical(res_df2$id, 100)
 })
 
 test_that("test incrementality in response", {
@@ -168,7 +168,7 @@ test_that("test incrementality in response", {
 
     res_df <- read.csv(dest_file)
     expect_true("feed_incrementality" %in% names(res_df))
-    expect_equal(res_df$feed_incrementality, "FULL_DATASET")
+    expect_identical(res_df$feed_incrementality, "FULL_DATASET")
 })
 
 test_that("scrape_interval performs at least 3 requests", {
@@ -204,9 +204,9 @@ test_that("scrape_interval performs at least 3 requests", {
     )
 
     elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-    expect_equal(state$request_count, 4)
+    expect_identical(state$request_count, 4)
     res_df <- read.csv(dest_file)
-    expect_equal(nrow(res_df), 3)
+    expect_identical(nrow(res_df), 3L)
     expect_gte(elapsed_time, 3)
 })
 

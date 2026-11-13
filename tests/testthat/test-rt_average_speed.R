@@ -26,7 +26,7 @@ test_that("rt_average_speed computes speeds along trip geometry", {
         "Trip UNMATCHED_TRIP has less than 2 updates. Ignoring it."
     )
     expect_s3_class(res, "sf")
-    expect_equal(nrow(res), 4)
+    expect_identical(nrow(res), 4L)
     expect_contains(unique(res$trip_id), c("T1", "T2"))
     expect_false("UNMATCHED_TRIP" %in% res$trip_id)
 
@@ -45,18 +45,18 @@ test_that("rt_average_speed computes speeds along trip geometry", {
 
     # Validate first observation in T1 (timestamp == 1000: previous values and speed are NA)
     r_t1_1 <- res[res$trip_id == "T1" & res$timestamp == 1000, ]
-    expect_equal(nrow(r_t1_1), 1)
-    expect_equal(r_t1_1$distance_along_geometry, 0)
-    expect_equal(r_t1_1$distance_along_geometry_reversed, 1000)
-    expect_equal(r_t1_1$distance_to_closest_on_geometry, 0)
+    expect_identical(nrow(r_t1_1), 1L)
+    expect_identical(r_t1_1$distance_along_geometry, 0)
+    expect_identical(r_t1_1$distance_along_geometry_reversed, 1000)
+    expect_identical(r_t1_1$distance_to_closest_on_geometry, 0)
     expect_true(is.na(r_t1_1$time_since_prev_sec))
     expect_true(is.na(r_t1_1$distance_since_prev_meters))
     expect_true(is.na(r_t1_1$speed_kmh))
 
     # Validate second observation in T1 (timestamp == 1060 offset by 10m off line: distance_to_closest_on_geometry == 10)
     r_t1_2 <- res[res$trip_id == "T1" & res$timestamp == 1060, ]
-    expect_equal(nrow(r_t1_2), 1)
-    expect_equal(r_t1_2$time_since_prev_sec, 60)
+    expect_identical(nrow(r_t1_2), 1L)
+    expect_identical(r_t1_2$time_since_prev_sec, 60)
     expect_equal(r_t1_2$distance_along_geometry, 500, tolerance = 1e-2)
     expect_equal(r_t1_2$distance_along_geometry_reversed, 500, tolerance = 1e-2)
     expect_equal(r_t1_2$distance_to_closest_on_geometry, 10, tolerance = 1e-2)
@@ -65,13 +65,13 @@ test_that("rt_average_speed computes speeds along trip geometry", {
 
     # Validate trip T2 (timestamp == 1080: first update, speed is NA)
     r_t2_1 <- res[res$trip_id == "T2" & res$timestamp == 1080, ]
-    expect_equal(nrow(r_t2_1), 1)
+    expect_identical(nrow(r_t2_1), 1L)
     expect_true(is.na(r_t2_1$speed_kmh))
 
     # Validate trip T2 (timestamp == 1140: second update, distance 400m over 60s -> 24 km/h)
     r_t2_2 <- res[res$trip_id == "T2" & res$timestamp == 1140, ]
-    expect_equal(nrow(r_t2_2), 1)
-    expect_equal(r_t2_2$time_since_prev_sec, 60)
+    expect_identical(nrow(r_t2_2), 1L)
+    expect_identical(r_t2_2$time_since_prev_sec, 60)
     expect_equal(r_t2_2$distance_since_prev_meters, 400, tolerance = 1e-2)
     expect_equal(r_t2_2$distance_along_geometry, 400, tolerance = 1e-2)
     expect_equal(r_t2_2$distance_along_geometry_reversed, 600, tolerance = 1e-2)
@@ -94,7 +94,7 @@ test_that("rt_average_speed issues warning and ignores trips with less than 2 up
         res <- GTFShift::rt_average_speed(rt_updates_single, trip_geom, metric_crs = 3857),
         "Trip T1 has less than 2 updates. Ignoring it."
     )
-    expect_equal(nrow(res), 0)
+    expect_identical(nrow(res), 0L)
 })
 
 test_that("rt_average_speed stops on invalid inputs and mismatched columns", {

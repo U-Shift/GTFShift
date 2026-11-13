@@ -31,25 +31,25 @@ test_that("prioritise_lanes analyzes lane prioritisation with mocked dependencie
         code = {
             res <- GTFShift::prioritise_lanes(gtfs, q = NA, date = ref_date)
             expect_s3_class(res, "sf")
-            expect_equal(nrow(res), 2)
+            expect_identical(nrow(res), 2L)
 
             # Default keep_osm_attributes = FALSE: OSM columns should not be in the output
             expect_false(any(c("lanes", "oneway", "psv", "parking:lane:both") %in% names(res)))
 
             # Check is_bus_lane
-            expect_equal(res$is_bus_lane, c(FALSE, TRUE))
+            expect_identical(res$is_bus_lane, c(FALSE, TRUE))
 
             # Check n_lanes_parking
-            expect_equal(res$n_lanes_parking, c(2L, 1L))
+            expect_identical(res$n_lanes_parking, c(2L, 1L))
 
             # Check n_lanes_circulation
-            expect_equal(res$n_lanes_circulation, c(2, 4))
+            expect_identical(res$n_lanes_circulation, c(2, 4))
 
             # Check n_directions
-            expect_equal(res$n_directions, c(1, 2))
+            expect_identical(res$n_directions, c(1, 2))
 
             # Check n_lanes_circulation_direction
-            expect_equal(res$n_lanes_circulation_direction, c(2, 2))
+            expect_identical(res$n_lanes_circulation_direction, c(2, 2))
         }
     )
 })
