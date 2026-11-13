@@ -14,19 +14,22 @@ get_trip_speed_profile(
 \arguments{
 \item{rt_speed}{data.frame or sf data.frame. The result of
 \code{GTFShift::rt_average_speed()}. Must contain at least the columns
-\code{distance_along_geometry}, \code{distance_along_geometry_reversed}, and
-\code{timestamp}.}
+\code{distance_along_geometry}, \code{distance_along_geometry_reversed},
+and \code{timestamp}.}
 
 \item{by}{Character vector (Default \code{c("trip_id", "route_id", "day")}).
-Columns to aggregate by. If \code{"day"} is included in \code{by} but not present
-in \code{rt_speed}, it is automatically derived from the \code{timestamp} column.
-Set to \code{NULL} or \code{character(0)} to compute metrics across the entire dataset.}
+Columns to aggregate by. If \code{"day"} is included in \code{by} but not
+present in \code{rt_speed}, it is automatically derived from the
+\code{timestamp} column. Set to \code{NULL} or \code{character(0)} to
+compute metrics across the entire dataset.}
 
-\item{speed_col}{Character (Default \code{"speed_kmh"}). Column name present in
-\code{rt_speed} representing estimated speed between consecutive updates (in km/h).}
+\item{speed_col}{Character (Default \code{"speed_kmh"}). Column name present
+in \code{rt_speed} representing estimated speed between consecutive updates
+(in km/h).}
 
-\item{time_col}{Character (Default \code{"timestamp"}). Column name present in
-\code{rt_speed} representing update timestamps (numeric epoch, POSIXct, or Date).}
+\item{time_col}{Character (Default \code{"timestamp"}). Column name present
+in \code{rt_speed} representing update timestamps (numeric epoch, POSIXct,
+or Date).}
 }
 \value{
 data.frame. Aggregated speed profile metrics with one row per group.
@@ -35,48 +38,69 @@ data.frame. Aggregated speed profile metrics with one row per group.
 Computes aggregated speed metrics for trips or groups from the output of
 \code{GTFShift::rt_average_speed()}. Aggregates by trip, route, and day
 (customizable via the \code{by} parameter), calculating commercial speed
-(distance between first and last updates along geometry divided by elapsed time),
-alternative commercial speed (considering the 2nd and penultimate updates to avoid
-terminal wait biases), and measures of centrality and spread for speed observations.
+(distance between first and last updates along geometry divided by elapsed
+time), alternative commercial speed (considering the 2nd and penultimate
+updates to avoid terminal wait biases), and measures of centrality and spread
+for speed observations.
 }
 \details{
 For each group defined by \code{by} (by default, each unique combination of
 \code{trip_id}, \code{route_id}, and \code{day}), observations are ordered
 chronologically by \code{timestamp}.
 
-Let \eqn{\{(d_i, d_i^{\mathrm{rev}}, t_i)\}_{i=1}^n} denote the ordered sequence of updates, where
-\eqn{d_i} is the distance along geometry (meters), \eqn{d_i^{\mathrm{rev}}} is the reversed distance
-along geometry (meters), and \eqn{t_i} is the timestamp (seconds).
+Let \eqn{\{(d_i, d_i^{\mathrm{rev}}, t_i)\}_{i=1}^n} denote the ordered
+sequence of updates, where \eqn{d_i} is the distance along geometry (meters),
+\eqn{d_i^{\mathrm{rev}}} is the reversed distance along geometry (meters),
+and \eqn{t_i} is the timestamp (seconds).
 
-To accommodate circular geometries (where starting and terminal positions may map to the same
-location on the shape), the distance traveled between two observations \eqn{i} and \eqn{j} (\eqn{j > i})
-is calculated by considering both the normal and reversed distances and taking the maximum:
+To accommodate circular geometries (where starting and terminal positions may
+map to the same location on the shape), the distance traveled between two
+observations \eqn{i} and \eqn{j} (\eqn{j > i}) is calculated by considering
+both the normal and reversed distances and taking the maximum:
 \deqn{\Delta d_{i, j}^{\mathrm{fwd}} = \left| d_j - d_i \right|}
-\deqn{\Delta d_{i, j}^{\mathrm{circ}} = \left| d_j - d_i^{\mathrm{rev}} \right|}
-\deqn{\Delta d_{i, j} = \max\left(\Delta d_{i, j}^{\mathrm{fwd}}, \Delta d_{i, j}^{\mathrm{circ}}\right)}
+\deqn{
+  \Delta d_{i, j}^{\mathrm{circ}} =
+    \left| d_j - d_i^{\mathrm{rev}} \right|
+}
+\deqn{
+  \Delta d_{i, j} =
+    \max\left(
+      \Delta d_{i, j}^{\mathrm{fwd}},
+      \Delta d_{i, j}^{\mathrm{circ}}
+    \right)
+}
 
-\strong{Commercial speed} is calculated as the total distance traveled between the
-first and last updates divided by the elapsed time:
-\deqn{v_{\mathrm{commercial}} = \frac{\Delta d_{1, n}}{1000} \div \frac{t_n - t_1}{3600}}
+\strong{Commercial speed} is calculated as the total distance traveled
+between the first and last updates divided by the elapsed time:
+\deqn{
+  v_{\mathrm{commercial}} =
+    \frac{\Delta d_{1, n}}{1000} \div \frac{t_n - t_1}{3600}
+}
 If \eqn{n < 2} or \eqn{t_n \le t_1}, \code{commercial_speed} is \code{NA}.
 
-\strong{Alternative commercial speed} (\code{commercial_speed_alt}) uses the 2nd and
-penultimate (\eqn{n-1}) observations to eliminate potential dwell times or layovers at
-the terminal stops:
-\deqn{v_{\mathrm{commercial\_alt}} = \frac{\Delta d_{2, n-1}}{1000} \div \frac{t_{n-1} - t_2}{3600}}
-If \eqn{n < 4} or \eqn{t_{n-1} \le t_2}, \code{commercial_speed_alt} is \code{NA}.
+\strong{Alternative commercial speed} (\code{commercial_speed_alt}) uses the
+2nd and penultimate (\eqn{n-1}) observations to eliminate potential dwell
+times or layovers at the terminal stops:
+\deqn{
+  v_{\mathrm{commercial\_alt}} =
+    \frac{\Delta d_{2, n-1}}{1000} \div \frac{t_{n-1} - t_2}{3600}
+}
+If \eqn{n < 4} or \eqn{t_{n-1} \le t_2}, \code{commercial_speed_alt} is
+\code{NA}.
 
-If \code{by} does not include \code{trip_id} (e.g., aggregating at route or day level),
-\code{commercial_speed} and \code{commercial_speed_alt} are computed per trip and averaged
-across trips within each group.
+If \code{by} does not include \code{trip_id} (e.g., aggregating at route or
+day level), \code{commercial_speed} and \code{commercial_speed_alt} are
+computed per trip and averaged across trips within each group.
 
-\strong{Measures of centrality and spread} are calculated from all valid (non-NA, finite)
-speed observations in \code{speed_kmh} for each group:
+\strong{Measures of centrality and spread} are calculated from all valid
+(non-NA, finite) speed observations in \code{speed_kmh} for each group:
 \describe{
   \item{timestamp_min}{Earliest timestamp in the trip/group.}
   \item{timestamp_max}{Latest timestamp in the trip/group.}
-  \item{commercial_speed}{Commercial speed between first and last update (km/h).}
-  \item{commercial_speed_alt}{Alternative commercial speed between 2nd and penultimate update (km/h).}
+  \item{commercial_speed}{Commercial speed between first and last update
+    (km/h).}
+  \item{commercial_speed_alt}{Alternative commercial speed between 2nd and
+    penultimate update (km/h).}
   \item{speed_avg}{Arithmetic mean speed (km/h).}
   \item{speed_median}{Median speed (km/h).}
   \item{speed_sd}{Standard deviation of speeds (km/h).}
@@ -92,21 +116,26 @@ speed observations in \code{speed_kmh} for each group:
   \item{n_updates}{Total number of position updates in the group.}
 }
 
-In addition, an attribute \code{"global_summary"} is attached to the returned data frame,
-providing the same metrics evaluated over the entire input dataset.
+In addition, an attribute \code{"global_summary"} is attached to the returned
+data frame, providing the same metrics evaluated over the entire input
+dataset.
 }
 \examples{
 \donttest{
 # Get GTFS-RT data collection and route geometries
 rt_collect_file <- system.file(
-  "extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift"
+  "extdata/samples",
+  "gtfs_rt_sample_tcb_4_4-CS-TERM.csv",
+  package = "GTFShift"
 )
 rt_collection <- read.csv(rt_collect_file) |>
   sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |>
   dplyr::select(-speed)
 
 osm_routes <- sf::st_read(
-  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  system.file(
+    "extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"
+  ),
   quiet = TRUE
 ) |>
   dplyr::filter(route_id \%in\% rt_collection$route_id) |>
@@ -124,7 +153,9 @@ profile <- GTFShift::get_trip_speed_profile(speed)
 head(profile)
 
 # Customize aggregation (e.g. by route and day)
-route_profile <- GTFShift::get_trip_speed_profile(speed, by = c("route_id", "day"))
+route_profile <- GTFShift::get_trip_speed_profile(
+  speed, by = c("route_id", "day")
+)
 head(route_profile)
 }
 

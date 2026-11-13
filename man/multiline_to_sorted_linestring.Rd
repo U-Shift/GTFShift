@@ -13,12 +13,14 @@ multiline_to_sorted_linestring(
 \arguments{
 \item{multilinestring}{sf object with MULTILINESTRING geometry}
 
-\item{points}{(Optional) collection of sorted point geometries used to guide ordering.
-If provided, the first point defines the initial segment and the second
-point (when available) is used as tie-break guidance for its orientation. Remaining points are
-used as iterative tie-break guidance.}
+\item{points}{(Optional) collection of sorted point geometries used to guide
+ordering. If provided, the first point defines the initial segment and the
+second point (when available) is used as tie-break guidance for its
+orientation. Remaining points are used as iterative tie-break guidance.}
 
-\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute distances and lengths during sorting. If NULL, spherical geometry (s2) is used by default.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS
+used to compute distances and lengths during sorting. If NULL, spherical
+geometry (s2) is used by default.}
 }
 \value{
 sfc. LINESTRING geometry object.
@@ -27,66 +29,99 @@ sfc. LINESTRING geometry object.
 Convert a MULTILINESTRING to a sorted LINESTRING
 }
 \details{
-The function takes a MULTILINESTRING object and converts it to a LINESTRING object
-by sorting the linestrings and combining them in the correct order.
+The function takes a MULTILINESTRING object and converts it to a LINESTRING
+object by sorting the linestrings and combining them in the correct order.
 
 The algorithm is formulated as follows:
-Let \eqn{\mathcal{L} = \{L_1, \dots, L_n\}} be the set of individual LINESTRING components.
-Each component \eqn{L_i} is characterized by its start point \eqn{S(L_i)} and end point \eqn{E(L_i)}.
+Let \eqn{\mathcal{L} = \{L_1, \dots, L_n\}} be the set of individual
+LINESTRING components. Each component \eqn{L_i} is characterized by its start
+point \eqn{S(L_i)} and end point \eqn{E(L_i)}.
 
 \bold{1. Initialization}
 
-If guiding points are provided, let \eqn{\mathrm{start\_point}=P_1} be the first point and
-\eqn{P_2} the second point (if available). The initial segment is chosen as
-\deqn{L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}} d(\mathrm{start\_point}, L).}
-where \eqn{d(\cdot)} is the Euclidean distance. If no points are provided, \eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
+If guiding points are provided, let \eqn{\mathrm{start\_point}=P_1} be the
+first point and \eqn{P_2} the second point (if available). The initial
+segment is chosen as
+\deqn{
+  L^{(1)} = \operatorname*{argmin}_{L \in \mathcal{L}}
+    d(\mathrm{start\_point}, L).
+}
+where \eqn{d(\cdot)} is the Euclidean distance. If no points are provided,
+\eqn{L^{(1)} = L_1} (assuming the input MULTILINESTRING is ordered).
 
-Additionally, the orientation of \eqn{L^{(1)}} is determined by comparing the distances 
-from its edges to the remaining segments in \eqn{\mathcal{L} \setminus \{L^{(1)}\}}. 
-The edge that is closest to any remaining segment is designated as the end of \eqn{L^{(1)}}. 
+Additionally, the orientation of \eqn{L^{(1)}} is determined by comparing the
+distances from its edges to the remaining segments in
+\eqn{\mathcal{L} \setminus \{L^{(1)}\}}.
+The edge that is closest to any remaining segment is designated as the end of
+\eqn{L^{(1)}}.
 
-If both edges are equidistant to the remaining segments, the orientation is determined 
-by the proximity to \eqn{P_2} (if available) or by orienting away from \eqn{P_1}.
+If both edges are equidistant to the remaining segments, the orientation is
+determined by the proximity to \eqn{P_2} (if available) or by orienting away
+from \eqn{P_1}.
 
 
 \bold{2. Iterative Step}
 
-At iteration \eqn{k}, with current segment endpoint \eqn{e^{(k)} = E(L^{(k)})}, define
-for each remaining segment \eqn{L \in \mathcal{R}^{(k)}}:
-\deqn{d_s(L) = d\!\left(e^{(k)}, S(L)\right), \qquad d_e(L) = d\!\left(e^{(k)}, E(L)\right).}
-Segments with geometry equal to \eqn{L^{(k)}} are excluded. Candidate segments
-minimize endpoint proximity:
-\deqn{\mathcal{C}^{(k)} = \left\{L \in \mathcal{R}^{(k)} : \min\big(d_s(L), d_e(L)\big) = m^{(k)}\right\},
-\quad m^{(k)} = \min_{J \in \mathcal{R}^{(k)}} \min\big(d_s(J), d_e(J)\big).}
+At iteration \eqn{k}, with current segment endpoint
+\eqn{e^{(k)} = E(L^{(k)})}, define for each remaining segment
+\eqn{L \in \mathcal{R}^{(k)}}:
+\deqn{
+  d_s(L) = d\!\left(e^{(k)}, S(L)\right), \qquad
+  d_e(L) = d\!\left(e^{(k)}, E(L)\right).
+}
+Segments with geometry equal to \eqn{L^{(k)}} are excluded. Candidate
+segments minimize endpoint proximity:
+\deqn{
+  \mathcal{C}^{(k)} = \left\{
+    L \in \mathcal{R}^{(k)} : \min\big(d_s(L), d_e(L)\big) = m^{(k)}
+  \right\},
+  \quad m^{(k)} =
+    \min_{J \in \mathcal{R}^{(k)}} \min\big(d_s(J), d_e(J)\big).
+}
 Ties are broken as follows:
-\deqn{\text{(i) if next unvisited point } Q \text{ exists, choose closest candidate, minimizing } d(Q,L) \text{ over } L \in \mathcal{C}^{(k)};}
-\deqn{\text{(ii) if still tied, choose candidate closest to the current endpoint } e^{(k)}, \text{ minimizing } d\!\left(e^{(k)}, S(L)\right) \text{ over } L \in \mathcal{C}^{(k)}.}
+\deqn{
+  \text{(i) if next unvisited point } Q \text{ exists, choose closest }
+  \text{candidate, minimizing } d(Q,L) \text{ over } L \in \mathcal{C}^{(k)};
+}
+\deqn{
+  \text{(ii) if still tied, choose candidate closest to the current }
+  \text{endpoint } e^{(k)}, \text{ minimizing }
+  d\!\left(e^{(k)}, S(L)\right) \text{ over } L \in \mathcal{C}^{(k)}.
+}
 
 \bold{3. Verification and Assembly}
 
 Let \eqn{L^*} be the selected candidate. If
-\deqn{d\!\left(L^{(k)}, L^*\right) > \operatorname{len}\!\left(L^{(k)}\right) + \operatorname{len}(L^*),}
+\deqn{
+  d\!\left(L^{(k)}, L^*\right) >
+    \operatorname{len}\!\left(L^{(k)}\right) + \operatorname{len}(L^*),
+}
 then \eqn{L^*} is removed from the remaining set and the loop restarts.
 Otherwise, \eqn{L^*} is oriented to connect from \eqn{e^{(k)}} and
 appended to the ordered sequence. When points are provided, consecutive
 unvisited points \eqn{Q} are marked visited when
-\deqn{d\!\left(L^{(k+1)}, Q\right) \leq \min_{J \in \mathcal{R}^{(k+1)}} d(J, Q).}
+\deqn{
+  d\!\left(L^{(k+1)}, Q\right) \leq
+    \min_{J \in \mathcal{R}^{(k+1)}} d(J, Q).
+}
 
 The ordered segments are concatenated into a single \code{LINESTRING} and
 transformed back to the original CRS of \code{multilinestring}.
 }
 \examples{
 \donttest{
-# Get OSM route geometries (MULTILINESTRING)  
+# Get OSM route geometries (MULTILINESTRING)
 osm_routes <- sf::st_read(
-  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  system.file(
+    "extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"
+  ),
   quiet = TRUE
 ) |> dplyr::sample_n(1)
 
 head(osm_routes)
 
 # Convert geometry to LINESTRING
-osm_routes <- osm_routes |>  dplyr::mutate(
+osm_routes <- osm_routes |> dplyr::mutate(
   geom = GTFShift::multiline_to_sorted_linestring(geom)
 )
 

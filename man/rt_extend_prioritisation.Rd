@@ -7,24 +7,33 @@
 rt_extend_prioritisation(
   lane_prioritisation,
   rt_collection,
-  rt_current_status = c("IN_TRANSIT_TO"),
+  rt_current_status = "IN_TRANSIT_TO",
   lane_buffer = 15,
   metric_crs = NULL
 )
 }
 \arguments{
-\item{lane_prioritisation}{sf data.frame. Result of \code{GTFShift::prioritise_lanes()}}
+\item{lane_prioritisation}{sf data.frame. Result of
+\code{GTFShift::prioritise_lanes()}}
 
-\item{rt_collection}{sf data.frame. GTFS-RT data collection. Must include \code{speed} column.}
+\item{rt_collection}{sf data.frame. GTFS-RT data collection. Must include
+\code{speed} column.}
 
-\item{rt_current_status}{Character vector (Default \code{c("IN_TRANSIT_TO")}). If the \code{current_status} column is present in the \code{rt_collection} data, only points with \code{current_status} in this vector are considered.}
+\item{rt_current_status}{Character vector (Default
+\code{c("IN_TRANSIT_TO")}). If the \code{current_status} column is present
+in the \code{rt_collection} data, only points with \code{current_status} in
+this vector are considered.}
 
-\item{lane_buffer}{numeric (Default 15). Buffer distance (in meters) to create around lane segments to capture nearby GTFS-RT points.}
+\item{lane_buffer}{numeric (Default 15). Buffer distance (in meters) to
+create around lane segments to capture nearby GTFS-RT points.}
 
-\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to apply lane buffer distances in meters. If NULL, spherical geometry (s2) is used by default.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS
+used to apply lane buffer distances in meters. If NULL, spherical geometry
+(s2) is used by default.}
 }
 \value{
-sf data.frame. Extended lane prioritisation with the following columns:
+sf data.frame. Extended lane prioritisation with the following
+  columns:
 \describe{
   \item{speed_avg}{The average speed of the vehicles on the way.}
   \item{speed_median}{The median speed of the vehicles on the way.}
@@ -36,14 +45,21 @@ sf data.frame. Extended lane prioritisation with the following columns:
 }
 }
 \description{
-This function extends lane segment indicators for prioritisation with speed metrics produced with GTFS-RT data.
+This function extends lane segment indicators for prioritisation with speed
+metrics produced with GTFS-RT data.
 }
 \details{
-Extends the \code{lane_prioritisation} data with speed metrics calculated from the GTFS-RT data points that fall within a buffer around each lane segment.
+Extends the \code{lane_prioritisation} data with speed metrics calculated
+from the GTFS-RT data points that fall within a buffer around each lane
+segment.
 
-If GTFS-RT data does not provide speed information, it can be inferred from the progression of position updates through time using \code{GTFShift::rt_average_speed()}.
+If GTFS-RT data does not provide speed information, it can be inferred from
+the progression of position updates through time using
+\code{GTFShift::rt_average_speed()}.
 
-Refer to \code{GTFShift::rt_collect_json()} or \code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data collection.
+Refer to \code{GTFShift::rt_collect_json()} or
+\code{GTFShift::rt_collect_protobuf()} for details on GTFS-RT data
+collection.
 }
 \examples{
 \dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
@@ -52,13 +68,21 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip",
   package = "GTFShift"
 ))
-gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
+gtfs <- GTFShift::filter_by_route_name(gtfs, "4")
 
 # Build query and prepare osm extract (possible to use API as alternative)
-q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+q <- osmdata::opq(bbox = bbox) |>
   osmdata::add_osm_feature(key = "route", value = "bus") |>
-  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
+  osmdata::add_osm_feature(
+    key = "operator",
+    value = "Transportes Colectivos do Barreiro"
+  )
+osm_file <- system.file(
+  "extdata/samples",
+  "osmextract_tcb_network.pbf",
+  package = "GTFShift"
+)
 
 # Prioritise lanes
 lane_prioritisation <- GTFShift::prioritise_lanes(

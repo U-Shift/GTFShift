@@ -20,23 +20,28 @@ project_points_along_geometry(
 \item{geometry_sample_meters}{Numeric (Default 10). Sampling step used to
 discretize the line when estimating cumulative distance along geometry.}
 
-\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to
-compute nearest points, line sampling, and cumulative distances. If NULL, spherical geometry (s2) is used by default.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS
+used to compute nearest points, line sampling, and cumulative distances. If
+NULL, spherical geometry (s2) is used by default.}
 }
 \value{
 data.frame. Input points projected along geometry with four columns:
 \describe{
-  \item{closest_on_geometry}{An \code{sfc_POINT} column with the projected location on the line.}
-  \item{distance_to_closest_on_geometry}{Numeric distance from each input point to its projected location on the line.}
-  \item{distance_along_geometry}{Numeric cumulative distance from the line start to the projected location.}
-  \item{distance_along_geometry_reversed}{Numeric cumulative distance from the line end to the projected location.}
+  \item{closest_on_geometry}{An \code{sfc_POINT} column with the projected
+    location on the line.}
+  \item{distance_to_closest_on_geometry}{Numeric distance from each input
+    point to its projected location on the line.}
+  \item{distance_along_geometry}{Numeric cumulative distance from the line
+    start to the projected location.}
+  \item{distance_along_geometry_reversed}{Numeric cumulative distance from
+    the line end to the projected location.}
 }
 
 If \code{points} is empty, returns an empty data.frame with the same columns.
 }
 \description{
-Projects point geometries to the closest location along a single LINESTRING or
-MULTILINESTRING and estimates each projected point position as cumulative
+Projects point geometries to the closest location along a single LINESTRING
+or MULTILINESTRING and estimates each projected point position as cumulative
 distance from the start of the line.
 }
 \details{
@@ -51,16 +56,21 @@ projected points are transformed back to the original \code{geometry} CRS.
 \examples{
 # Get sample points from GTFS-RT collection
 rt_collect_file <- system.file(
-  "extdata/samples", "gtfs_rt_sample_tcb_4_4-CS-TERM.csv", package = "GTFShift"
+  "extdata/samples",
+  "gtfs_rt_sample_tcb_4_4-CS-TERM.csv",
+  package = "GTFShift"
 )
-points <- read.csv(rt_collect_file) |> 
-  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> dplyr::sample_n(5)
+points <- read.csv(rt_collect_file) |>
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |>
+  dplyr::sample_n(5)
 
 head(points |> dplyr::select(geometry))
 
 # Get route geometry for points
 osm_routes <- sf::st_read(
-  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+  system.file(
+    "extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"
+  ),
   quiet = TRUE
 ) |> dplyr::filter(route_id \%in\% points$route_id)
 

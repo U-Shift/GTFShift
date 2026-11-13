@@ -24,37 +24,60 @@ osm_shapes_match_routes(
 
 \item{q}{osmdata::opq. Overpass query for transit network}
 
-\item{geometry}{Boolean (Default TRUE). If TRUE, returns sf object with geometry, otherwise, a simple data.frame.}
+\item{geometry}{Boolean (Default TRUE). If TRUE, returns sf object with
+geometry, otherwise, a simple data.frame.}
 
-\item{gtfs_match}{String (Default route_short_name). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
+\item{gtfs_match}{String (Default route_short_name). routes.txt attribute
+that identifies routes. Accepted values: route_id, route_short_name,
+route_long_name.}
 
-\item{osm_match}{String (Default ref). OSM attribute that identifies routes by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.}
+\item{osm_match}{String (Default ref). OSM attribute that identifies routes
+by matching with gtfs_match. Accepted values: ref, name, gtfs:route_id.}
 
-\item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route names are matched strictly. Otherwise, partial string match is considered (all words in gtfs_match must be in osm_match, ignoring case).}
+\item{gtfs_osm_match_exact}{Boolean (Default TRUE). If TRUE, gtfs and route
+names are matched strictly. Otherwise, partial string match is considered
+(all words in gtfs_match must be in osm_match, ignoring case).}
 
-\item{log_file}{String (Optional). If provided, will log warnings to this file, in addition to the console.}
+\item{log_file}{String (Optional). If provided, will log warnings to this
+file, in addition to the console.}
 
-\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
+\item{osm_file}{character (Optional). Location of OSM extract file with
+\code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more
+details. If not provided OSM Overpass API is called through
+\code{osmdata::osmdata_sf()}.}
 
-\item{num_cores}{Integer (Default 1). Number of cores to use for parallel computation. Only supported on Unix-like systems (Linux, macOS).}
+\item{num_cores}{Integer (Default 1). Number of cores to use for parallel
+computation. Only supported on Unix-like systems (Linux, macOS).}
 
-\item{osm_stop_order_relaxed}{Boolean (Default FALSE). If TRUE, OSM routes with entry/exit stops not respecting the right order will still be matched (this may indicate OSM data integrity problems). If FALSE, these routes will be ignored.}
+\item{osm_stop_order_relaxed}{Boolean (Default FALSE). If TRUE, OSM routes
+with entry/exit stops not respecting the right order will still be matched
+(this may indicate OSM data integrity problems). If FALSE, these routes
+will be ignored.}
 
-\item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
+\item{osm_route_type}{character (Default "bus"). OSM route type. Used to
+query OSM network (e.g., 'bus', 'train').}
 
-\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute shapes and routes lengths and stop-to-stop distances. If NULL, spherical geometry (s2) is used by default.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS
+used to compute shapes and routes lengths and stop-to-stop distances. If
+NULL, spherical geometry (s2) is used by default.}
 }
 \value{
-data.frame. Matched routes (\code{sf} if \code{geometry=TRUE}) with the following columns:
+data.frame. Matched routes (\code{sf} if \code{geometry=TRUE}) with
+  the following columns:
 \describe{
   \item{route_id}{The \code{route_id} attribute from \code{routes.txt} file.}
   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
   \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
-  \item{distance_diff}{The difference, in meters, between GTFS shape and OSM route lengths.}
-  \item{points_diff}{The sum of the difference, in meters, between GTFS shape and OSM route start and end points.}
-  \item{stops_diff}{The difference between GTFS and OSM routes number of stops.}
-  \item{route_short_name}{The \code{route_short_name} attribute from \code{routes.txt} file.}
-  \item{route_long_name}{The \code{route_long_name} attribute from \code{routes.txt} file.}
+  \item{distance_diff}{The difference, in meters, between GTFS shape and OSM
+    route lengths.}
+  \item{points_diff}{The sum of the difference, in meters, between GTFS shape
+    and OSM route start and end points.}
+  \item{stops_diff}{The difference between GTFS and OSM routes number of
+    stops.}
+  \item{route_short_name}{The \code{route_short_name} attribute from
+    \code{routes.txt} file.}
+  \item{route_long_name}{The \code{route_long_name} attribute from
+    \code{routes.txt} file.}
   \item{osm_ref}{The \code{ref} attribute from OSM route relation.}
   \item{osm_name}{The \code{name} attribute from OSM route relation.}
   \item{geometry}{The geometrical data for the OSM route relation.}
@@ -70,51 +93,84 @@ The matching algorithm is formulated as follows:
 Let \eqn{R} be a GTFS route identifier.
 
 \bold{1. Filtering and Base Data Selection:}
-Let \eqn{\mathcal{O}_R = \{O_1, \dots, O_m\}} be the set of candidate OSM route relations matching the identifier \eqn{R}
+Let \eqn{\mathcal{O}_R = \{O_1, \dots, O_m\}} be the set of candidate OSM
+route relations matching the identifier \eqn{R}
 (based on \code{gtfs_match} and \code{osm_match}).
 If \eqn{\mathcal{O}_R} is empty, route \eqn{R} is skipped.
-Unless \code{osm_stop_order_relaxed = TRUE}, any relation in \eqn{\mathcal{O}_R} with entry/exit stops not in the correct order is discarded.
-We also retrieve the set of GTFS shapes associated with route \eqn{R}, denoted as \eqn{\mathcal{S}_R = \{S_1, \dots, S_n\}}.
+Unless \code{osm_stop_order_relaxed = TRUE}, any relation in
+\eqn{\mathcal{O}_R} with entry/exit stops not in the correct order is
+discarded.
+We also retrieve the set of GTFS shapes associated with route \eqn{R},
+denoted as \eqn{\mathcal{S}_R = \{S_1, \dots, S_n\}}.
 
 \bold{2. Feature Extraction:}
 For each GTFS shape \eqn{S_i \in \mathcal{S}_R}:
 \itemize{
-  \item Extract the start and end coordinates of its trips' first and last stops: \eqn{\text{init}_{GTFS, i}} and \eqn{\text{fin}_{GTFS, i}}.
-  \item Compute the shape's total length \eqn{L_{GTFS, i}} and the number of stop times \eqn{N_{stops, i}}.
+  \item Extract the start and end coordinates of its trips' first and last
+    stops: \eqn{\text{init}_{GTFS, i}} and \eqn{\text{fin}_{GTFS, i}}.
+  \item Compute the shape's total length \eqn{L_{GTFS, i}} and the number of
+    stop times \eqn{N_{stops, i}}.
 }
 For each candidate OSM route relation \eqn{O_j \in \mathcal{O}_R}:
 \itemize{
-  \item Extract the coordinates of the first and last stops/platforms: \eqn{\text{init}_{OSM, j}} and \eqn{\text{fin}_{OSM, j}}.
-  \item Compute the relation's geometry length \eqn{L_{OSM, j}} and the number of stop/platform nodes \eqn{N_{stops, j}}.
+  \item Extract the coordinates of the first and last stops/platforms:
+    \eqn{\text{init}_{OSM, j}} and \eqn{\text{fin}_{OSM, j}}.
+  \item Compute the relation's geometry length \eqn{L_{OSM, j}} and the
+    number of stop/platform nodes \eqn{N_{stops, j}}.
 }
 
 \bold{3. Closeness Metric Evaluation:}
-For each GTFS shape \eqn{S_i}, we calculate the closeness metric \eqn{C(i, j)} for all candidate OSM routes \eqn{O_j \in \mathcal{O}_R}:
-\deqn{C(i, j) = d(\text{init}_{GTFS, i}, \text{init}_{OSM, j}) + d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j}) + |L_{GTFS, i} - L_{OSM, j}| + \frac{L_{GTFS, i}}{N_{stops, i}} \cdot |N_{stops, i} - N_{stops, j}|}{C(i, j) = d(init_GTFS,i, init_OSM,j) + d(fin_GTFS,i, fin_OSM,j) + |L_GTFS,i - L_OSM,j| + (L_GTFS,i / N_stops,i) * |N_stops,i - N_stops,j|}
+For each GTFS shape \eqn{S_i}, we calculate the closeness metric
+\eqn{C(i, j)} for all candidate OSM routes \eqn{O_j \in \mathcal{O}_R}:
+\deqn{
+  C(i, j) = d(\text{init}_{GTFS, i}, \text{init}_{OSM, j}) +
+    d(\text{fin}_{GTFS, i}, \text{fin}_{OSM, j}) +
+    |L_{GTFS, i} - L_{OSM, j}| +
+    \frac{L_{GTFS, i}}{N_{stops, i}} \cdot |N_{stops, i} - N_{stops, j}|
+}{
+  C(i, j) = d(init_GTFS,i, init_OSM,j) + d(fin_GTFS,i, fin_OSM,j) +
+    |L_GTFS,i - L_OSM,j| + (L_GTFS,i / N_stops,i) * |N_stops,i - N_stops,j|
+}
 
 where:
 \itemize{
   \item \eqn{d(\cdot)} is the Euclidean distance.
-  \item The term \eqn{\frac{L_{GTFS, i}}{N_{stops, i}}}{(L_GTFS,i / N_stops,i)} represents the average distance between stops on the GTFS shape, serving as a scale factor for the difference in the number of stops.
+  \item The term \eqn{\frac{L_{GTFS, i}}{N_{stops, i}}}{(L_GTFS,i /
+    N_stops,i)} represents the average distance between stops on the GTFS
+    shape, serving as a scale factor for the difference in the number of
+    stops.
 }
-Shape \eqn{S_i} is associated with the OSM route \eqn{O_{j^*}} that minimizes the closeness metric:
+Shape \eqn{S_i} is associated with the OSM route \eqn{O_{j^*}} that minimizes
+the closeness metric:
 \deqn{j^* = \operatorname{argmin}_{j} C(i, j)}{j* = argmin_j C(i, j)}
 
 \bold{4. Conflict Resolution:}
-If multiple GTFS shapes are associated with the same OSM route \eqn{O_j}, only the shape \eqn{S_i} that minimizes the closeness metric is retained. The other conflicting shapes are ignored and a warning is triggered.
+If multiple GTFS shapes are associated with the same OSM route \eqn{O_j},
+only the shape \eqn{S_i} that minimizes the closeness metric is retained. The
+other conflicting shapes are ignored and a warning is triggered.
 
 
-Be aware that the result might ignore some GTFS routes, in the following cases:
+Be aware that the result might ignore some GTFS routes, in the following
+cases:
 \itemize{
- \item If there is no OSM route relation that matches the GTFS route identifier;
- \item If, for a GTFS route, there is any OSM route relation that has entry/exit stops not respecting the right order (unless \code{osm_stop_order_relaxed} is set to TRUE);
- \item If, for the same route, distinct shapes are associated to the same OSM route. In that case, only the shape that minimizes the closeness metric is retained.
+ \item If there is no OSM route relation that matches the GTFS route
+   identifier;
+ \item If, for a GTFS route, there is any OSM route relation that has
+   entry/exit stops not respecting the right order (unless
+   \code{osm_stop_order_relaxed} is set to TRUE);
+ \item If, for the same route, distinct shapes are associated to the same OSM
+   route. In that case, only the shape that minimizes the closeness metric is
+   retained.
 }
-If any of these errors occurs, warnings will be thrown at end of the method execution, and those GTFS route will be ignored in the results.
+If any of these errors occurs, warnings will be thrown at end of the method
+execution, and those GTFS route will be ignored in the results.
 
-Nevertheless, provided there are enough OSM routes, all the GTFS shapes for each route will necessarily be associated with
-an OSM one. This might generate wrong results if the topology of routes on OSM does not match the GTFS shapes for that route.
-Refer to  \code{distance_diff}, \code{points_diff} and \code{stops_diff} on the results table to validate the results and identify misassociations.
+Nevertheless, provided there are enough OSM routes, all the GTFS shapes for
+each route will necessarily be associated with an OSM one. This might
+generate wrong results if the topology of routes on OSM does not match the
+GTFS shapes for that route.
+Refer to \code{distance_diff}, \code{points_diff} and \code{stops_diff} on
+the results table to validate the results and identify misassociations.
 }
 \examples{
 \dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
@@ -126,10 +182,18 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
 # Build query and prepare osm extract (possible to use API as alternative)
-q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+q <- osmdata::opq(bbox = bbox) |>
   osmdata::add_osm_feature(key = "route", value = "bus") |>
-  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
+  osmdata::add_osm_feature(
+    key = "operator",
+    value = "Transportes Colectivos do Barreiro"
+  )
+osm_file <- system.file(
+  "extdata/samples",
+  "osmextract_tcb_network.pbf",
+  package = "GTFShift"
+)
 
 # Get OSM route geometries based on geometrical match
 shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
@@ -137,6 +201,11 @@ shapes_osm_routes <- GTFShift::osm_shapes_match_routes(
   osm_file = osm_file
 )
 
-head(shapes_osm_routes |> dplyr::select(shape_id, osm_id, distance_diff, points_diff, stops_diff))
+head(
+  shapes_osm_routes |>
+    dplyr::select(
+      shape_id, osm_id, distance_diff, points_diff, stops_diff
+    )
+)
 \dontshow{\}) # examplesIf}
 }

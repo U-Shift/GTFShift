@@ -17,17 +17,27 @@ get_network_extension(
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{route_identifier}{String. (Default \code{"route_id"}). routes.txt attribute that identifies routes. Accepted values: route_id, route_short_name, route_long_name.}
+\item{route_identifier}{String. (Default \code{"route_id"}). routes.txt
+attribute that identifies routes. Accepted values: route_id,
+route_short_name, route_long_name.}
 
-\item{direction_wise}{Boolean (Default \code{TRUE}). If TRUE, extension considers sum of both directions. Otherwise, only one direction is considered.}
+\item{direction_wise}{Boolean (Default \code{TRUE}). If TRUE, extension
+considers sum of both directions. Otherwise, only one direction is
+considered.}
 
-\item{unified}{Boolean (Default \code{FALSE}). If TRUE, overlapping route segments are only counted once in the total extension.}
+\item{unified}{Boolean (Default \code{FALSE}). If TRUE, overlapping route
+segments are only counted once in the total extension.}
 
-\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
+\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
+Reference date to consider when analyzing the GTFS file.}
 
-\item{use_osm_routes}{osmdata::opq (Default NA). If overpass query for transit network is defined, analysis is performed considering OSM route geometry, using \code{GTFShift::osm_shapes_to_routes}.}
+\item{use_osm_routes}{osmdata::opq (Default NA). If overpass query for
+transit network is defined, analysis is performed considering OSM route
+geometry, using \code{GTFShift::osm_shapes_to_routes}.}
 
-\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute route lengths in meters. If NULL, spherical geometry (s2) is used by default.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS
+used to compute route lengths in meters. If NULL, spherical geometry (s2)
+is used by default.}
 }
 \value{
 Numeric. The routes extension, in meters.
@@ -36,8 +46,9 @@ Numeric. The routes extension, in meters.
 Get total extension of GTFS feed routes
 }
 \details{
-This method calculates the sum of the GTFS feed routes length, considering, for each, the shape of the variant with the highest frequency for the given date
-(using \code{GTFShift::get_route_frequency_hourly()}).
+This method calculates the sum of the GTFS feed routes length, considering,
+for each, the shape of the variant with the highest frequency for the given
+date (using \code{GTFShift::get_route_frequency_hourly()}).
 For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{

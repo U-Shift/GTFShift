@@ -16,14 +16,19 @@ data.frame. Table for calendar.txt.
 Create calendar.txt from calendar_dates.txt
 }
 \details{
-When \code{calendar_dates.txt} declares all service dates, \code{calendar.txt} becomes optional in the
-\href{https://gtfs.org/documentation/schedule/reference/#dataset-files}{GTFS feed specification}.
+When \code{calendar_dates.txt} declares all service dates,
+\code{calendar.txt} becomes optional in the
+\href{https://gtfs.org/documentation/schedule/reference/#dataset-files}{GTFS
+feed specification}.
 However, to perform some operations, this table might be necessary.
 
-This method allows to create a \code{calendar.txt} table, based on the \code{calendar_dates.txt}.
+This method allows to create a \code{calendar.txt} table, based on the
+\code{calendar_dates.txt}.
 It performs an approximation, considering, for each \code{service_id}, the
-minimum and maximum dates and setting each week day to true if it has any date that matches that date. The results
-might not be 100% accurate, as it captures the whole time span and exceptions in the week days along it are ignored.
+minimum and maximum dates and setting each week day to true if it has any
+date that matches that date. The results might not be 100% accurate, as it
+captures the whole time span and exceptions in the week days along it are
+ignored.
 }
 \examples{
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",

@@ -12,11 +12,16 @@ create_shapes_from_sf(
 )
 }
 \arguments{
-\item{sf_shapes}{sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING).}
+\item{sf_shapes}{sf object associating \code{shape_id} with an sf object
+(either LINESTRING or MULTILINESTRING).}
 
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used when computing distances (passed to \code{multiline_to_sorted_linestring} and \code{project_points_along_geometry}). If NULL, spherical geometry (s2) is used by default.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS
+used when computing distances (passed to
+\code{multiline_to_sorted_linestring} and
+\code{project_points_along_geometry}). If NULL, spherical geometry (s2) is
+used by default.}
 
 \item{shape_dist_traveled}{Boolean (Default FALSE). If TRUE, computes
 \code{shape_dist_traveled} for each generated shape.}
@@ -31,18 +36,19 @@ Build shapes from simple feature object
 \details{
 This function builds the shapes.txt file from a simple feature object.
 
-It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
-\code{multiline_to_sorted_linestring}, using a point guide per shape:
+It first converts any MULTILINESTRING geometries to LINESTRING geometries
+using the \code{multiline_to_sorted_linestring}, using a point guide per
+shape:
 all ordered stops when the selected trip is circular (first and last
 \code{stop_id} are equal), or the first two stops otherwise.
-Then, it converts the LINESTRING geometries to a data.frame representing a GTFS shapes table using
-\code{gtfstools::convert_sf_to_shapes}.
+Then, it converts the LINESTRING geometries to a data.frame representing a
+GTFS shapes table using \code{gtfstools::convert_sf_to_shapes}.
 
 Coordinates are 4326 (WGS 84) by default, following GTFS specifications.
 
 Optionally, when \code{shape_dist_traveled = TRUE}, it estimates cumulative
 distance along each shape for all generated points and appends this as
-\code{shape_dist_traveled}. This metric is computed in the units of 
+\code{shape_dist_traveled}. This metric is computed in the units of
 \code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
 }
 \examples{
@@ -53,16 +59,22 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 )
 
 # Load TCB OSM routes sample linestring
-osm_routes = sf::st_read(
-  system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+osm_routes <- sf::st_read(
+  system.file(
+    "extdata/samples",
+    "osm_routes_tcb.gpkg",
+    package = "GTFShift"
+  ),
   quiet = TRUE
-) |> dplyr::filter(shape_id \%in\% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
+) |>
+  dplyr::filter(shape_id \%in\% gtfs$shapes$shape_id) |>
+  dplyr::sample_n(1)
 
 head(osm_routes)
 
 # Create shapes.txt for geometries
 shapes_txt <- GTFShift::create_shapes_from_sf(
-  osm_routes, gtfs, 
+  osm_routes, gtfs,
   shape_dist_traveled = TRUE
 )
 

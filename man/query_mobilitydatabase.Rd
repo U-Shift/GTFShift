@@ -22,19 +22,24 @@ query_mobilitydatabase(
 
 \item{refresh_token}{String (Optional when access_token). Refresh token.}
 
-\item{bounding_filter_method}{String (Default partially_enclosed). Filtering method to use with the dataset_latitudes and dataset_longitudes parameters.}
+\item{bounding_filter_method}{String (Default partially_enclosed). Filtering
+method to use with the dataset_latitudes and dataset_longitudes parameters.}
 
 \item{limit}{Integer (Default 10). The number of items to be returned.}
 
 \item{offset}{Integer (Default 0). Offset of the first item to return.}
 
-\item{country_code}{String (Optional). Filter feeds by their exact country code.}
+\item{country_code}{String (Optional). Filter feeds by their exact country
+code.}
 
-\item{subdivision_name}{String (Optional). List only feeds with the specified value. Can be a partial match.}
+\item{subdivision_name}{String (Optional). List only feeds with the specified
+value. Can be a partial match.}
 
-\item{municipality}{String (Optional). List only feeds with the specified value. Can be a partial match. Case insensitive.}
+\item{municipality}{String (Optional). List only feeds with the specified
+value. Can be a partial match. Case insensitive.}
 
-\item{bbox}{bbox (Optional). Area from which to get GTFS feeds. Converted to API dataset_latitudes and dataset_longitudes URL parameters.}
+\item{bbox}{bbox (Optional). Area from which to get GTFS feeds. Converted to
+API dataset_latitudes and dataset_longitudes URL parameters.}
 
 \item{is_official}{Boolean (Optional). If TRUE, only return official feeds.}
 }
@@ -45,11 +50,14 @@ data.frame. Query results from Mobility Database.
 Query Mobility Database API for GTFS feeds
 }
 \details{
-This method queries \href{https://mobilitydatabase.org/}{Mobility Database} API, allowing to get a list of GTFS feeds documented at this platform.
+This method queries \href{https://mobilitydatabase.org/}{Mobility Database}
+API, allowing to get a list of GTFS feeds documented at this platform.
 To use it, an access or a refresh token must be provided.
 It can be obtained for free at Mobility Database website.\cr\cr
-For more details on the parameters, refer to \url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
-Some useful columns of the returned data.frame (refer to the API documentation for a full list) are:
+For more details on the parameters, refer to
+\url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr % # nolint
+Some useful columns of the returned data.frame (refer to the API
+documentation for a full list) are:
 \describe{
   \item{provider}{The name of the GTFS provider.}
   \item{status}{Tells if the feed is active, inactive or deprecated.}

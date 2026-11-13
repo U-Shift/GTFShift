@@ -11,9 +11,11 @@ filter_by_route_name(gtfs, values, short_name = TRUE, exact_match = TRUE)
 
 \item{values}{String[]. List of the route names to filter the feed.}
 
-\item{short_name}{Boolean. If TRUE, query for route_short_name, otherwise, route_long_name is considered.}
+\item{short_name}{Boolean. If TRUE, query for route_short_name, otherwise,
+route_long_name is considered.}
 
-\item{exact_match}{Boolean. If TRUE, route name is queried for an exact match, otherwise, partial match is considered.}
+\item{exact_match}{Boolean. If TRUE, route name is queried for an exact
+match, otherwise, partial match is considered.}
 }
 \value{
 tidygtfs. The filtered GTFS feed.
@@ -22,9 +24,10 @@ tidygtfs. The filtered GTFS feed.
 Filter GTFS feed by route name
 }
 \details{
-On a GTFS feed, the \code{route_id} rarely matches the real name of the route, that can range from numbers,
-letters, words or combinations of both.
-This method allows to filter the feed for the route short or long name, with a partial or exact match.
+On a GTFS feed, the \code{route_id} rarely matches the real name of the
+route, that can range from numbers, letters, words or combinations of both.
+This method allows to filter the feed for the route short or long name, with
+a partial or exact match.
 }
 \examples{
 # Load GTFS
@@ -36,7 +39,7 @@ summary(gtfs)
 
 
 # Filter by route
-gtfs_route <- GTFShift::filter_by_route_name(gtfs, c("4"))
+gtfs_route <- GTFShift::filter_by_route_name(gtfs, "4")
 
 summary(gtfs_route)
 

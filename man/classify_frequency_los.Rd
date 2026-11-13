@@ -9,17 +9,20 @@ classify_frequency_los(frequencies, frequency_col = "frequency")
 \arguments{
 \item{frequencies}{data.frame. Data frame with frequency information.}
 
-\item{frequency_col}{String (Default "frequency"). Name of the column with frequency values.}
+\item{frequency_col}{String (Default "frequency"). Name of the column with
+frequency values.}
 }
 \value{
-data.frame. Input data frame with an additional column \code{frequency_los} indicating the LOS classification.
+data.frame. Input data frame with an additional column
+  \code{frequency_los} indicating the LOS classification.
 }
 \description{
 Classify bus frequency level of service based on HCM
 }
 \details{
-Classifies bus frequency level of service (LOS) based on the Highway Capacity Manual (HCM) 2000 guidelines
-on "Service Frequency LOS for Urban Scheduled Transit Service" (Exhibit 27-1).
+Classifies bus frequency level of service (LOS) based on the Highway Capacity
+Manual (HCM) 2000 guidelines on "Service Frequency LOS for Urban Scheduled
+Transit Service" (Exhibit 27-1).
 
 Refer to \code{vignette("classify")} for more details on this classification.
 }
@@ -30,16 +33,16 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 )
 gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
-# Get route frequency 
+# Get route frequency
 frequency_analysis <- GTFShift::get_route_frequency_hourly(
-  gtfs, 
+  gtfs,
   date = gtfs$calendar$start_date[1]
-) 
+)
 
 # Compute LOS
 frequency_los <- GTFShift::classify_frequency_los(frequency_analysis)
 
-frequency_los |> 
+frequency_los |>
   sf::st_drop_geometry() |>
   dplyr::select(route_id, frequency_los)
 
