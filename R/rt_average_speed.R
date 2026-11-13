@@ -117,7 +117,8 @@
 #' # Get route geometry for data collected
 #' osm_routes <- sf::st_read(
 #'   system.file(
-#'     "extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"
+#'     "extdata/samples", "osm_routes_tcb.gpkg",
+#'     package = "GTFShift"
 #'   ),
 #'   quiet = TRUE
 #' ) |>
@@ -138,12 +139,10 @@
 #'   dplyr::select(
 #'     trip_id, timestamp, speed_kmh,
 #'     distance_along_geometry, distance_to_closest_on_geometry
-#'   )
-#' )
+#'   ))
 #'
 #' nrow(speed)
 #' }
-#'
 #'
 #' @seealso \code{GTFShift::project_points_along_geometry()}
 #' @seealso \code{GTFShift::multiline_to_sorted_linestring()}
