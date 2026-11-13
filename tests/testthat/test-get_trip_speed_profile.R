@@ -46,8 +46,8 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
     expect_equal(r_t1$speed_p75, 25.5)
     expect_equal(r_t1$speed_p85, 27.3)
     expect_equal(r_t1$speed_iqr, 7.5)
-    expect_identical(r_t1$speed_count, 4)
-    expect_identical(r_t1$n_updates, 5)
+    expect_identical(r_t1$speed_count, 4L)
+    expect_identical(r_t1$n_updates, 5L)
 
     # Monotonicity of percentiles
     expect_lte(r_t1$speed_p15, r_t1$speed_p25)
@@ -66,8 +66,8 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
     expect_equal(r_t2$speed_median, 32.4)
     expect_equal(r_t2$speed_min, 28.8)
     expect_equal(r_t2$speed_max, 36.0)
-    expect_identical(r_t2$speed_count, 4)
-    expect_identical(r_t2$n_updates, 5)
+    expect_identical(r_t2$speed_count, 4L)
+    expect_identical(r_t2$n_updates, 5L)
 
     # Check global_summary attribute
     global_sum <- attr(res, "global_summary")
@@ -77,8 +77,8 @@ test_that("get_trip_speed_profile calculates speed profile with default paramete
     expect_identical(global_sum$timestamp_max, 2200)
     expect_equal(global_sum$commercial_speed, 27.45) # mean of 22.5 and 32.4
     expect_equal(global_sum$commercial_speed_alt, 29.7) # mean of 27.0 and 32.4
-    expect_identical(global_sum$speed_count, 8)
-    expect_identical(global_sum$n_updates, 10)
+    expect_identical(global_sum$speed_count, 8L)
+    expect_identical(global_sum$n_updates, 10L)
 })
 
 test_that("get_trip_speed_profile supports custom aggregation columns in 'by'", {
@@ -98,8 +98,8 @@ test_that("get_trip_speed_profile supports custom aggregation columns in 'by'", 
     # Commercial speeds should be averaged across the two trips
     expect_equal(res_route$commercial_speed, 27.45)
     expect_equal(res_route$commercial_speed_alt, 29.7)
-    expect_identical(res_route$n_updates, 10)
-    expect_identical(res_route$speed_count, 8)
+    expect_identical(res_route$n_updates, 10L)
+    expect_identical(res_route$speed_count, 8L)
 
     # 2. Grouping solely by trip_id
     res_trip <- GTFShift::get_trip_speed_profile(df, by = "trip_id")
@@ -112,7 +112,7 @@ test_that("get_trip_speed_profile supports custom aggregation columns in 'by'", 
     res_null <- GTFShift::get_trip_speed_profile(df, by = NULL)
     expect_identical(nrow(res_null), 1L)
     expect_equal(res_null$commercial_speed, 27.45)
-    expect_identical(res_null$n_updates, 10)
+    expect_identical(res_null$n_updates, 10L)
 
     # 4. by = character(0)
     res_char0 <- GTFShift::get_trip_speed_profile(df, by = character(0))
@@ -197,8 +197,8 @@ test_that("get_trip_speed_profile handles update count edge cases (n < 2, 2 <= n
     expect_true(is.na(res_n1$speed_sd))
     expect_true(is.na(res_n1$speed_var))
     expect_equal(res_n1$speed_avg, 25.0)
-    expect_identical(res_n1$speed_count, 1)
-    expect_identical(res_n1$n_updates, 1)
+    expect_identical(res_n1$speed_count, 1L)
+    expect_identical(res_n1$n_updates, 1L)
 
     # 2 updates: commercial_speed valid, commercial_speed_alt NA
     df_n2 <- data.frame(
@@ -364,7 +364,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
     expect_equal(res_inf$speed_avg, 30.0)
     expect_equal(res_inf$speed_min, 20.0)
     expect_equal(res_inf$speed_max, 40.0)
-    expect_identical(res_inf$speed_count, 2)
+    expect_identical(res_inf$speed_count, 2L)
 
     # 2. All speeds NA
     df_all_na <- data.frame(
@@ -375,7 +375,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
         speed_kmh = c(NA_real_, NA_real_)
     )
     res_all_na <- GTFShift::get_trip_speed_profile(df_all_na, by = "trip_id")
-    expect_identical(res_all_na$speed_count, 0)
+    expect_identical(res_all_na$speed_count, 0L)
     expect_true(is.na(res_all_na$speed_avg))
     expect_true(is.na(res_all_na$speed_median))
     expect_true(is.na(res_all_na$speed_sd))
@@ -397,7 +397,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
         distance_along_geometry_reversed = c(500, 0)
     )
     res_no_speed <- GTFShift::get_trip_speed_profile(df_no_speed, by = "trip_id")
-    expect_identical(res_no_speed$speed_count, 0)
+    expect_identical(res_no_speed$speed_count, 0L)
     expect_true(is.na(res_no_speed$speed_avg))
     expect_equal(res_no_speed$commercial_speed, 30.0)
 
@@ -417,7 +417,7 @@ test_that("get_trip_speed_profile handles speed column variations and edge cases
     )
     expect_equal(res_custom$commercial_speed, 30.0)
     expect_equal(res_custom$speed_avg, 30.0)
-    expect_identical(res_custom$speed_count, 3)
+    expect_identical(res_custom$speed_count, 3L)
 
     # 5. Grouped data.frame input is ungrouped properly
     df_grouped <- dplyr::group_by(df_inf, trip_id)
@@ -507,7 +507,7 @@ test_that("get_trip_speed_profile integrates seamlessly with rt_average_speed ou
     global_summary <- attr(profile, "global_summary")
     expect_s3_class(global_summary, "data.frame")
     expect_identical(nrow(global_summary), 1L)
-    expect_identical(global_summary$n_updates, 8)
+    expect_identical(global_summary$n_updates, 8L)
 })
 
 test_that("get_trip_speed_profile accommodates circular geometries by taking max of normal and reversed distances", {

@@ -149,6 +149,7 @@ rt_extend_prioritisation <- function(
 
   # 4. Spatial join between lane buffers and rt_collection points
   job <- callr::r_bg(function(rt_collection, lane_buffers) { # update spinner while blocking method call
+    requireNamespace("sf", quietly = TRUE)
     lane_buffers_way <- lane_buffers |> dplyr::select("way_osm_id")
     joined <- sf::st_join(
       rt_collection,

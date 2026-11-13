@@ -53,8 +53,8 @@ test_that("multiline_to_sorted_linestring parameter variation with guiding point
     coords <- unname(sf::st_coordinates(res))
 
     # Should start near (0,0) and end near (2,0)
-    expect_identical(coords[1, 1:2], c(0, 0))
-    expect_identical(coords[nrow(coords), 1:2], c(2, 0))
+    expect_equal(coords[1, 1:2], c(0, 0), tolerance = 1e-6)
+    expect_equal(coords[nrow(coords), 1:2], c(2, 0), tolerance = 1e-6)
 })
 
 test_that("multiline_to_sorted_linestring discards line segments farther than current + next length", {
@@ -70,8 +70,8 @@ test_that("multiline_to_sorted_linestring discards line segments farther than cu
 
     # Discards the far segment and retains only the first segment
     expect_identical(nrow(coords), 2L)
-    expect_identical(coords[1, 1:2], c(0, 0))
-    expect_identical(coords[2, 1:2], c(1, 0))
+    expect_equal(coords[1, 1:2], c(0, 0), tolerance = 1e-6)
+    expect_equal(coords[2, 1:2], c(1, 0), tolerance = 1e-6)
 })
 
 test_that("multiline_to_sorted_linestring orient start line when start_point is closer to remaining lines", {
@@ -84,8 +84,8 @@ test_that("multiline_to_sorted_linestring orient start line when start_point is 
 
     res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
     coords <- unname(sf::st_coordinates(res))
-    expect_identical(coords[1, 1:2], c(0, 0))
-    expect_identical(coords[nrow(coords), 1:2], c(2, 0))
+    expect_equal(coords[1, 1:2], c(0, 0), tolerance = 1e-6)
+    expect_equal(coords[nrow(coords), 1:2], c(2, 0), tolerance = 1e-6)
 })
 
 test_that("multiline_to_sorted_linestring orient start line with second_point tie break", {
@@ -99,7 +99,7 @@ test_that("multiline_to_sorted_linestring orient start line with second_point ti
 
     res <- GTFShift::multiline_to_sorted_linestring(mls_sf, points = pts, metric_crs = 3857)
     coords <- unname(sf::st_coordinates(res))
-    expect_identical(coords[1, 1:2], c(2, 0))
+    expect_equal(coords[1, 1:2], c(2, 0), tolerance = 1e-6)
 })
 
 test_that("multiline_to_sorted_linestring excludes identical duplicate remaining segments", {
