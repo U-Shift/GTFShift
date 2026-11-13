@@ -20,19 +20,26 @@ rt_collect_json(
 \arguments{
 \item{gtfs_rt_url}{String. URL of the GTFS-RT feed in JSON format.}
 
-\item{destination_file}{String. File to save the downloaded GTFS-RT data. Content is appended in each iteration.}
+\item{destination_file}{String. File to save the downloaded GTFS-RT data.
+Content is appended in each iteration.}
 
-\item{header_key}{String (Default "header"). Key in the JSON corresponding to the feed header. Set to NA if not present.}
+\item{header_key}{String (Default "header"). Key in the JSON corresponding to
+the feed header. Set to NA if not present.}
 
-\item{entity_key}{String (Default "entity"). Key in the JSON corresponding to the feed entities. Set to NA if response is a flat list. Use "." for nested keys.}
+\item{entity_key}{String (Default "entity"). Key in the JSON corresponding to
+the feed entities. Set to NA if response is a flat list. Use "." for nested
+keys.}
 
-\item{fields_collect}{Character vector. Fields to extract from each entity in the feed. Use "." for nested keys.}
+\item{fields_collect}{Character vector. Fields to extract from each entity in
+the feed. Use "." for nested keys.}
 
-\item{scrape_interval}{Integer (Default 60). Interval in seconds between each download. Negative to run only once.}
+\item{scrape_interval}{Integer (Default 60). Interval in seconds between each
+download. Negative to run only once.}
 
 \item{log_file}{String (Optional). Path to a log file to save download logs.}
 
-\item{headers}{Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.}
+\item{headers}{Named list or character vector (Optional). Custom HTTP headers
+for credentials when accessing the GTFS-RT feed URL.}
 }
 \value{
 String. The location of the file where data was collected.
@@ -41,13 +48,18 @@ String. The location of the file where data was collected.
 Collect GTFS-RT data from a JSON feed at regular intervals
 }
 \details{
-Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
+Downloads GTFS-RT data from the specified URL at regular intervals and saves
+them to the destination file.
 
 This function will run indefinitely until manually stopped (CTRL + C).
 }
 \examples{
 # Sample GTFS-RT JSON file
-sample_json <- system.file("extdata/samples", "gtfs_rt_sample.json", package = "GTFShift")
+sample_json <- system.file(
+  "extdata/samples",
+  "gtfs_rt_sample.json",
+  package = "GTFShift"
+)
 destination_file <- withr::local_tempfile(fileext = ".csv")
 
 # Collect data

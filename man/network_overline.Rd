@@ -21,13 +21,18 @@ network_overline(
 
 \item{attr}{String. The attribute to aggregate the lines by.}
 
-\item{target_network_split}{Integer (Default 100). If not NA, network is split in segments of defined meters.}
+\item{target_network_split}{Integer (Default 100). If not NA, network is
+split in segments of defined meters.}
 
-\item{fun}{Method (Default \code{base::sum}). Function to summarise the attributes by.}
+\item{fun}{Method (Default \code{base::sum}). Function to summarise the
+attributes by.}
 
-\item{join_dist}{Integer (Default 10). Meters to consider when joining routes and network segments.}
+\item{join_dist}{Integer (Default 10). Meters to consider when joining routes
+and network segments.}
 
-\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute segment lengths and join distances in meters. If NULL, spherical geometry (s2) is used by default.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS
+used to compute segment lengths and join distances in meters. If NULL,
+spherical geometry (s2) is used by default.}
 }
 \value{
 sf. Spatial network object extended with aggregated values.
@@ -36,12 +41,15 @@ sf. Spatial network object extended with aggregated values.
 Aggregate lines based on overlap with target network
 }
 \details{
-This method allows for the lines aggregation. Given a target network, it identifies (using \code{stplanr::rnet_join()})
-the segments corresponding to each line and uses them to aggregate the attribute defined in the parameters.
+This method allows for the lines aggregation. Given a target network, it
+identifies (using \code{stplanr::rnet_join()}) the segments corresponding to
+each line and uses them to aggregate the attribute defined in the parameters.
 
-It provides an alternative to \code{GTFShift::get_route_frequency_hourly()} with the attribute \code{overline=TRUE}, which
-creates an aggregated network based on the lines overlap. Instead, \code{GTFShift::network_overline()} finds, for each network
-segment, the overlapping lines and aggregates their \code{attr} values, using \code{fun}.
+It provides an alternative to \code{GTFShift::get_route_frequency_hourly()}
+with the attribute \code{overline=TRUE}, which creates an aggregated network
+based on the lines overlap. Instead, \code{GTFShift::network_overline()}
+finds, for each network segment, the overlapping lines and aggregates their
+\code{attr} values, using \code{fun}.
 }
 \examples{
 \donttest{
@@ -61,19 +69,19 @@ head(target_network)
 
 # Get route frequency (and geometry)
 frequency_analysis <- GTFShift::get_route_frequency_hourly(
-  gtfs, 
+  gtfs,
   date = gtfs$calendar$start_date[1]
-) |> 
+) |>
 dplyr::group_by(shape_id) |>
 dplyr::summarize(frequency = max(frequency))
 
 head(frequency_analysis)
 
-# Aggregate frequencies based on geometry overlap using GTFShift::network_overline
-suppressWarnings({ 
+# Aggregate frequencies based on geometry overlap
+suppressWarnings({
   overline <- GTFShift::network_overline(
-    target_network = target_network, 
-    lines = frequency_analysis, 
+    target_network = target_network,
+    lines = frequency_analysis,
     attr = "frequency"
   )
 })

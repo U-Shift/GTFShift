@@ -15,20 +15,27 @@ get_way_frequency_hourly(
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{q}{osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.}
+\item{q}{osmdata::opq. Overpass query for transit network, to obtain OSM
+route ways, using \code{GTFShift::osm_shapes_to_routes()}.}
 
-\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
+\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
+Reference date to consider when analyzing the GTFS file.}
 
-\item{keep_osm_attributes}{Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.}
+\item{keep_osm_attributes}{Boolean (Default FALSE). Whether to keep all OSM
+way attributes in the output \code{sf} object.}
 
-\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
+\item{osm_file}{character (Optional). Location of OSM extract file with
+\code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more
+details. If not provided OSM Overpass API is called through
+\code{osmdata::osmdata_sf()}.}
 }
 \value{
 sf data.frame. Hourly way frequencies, with the following columns:
 \describe{
   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
   \item{hour}{The hour for which the frequency applies (24 hour format).}
-  \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+  \item{frequency}{The number of services for the route that depart from the
+    first stop for the corresponding 60 minutes period.}
   \item{routes}{The list of route_ids that use the way.}
   \item{shapes}{The list of shape_ids that use the way.}
   \item{geometry}{The route shape.}
@@ -36,11 +43,14 @@ sf data.frame. Hourly way frequencies, with the following columns:
 }
 }
 \description{
-For each OSM way with GTFS service, returns the number of departures aggregated per hour and direction.
+For each OSM way with GTFS service, returns the number of departures
+aggregated per hour and direction.
 }
 \details{
-This method analyses the GTFS feed for a representative day, finding for each route the corresponding OSM ways using \code{GTFShift::osm_shapes_to_routes()}
-(routes not on OSM are ignored), aggregating the number of services per hour and direction for each.
+This method analyses the GTFS feed for a representative day, finding for each
+route the corresponding OSM ways using
+\code{GTFShift::osm_shapes_to_routes()} (routes not on OSM are ignored),
+aggregating the number of services per hour and direction for each.
 
 For a detailed example, see the \code{vignette("analyse")}.
 }
@@ -53,14 +63,22 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
 # Build query and prepare osm extract (possible to use API as alternative)
-q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
-  osmdata::add_osm_feature(key = "route", value = "bus") |> 
-  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
+shapes_bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+q <- osmdata::opq(bbox = shapes_bbox) |>
+  osmdata::add_osm_feature(key = "route", value = "bus") |>
+  osmdata::add_osm_feature(
+    key = "operator",
+    value = "Transportes Colectivos do Barreiro"
+  )
+osm_file <- system.file(
+  "extdata/samples",
+  "osmextract_tcb_network.pbf",
+  package = "GTFShift"
+)
 
 # Get frequency
 frequency_analysis <- GTFShift::get_way_frequency_hourly(
-  gtfs, q, 
+  gtfs, q,
   date = gtfs$calendar$start_date[1],
   osm_file = osm_file
 )

@@ -15,25 +15,33 @@ prioritise_lanes(
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{q}{osmdata::opq. Overpass query for transit network, to obtain OSM route ways, using \code{GTFShift::osm_shapes_to_routes()}.}
+\item{q}{osmdata::opq. Overpass query for transit network, to obtain OSM
+route ways, using \code{GTFShift::osm_shapes_to_routes()}.}
 
-\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
+\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
+Reference date to consider when analyzing the GTFS file.}
 
-\item{keep_osm_attributes}{Boolean (Default FALSE). Whether to keep all OSM way attributes in the output \code{sf} object.}
+\item{keep_osm_attributes}{Boolean (Default FALSE). Whether to keep all OSM
+way attributes in the output \code{sf} object.}
 
-\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
+\item{osm_file}{character (Optional). Location of OSM extract file with
+\code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more
+details. If not provided OSM Overpass API is called through
+\code{osmdata::osmdata_sf()}.}
 }
 \value{
 sf data.frame. Prioritised lanes with the following columns:
 \describe{
   \item{way_osm_id}{The \code{osm_id} attribute from OSM way.}
   \item{hour}{The hour for which the frequency applies (24 hour format).}
-  \item{frequency}{The number of services for the route that depart from the first stop for the corresponding 60 minutes period.}
+  \item{frequency}{The number of services for the route that depart from the
+    first stop for the corresponding 60 minutes period.}
   \item{is_bus_lane}{Whether the way has a bus lane.}
   \item{n_lanes_parking}{The number of parking lanes.}
   \item{n_lanes_circulation}{The number of circulation lanes.}
   \item{n_directions}{The number of travel directions.}
-  \item{n_lanes_circulation_direction}{The number of circulation lanes per direction.}
+  \item{n_lanes_circulation_direction}{The number of circulation lanes per
+    direction.}
   \item{routes}{The list of route_id that use the way.}
   \item{shapes}{The list of shape_id that use the way.}
   \item{geometry}{The route shape.}
@@ -41,17 +49,22 @@ sf data.frame. Prioritised lanes with the following columns:
 }
 }
 \description{
-For each OSM way with GTFS service, aggregates its characteristics to assist in the bus lane implementation prioritisation
+For each OSM way with GTFS service, aggregates its characteristics to assist
+in the bus lane implementation prioritisation
 }
 \details{
-This method analyses the GTFS feed for a representative day, returning a data.frame with the road segments where transit routes
-run and for each, a set of parameters that can be used to prioritise bus lane implementations.
+This method analyses the GTFS feed for a representative day, returning a
+data.frame with the road segments where transit routes run and for each, a
+set of parameters that can be used to prioritise bus lane implementations.
 
-Its functionality is a bundle that encapsulates the logic of several methods from the package,
-including \code{GTFShift::get_way_frequency_hourly()} and \code{GTFShift::osm_bus_lanes()}, that can be used separately if needed.
+Its functionality is a bundle that encapsulates the logic of several methods
+from the package, including \code{GTFShift::get_way_frequency_hourly()} and
+\code{GTFShift::osm_bus_lanes()}, that can be used separately if needed.
 
-Mind that this method uses \code{GTFShift::get_way_frequency_hourly()} to match routes with OSM ways, which requires that the
-OSM relation mapping is well defined for the transit routes. Routes that do not have an OSM match are ignored.
+Mind that this method uses \code{GTFShift::get_way_frequency_hourly()} to
+match routes with OSM ways, which requires that the OSM relation mapping is
+well defined for the transit routes. Routes that do not have an OSM match are
+ignored.
 }
 \examples{
 \dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
@@ -59,23 +72,33 @@ OSM relation mapping is well defined for the transit routes. Routes that do not 
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
 )
-gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
+gtfs <- GTFShift::filter_by_route_name(gtfs, "4")
 
 # Build query and prepare osm extract (possible to use API as alternative)
-q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
-  osmdata::add_osm_feature(key = "route", value = "bus") |> 
-  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
+bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+q <- osmdata::opq(bbox = bbox) |>
+  osmdata::add_osm_feature(key = "route", value = "bus") |>
+  osmdata::add_osm_feature(
+    key = "operator",
+    value = "Transportes Colectivos do Barreiro"
+  )
+osm_file <- system.file(
+  "extdata/samples",
+  "osmextract_tcb_network.pbf",
+  package = "GTFShift"
+)
 
 lane_prioritisation <- GTFShift::prioritise_lanes(
-  gtfs, q, 
-  osm_file = osm_file, 
+  gtfs, q,
+  osm_file = osm_file,
   date = gtfs$calendar$start_date[1]
 )
 
 head(
-  lane_prioritisation |> 
-  dplyr::select(way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes)
+  lane_prioritisation |>
+    dplyr::select(
+      way_osm_id, hour, frequency, is_bus_lane, n_lanes_circulation, routes
+    )
 )
 \dontshow{\}) # examplesIf}
 }

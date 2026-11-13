@@ -18,9 +18,11 @@ tidygtfs. The filtered GTFS feed.
 Filter GTFS feed by mode
 }
 \details{
-Allows to filter a GTFS feed for the type of transportation used, allowing for a more narrow analysis of multimodal files.
+Allows to filter a GTFS feed for the type of transportation used, allowing
+for a more narrow analysis of multimodal files.
 Refer to \code{routes.txt} \code{route_type} parameter on
-\href{https://gtfs.org/documentation/schedule/reference/#routestxt}{GTFS documentation} for more details.
+\href{https://gtfs.org/documentation/schedule/reference/#routestxt}{GTFS
+documentation} for more details.
 }
 \examples{
 # Load sample feed with multiple modes
@@ -34,7 +36,7 @@ summary(gtfs)
 
 
 # Filter by bus mode (ferry agency should be excluded)
-gtfs_bus <- gtfs |> GTFShift::filter_by_modes(modes = c(3))
+gtfs_bus <- gtfs |> GTFShift::filter_by_modes(modes = 3)
 
 gtfs_bus$routes |> dplyr::select(route_id, route_type)
 

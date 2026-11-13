@@ -10,20 +10,31 @@ create_shapes_from_stops(gtfs)
 \item{gtfs}{tidygtfs. GTFS feed.}
 }
 \value{
-tidygtfs. The GTFS feed with the shapes table defined and the trips table updated with the matching shape_id.
+tidygtfs. The GTFS feed with the shapes table defined and the trips
+  table updated with the matching shape_id.
 }
 \description{
 Build shapes from GTFS stops data
 }
 \details{
-The function builds the shapes.txt file from the stop_times.txt and stops.txt files, by grouping trips with the same stop sequence and assigning them the same shape_id.
-The resulting shapes are a simplified version of the original ones, as they do not take into account the actual path followed by the vehicles, but only the stop sequence.
-This can be useful for some applications that do not require high precision in the shapes, and can be used as a fallback when the original feed does not include shapes.txt file.
+The function builds the shapes.txt file from the stop_times.txt and stops.txt
+files, by grouping trips with the same stop sequence and assigning them the
+same shape_id.
+The resulting shapes are a simplified version of the original ones, as they
+do not take into account the actual path followed by the vehicles, but only
+the stop sequence.
+This can be useful for some applications that do not require high precision
+in the shapes, and can be used as a fallback when the original feed does not
+include shapes.txt file.
 }
 \examples{
 # Load GTFS without shapes
 gtfs <- tidytransit::read_gtfs(
-  system.file("extdata/samples", "gtfs_ttsl_sample_no_shapes.zip", package = "GTFShift")
+  system.file(
+    "extdata/samples",
+    "gtfs_ttsl_sample_no_shapes.zip",
+    package = "GTFShift"
+  )
 )
 
 summary(gtfs)
@@ -34,8 +45,8 @@ gtfs_with_shapes <- GTFShift::create_shapes_from_stops(gtfs)
 head(gtfs_with_shapes$shapes)
 
 head(
-  gtfs_with_shapes$trips |> 
-    dplyr::select(trip_id, shape_id) |> 
+  gtfs_with_shapes$trips |>
+    dplyr::select(trip_id, shape_id) |>
     dplyr::distinct(shape_id, .keep_all = TRUE)
 )
 

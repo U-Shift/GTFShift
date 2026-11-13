@@ -13,21 +13,29 @@ get_prioritisation_stats(
 \arguments{
 \item{lane_prioritisation}{sf data.frame. Lane prioritisation.}
 
-\item{weight}{Character. Weight to use for weighted mean. Accepted values: "length", "frequency".}
+\item{weight}{Character. Weight to use for weighted mean. Accepted values:
+"length", "frequency".}
 
-\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS used to compute lengths in meters. If NULL, spherical geometry (s2) is used by default.}
+\item{metric_crs}{Integer or character (Default NULL). Optional projected CRS
+used to compute lengths in meters. If NULL, spherical geometry (s2) is used
+by default.}
 }
 \value{
-List. Statistics about lane prioritisation, with the following attributes:
+List. Statistics about lane prioritisation, with the following
+  attributes:
 \describe{
   \item{extension}{Total length of the prioritised network, in meters.}
-  \item{extension_bus_lane}{Total length of the bus lane segments, in meters.}
+  \item{extension_bus_lane}{Total length of the bus lane segments, in
+    meters.}
   \item{speed_avg}{Average speed of the prioritised network, in km/h.}
   \item{speed_min}{Minimum speed of the prioritised network, in km/h.}
   \item{speed_max}{Maximum speed of the prioritised network, in km/h.}
-  \item{n_lanes_circulation_avg}{Average number of lanes in the prioritised network.}
-  \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritised network.}
-  \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritised network.}
+  \item{n_lanes_circulation_avg}{Average number of lanes in the prioritised
+    network.}
+  \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritised
+    network.}
+  \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritised
+    network.}
 }
 }
 \description{
@@ -39,18 +47,26 @@ Get statistics about lane prioritisation
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
   "gtfs_tcb_sample.zip", package = "GTFShift")
 )
-gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
+gtfs <- GTFShift::filter_by_route_name(gtfs, "4")
 
 # Build query and prepare osm extract (possible to use API as alternative)
-q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
-  osmdata::add_osm_feature(key = "route", value = "bus") |> 
-  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
+shapes_bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+q <- osmdata::opq(bbox = shapes_bbox) |>
+  osmdata::add_osm_feature(key = "route", value = "bus") |>
+  osmdata::add_osm_feature(
+    key = "operator",
+    value = "Transportes Colectivos do Barreiro"
+  )
+osm_file <- system.file(
+  "extdata/samples",
+  "osmextract_tcb_network.pbf",
+  package = "GTFShift"
+)
 
 # Prioritise lanes
 lane_prioritisation <- GTFShift::prioritise_lanes(
-  gtfs, q, 
-  osm_file = osm_file,  
+  gtfs, q,
+  osm_file = osm_file,
   date = gtfs$calendar$start_date[1]
 )
 

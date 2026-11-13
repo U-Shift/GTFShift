@@ -12,14 +12,16 @@ get_stop_frequency_hourly(
 \arguments{
 \item{gtfs}{tidygtfs. GTFS feed.}
 
-\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}). Reference date to consider when analyzing the GTFS file.}
+\item{date}{Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
+Reference date to consider when analyzing the GTFS file.}
 }
 \value{
 sf data.frame. Hourly stop frequencies, with the following columns:
 \describe{
   \item{stop_id}{The \code{stop_id} attribute from \code{stops.txt} file.}
   \item{hour}{The hour for which the frequency applies (24 hour format).}
-  \item{frequency}{The number of services provided at the stop for the corresponding 60 minutes period.}
+  \item{frequency}{The number of services provided at the stop for the
+    corresponding 60 minutes period.}
   \item{geometry}{The stop coordinates.}
 }
 }
@@ -27,7 +29,8 @@ sf data.frame. Hourly stop frequencies, with the following columns:
 For each stop, returns the number of departures aggregated per hour.
 }
 \details{
-This method analyses the GTFS feed for a representative day, generating for each stop the number of services aggregated per hour.
+This method analyses the GTFS feed for a representative day, generating for
+each stop the number of services aggregated per hour.
 For a detailed example, see the \code{vignette("analyse")}.
 }
 \examples{

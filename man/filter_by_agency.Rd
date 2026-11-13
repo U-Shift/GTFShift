@@ -20,7 +20,8 @@ tidygtfs. The filtered GTFS feed.
 Filter GTFS feed by agency
 }
 \details{
-Allows to filter a GTFS feed for the agency, using the id, name or both. Returns empty feed it none provided.
+Allows to filter a GTFS feed for the agency, using the id, name or both.
+Returns empty feed if none provided.
 }
 \examples{
 # Load sample feed with multiple agencies
@@ -37,8 +38,9 @@ gtfs_id_8 <- gtfs |> GTFShift::filter_by_agency(id = "8")
 summary(gtfs_id_8)
 
 
-# Filter by name 
-gtfs_ttsl <- gtfs |> GTFShift::filter_by_agency(name = "TTSL - Transtejo Soflusa") 
+# Filter by name
+gtfs_ttsl <- gtfs |>
+  GTFShift::filter_by_agency(name = "TTSL - Transtejo Soflusa")
 
 summary(gtfs_ttsl)
 

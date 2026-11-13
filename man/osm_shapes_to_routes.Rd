@@ -18,33 +18,44 @@ osm_shapes_to_routes(
 
 \item{q}{osmdata::opq. Overpass query for transit network.}
 
-\item{ways}{boolean (Default False). If true, relation is disaggregated in ways.}
+\item{ways}{boolean (Default False). If true, relation is disaggregated in
+ways.}
 
-\item{ways_tags}{character vector (Default \code{c("lanes", "psv", "bus", "way", "parking", "name")}). List of OSM way tags to extract when \code{ways} parameter is set to true. Match is done using \code{tidyselect::contains()}.}
+\item{ways_tags}{character vector (Default
+\code{c("lanes", "psv", "bus", "way", "parking", "name")}). List of OSM way
+tags to extract when \code{ways} parameter is set to true. Match is done
+using \code{tidyselect::contains()}.}
 
-\item{osm_file}{character (Optional). Location of OSM extract file with \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more details. If not provided OSM Overpass API is called through \code{osmdata::osmdata_sf()}.}
+\item{osm_file}{character (Optional). Location of OSM extract file with
+\code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more
+details. If not provided OSM Overpass API is called through
+\code{osmdata::osmdata_sf()}.}
 
-\item{osm_route_type}{character (Default "bus"). OSM route type. Used to query OSM network (e.g., 'bus', 'train').}
+\item{osm_route_type}{character (Default "bus"). OSM route type. Used to
+query OSM network (e.g., 'bus', 'train').}
 }
 \value{
-sf data.frame. Matched shape to route geometries with the following columns:
+sf data.frame. Matched shape to route geometries with the following
+  columns:
 \describe{
   \item{shape_id}{The \code{shape_id} attribute from \code{shapes.txt} file.}
   \item{osm_id}{The \code{osm_id} attribute from OSM route relation.}
-  \item{way_osm_id}{The \code{osm_id} attribute from OSM way (if \code{ways} parameter is set to true).}
+  \item{way_osm_id}{The \code{osm_id} attribute from OSM way (if \code{ways}
+    parameter is set to true).}
   \item{*}{Any column that matches \code{ways_tags} parameter.}
   \item{geometry}{The geometrical data for the OSM route relation.}
 }
 
 Shapes that do not have a match on OSM are ignored.
-If that occurs, a warning is displayed during the method execution, informing about the missing geometries.
+If that occurs, a warning is displayed during the method execution, informing
+about the missing geometries.
 }
 \description{
 Get OSM routes geometry considering gtfs:shape_id match
 }
 \details{
-For each route, matches its trips' shapes with OSM route relations, considering the
-OSM \code{gtfs:shape_id} attribute.
+For each route, matches its trips' shapes with OSM route relations,
+considering the OSM \code{gtfs:shape_id} attribute.
 }
 \examples{
 \dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
@@ -55,10 +66,18 @@ gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 gtfs <- GTFShift::filter_by_route_name(gtfs, c("1", "2", "3", "4"))
 
 # Build query and prepare osm extract (possible to use API as alternative)
-q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |>
+bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+q <- osmdata::opq(bbox = bbox) |>
   osmdata::add_osm_feature(key = "route", value = "bus") |>
-  osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
+  osmdata::add_osm_feature(
+    key = "operator",
+    value = "Transportes Colectivos do Barreiro"
+  )
+osm_file <- system.file(
+  "extdata/samples",
+  "osmextract_tcb_network.pbf",
+  package = "GTFShift"
+)
 
 # Get OSM route geometries based on gtfs:shape_id match
 shapes_osm_routes <- GTFShift::osm_shapes_to_routes(
