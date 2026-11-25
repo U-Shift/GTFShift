@@ -1,8 +1,7 @@
-library(testthat)
-library(sf)
-
 test_that("osm_shapes_to_routes matches shapes by gtfs:shape_id using mocks", {
-    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+    sample_file <- system.file(
+        "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    )
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
@@ -17,9 +16,12 @@ test_that("osm_shapes_to_routes matches shapes by gtfs:shape_id using mocks", {
         check.names = FALSE
     )
 
-    mock_ways <- st_sf(
+    mock_ways <- sf::st_sf(
         osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)),
+            crs = 4326
+        )
     )
 
     testthat::with_mocked_bindings(
@@ -30,27 +32,40 @@ test_that("osm_shapes_to_routes matches shapes by gtfs:shape_id using mocks", {
                 oe_read = function(...) mock_ways,
                 .package = "osmextract",
                 code = {
-                    suppressWarnings({ # There will be warns about gtfs shapes not matched
-                        res <- GTFShift::osm_shapes_to_routes(gtfs, q = NA, osm_file = "dummy.pbf")
+                    # There will be warns about gtfs shapes not matched
+                    suppressWarnings({
+                        res <- GTFShift::osm_shapes_to_routes(
+                            gtfs, q = NA, osm_file = "dummy.pbf"
+                        )
                     })
                     expect_s3_class(res, "sf")
-                    expect_contains(names(res), c("shape_id", "osm_id", "geometry"))
+                    expect_contains(
+                        names(res),
+                        c("shape_id", "osm_id", "geometry")
+                    )
                 }
             )
         }
     )
 })
 
-test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overpass API)", {
-    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+test_that("osm_shapes_to_routes works when osm_file is not provided", {
+    sample_file <- system.file(
+        "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    )
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
 
-    mock_multilines <- st_sf(
+    mock_multilines <- sf::st_sf(
         osm_id = "rel_1",
         `gtfs:shape_id` = target_shape_id,
-        geometry = st_sfc(st_multilinestring(list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))), crs = 4326)
+        geometry = sf::st_sfc(
+            sf::st_multilinestring(
+                list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))
+            ),
+            crs = 4326
+        )
     )
 
     mock_osm_data <- list(
@@ -67,12 +82,13 @@ test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overp
         get_result = function() NULL
     )
 
-    r_bg_call_count <- 0
+    state <- new.env(parent = emptyenv())
+    state$r_bg_call_count <- 0
 
     testthat::with_mocked_bindings(
         r_bg = function(...) {
-            r_bg_call_count <<- r_bg_call_count + 1
-            if (r_bg_call_count == 1) {
+            state$r_bg_call_count <- state$r_bg_call_count + 1
+            if (state$r_bg_call_count == 1) {
                 return(mock_bg_job_xml)
             } else {
                 return(mock_bg_job)
@@ -80,20 +96,25 @@ test_that("osm_shapes_to_routes works when osm_file is not provided (calls Overp
         },
         .package = "callr",
         code = {
-            suppressWarnings({ # There will be warns about gtfs shapes not matched
-                res <- GTFShift::osm_shapes_to_routes(gtfs, q = "dummy_q", osm_file = NULL)
+            # There will be warns about gtfs shapes not matched
+            suppressWarnings({
+                res <- GTFShift::osm_shapes_to_routes(
+                    gtfs, q = "dummy_q", osm_file = NULL
+                )
             })
             expect_s3_class(res, "sf")
             expect_contains(names(res), c("shape_id", "osm_id", "geometry"))
-            expect_equal(nrow(res), 1)
-            expect_equal(res$shape_id, target_shape_id)
-            expect_equal(res$osm_id, "rel_1")
+            expect_identical(nrow(res), 1L)
+            expect_identical(res$shape_id, target_shape_id)
+            expect_identical(res$osm_id, "rel_1")
         }
     )
 })
 
-test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts way tags", {
-    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+test_that("osm_shapes_to_routes with ways = TRUE and osm_file extracts tags", {
+    sample_file <- system.file(
+        "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    )
     gtfs <- GTFShift::load_feed(sample_file)
 
     target_shape_id <- gtfs$trips$shape_id[1]
@@ -108,9 +129,12 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
         check.names = FALSE
     )
 
-    mock_ways <- st_sf(
+    mock_ways <- sf::st_sf(
         osm_id = "w1",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
+        geometry = sf::st_sfc(
+            sf::st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)),
+            crs = 4326
+        )
     )
 
     mock_extra_tags <- data.frame(
@@ -131,13 +155,20 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
                     if (is.null(extra_tags)) {
                         return(mock_ways)
                     } else {
-                        return(st_sf(mock_extra_tags, geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)))
+                        geom <- sf::st_sfc(
+                            sf::st_linestring(
+                                matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)
+                            ),
+                            crs = 4326
+                        )
+                        return(sf::st_sf(mock_extra_tags, geometry = geom))
                     }
                 },
                 oe_get_keys = function(...) c("lanes", "maxspeed"),
                 .package = "osmextract",
                 code = {
-                    suppressWarnings({ # There will be warns about gtfs shapes not matched
+                    # There will be warns about gtfs shapes not matched
+                    suppressWarnings({
                         res <- GTFShift::osm_shapes_to_routes(
                             gtfs, q = NA, ways = TRUE,
                             ways_tags = c("lanes", "maxspeed"),
@@ -145,10 +176,16 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
                         )
                     })
                     expect_s3_class(res, "sf")
-                    expect_contains(names(res), c("shape_id", "osm_id", "way_osm_id", "lanes", "maxspeed", "geometry"))
-                    expect_equal(res$way_osm_id, "w1")
-                    expect_equal(res$lanes, "2")
-                    expect_equal(res$maxspeed, "50")
+                    expect_contains(
+                        names(res),
+                        c(
+                            "shape_id", "osm_id", "way_osm_id",
+                            "lanes", "maxspeed", "geometry"
+                        )
+                    )
+                    expect_identical(res$way_osm_id, "w1")
+                    expect_identical(res$lanes, "2")
+                    expect_identical(res$maxspeed, "50")
                 }
             )
         }
@@ -157,81 +194,104 @@ test_that("osm_shapes_to_routes with ways = TRUE and osm_file provided extracts 
 
 
 
-test_that("osm_shapes_to_routes with ways = TRUE and osm_file = NULL extracts ways and ways_tags", {
-    sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
-    gtfs <- GTFShift::load_feed(sample_file)
+test_that(
+    "osm_shapes_to_routes with ways = TRUE and osm_file = NULL extracts tags",
+    {
+        sample_file <- system.file(
+            "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+        )
+        gtfs <- GTFShift::load_feed(sample_file)
 
-    target_shape_id <- gtfs$trips$shape_id[1]
+        target_shape_id <- gtfs$trips$shape_id[1]
 
-    mock_multilines <- st_sf(
-        osm_id = "rel_1",
-        `gtfs:shape_id` = target_shape_id,
-        geometry = st_sfc(st_multilinestring(list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))), crs = 4326)
-    )
+        mock_multilines <- sf::st_sf(
+            osm_id = "rel_1",
+            `gtfs:shape_id` = target_shape_id,
+            geometry = sf::st_sfc(
+                sf::st_multilinestring(
+                    list(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2))
+                ),
+                crs = 4326
+            )
+        )
 
-    mock_lines <- st_sf(
-        osm_id = "w1",
-        lanes = "3",
-        maxspeed = "60",
-        geometry = st_sfc(st_linestring(matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)), crs = 4326)
-    )
+        mock_lines <- sf::st_sf(
+            osm_id = "w1",
+            lanes = "3",
+            maxspeed = "60",
+            geometry = sf::st_sfc(
+                sf::st_linestring(
+                    matrix(c(-8.6, -8.61, 41.1, 41.11), ncol = 2)
+                ),
+                crs = 4326
+            )
+        )
 
-    mock_osm_data <- list(
-        osm_multilines = mock_multilines,
-        osm_lines = mock_lines
-    )
+        mock_osm_data <- list(
+            osm_multilines = mock_multilines,
+            osm_lines = mock_lines
+        )
 
-    mock_bg_job_sf <- list(
-        is_alive = function() FALSE,
-        get_result = function() mock_osm_data
-    )
+        mock_bg_job_sf <- list(
+            is_alive = function() FALSE,
+            get_result = function() mock_osm_data
+        )
 
-    mock_bg_job_xml <- list(
-        is_alive = function() FALSE,
-        get_result = function() NULL
-    )
+        mock_bg_job_xml <- list(
+            is_alive = function() FALSE,
+            get_result = function() NULL
+        )
 
-    mock_relations_df <- data.frame(
-        type = "way",
-        ref = "w1",
-        role = "forward",
-        relation_osm_id = "rel_1",
-        stringsAsFactors = FALSE
-    )
+        mock_relations_df <- data.frame(
+            type = "way",
+            ref = "w1",
+            role = "forward",
+            relation_osm_id = "rel_1",
+            stringsAsFactors = FALSE
+        )
 
-    r_bg_call_count <- 0
+        state <- new.env(parent = emptyenv())
+        state$r_bg_call_count <- 0
 
-    testthat::with_mocked_bindings(
-        r_bg = function(func, args, ...) {
-            r_bg_call_count <<- r_bg_call_count + 1
-            if (r_bg_call_count == 1) {
-                return(mock_bg_job_xml)
-            } else if (r_bg_call_count == 2) {
-                return(mock_bg_job_sf)
-            } else {
-                return(list(
-                    is_alive = function() FALSE,
-                    get_result = function() mock_relations_df
-                ))
-            }
-        },
-        .package = "callr",
-        code = {
-            suppressWarnings({ # There will be warns about gtfs shapes not matched
-                res <- GTFShift::osm_shapes_to_routes(
-                    gtfs, q = "dummy_q", ways = TRUE,
-                    ways_tags = c("lanes", "maxspeed"),
-                    osm_file = NULL
+        testthat::with_mocked_bindings(
+            r_bg = function(func, args, ...) {
+                state$r_bg_call_count <- state$r_bg_call_count + 1
+                if (state$r_bg_call_count == 1) {
+                    return(mock_bg_job_xml)
+                } else if (state$r_bg_call_count == 2) {
+                    return(mock_bg_job_sf)
+                } else {
+                    return(list(
+                        is_alive = function() FALSE,
+                        get_result = function() mock_relations_df
+                    ))
+                }
+            },
+            .package = "callr",
+            code = {
+                # There will be warns about gtfs shapes not matched
+                suppressWarnings({
+                    res <- GTFShift::osm_shapes_to_routes(
+                        gtfs, q = "dummy_q", ways = TRUE,
+                        ways_tags = c("lanes", "maxspeed"),
+                        osm_file = NULL
+                    )
+                })
+                expect_s3_class(res, "sf")
+                expect_contains(
+                    names(res),
+                    c(
+                        "shape_id", "osm_id", "way_osm_id",
+                        "lanes", "maxspeed", "geometry"
+                    )
                 )
-            })
-            expect_s3_class(res, "sf")
-            expect_contains(names(res), c("shape_id", "osm_id", "way_osm_id", "lanes", "maxspeed", "geometry"))
-            expect_equal(res$way_osm_id, "w1")
-            expect_equal(res$lanes, "3")
-            expect_equal(res$maxspeed, "60")
-        }
-    )
-})
+                expect_identical(res$way_osm_id, "w1")
+                expect_identical(res$lanes, "3")
+                expect_identical(res$maxspeed, "60")
+            }
+        )
+    }
+)
 
 
 

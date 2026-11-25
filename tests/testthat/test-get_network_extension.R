@@ -1,5 +1,3 @@
-library(testthat)
-
 #' @srrstats {G2.11} Tests `units` and numeric output handling from `get_network_extension()`.
 #' @srrstats {G5.0} Uses bundled sample GTFS feed (`gtfs_tcb_sample.zip`).
 #' @srrstats {G5.1} Confirms tests run on exported sample datasets in `inst/extdata/samples`.
@@ -7,25 +5,42 @@ library(testthat)
 #' @srrstats {G5.2b} Verifies error messages via `expect_error()`.
 #' @srrstats {SP6.1} Tests `get_network_extension()` on both projected (`metric_crs = 3857`) and geographic (`metric_crs = NULL`) CRS.
 #' @srrstats {SP6.1b} Verifies equivalent results across numeric (`3857`) and character (`"EPSG:3857"`) CRS specifications.
-test_that("get_network_extension calculates network route extension in meters", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
-  gtfs <- GTFShift::load_feed(sample_file)
+test_that(
+  "get_network_extension calculates network route extension in meters",
+  {
+    sample_file <- system.file(
+      "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    )
+    gtfs <- GTFShift::load_feed(sample_file)
 
-  ref_date <- gtfs$calendar$start_date[1]
+    ref_date <- gtfs$calendar$start_date[1]
 
-  ext <- GTFShift::get_network_extension(gtfs, date = ref_date, metric_crs = 3857)
-  expect_true(is.numeric(ext) || inherits(ext, "units"))
-  expect_gt(as.numeric(ext), 0)
-})
+    ext <- GTFShift::get_network_extension(
+      gtfs, date = ref_date, metric_crs = 3857
+    )
+    expect_true(is.numeric(ext) || inherits(ext, "units"))
+    expect_gt(as.numeric(ext), 0)
+  }
+)
 
 test_that("get_network_extension throws error for invalid route_identifier", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+  sample_file <- system.file(
+    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+  )
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 
   expect_error(
-    GTFShift::get_network_extension(gtfs, route_identifier = "invalid_id", date = ref_date, metric_crs = 3857),
-    "route_identifier should be one of: route_id, route_short_name or route_long_name"
+    GTFShift::get_network_extension(
+      gtfs,
+      route_identifier = "invalid_id",
+      date = ref_date,
+      metric_crs = 3857
+    ),
+    paste0(
+      "route_identifier should be one of: ",
+      "route_id, route_short_name or route_long_name"
+    )
   )
   expect_error(
     GTFShift::get_network_extension(list(), date = ref_date),
@@ -34,7 +49,9 @@ test_that("get_network_extension throws error for invalid route_identifier", {
 })
 
 test_that("get_network_extension throws error for invalid metric_crs", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+  sample_file <- system.file(
+    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+  )
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 
@@ -45,7 +62,9 @@ test_that("get_network_extension throws error for invalid metric_crs", {
 })
 
 test_that("get_network_extension works when metric_crs is default (NULL)", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+  sample_file <- system.file(
+    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+  )
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 
@@ -57,7 +76,9 @@ test_that("get_network_extension works when metric_crs is default (NULL)", {
 })
 
 test_that("get_network_extension works with parameter variations", {
-  sample_file <- system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift")
+  sample_file <- system.file(
+    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+  )
   gtfs <- GTFShift::load_feed(sample_file)
   ref_date <- gtfs$calendar$start_date[1]
 
@@ -103,19 +124,25 @@ test_that("get_network_extension works with parameter variations", {
     date = ref_date,
     metric_crs = "EPSG:3857"
   )
-  expect_equal(as.numeric(ext_epsg_str), as.numeric(ext_non_unified))
+  expect_identical(as.numeric(ext_epsg_str), as.numeric(ext_non_unified))
 
-  # Variation 5: local rectilinear CRS (EPSG:3763) vs curvilinear (metric_crs = NULL)
-  ext_curv <- GTFShift::get_network_extension(gtfs, date = ref_date, metric_crs = NULL)
-  ext_3763 <- GTFShift::get_network_extension(gtfs, date = ref_date, metric_crs = 3763)
+  # Variation 5: local rectilinear CRS (EPSG:3763) vs curvilinear (NULL)
+  ext_curv <- GTFShift::get_network_extension(
+    gtfs, date = ref_date, metric_crs = NULL
+  )
+  ext_3763 <- GTFShift::get_network_extension(
+    gtfs, date = ref_date, metric_crs = 3763
+  )
   expect_equal(as.numeric(ext_curv), as.numeric(ext_3763), tolerance = 5e-3)
 
   # Variation 6: PROJ4-string is explicitly rejected (SP2.4a)
+  proj4_str <- paste0(
+    "+proj=merc +lat_ts=0 +lon_0=0 +k=1 +x_0=0 +y_0=0 ",
+    "+datum=WGS84 +units=m +no_defs"
+  )
   expect_error(
     GTFShift::get_network_extension(
-      gtfs,
-      date = ref_date,
-      metric_crs = "+proj=merc +lat_ts=0 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+      gtfs, date = ref_date, metric_crs = proj4_str
     ),
     "PROJ4-strings are not permitted"
   )

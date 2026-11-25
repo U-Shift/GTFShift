@@ -2,19 +2,28 @@
 #'
 #' @param target_network sf. A spatial object representing the target network.
 #' @param lines sf. A spatial object representing the lines to aggregate.
-#' @param attr String. Case-sensitive column name in \code{lines} to aggregate by.
-#' @param target_network_split Integer (Default 100). If not NA, network is split in segments of defined meters.
-#' @param fun Method (Default \code{base::sum}). Function to summarise the attributes by.
-#' @param join_dist Integer (Default 10). Meters to consider when joining routes and network segments.
-#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to compute segment lengths and join distances in meters. If NULL, spherical geometry (s2) is used by default.
+#' @param attr String. Case-sensitive column name in \code{lines} to aggregate
+#'   by.
+#' @param target_network_split Integer (Default 100). If not NA, network is
+#'   split in segments of defined meters.
+#' @param fun Method (Default \code{base::sum}). Function to summarise the
+#'   attributes by.
+#' @param join_dist Integer (Default 10). Meters to consider when joining routes
+#'   and network segments.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS
+#'   used to compute segment lengths and join distances in meters. If NULL,
+#'   spherical geometry (s2) is used by default.
 #'
 #' @details
-#' This method allows for the lines aggregation. Given a target network, it identifies (using \code{stplanr::rnet_join()})
-#' the segments corresponding to each line and uses them to aggregate the attribute defined in the parameters.
+#' This method allows for the lines aggregation. Given a target network, it
+#' identifies (using \code{stplanr::rnet_join()}) the segments corresponding to
+#' each line and uses them to aggregate the attribute defined in the parameters.
 #'
-#' It provides an alternative to \code{GTFShift::get_route_frequency_hourly()} with the attribute \code{overline=TRUE}, which
-#' creates an aggregated network based on the lines overlap. Instead, \code{GTFShift::network_overline()} finds, for each network
-#' segment, the overlapping lines and aggregates their \code{attr} values, using \code{fun}.
+#' It provides an alternative to \code{GTFShift::get_route_frequency_hourly()}
+#' with the attribute \code{overline=TRUE}, which creates an aggregated network
+#' based on the lines overlap. Instead, \code{GTFShift::network_overline()}
+#' finds, for each network segment, the overlapping lines and aggregates their
+#' \code{attr} values, using \code{fun}.
 #'
 #'
 #' @returns sf. Spatial network object extended with aggregated values.
@@ -26,34 +35,34 @@
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
-#' 
+#'
 #' # Load OSM network to serve as target network
-#' target_network = sf::st_read(
+#' target_network <- sf::st_read(
 #'   system.file("extdata/samples", "osm_ways_tcb.gpkg", package = "GTFShift"),
 #'   quiet = TRUE
 #' )
-#' 
+#'
 #' head(target_network)
-#' 
+#'
 #' # Get route frequency (and geometry)
 #' frequency_analysis <- GTFShift::get_route_frequency_hourly(
-#'   gtfs, 
+#'   gtfs,
 #'   date = gtfs$calendar$start_date[1]
-#' ) |> 
+#' ) |>
 #' dplyr::group_by(shape_id) |>
 #' dplyr::summarize(frequency = max(frequency))
-#' 
+#'
 #' head(frequency_analysis)
-#' 
-#' # Aggregate frequencies based on geometry overlap using GTFShift::network_overline
-#' suppressWarnings({ 
+#'
+#' # Aggregate frequencies based on geometry overlap
+#' suppressWarnings({
 #'   overline <- GTFShift::network_overline(
-#'     target_network = target_network, 
-#'     lines = frequency_analysis, 
+#'     target_network = target_network,
+#'     lines = frequency_analysis,
 #'     attr = "frequency"
 #'   )
 #' })
-#' 
+#'
 #' head(overline |> sf::st_drop_geometry())
 #' }
 #'
@@ -89,13 +98,16 @@ network_overline <- function(
     target_network,
     lines,
     attr,
-    target_network_split=100,
-    fun=sum,
-    join_dist=10,
+    target_network_split = 100,
+    fun = sum,
+    join_dist = 10,
     metric_crs = NULL
 ) {
   if (!requireNamespace("stplanr", quietly = TRUE)) {
-    stop("Package 'stplanr' is required for this function. Install it with: install.packages('stplanr')")
+    stop(
+      "Package 'stplanr' is required for this function. ",
+      "Install it with: install.packages('stplanr')"
+    )
   }
   if (!inherits(target_network, "sf")) {
     stop("target_network must be an sf object")
@@ -122,45 +134,46 @@ network_overline <- function(
   )
 
   # 1. Prepare network
-  network_line = stplanr::line_cast(target_network)
+  network_line <- stplanr::line_cast(target_network)
   if (!is.na(target_network_split)) {
-    network_segmented = stplanr::line_segment(
+    network_segmented <- stplanr::line_segment(
       network_line,
       segment_length=target_network_split
     ) |> mutate(segment=row_number())
   } else {
-    network_segmented = network_line |>
+    network_segmented <- network_line |>
       mutate(segment = row_number())
   }
 
-  df = lines |>
+  df <- lines |>
     mutate(df_id=row_number())
 
   # 2. Overlap df and network segments
-  df_network_match = stplanr::rnet_join(
+  network_segments_only <- network_segmented |>
+    select("segment")
+  df_network_match <- stplanr::rnet_join(
     rnet_x = df,
-    rnet_y = network_segmented |>
-      select("segment"),
+    rnet_y = network_segments_only,
     length_y = FALSE,
     key_column = "df_id",
     dist = join_dist,
     crs = st_crs(df)
   ) |> st_drop_geometry()
 
-  df_network_attr = df_network_match |>
-    left_join(df |>
-                st_drop_geometry() |>
-                select(all_of(attr), "df_id"),
-              by = "df_id")
+  df_attrs <- df |>
+    st_drop_geometry() |>
+    select(all_of(attr), "df_id")
+  df_network_attr <- df_network_match |>
+    left_join(df_attrs, by = "df_id")
 
   # 3. Group attr by segment
-  df_network_segment = df_network_attr |>
+  df_network_segment <- df_network_attr |>
     select("segment", all_of(attr)) |>
     group_by(.data$segment) |>
     summarise(!!attr := fun(.data[[attr]]))
 
   # 4. Get geometry back
-  result = network_segmented |>
+  result <- network_segmented |>
     filter(.data$segment %in% df_network_segment$segment) |>
     left_join(df_network_segment, by="segment") |>
     select(-"segment")

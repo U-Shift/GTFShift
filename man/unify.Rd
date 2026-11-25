@@ -17,17 +17,26 @@ unify(
 \arguments{
 \item{...}{tidygtfs[]. List of GTFS feeds.}
 
-\item{prefix}{Boolean (Default FALSE). If TRUE, prefixes all tables with the agency_id, to avoid conflicts in case of same IDs in different feeds.}
+\item{prefix}{Boolean (Default FALSE). If TRUE, prefixes all tables with the
+agency_id, to avoid conflicts in case of same IDs in different feeds.}
 
-\item{store_path}{String (Optional). If provided, aggregated feed zip is stored at location. The file is overwritten if it already exists.}
+\item{store_path}{String (Optional). If provided, aggregated feed zip is
+stored at location. The file is overwritten if it already exists.}
 
-\item{create_transfers}{Boolean (Default FALSE). When true, generates transfers table, aggregating close stops, even if from different GTFS.}
+\item{create_transfers}{Boolean (Default FALSE). When true, generates
+transfers table, aggregating close stops, even if from different GTFS.}
 
-\item{transfer_distance}{Integer (Default 300). Upper straight-line distance limit in meters for transfers.}
+\item{transfer_distance}{Integer (Default 300). Upper straight-line distance
+limit in meters for transfers.}
 
-\item{transfer_time}{Integer (Default 120). Minimum time in seconds for transfers; all values below this will be replaced with this value, particularly all those defining in-place transfers where stop longitudes and latitudes remain identical.}
+\item{transfer_time}{Integer (Default 120). Minimum time in seconds for
+transfers; all values below this will be replaced with this value,
+particularly all those defining in-place transfers where stop longitudes
+and latitudes remain identical.}
 
-\item{transfer_street_routing}{Boolean (Default FALSE). If TRUE, transfer times are calculated by routing throughout the underlying street network (downloaded automatically).}
+\item{transfer_street_routing}{Boolean (Default FALSE). If TRUE, transfer
+times are calculated by routing throughout the underlying street network
+(downloaded automatically).}
 }
 \value{
 tidygtfs. The unified GTFS feed.
@@ -37,12 +46,15 @@ Merge multiple GTFS into a single aggregated file
 }
 \details{
 Aggregates multiple feeds using \code{gtfstools::merge_gtfs()}.
-When generating transfers, those already existing in each GTFS file are kept, extended with new ones computed based
-on the stops network of the final aggregated version.
+When generating transfers, those already existing in each GTFS file are kept,
+extended with new ones computed based on the stops network of the final
+aggregated version.
 
 This computation is executed with \code{gtfsrouter::gtfs_transfer_table()},
-with the parameters \code{d_limit=transfer_distance}, \code{min_transfer_time=transfer_time} and
-\code{network_times=transfer_street_routing}. The other parameters are applied the library default values.
+with the parameters \code{d_limit=transfer_distance},
+\code{min_transfer_time=transfer_time} and
+\code{network_times=transfer_street_routing}. The other parameters are
+applied the library default values.
 
 For a detailed example, see the \code{vignette("unify")}.
 }

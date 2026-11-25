@@ -3,19 +3,27 @@
 #' Get statistics about lane prioritisation
 #'
 #' @param lane_prioritisation sf data.frame. Lane prioritisation.
-#' @param weight Character. Weight to use for weighted mean. Accepted values: "length", "frequency".
-#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used to compute lengths in meters. If NULL, spherical geometry (s2) is used by default.
+#' @param weight Character. Weight to use for weighted mean. Accepted values:
+#'   "length", "frequency".
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS
+#'   used to compute lengths in meters. If NULL, spherical geometry (s2) is used
+#'   by default.
 #'
-#' @returns List. Statistics about lane prioritisation, with the following attributes:
+#' @returns List. Statistics about lane prioritisation, with the following
+#'   attributes:
 #' \describe{
 #'   \item{extension}{Total length of the prioritised network, in meters.}
-#'   \item{extension_bus_lane}{Total length of the bus lane segments, in meters.}
+#'   \item{extension_bus_lane}{Total length of the bus lane segments, in
+#'     meters.}
 #'   \item{speed_avg}{Average speed of the prioritised network, in km/h.}
 #'   \item{speed_min}{Minimum speed of the prioritised network, in km/h.}
 #'   \item{speed_max}{Maximum speed of the prioritised network, in km/h.}
-#'   \item{n_lanes_circulation_avg}{Average number of lanes in the prioritised network.}
-#'   \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritised network.}
-#'   \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritised network.}
+#'   \item{n_lanes_circulation_avg}{Average number of lanes in the prioritised
+#'     network.}
+#'   \item{n_lanes_circulation_min}{Minimum number of lanes in the prioritised
+#'     network.}
+#'   \item{n_lanes_circulation_max}{Maximum number of lanes in the prioritised
+#'     network.}
 #' }
 #'
 #' @examplesIf nzchar(Sys.which("osmium"))
@@ -23,24 +31,32 @@
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
-#' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4"))
-#' 
+#' gtfs <- GTFShift::filter_by_route_name(gtfs, "4")
+#'
 #' # Build query and prepare osm extract (possible to use API as alternative)
-#' q <- osmdata::opq(bbox = sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))) |> 
-#'   osmdata::add_osm_feature(key = "route", value = "bus") |> 
-#'   osmdata::add_osm_feature(key = "operator", value = "Transportes Colectivos do Barreiro")
-#' osm_file <- system.file("extdata/samples", "osmextract_tcb_network.pbf", package = "GTFShift")
-#' 
+#' shapes_bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
+#' q <- osmdata::opq(bbox = shapes_bbox) |>
+#'   osmdata::add_osm_feature(key = "route", value = "bus") |>
+#'   osmdata::add_osm_feature(
+#'     key = "operator",
+#'     value = "Transportes Colectivos do Barreiro"
+#'   )
+#' osm_file <- system.file(
+#'   "extdata/samples",
+#'   "osmextract_tcb_network.pbf",
+#'   package = "GTFShift"
+#' )
+#'
 #' # Prioritise lanes
 #' lane_prioritisation <- GTFShift::prioritise_lanes(
-#'   gtfs, q, 
-#'   osm_file = osm_file,  
+#'   gtfs, q,
+#'   osm_file = osm_file,
 #'   date = gtfs$calendar$start_date[1]
 #' )
-#' 
+#'
 #' # Get statistics for prioritisation
 #' stats <- GTFShift::get_prioritisation_stats(lane_prioritisation)
-#' 
+#'
 #' data.frame(metric = names(stats), value = unlist(stats, use.names = FALSE))
 #'
 #' @import dplyr
@@ -99,14 +115,15 @@ get_prioritisation_stats <- function(
 
     # Compute bus lane extension
     stats$extension <- sum(prioritisation_internal$length, na.rm = TRUE)
-    stats$extension_bus_lane <- sum(
-        prioritisation_internal |> filter(.data$is_bus_lane) |> pull(.data$length),
-        na.rm = TRUE
-    )
+    bus_lane_lengths <- prioritisation_internal |>
+        filter(.data$is_bus_lane) |>
+        pull(.data$length)
+    stats$extension_bus_lane <- sum(bus_lane_lengths, na.rm = TRUE)
 
     # Compute average speed, weighted by chosen weight
     if ("speed_avg" %in% names(prioritisation_internal)) {
-        speed_units <- if (inherits(prioritisation_internal$speed_avg, "units")) {
+        has_units <- inherits(prioritisation_internal$speed_avg, "units")
+        speed_units <- if (has_units) {
             units(prioritisation_internal$speed_avg)
         } else {
             NULL
@@ -123,13 +140,19 @@ get_prioritisation_stats <- function(
     }
 
     # Compute number of lanes, weighted by chosen weight
-    stats$n_lanes_circulation_avg <- weighted.mean(as.numeric(prioritisation_internal$n_lanes_circulation), weight_vals, na.rm = TRUE)
-    stats$n_lanes_circulation_min <- min(as.numeric(prioritisation_internal$n_lanes_circulation), na.rm = TRUE)
-    stats$n_lanes_circulation_max <- max(as.numeric(prioritisation_internal$n_lanes_circulation), na.rm = TRUE)
+    n_circ <- as.numeric(prioritisation_internal$n_lanes_circulation)
+    stats$n_lanes_circulation_avg <- weighted.mean(
+        n_circ, weight_vals, na.rm = TRUE
+    )
+    stats$n_lanes_circulation_min <- min(n_circ, na.rm = TRUE)
+    stats$n_lanes_circulation_max <- max(n_circ, na.rm = TRUE)
 
-    stats$n_lanes_parking_avg <- weighted.mean(as.numeric(prioritisation_internal$n_lanes_parking), weight_vals, na.rm = TRUE)
-    stats$n_lanes_parking_min <- min(as.numeric(prioritisation_internal$n_lanes_parking), na.rm = TRUE)
-    stats$n_lanes_parking_max <- max(as.numeric(prioritisation_internal$n_lanes_parking), na.rm = TRUE)
+    n_park <- as.numeric(prioritisation_internal$n_lanes_parking)
+    stats$n_lanes_parking_avg <- weighted.mean(
+        n_park, weight_vals, na.rm = TRUE
+    )
+    stats$n_lanes_parking_min <- min(n_park, na.rm = TRUE)
+    stats$n_lanes_parking_max <- max(n_park, na.rm = TRUE)
 
     return(stats)
 }

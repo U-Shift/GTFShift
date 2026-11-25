@@ -18,15 +18,19 @@ rt_collect_protobuf(
 \arguments{
 \item{gtfs_rt_url}{String. URL of the Protocol Buffers GTFS-RT feed.}
 
-\item{destination_file}{String. File to save the downloaded GTFS-RT data. Content is appended in each iteration.}
+\item{destination_file}{String. File to save the downloaded GTFS-RT data.
+Content is appended in each iteration.}
 
-\item{fields_collect}{Character vector. Fields to extract from each entity in the feed.}
+\item{fields_collect}{Character vector. Fields to extract from each entity in
+the feed.}
 
-\item{scrape_interval}{Integer (Default 60). Interval in seconds between each download. Negative to run only once.}
+\item{scrape_interval}{Integer (Default 60). Interval in seconds between each
+download. Negative to run only once.}
 
 \item{log_file}{String (Optional). Path to a log file to save download logs.}
 
-\item{headers}{Named list or character vector (Optional). Custom HTTP headers for credentials when accessing the GTFS-RT feed URL.}
+\item{headers}{Named list or character vector (Optional). Custom HTTP headers
+for credentials when accessing the GTFS-RT feed URL.}
 }
 \value{
 String. The location of the file where data was collected.
@@ -35,32 +39,36 @@ String. The location of the file where data was collected.
 Collect GTFS-RT data from a Protocol Buffers feed at regular intervals
 }
 \details{
-Downloads GTFS-RT data from the specified URL at regular intervals and saves them to the destination file.
+Downloads GTFS-RT data from the specified URL at regular intervals and saves
+them to the destination file.
 
 This function will run indefinitely until manually stopped (CTRL + C).
 }
 \examples{
-# Create file
+# Sample GTFS-RT Protobuf file
+sample_pb <- system.file(
+  "extdata/samples",
+  "gtfs_rt_sample.pb",
+  package = "GTFShift"
+)
 destination_file <- withr::local_tempfile(fileext = ".csv")
 
 # Collect data
 GTFShift::rt_collect_protobuf(
-  gtfs_rt_url = "https://go.tmlmobilidade.pt/hub/api/v1/0XJC9/vehicles/positions/gtfs.pb",
+  gtfs_rt_url = sample_pb,
   destination_file = destination_file,
   scrape_interval = -1 # Negative to run only once
 )
 
 # Read data
-if (file.exists(destination_file)) {
-  collection <- read.csv(destination_file)
-  names(collection)
-  head(
-    collection |>
-      dplyr::select(
-        "vehicle.trip.trip_id", "vehicle.position.latitude",
-        "vehicle.position.longitude"
-      )
-  )
-}
+collection <- read.csv(destination_file)
+names(collection)
+head(
+  collection |>
+    dplyr::select(
+      "vehicle.trip.trip_id", "vehicle.position.latitude",
+      "vehicle.position.longitude"
+    )
+)
 
 }

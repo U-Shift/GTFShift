@@ -2,7 +2,7 @@ Type: Package
 Package: GTFShift
 Title: Explore and Analyse General Transit Feed Specification (GTFS) Files
     with a Focus on Urban Mobility
-Version: 1.2.0
+Version: 1.2.0.9000
 Authors@R: c(
     person(c("Gonçalo", "F."), "Matos", , "goncaloafmatos@tecnico.pt", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0001-3489-1732")),
@@ -18,6 +18,7 @@ Description: A bundle of methods to
 License: GPL
 URL: https://github.com/U-Shift/GTFShift,
     https://u-shift.github.io/GTFShift/
+BugReports: https://github.com/U-Shift/GTFShift/issues
 Depends:
     R (>= 4.1.0)
 Imports: 
@@ -25,19 +26,15 @@ Imports:
   gtfstools (>= 2.0.0),
   sf,
   tidyselect,
-  tidyr,
   lubridate,
   httr,
   jsonlite,
   dplyr,
   osmdata,
-  stringr,
   callr,
-  purrr,
   rlang,
   xml2,
-  withr,
-  units
+  withr
 Suggests: 
     knitr,
     rmarkdown,
@@ -54,7 +51,8 @@ Suggests:
     lwgeom,
     progress,
     stringi,
-    spelling
+    spelling,
+    units
 VignetteBuilder: 
     knitr
 Config/Needs/website: rmarkdown

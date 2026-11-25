@@ -1,28 +1,34 @@
 #' Build shapes from simple feature object
 #'
-#' @param sf_shapes sf object associating \code{shape_id} with an sf object (either LINESTRING or MULTILINESTRING).
+#' @param sf_shapes sf object associating \code{shape_id} with an sf object
+#'   (either LINESTRING or MULTILINESTRING).
 #' @param gtfs tidygtfs. GTFS feed.
-#' @param metric_crs Integer or character (Default NULL). Optional projected CRS used when computing distances (passed to \code{multiline_to_sorted_linestring} and \code{project_points_along_geometry}). If NULL, spherical geometry (s2) is used by default.
+#' @param metric_crs Integer or character (Default NULL). Optional projected CRS
+#'   used when computing distances (passed to
+#'   \code{multiline_to_sorted_linestring} and
+#'   \code{project_points_along_geometry}). If NULL, spherical geometry (s2) is
+#'   used by default.
 #' @param shape_dist_traveled Boolean (Default FALSE). If TRUE, computes
 #'   \code{shape_dist_traveled} for each generated shape.
 #'
 #' @details
 #' This function builds the shapes.txt file from a simple feature object.
-#' 
-#' It first converts any MULTILINESTRING geometries to LINESTRING geometries using the
-#' \code{multiline_to_sorted_linestring}, using a point guide per shape:
+#'
+#' It first converts any MULTILINESTRING geometries to LINESTRING geometries
+#' using the \code{multiline_to_sorted_linestring}, using a point guide per
+#' shape:
 #' all ordered stops when the selected trip is circular (first and last
 #' \code{stop_id} are equal), or the first two stops otherwise.
-#' Then, it converts the LINESTRING geometries to a data.frame representing a GTFS shapes table using
-#' \code{gtfstools::convert_sf_to_shapes}.
-#' 
+#' Then, it converts the LINESTRING geometries to a data.frame representing a
+#' GTFS shapes table using \code{gtfstools::convert_sf_to_shapes}.
+#'
 #' Coordinates are 4326 (WGS 84) by default, following GTFS specifications.
-#' 
+#'
 #' Optionally, when \code{shape_dist_traveled = TRUE}, it estimates cumulative
 #' distance along each shape for all generated points and appends this as
-#' \code{shape_dist_traveled}. This metric is computed in the units of 
+#' \code{shape_dist_traveled}. This metric is computed in the units of
 #' \code{metric_crs}, using \code{GTFShift::project_points_along_geometry()}.
-#' 
+#'
 #'
 #' @returns data.frame. A GTFS shapes table. Includes
 #' \code{shape_dist_traveled} if \code{shape_dist_traveled = TRUE}.
@@ -33,21 +39,27 @@
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' # Load TCB OSM routes sample linestring
-#' osm_routes = sf::st_read(
-#'   system.file("extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"),
+#' osm_routes <- sf::st_read(
+#'   system.file(
+#'     "extdata/samples",
+#'     "osm_routes_tcb.gpkg",
+#'     package = "GTFShift"
+#'   ),
 #'   quiet = TRUE
-#' ) |> dplyr::filter(shape_id %in% gtfs$shapes$shape_id) |> dplyr::sample_n(1)
-#' 
+#' ) |>
+#'   dplyr::filter(shape_id %in% gtfs$shapes$shape_id) |>
+#'   dplyr::sample_n(1)
+#'
 #' head(osm_routes)
-#' 
+#'
 #' # Create shapes.txt for geometries
 #' shapes_txt <- GTFShift::create_shapes_from_sf(
-#'   osm_routes, gtfs, 
+#'   osm_routes, gtfs,
 #'   shape_dist_traveled = TRUE
 #' )
-#' 
+#'
 #' head(shapes_txt)
 #' }
 #'
@@ -77,8 +89,8 @@
 #'
 #' @export
 create_shapes_from_sf <- function(
-    sf_shapes, 
-    gtfs, 
+    sf_shapes,
+    gtfs,
     metric_crs = NULL,
     shape_dist_traveled = FALSE
 ) {
@@ -98,16 +110,24 @@ create_shapes_from_sf <- function(
     # Build point guides per shape
     # > circular trip: all stops in sequence
     # > non-circular trip: first two stops
+    trips_shapes <- gtfs$trips |> select("trip_id", "shape_id")
+    stops_info <- gtfs$stops |>
+        select("stop_id", "stop_name", "stop_lat", "stop_lon")
     trips_stops_sf <- gtfs$stop_times |>
         arrange(.data$trip_id, .data$stop_sequence) |>
-        left_join(gtfs$trips |> select("trip_id", "shape_id"), by = "trip_id") |>
-        left_join(gtfs$stops |> select("stop_id", "stop_name", "stop_lat", "stop_lon"), by = "stop_id") |>
+        left_join(trips_shapes, by = "trip_id") |>
+        left_join(stops_info, by = "stop_id") |>
         st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 4326)
 
     trips_points <- split(trips_stops_sf, trips_stops_sf$trip_id) |>
         lapply(function(trip_sf) {
-            is_circular <- nrow(trip_sf) > 1 && trip_sf$stop_id[1] == trip_sf$stop_id[nrow(trip_sf)]
-            trip_points <- if (is_circular) sf::st_geometry(trip_sf) else sf::st_geometry(trip_sf)[seq_len(min(2, nrow(trip_sf)))]
+            is_circular <- nrow(trip_sf) > 1 &&
+                trip_sf$stop_id[1] == trip_sf$stop_id[nrow(trip_sf)]
+            trip_points <- if (is_circular) {
+                sf::st_geometry(trip_sf)
+            } else {
+                sf::st_geometry(trip_sf)[seq_len(min(2, nrow(trip_sf)))]
+            }
 
             data.frame(
                 trip_id = trip_sf$trip_id[1],
@@ -133,7 +153,8 @@ create_shapes_from_sf <- function(
             shapes_points,
             by = "shape_id"
         ) |>
-        filter(lengths(.data$points) > 0) |> # Only consider sf_shapes that have a GTFS match
+        # Only consider sf_shapes that have a GTFS match
+        filter(lengths(.data$points) > 0) |>
         # sample_n(10) |> # For debug only
         rowwise() |>
         mutate(!!current_geom_col := multiline_to_sorted_linestring(
@@ -144,14 +165,10 @@ create_shapes_from_sf <- function(
         ungroup() |>
         select("shape_id")
 
-    #mapview::mapview(sf_shapes_linestrings |> select(-stop_point), zcol="shape_id")
-    #sf_shapes_linestrings_debug = sf_shapes_linestrings|>filter(shape_id=="1-VA-TERM")
-    #mapview::mapview((sf_shapes_linestrings_debug )$geom)+
-    #    mapview::mapview((sf_shapes_linestrings_debug)$stop_point) 
-
     # Convert LINESTRING to GTFS shapes.txt data.frame
+    # Use WGS 84 as default CRS for GTFS shapes
     shapes_gtfstools <- gtfstools::convert_sf_to_shapes(
-        sf_shapes_linestrings |> st_transform(4326), # Use WGS 84 as default CRS for GTFS shapes
+        sf_shapes_linestrings |> st_transform(4326),
         calculate_distance = FALSE
     )
 
@@ -167,7 +184,9 @@ create_shapes_from_sf <- function(
 
         for (shape_id_i in unique(shapes_gtfstools$shape_id)) {
             shape_rows <- which(shapes_gtfstools$shape_id == shape_id_i)
-            shape_geometry <- sf_shapes_linestrings |> filter(.data$shape_id == shape_id_i) |> st_transform(4326)
+            shape_geometry <- sf_shapes_linestrings |>
+                filter(.data$shape_id == shape_id_i) |>
+                st_transform(4326)
 
             if (nrow(shape_geometry) == 0 || length(shape_rows) == 0) {
                 next
@@ -180,7 +199,9 @@ create_shapes_from_sf <- function(
                 metric_crs = metric_crs
             )
 
-            shape_dist_values[shape_rows] <- as.numeric(projected$distance_along_geometry)
+            shape_dist_values[shape_rows] <- as.numeric(
+                projected$distance_along_geometry
+            )
         }
 
         shapes_gtfstools$shape_dist_traveled <- shape_dist_values

@@ -2,13 +2,17 @@
 #'
 #' @param gtfs tidygtfs. GTFS feed.
 #' @param values String[]. List of the route names to filter the feed.
-#' @param short_name Boolean. If TRUE, query for \code{route_short_name}, otherwise, \code{route_long_name} is considered.
-#' @param exact_match Boolean. If TRUE, route name is queried for an exact (case-sensitive) match, otherwise, partial (case-insensitive) match is considered.
+#' @param short_name Boolean. If TRUE, query for \code{route_short_name},
+#'   otherwise, \code{route_long_name} is considered.
+#' @param exact_match Boolean. If TRUE, route name is queried for an exact
+#'   (case-sensitive) match, otherwise, partial (case-insensitive) match is
+#'   considered.
 #'
 #' @details
-#' On a GTFS feed, the \code{route_id} rarely matches the real name of the route, that can range from numbers,
-#' letters, words or combinations of both.
-#' This method allows to filter the feed for the route short or long name, with a partial or exact match.
+#' On a GTFS feed, the \code{route_id} rarely matches the real name of the
+#' route, that can range from numbers, letters, words or combinations of both.
+#' This method allows to filter the feed for the route short or long name, with
+#' a partial or exact match.
 #'
 #' @returns tidygtfs. The filtered GTFS feed.
 #'
@@ -17,24 +21,28 @@
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
 #'   "gtfs_tcb_sample.zip", package = "GTFShift")
 #' )
-#' 
+#'
 #' summary(gtfs)
-#' 
-#' 
+#'
+#'
 #' # Filter by route
-#' gtfs_route <- GTFShift::filter_by_route_name(gtfs, c("4"))
-#' 
+#' gtfs_route <- GTFShift::filter_by_route_name(gtfs, "4")
+#'
 #' summary(gtfs_route)
 #'
 #' @import tidytransit
 #' @import dplyr
-#' @importFrom stringr str_detect regex
 #' @importFrom rlang .data
 #' @srrstats {G2.0} Validates that `values` is a non-empty vector or list (`length(values) > 0`).
 #' @srrstats {G2.0a} Documents that `values` is a vector/list of route names.
 #'
 #' @export
-filter_by_route_name <- function(gtfs, values, short_name=TRUE, exact_match=TRUE) {
+filter_by_route_name <- function(
+  gtfs,
+  values,
+  short_name = TRUE,
+  exact_match = TRUE
+) {
   if (missing(values) || length(values) == 0) {
     stop("values must be a non-empty vector or list of route names")
   }
@@ -42,20 +50,28 @@ filter_by_route_name <- function(gtfs, values, short_name=TRUE, exact_match=TRUE
   # Get routes that match query
   pattern <- paste(unlist(values), collapse = "|")
 
-  routes = gtfs$routes |>
+  routes <- gtfs$routes |>
     filter(
-      if (short_name & exact_match) .data$route_short_name %in% values
-      else if (short_name) str_detect(.data$route_short_name, regex(pattern, ignore_case = TRUE))
-      else if (!short_name & exact_match) .data$route_long_name %in% values
-      else str_detect(.data$route_long_name, regex(pattern, ignore_case = TRUE))
+      if (short_name & exact_match) {
+        .data$route_short_name %in% values
+      } else if (short_name) {
+        grepl(pattern, .data$route_short_name, ignore.case = TRUE)
+      } else if (!short_name & exact_match) {
+        .data$route_long_name %in% values
+      } else {
+        grepl(pattern, .data$route_long_name, ignore.case = TRUE)
+      }
     )
 
   # Get trips that match those routes
-  trips = gtfs$trips |>
+  trips <- gtfs$trips |>
     filter(.data$route_id %in% routes$route_id)
 
   # Filter feed by trip id
-  gtfs_filtered = tidytransit::filter_feed_by_trips(gtfs, trip_ids = trips$trip_id)
+  gtfs_filtered <- tidytransit::filter_feed_by_trips(
+    gtfs,
+    trip_ids = trips$trip_id
+  )
 
   return(gtfs_filtered)
 }
