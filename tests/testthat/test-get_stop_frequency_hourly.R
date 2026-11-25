@@ -6,7 +6,8 @@
 #' @srrstats {EA6.0e} Tests exact numeric equality of hourly stop departure counts.
 test_that("get_stop_frequency_hourly calculates stop departures per hour", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 

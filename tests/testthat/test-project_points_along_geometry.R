@@ -26,7 +26,8 @@ test_that(
     pts <- sf::st_sfc(sf::st_point(c(20, 10)), crs = 3857)
 
     res <- GTFShift::project_points_along_geometry(
-      line, pts, geometry_sample_meters = 5, metric_crs = 3857
+      line, pts,
+      geometry_sample_meters = 5, metric_crs = 3857
     )
     expect_s3_class(res, "sf")
     expect_identical(nrow(res), 1L)
@@ -97,7 +98,8 @@ test_that(
 
     expect_error(
       GTFShift::project_points_along_geometry(
-        "not_a_geometry", pts, metric_crs = 3857
+        "not_a_geometry", pts,
+        metric_crs = 3857
       ),
       "geometry must be an sf object or sfc geometry"
     )
@@ -110,7 +112,8 @@ test_that("project_points_along_geometry stops when points is not sf or sfc", {
 
   expect_error(
     GTFShift::project_points_along_geometry(
-      line, "not_points", metric_crs = 3857
+      line, "not_points",
+      metric_crs = 3857
     ),
     "points must be an sf object or sfc geometry"
   )
@@ -129,7 +132,8 @@ test_that(
 
     expect_error(
       GTFShift::project_points_along_geometry(
-        line_multi, pts, metric_crs = 3857
+        line_multi, pts,
+        metric_crs = 3857
       ),
       "geometry must contain exactly one feature"
     )
@@ -142,7 +146,8 @@ test_that("project_points_along_geometry handles empty points input", {
   pts_empty <- sf::st_sfc(crs = 3857)
 
   res <- GTFShift::project_points_along_geometry(
-    line, pts_empty, metric_crs = 3857
+    line, pts_empty,
+    metric_crs = 3857
   )
   expect_identical(nrow(res), 0L)
   expect_contains(
@@ -166,7 +171,8 @@ test_that(
 
     expect_error(
       GTFShift::project_points_along_geometry(
-        point_geom, pts, metric_crs = 3857
+        point_geom, pts,
+        metric_crs = 3857
       ),
       "geometry must be LINESTRING or MULTILINESTRING"
     )
@@ -182,7 +188,8 @@ test_that(
 
     expect_error(
       GTFShift::project_points_along_geometry(
-        line_nocrs, pts, metric_crs = 3857
+        line_nocrs, pts,
+        metric_crs = 3857
       ),
       "geometry and points must have a valid CRS to use metric_crs"
     )
@@ -199,12 +206,14 @@ test_that(
     line_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 3857))
     pts_sf <- sf::st_sf(
       geometry = sf::st_sfc(
-        sf::st_point(c(25, 5)), sf::st_point(c(75, -5)), crs = 3857
+        sf::st_point(c(25, 5)), sf::st_point(c(75, -5)),
+        crs = 3857
       )
     )
 
     res <- GTFShift::project_points_along_geometry(
-      line_sf, pts_sf, geometry_sample_meters = 100, metric_crs = 3857
+      line_sf, pts_sf,
+      geometry_sample_meters = 100, metric_crs = 3857
     )
     expect_identical(nrow(res), 2L)
     expect_s3_class(res$closest_on_geometry, "sfc_POINT")
@@ -218,11 +227,13 @@ test_that(
     l_np <- sf::st_linestring(matrix(c(0, 89, 0, 90), ncol = 2, byrow = TRUE))
     line_north_pole <- sf::st_sfc(l_np, crs = 4326)
     pts_north_pole <- sf::st_sfc(
-      sf::st_point(c(0, 89)), sf::st_point(c(0, 90)), crs = 4326
+      sf::st_point(c(0, 89)), sf::st_point(c(0, 90)),
+      crs = 4326
     )
 
     res_np <- GTFShift::project_points_along_geometry(
-      line_north_pole, pts_north_pole, geometry_sample_meters = 1000
+      line_north_pole, pts_north_pole,
+      geometry_sample_meters = 1000
     )
     expect_identical(nrow(res_np), 2L)
     expect_identical(res_np$distance_along_geometry[1], 0)
@@ -233,11 +244,13 @@ test_that(
     )
     line_south_pole <- sf::st_sfc(l_sp, crs = 4326)
     pts_south_pole <- sf::st_sfc(
-      sf::st_point(c(0, -89)), sf::st_point(c(0, -90)), crs = 4326
+      sf::st_point(c(0, -89)), sf::st_point(c(0, -90)),
+      crs = 4326
     )
 
     res_sp <- GTFShift::project_points_along_geometry(
-      line_south_pole, pts_south_pole, geometry_sample_meters = 1000
+      line_south_pole, pts_south_pole,
+      geometry_sample_meters = 1000
     )
     expect_identical(nrow(res_sp), 2L)
     expect_identical(res_sp$distance_along_geometry[1], 0)
@@ -260,7 +273,8 @@ test_that(
 
     expect_error(
       GTFShift::project_points_along_geometry(
-        line, pts, metric_crs = proj4_str
+        line, pts,
+        metric_crs = proj4_str
       ),
       "PROJ4-strings are not permitted"
     )
@@ -283,17 +297,20 @@ test_that(
 
     # 1. Curvilinear (EPSG:4326, s2 spherical distances)
     res_curv <- GTFShift::project_points_along_geometry(
-      line_4326, pts_4326, geometry_sample_meters = 1, metric_crs = NULL
+      line_4326, pts_4326,
+      geometry_sample_meters = 1, metric_crs = NULL
     )
     # 2. Geographic input with metric_crs = 3763
     res_metric_param <- GTFShift::project_points_along_geometry(
-      line_4326, pts_4326, geometry_sample_meters = 1, metric_crs = 3763
+      line_4326, pts_4326,
+      geometry_sample_meters = 1, metric_crs = 3763
     )
     # 3. Explicitly pre-transformed input via sf::st_transform(..., 3763)
     line_3763 <- sf::st_transform(line_4326, 3763)
     pts_3763 <- sf::st_transform(pts_4326, 3763)
     res_pre_transformed <- GTFShift::project_points_along_geometry(
-      line_3763, pts_3763, geometry_sample_meters = 1
+      line_3763, pts_3763,
+      geometry_sample_meters = 1
     )
 
     # Exact equivalence between metric_crs = 3763 and explicit st_transform

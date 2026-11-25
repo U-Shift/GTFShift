@@ -118,7 +118,8 @@
 #'
 #' osm_routes <- sf::st_read(
 #'   system.file(
-#'     "extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"
+#'     "extdata/samples", "osm_routes_tcb.gpkg",
+#'     package = "GTFShift"
 #'   ),
 #'   quiet = TRUE
 #' ) |>
@@ -138,7 +139,8 @@
 #'
 #' # Customize aggregation (e.g. by route and day)
 #' route_profile <- GTFShift::get_trip_speed_profile(
-#'   speed, by = c("route_id", "day")
+#'   speed,
+#'   by = c("route_id", "day")
 #' )
 #' head(route_profile)
 #' }
@@ -251,7 +253,9 @@ get_trip_speed_profile <- function(
 
   # Helper: compute time difference in seconds between two timestamps
   get_time_diff_sec <- function(t_start, t_end) {
-    if (is.na(t_start) || is.na(t_end)) return(NA_real_)
+    if (is.na(t_start) || is.na(t_end)) {
+      return(NA_real_)
+    }
     if (inherits(t_start, "POSIXt") || inherits(t_start, "Date")) {
       return(as.numeric(difftime(t_end, t_start, units = "secs")))
     }

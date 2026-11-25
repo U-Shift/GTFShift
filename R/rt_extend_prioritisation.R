@@ -187,7 +187,8 @@ rt_extend_prioritisation <- function(
 
   # 4. Create buffers in lane segments to overlap with updates
   # update spinner while blocking method call
-  job <- callr::r_bg(function(
+  job <- callr::r_bg(
+  function(
     lanes_unique,
     lane_buffer,
     metric_crs,

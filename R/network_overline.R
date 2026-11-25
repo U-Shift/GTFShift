@@ -32,8 +32,9 @@
 #' \donttest{
 #' # Subset GTFS for one route only, for demo purposes
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-#'   "gtfs_tcb_sample.zip", package = "GTFShift")
-#' )
+#'   "gtfs_tcb_sample.zip",
+#'   package = "GTFShift"
+#' ))
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
 #'
 #' # Load OSM network to serve as target network
@@ -49,8 +50,8 @@
 #'   gtfs,
 #'   date = gtfs$calendar$start_date[1]
 #' ) |>
-#' dplyr::group_by(shape_id) |>
-#' dplyr::summarize(frequency = max(frequency))
+#'   dplyr::group_by(shape_id) |>
+#'   dplyr::summarize(frequency = max(frequency))
 #'
 #' head(frequency_analysis)
 #'
@@ -95,13 +96,13 @@
 #'
 #' @export
 network_overline <- function(
-    target_network,
-    lines,
-    attr,
-    target_network_split = 100,
-    fun = sum,
-    join_dist = 10,
-    metric_crs = NULL
+  target_network,
+  lines,
+  attr,
+  target_network_split = 100,
+  fun = sum,
+  join_dist = 10,
+  metric_crs = NULL
 ) {
   if (!requireNamespace("stplanr", quietly = TRUE)) {
     stop(
@@ -138,15 +139,15 @@ network_overline <- function(
   if (!is.na(target_network_split)) {
     network_segmented <- stplanr::line_segment(
       network_line,
-      segment_length=target_network_split
-    ) |> mutate(segment=row_number())
+      segment_length = target_network_split
+    ) |> mutate(segment = row_number())
   } else {
     network_segmented <- network_line |>
       mutate(segment = row_number())
   }
 
   df <- lines |>
-    mutate(df_id=row_number())
+    mutate(df_id = row_number())
 
   # 2. Overlap df and network segments
   network_segments_only <- network_segmented |>
@@ -175,7 +176,7 @@ network_overline <- function(
   # 4. Get geometry back
   result <- network_segmented |>
     filter(.data$segment %in% df_network_segment$segment) |>
-    left_join(df_network_segment, by="segment") |>
+    left_join(df_network_segment, by = "segment") |>
     select(-"segment")
   if (!is.null(attr_units) && !inherits(result[[attr]], "units")) {
     units(result[[attr]]) <- attr_units

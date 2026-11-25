@@ -5,7 +5,8 @@
 #' @srrstats {EA6.0d} Tests numeric/integer types of `frequency` and `hour` columns and `sfc` geometry column.
 test_that("get_route_frequency_hourly calculates route frequencies", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
@@ -29,27 +30,31 @@ test_that("get_route_frequency_hourly calculates route frequencies", {
 
 test_that("get_route_frequency_hourly supports overline = TRUE", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
   ref_date <- gtfs$calendar$start_date[1]
 
   res <- GTFShift::get_route_frequency_hourly(
-    gtfs, date = ref_date, overline = TRUE
+    gtfs,
+    date = ref_date, overline = TRUE
   )
   expect_s3_class(res, "sf")
   expect_contains(names(res), c("frequency", "hour", "geometry"))
 
   res_no_overline <- GTFShift::get_route_frequency_hourly(
-    gtfs, date = ref_date, overline = FALSE
+    gtfs,
+    date = ref_date, overline = FALSE
   )
   expect_gt(nrow(res), nrow(res_no_overline))
 })
 
 test_that("get_route_frequency_hourly supports use_osm_routes != NA", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
@@ -74,11 +79,11 @@ test_that("get_route_frequency_hourly supports use_osm_routes != NA", {
     .package = "GTFShift",
     code = {
       res <- GTFShift::get_route_frequency_hourly(
-        gtfs, date = ref_date, use_osm_routes = "mock_opq"
+        gtfs,
+        date = ref_date, use_osm_routes = "mock_opq"
       )
       expect_s3_class(res, "sf")
       expect_contains(names(res), c("frequency", "hour"))
     }
   )
 })
-

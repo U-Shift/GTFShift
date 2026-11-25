@@ -19,8 +19,9 @@
 #' @examples
 #' # Load GTFS
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-#'   "gtfs_tcb_sample.zip", package = "GTFShift")
-#' )
+#'   "gtfs_tcb_sample.zip",
+#'   package = "GTFShift"
+#' ))
 #'
 #' summary(gtfs)
 #'

@@ -81,7 +81,8 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     expect_identical(r_t1_2$time_since_prev_sec, 60)
     expect_equal(r_t1_2$distance_along_geometry, 500, tolerance = 1e-2)
     expect_equal(
-        r_t1_2$distance_along_geometry_reversed, 500, tolerance = 1e-2
+        r_t1_2$distance_along_geometry_reversed, 500,
+        tolerance = 1e-2
     )
     expect_equal(r_t1_2$distance_to_closest_on_geometry, 10, tolerance = 1e-2)
     expect_equal(r_t1_2$distance_since_prev_meters, 500, tolerance = 1e-2)
@@ -99,7 +100,8 @@ test_that("rt_average_speed computes speeds along trip geometry", {
     expect_equal(r_t2_2$distance_since_prev_meters, 400, tolerance = 1e-2)
     expect_equal(r_t2_2$distance_along_geometry, 400, tolerance = 1e-2)
     expect_equal(
-        r_t2_2$distance_along_geometry_reversed, 600, tolerance = 1e-2
+        r_t2_2$distance_along_geometry_reversed, 600,
+        tolerance = 1e-2
     )
     expect_equal(r_t2_2$speed_kmh, 24, tolerance = 0.5)
 })
@@ -123,7 +125,8 @@ test_that("rt_average_speed warns and ignores trips with < 2 updates", {
 
     expect_warning(
         res <- GTFShift::rt_average_speed(
-            rt_updates_single, trip_geom, metric_crs = 3857
+            rt_updates_single, trip_geom,
+            metric_crs = 3857
         ),
         "Trip T1 has less than 2 updates. Ignoring it."
     )
@@ -233,4 +236,3 @@ test_that("rt_average_speed stops on invalid inputs and mismatched columns", {
         "metric_crs should be a valid CRS value"
     )
 })
-

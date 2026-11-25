@@ -29,29 +29,30 @@
 #' @examplesIf nzchar(Sys.which("osmium"))
 #' # Subset GTFS for one route only, for demo purposes
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-#'   "gtfs_tcb_sample.zip", package = "GTFShift")
-#' )
+#'     "gtfs_tcb_sample.zip",
+#'     package = "GTFShift"
+#' ))
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, "4")
 #'
 #' # Build query and prepare osm extract (possible to use API as alternative)
 #' shapes_bbox <- sf::st_bbox(tidytransit::shapes_as_sf(gtfs$shapes))
 #' q <- osmdata::opq(bbox = shapes_bbox) |>
-#'   osmdata::add_osm_feature(key = "route", value = "bus") |>
-#'   osmdata::add_osm_feature(
-#'     key = "operator",
-#'     value = "Transportes Colectivos do Barreiro"
-#'   )
+#'     osmdata::add_osm_feature(key = "route", value = "bus") |>
+#'     osmdata::add_osm_feature(
+#'         key = "operator",
+#'         value = "Transportes Colectivos do Barreiro"
+#'     )
 #' osm_file <- system.file(
-#'   "extdata/samples",
-#'   "osmextract_tcb_network.pbf",
-#'   package = "GTFShift"
+#'     "extdata/samples",
+#'     "osmextract_tcb_network.pbf",
+#'     package = "GTFShift"
 #' )
 #'
 #' # Prioritise lanes
 #' lane_prioritisation <- GTFShift::prioritise_lanes(
-#'   gtfs, q,
-#'   osm_file = osm_file,
-#'   date = gtfs$calendar$start_date[1]
+#'     gtfs, q,
+#'     osm_file = osm_file,
+#'     date = gtfs$calendar$start_date[1]
 #' )
 #'
 #' # Get statistics for prioritisation
@@ -142,14 +143,16 @@ get_prioritisation_stats <- function(
     # Compute number of lanes, weighted by chosen weight
     n_circ <- as.numeric(prioritisation_internal$n_lanes_circulation)
     stats$n_lanes_circulation_avg <- weighted.mean(
-        n_circ, weight_vals, na.rm = TRUE
+        n_circ, weight_vals,
+        na.rm = TRUE
     )
     stats$n_lanes_circulation_min <- min(n_circ, na.rm = TRUE)
     stats$n_lanes_circulation_max <- max(n_circ, na.rm = TRUE)
 
     n_park <- as.numeric(prioritisation_internal$n_lanes_parking)
     stats$n_lanes_parking_avg <- weighted.mean(
-        n_park, weight_vals, na.rm = TRUE
+        n_park, weight_vals,
+        na.rm = TRUE
     )
     stats$n_lanes_parking_min <- min(n_park, na.rm = TRUE)
     stats$n_lanes_parking_max <- max(n_park, na.rm = TRUE)

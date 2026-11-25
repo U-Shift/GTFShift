@@ -12,7 +12,8 @@ test_that(
   ),
   {
     sample_file <- system.file(
-      "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+      "extdata/samples", "gtfs_tcb_sample.zip",
+      package = "GTFShift"
     )
     gtfs <- GTFShift::load_feed(sample_file)
 
@@ -41,7 +42,8 @@ test_that(
       .package = "GTFShift",
       code = {
         res <- GTFShift::get_way_frequency_hourly(
-          gtfs, q = NA, date = ref_date
+          gtfs,
+          q = NA, date = ref_date
         )
         expect_s3_class(res, "sf")
         expect_s3_class(res, "data.frame")

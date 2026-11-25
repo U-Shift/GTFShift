@@ -76,9 +76,7 @@ test_that(
     state$captured_network_times <- NULL
 
     testthat::with_mocked_bindings(
-      gtfs_transfer_table = function(
-        gtfs_transfers, d_limit, min_transfer_time, network_times, ...
-      ) {
+      gtfs_transfer_table = function(gtfs_transfers, d_limit, min_transfer_time, network_times, ...) {
         state$transfer_table_called <- TRUE
         state$captured_d_limit <- d_limit
         state$captured_min_transfer_time <- min_transfer_time
@@ -94,7 +92,8 @@ test_that(
       code = {
         res <- GTFShift::load_feed(
           system.file(
-            "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+            "extdata/samples", "gtfs_tcb_sample.zip",
+            package = "GTFShift"
           ),
           create_transfers = TRUE,
           transfer_distance = 600,
@@ -117,7 +116,9 @@ test_that("clean empty stop_times", {
     system.file("extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"),
     create_transfers = TRUE
   )
-  random_trip <- gtfs$trips |> sample_n(1) |> pull(trip_id)
+  random_trip <- gtfs$trips |>
+    sample_n(1) |>
+    pull(trip_id)
   gtfs$stop_times[random_trip == gtfs$stop_times$trip_id, ][1, ]$arrival_time <-
     NA
   location <- withr::local_tempfile(fileext = ".zip")
@@ -132,7 +133,8 @@ test_that("clean empty stop_times", {
 
 test_that("load_feed interpolates missing intermediate stop times", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- tidytransit::read_gtfs(sample_file)
   t_id <- gtfs$stop_times$trip_id[1]
@@ -155,7 +157,8 @@ test_that("load_feed interpolates missing intermediate stop times", {
 
 test_that("load_feed removes duplicates across tables", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- tidytransit::read_gtfs(sample_file)
   gtfs$agency <- rbind(gtfs$agency, gtfs$agency[1, ])
@@ -168,7 +171,8 @@ test_that("load_feed removes duplicates across tables", {
 
 test_that("load_feed removes unused IDs across tables", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- tidytransit::read_gtfs(sample_file)
   unused_stop <- gtfs$stops[1, ]

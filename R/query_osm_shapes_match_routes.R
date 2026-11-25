@@ -215,11 +215,11 @@ osm_shapes_match_routes <- function(
     stop("gtfs must be a tidygtfs object")
   }
   if (!is.character(gtfs_match) || length(gtfs_match) != 1 ||
-      !(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
+    !(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
     stop("gtfs_match should be one of: route_id, route_short_name or route_long_name")
   }
   if (!is.character(osm_match) || length(osm_match) != 1 ||
-      !(osm_match %in% c("ref", "name", "gtfs:route_id"))) {
+    !(osm_match %in% c("ref", "name", "gtfs:route_id"))) {
     stop("osm_match should be one of: ref, name, gtfs:route_id")
   }
   metric_crs <- validate_metric_crs(metric_crs)
@@ -858,10 +858,12 @@ osm_shapes_match_routes <- function(
     init_dist <- sf::st_distance(osm_init, gtfs_init)
     fin_dist <- sf::st_distance(osm_fin, gtfs_fin)
     init <- matrix(
-      as.numeric(init_dist), nrow = nrow(init_dist), ncol = ncol(init_dist)
+      as.numeric(init_dist),
+      nrow = nrow(init_dist), ncol = ncol(init_dist)
     )
     fin <- matrix(
-      as.numeric(fin_dist), nrow = nrow(fin_dist), ncol = ncol(fin_dist)
+      as.numeric(fin_dist),
+      nrow = nrow(fin_dist), ncol = ncol(fin_dist)
     )
     length_diff <- vapply(
       gtfs_route_name$route_dist,
@@ -1023,7 +1025,8 @@ osm_shapes_match_routes <- function(
       )
     }
     results_list <- parallel::mclapply(
-      routes_names, match_route_worker, mc.cores = num_cores
+      routes_names, match_route_worker,
+      mc.cores = num_cores
     )
   } else {
     results_list <- lapply(routes_names, function(route_name) {

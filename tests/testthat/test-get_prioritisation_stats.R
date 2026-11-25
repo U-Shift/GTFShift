@@ -23,7 +23,8 @@ test_that(
     )
 
     stats <- GTFShift::get_prioritisation_stats(
-      prioritisation_df, weight = "length", metric_crs = 3857
+      prioritisation_df,
+      weight = "length", metric_crs = 3857
     )
     expect_type(stats, "list")
     expect_contains(
@@ -77,7 +78,8 @@ test_that(
 
     # Test with weight = "frequency" (weights: 10 and 5, total = 15)
     stats <- GTFShift::get_prioritisation_stats(
-      prioritisation_df, weight = "frequency", metric_crs = 3857
+      prioritisation_df,
+      weight = "frequency", metric_crs = 3857
     )
     expect_type(stats, "list")
     expect_contains(names(stats), c("speed_avg", "speed_min", "speed_max"))
@@ -112,7 +114,8 @@ test_that("get_prioritisation_stats works when metric_crs is default (NULL)", {
 
   expect_no_warning(
     stats <- GTFShift::get_prioritisation_stats(
-      prioritisation_df, weight = "length"
+      prioritisation_df,
+      weight = "length"
     )
   )
   expect_identical(stats$extension, 200)
@@ -132,14 +135,16 @@ test_that("get_prioritisation_stats stops on invalid weight or metric_crs", {
   # Invalid weight choice
   expect_error(
     GTFShift::get_prioritisation_stats(
-      prioritisation_df, weight = "invalid_weight", metric_crs = 3857
+      prioritisation_df,
+      weight = "invalid_weight", metric_crs = 3857
     )
   )
 
   # Invalid CRS
   expect_error(
     GTFShift::get_prioritisation_stats(
-      prioritisation_df, weight = "length", metric_crs = NA
+      prioritisation_df,
+      weight = "length", metric_crs = NA
     ),
     "metric_crs should be a valid CRS value"
   )
@@ -174,7 +179,8 @@ test_that(
 
     # 1) Weight by length (weights: 100 and 300, total = 400)
     stats_length <- GTFShift::get_prioritisation_stats(
-      prioritisation_df, weight = "length", metric_crs = 3857
+      prioritisation_df,
+      weight = "length", metric_crs = 3857
     )
     # speed_avg: (20*100 + 60*300) / 400 = (2000 + 18000) / 400 = 50
     expect_identical(stats_length$speed_avg, 50)
@@ -183,7 +189,8 @@ test_that(
 
     # 2) Weight by frequency (weights: 30 and 10, total = 40)
     stats_freq <- GTFShift::get_prioritisation_stats(
-      prioritisation_df, weight = "frequency", metric_crs = 3857
+      prioritisation_df,
+      weight = "frequency", metric_crs = 3857
     )
     # speed_avg: (20*30 + 60*10) / 40 = (600 + 600) / 40 = 30
     expect_identical(stats_freq$speed_avg, 30)
@@ -210,7 +217,8 @@ test_that(
     )
 
     stats <- GTFShift::get_prioritisation_stats(
-      prioritisation_df, weight = "FREQUENCY", metric_crs = 3857
+      prioritisation_df,
+      weight = "FREQUENCY", metric_crs = 3857
     )
     expect_s3_class(stats$speed_avg, "units")
     expect_s3_class(stats$speed_min, "units")

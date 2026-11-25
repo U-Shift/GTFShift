@@ -1,12 +1,14 @@
 test_that("filter_by_route_name filters by short name exact match", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
   short_target <- gtfs$routes$route_short_name[1]
   gtfs_short_exact <- GTFShift::filter_by_route_name(
-    gtfs, values = list(short_target), short_name = TRUE, exact_match = TRUE
+    gtfs,
+    values = list(short_target), short_name = TRUE, exact_match = TRUE
   )
   expect_contains(class(gtfs_short_exact), "tidygtfs")
   expect_identical(
@@ -16,14 +18,16 @@ test_that("filter_by_route_name filters by short name exact match", {
 
 test_that("filter_by_route_name filters by short name partial match", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
   short_target <- gtfs$routes$route_short_name[1]
   short_partial <- substr(short_target, 1, 1)
   gtfs_short_partial <- GTFShift::filter_by_route_name(
-    gtfs, values = list(short_partial), short_name = TRUE, exact_match = FALSE
+    gtfs,
+    values = list(short_partial), short_name = TRUE, exact_match = FALSE
   )
   expect_contains(class(gtfs_short_partial), "tidygtfs")
   expect_true(
@@ -39,13 +43,15 @@ test_that("filter_by_route_name filters by short name partial match", {
 
 test_that("filter_by_route_name filters by long name exact match", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
   long_target <- gtfs$routes$route_long_name[1]
   gtfs_long_exact <- GTFShift::filter_by_route_name(
-    gtfs, values = list(long_target), short_name = FALSE, exact_match = TRUE
+    gtfs,
+    values = list(long_target), short_name = FALSE, exact_match = TRUE
   )
   expect_contains(class(gtfs_long_exact), "tidygtfs")
   expect_identical(unique(gtfs_long_exact$routes$route_long_name), long_target)
@@ -53,7 +59,8 @@ test_that("filter_by_route_name filters by long name exact match", {
 
 test_that("filter_by_route_name filters by long name partial match", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
@@ -61,7 +68,8 @@ test_that("filter_by_route_name filters by long name partial match", {
   long_words <- unlist(strsplit(long_target, "\\s+"))
   long_partial <- long_words[1]
   gtfs_long_partial <- GTFShift::filter_by_route_name(
-    gtfs, values = list(long_partial), short_name = FALSE, exact_match = FALSE
+    gtfs,
+    values = list(long_partial), short_name = FALSE, exact_match = FALSE
   )
   expect_contains(class(gtfs_long_partial), "tidygtfs")
   expect_true(

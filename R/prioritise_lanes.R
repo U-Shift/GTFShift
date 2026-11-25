@@ -53,8 +53,9 @@
 #' @examplesIf nzchar(Sys.which("osmium"))
 #' # Subset GTFS for one route only, for demo purposes
 #' gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-#'   "gtfs_tcb_sample.zip", package = "GTFShift")
-#' )
+#'   "gtfs_tcb_sample.zip",
+#'   package = "GTFShift"
+#' ))
 #' gtfs <- GTFShift::filter_by_route_name(gtfs, "4")
 #'
 #' # Build query and prepare osm extract (possible to use API as alternative)
@@ -111,7 +112,8 @@ prioritise_lanes <- function(
 ) {
   # Get way frequency hourly
   way_frequency <- GTFShift::get_way_frequency_hourly(
-    gtfs, q, date, TRUE, osm_file = osm_file
+    gtfs, q, date, TRUE,
+    osm_file = osm_file
   )
 
   # Get bus lanes

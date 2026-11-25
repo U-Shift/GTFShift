@@ -305,7 +305,8 @@ test_that(
       speed_kmh = c(20, 30)
     )
     res_multi_n1 <- GTFShift::get_trip_speed_profile(
-      df_multi_n1, by = "route_id"
+      df_multi_n1,
+      by = "route_id"
     )
     expect_true(is.na(res_multi_n1$commercial_speed))
     expect_true(is.na(res_multi_n1$commercial_speed_alt))
@@ -320,7 +321,8 @@ test_that(
       speed_kmh = c(NA, 30, NA, 36)
     )
     res_multi_n2 <- GTFShift::get_trip_speed_profile(
-      df_multi_n2, by = "route_id"
+      df_multi_n2,
+      by = "route_id"
     )
     expect_equal(res_multi_n2$commercial_speed, 33.0) # mean of 30 and 36
     expect_true(is.na(res_multi_n2$commercial_speed_alt))
@@ -335,7 +337,8 @@ test_that(
       speed_kmh = c(NA, 30, 30, 30, 20)
     )
     res_multi_mixed <- GTFShift::get_trip_speed_profile(
-      df_multi_mixed, by = "route_id"
+      df_multi_mixed,
+      by = "route_id"
     )
     # only T1 has valid commercial speed
     expect_equal(res_multi_mixed$commercial_speed, 30.0)
@@ -361,7 +364,8 @@ test_that(
 
     res_sorted <- GTFShift::get_trip_speed_profile(df_sorted, by = "trip_id")
     res_scrambled <- GTFShift::get_trip_speed_profile(
-      df_scrambled, by = "trip_id"
+      df_scrambled,
+      by = "trip_id"
     )
     expect_identical(res_scrambled$timestamp_min, res_sorted$timestamp_min)
     expect_identical(res_scrambled$timestamp_max, res_sorted$timestamp_max)
@@ -413,7 +417,8 @@ test_that(
       speed_kmh = c(NA, 30, 30, 30)
     )
     res_backward <- GTFShift::get_trip_speed_profile(
-      df_backward, by = "trip_id"
+      df_backward,
+      by = "trip_id"
     )
     expect_equal(res_backward$commercial_speed, 30.0)
     expect_equal(res_backward$commercial_speed_alt, 30.0)
@@ -483,7 +488,8 @@ test_that(
       distance_along_geometry_reversed = c(500, 0)
     )
     res_no_speed <- GTFShift::get_trip_speed_profile(
-      df_no_speed, by = "trip_id"
+      df_no_speed,
+      by = "trip_id"
     )
     expect_identical(res_no_speed$speed_count, 0L)
     expect_true(is.na(res_no_speed$speed_avg))
@@ -601,7 +607,8 @@ test_that(
     )
 
     speed_sf <- GTFShift::rt_average_speed(
-      rt_updates, trip_geom, metric_crs = 3857
+      rt_updates, trip_geom,
+      metric_crs = 3857
     )
     profile <- GTFShift::get_trip_speed_profile(speed_sf)
 

@@ -71,7 +71,8 @@ test_that(
     )
 
     res <- GTFShift::multiline_to_sorted_linestring(
-      mls_sf, points = pts, metric_crs = 3857
+      mls_sf,
+      points = pts, metric_crs = 3857
     )
     coords <- unname(sf::st_coordinates(res))
 
@@ -118,7 +119,8 @@ test_that(
     pts <- sf::st_sfc(sf::st_point(c(0, 0)), crs = 4326)
 
     res <- GTFShift::multiline_to_sorted_linestring(
-      mls_sf, points = pts, metric_crs = 3857
+      mls_sf,
+      points = pts, metric_crs = 3857
     )
     coords <- unname(sf::st_coordinates(res))
     expect_equal(coords[1, 1:2], c(0, 0), tolerance = 1e-6)
@@ -136,11 +138,13 @@ test_that(
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
     pts <- sf::st_sfc(
-      sf::st_point(c(1, 0)), sf::st_point(c(0, 0)), crs = 4326
+      sf::st_point(c(1, 0)), sf::st_point(c(0, 0)),
+      crs = 4326
     )
 
     res <- GTFShift::multiline_to_sorted_linestring(
-      mls_sf, points = pts, metric_crs = 3857
+      mls_sf,
+      points = pts, metric_crs = 3857
     )
     coords <- unname(sf::st_coordinates(res))
     expect_equal(coords[1, 1:2], c(2, 0), tolerance = 1e-6)
@@ -161,7 +165,8 @@ test_that(
     pts <- sf::st_sfc(sf::st_point(c(0, 0)), crs = 4326)
 
     res <- GTFShift::multiline_to_sorted_linestring(
-      mls_sf, points = pts, metric_crs = 3857
+      mls_sf,
+      points = pts, metric_crs = 3857
     )
     coords <- unname(sf::st_coordinates(res))
     expect_identical(nrow(coords), 2L)
@@ -184,11 +189,13 @@ test_that(
     ))
     mls_sf <- sf::st_sf(geometry = sf::st_sfc(mls, crs = 4326))
     pts <- sf::st_sfc(
-      sf::st_point(c(0, 0)), sf::st_point(c(1, 1)), crs = 4326
+      sf::st_point(c(0, 0)), sf::st_point(c(1, 1)),
+      crs = 4326
     )
 
     res <- GTFShift::multiline_to_sorted_linestring(
-      mls_sf, points = pts, metric_crs = 3857
+      mls_sf,
+      points = pts, metric_crs = 3857
     )
     expect_s3_class(res, "sfc")
     coords <- unname(sf::st_coordinates(res))

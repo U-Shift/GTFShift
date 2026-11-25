@@ -5,7 +5,8 @@
 #' @srrstats {EA6.0d} Tests integer weekday indicator types and `Date` start/end date column classes.
 test_that("create_calendar generates calendar table from calendar_dates", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 

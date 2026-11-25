@@ -12,7 +12,8 @@
 #' @srrstats {SP6.1b} Verifies that `shape_dist_traveled` matches `sf::st_length()` in both projected and geographic CRS modes.
 test_that("create_shapes_from_sf generates shapes from sf object", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
@@ -24,7 +25,8 @@ test_that("create_shapes_from_sf generates shapes from sf object", {
   )
 
   shapes_df <- GTFShift::create_shapes_from_sf(
-    sf_line, gtfs, metric_crs = 3857
+    sf_line, gtfs,
+    metric_crs = 3857
   )
   expect_contains(
     names(shapes_df),
@@ -41,7 +43,8 @@ test_that(
   ),
   {
     sample_file <- system.file(
-      "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+      "extdata/samples", "gtfs_tcb_sample.zip",
+      package = "GTFShift"
     )
     gtfs <- GTFShift::load_feed(sample_file)
 
@@ -62,7 +65,8 @@ test_that(
     )
 
     shapes_df <- GTFShift::create_shapes_from_sf(
-      sf_lines, gtfs, metric_crs = 3857, shape_dist_traveled = TRUE
+      sf_lines, gtfs,
+      metric_crs = 3857, shape_dist_traveled = TRUE
     )
     expect_contains(
       names(shapes_df),
@@ -74,7 +78,8 @@ test_that(
     expect_false(anyNA(shapes_df$shape_dist_traveled))
     expect_identical(shapes_df$shape_dist_traveled[1], 0)
     expect_equal(
-      shapes_df$shape_dist_traveled[2], expected_dist, tolerance = 1e-3
+      shapes_df$shape_dist_traveled[2], expected_dist,
+      tolerance = 1e-3
     )
 
     # Validate that unmatched_shape_id was ignored and not present in shapes_df
@@ -84,7 +89,8 @@ test_that(
 
 test_that("create_shapes_from_sf works when metric_crs is default (NULL)", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
@@ -97,7 +103,8 @@ test_that("create_shapes_from_sf works when metric_crs is default (NULL)", {
 
   expect_no_warning(
     shapes_df <- GTFShift::create_shapes_from_sf(
-      sf_line, gtfs, shape_dist_traveled = TRUE
+      sf_line, gtfs,
+      shape_dist_traveled = TRUE
     )
   )
   expect_contains(
@@ -117,7 +124,8 @@ test_that("create_shapes_from_sf works when metric_crs is default (NULL)", {
 
 test_that("create_shapes_from_sf stops when metric_crs is invalid NA", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
@@ -136,7 +144,8 @@ test_that("create_shapes_from_sf stops when metric_crs is invalid NA", {
 
 test_that("create_shapes_from_sf stops when shape_id column is missing", {
   sample_file <- system.file(
-    "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+    "extdata/samples", "gtfs_tcb_sample.zip",
+    package = "GTFShift"
   )
   gtfs <- GTFShift::load_feed(sample_file)
 
@@ -164,7 +173,8 @@ test_that(
   "create_shapes_from_sf yields equivalent results across CRS modes",
   {
     sample_file <- system.file(
-      "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+      "extdata/samples", "gtfs_tcb_sample.zip",
+      package = "GTFShift"
     )
     gtfs <- GTFShift::load_feed(sample_file)
 
@@ -179,13 +189,16 @@ test_that(
     sf_line_3763 <- sf::st_transform(sf_line_4326, 3763)
 
     shapes_curv <- GTFShift::create_shapes_from_sf(
-      sf_line_4326, gtfs, metric_crs = NULL, shape_dist_traveled = TRUE
+      sf_line_4326, gtfs,
+      metric_crs = NULL, shape_dist_traveled = TRUE
     )
     shapes_metric <- GTFShift::create_shapes_from_sf(
-      sf_line_4326, gtfs, metric_crs = 3763, shape_dist_traveled = TRUE
+      sf_line_4326, gtfs,
+      metric_crs = 3763, shape_dist_traveled = TRUE
     )
     shapes_transformed <- GTFShift::create_shapes_from_sf(
-      sf_line_3763, gtfs, metric_crs = 3763, shape_dist_traveled = TRUE
+      sf_line_3763, gtfs,
+      metric_crs = 3763, shape_dist_traveled = TRUE
     )
 
     expect_true(all(is.finite(shapes_curv$shape_dist_traveled)))

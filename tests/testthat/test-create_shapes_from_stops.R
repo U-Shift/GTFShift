@@ -7,7 +7,8 @@ test_that(
   "create_shapes_from_stops constructs shape geometries from stop sequences",
   {
     sample_file <- system.file(
-      "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+      "extdata/samples", "gtfs_tcb_sample.zip",
+      package = "GTFShift"
     )
     gtfs <- GTFShift::load_feed(sample_file)
 

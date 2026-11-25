@@ -31,7 +31,8 @@ test_that("rt_extend_prioritisation extends lane prioritisation with speeds", {
     )
 
     res <- GTFShift::rt_extend_prioritisation(
-        lanes_sf, rt_points, metric_crs = 3857
+        lanes_sf, rt_points,
+        metric_crs = 3857
     )
     expect_s3_class(res, "sf")
     expect_contains(
@@ -104,7 +105,8 @@ test_that("rt_extend_prioritisation computes speed_p15 and speed_p85 with NA", {
     )
 
     res <- GTFShift::rt_extend_prioritisation(
-        lanes_sf, rt_points, metric_crs = 3763
+        lanes_sf, rt_points,
+        metric_crs = 3763
     )
 
     # w1 percentiles: 15% is 23.5, 25% is 32.5, 75% is 77.5, 85% is 86.5
@@ -184,7 +186,8 @@ test_that("rt_extend_prioritisation stops when missing way_osm_id column", {
 
     expect_error(
         GTFShift::rt_extend_prioritisation(
-            invalid_lanes, rt_points, metric_crs = 3857
+            invalid_lanes, rt_points,
+            metric_crs = 3857
         ),
         "lane_prioritisation is missing required columns: way_osm_id"
     )
@@ -208,7 +211,8 @@ test_that("rt_extend_prioritisation stops when missing speed column", {
 
     expect_error(
         GTFShift::rt_extend_prioritisation(
-            lanes_sf, invalid_rt, metric_crs = 3857
+            lanes_sf, invalid_rt,
+            metric_crs = 3857
         ),
         "rt_collection is missing required columns: speed"
     )
@@ -232,7 +236,8 @@ test_that("rt_extend_prioritisation stops when metric_crs is invalid", {
 
     expect_error(
         GTFShift::rt_extend_prioritisation(
-            lanes_sf, rt_points, metric_crs = NA
+            lanes_sf, rt_points,
+            metric_crs = NA
         )
     )
     expect_error(

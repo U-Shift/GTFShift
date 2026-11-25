@@ -9,7 +9,8 @@ test_that(
   "prioritise_lanes analyzes lane prioritisation with mocked dependencies",
   {
     sample_file <- system.file(
-      "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+      "extdata/samples", "gtfs_tcb_sample.zip",
+      package = "GTFShift"
     )
     gtfs <- GTFShift::load_feed(sample_file)
 
@@ -77,7 +78,8 @@ test_that(
   "prioritise_lanes retains OSM attributes when keep_osm_attributes = TRUE",
   {
     sample_file <- system.file(
-      "extdata/samples", "gtfs_tcb_sample.zip", package = "GTFShift"
+      "extdata/samples", "gtfs_tcb_sample.zip",
+      package = "GTFShift"
     )
     gtfs <- GTFShift::load_feed(sample_file)
 
@@ -105,7 +107,8 @@ test_that(
       .package = "GTFShift",
       code = {
         res <- GTFShift::prioritise_lanes(
-          gtfs, q = NA, date = ref_date, keep_osm_attributes = TRUE
+          gtfs,
+          q = NA, date = ref_date, keep_osm_attributes = TRUE
         )
         expect_s3_class(res, "sf")
         expect_contains(

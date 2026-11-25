@@ -98,7 +98,8 @@
 #' # Get OSM route geometries (MULTILINESTRING)
 #' osm_routes <- sf::st_read(
 #'   system.file(
-#'     "extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"
+#'     "extdata/samples", "osm_routes_tcb.gpkg",
+#'     package = "GTFShift"
 #'   ),
 #'   quiet = TRUE
 #' ) |> dplyr::sample_n(1)
@@ -181,9 +182,13 @@ multiline_to_sorted_linestring <- function(
       reference_crs = st_crs(linestrings),
       arg_name = "points"
     )
-    start_point <- points_df |> slice(1) |> pull(.data$geometry)
+    start_point <- points_df |>
+      slice(1) |>
+      pull(.data$geometry)
     if (length(points) > 1) {
-      second_point <- points_df |> slice(2) |> pull(.data$geometry)
+      second_point <- points_df |>
+        slice(2) |>
+        pull(.data$geometry)
     }
     # Mark the first point as visited
     points_df$visited[1] <- TRUE
@@ -288,7 +293,8 @@ multiline_to_sorted_linestring <- function(
     # Exclude segments with identical geometry to current_line
     same_as_current <- as.logical(
       sf::st_equals(
-        remaining_lines$geometry, current_line$geometry, sparse = FALSE
+        remaining_lines$geometry, current_line$geometry,
+        sparse = FALSE
       )[, 1]
     )
     if (any(same_as_current)) {
@@ -296,7 +302,7 @@ multiline_to_sorted_linestring <- function(
       distance_to_end[same_as_current] <- Inf
     }
     if (all(is.infinite(distance_to_start)) &&
-        all(is.infinite(distance_to_end))) {
+      all(is.infinite(distance_to_end))) {
       break
     }
 
@@ -325,8 +331,7 @@ multiline_to_sorted_linestring <- function(
       )
       min_geom_next <- min(candidate_df$geometry_to_next)
       candidate_df <- candidate_df[
-        abs(candidate_df$geometry_to_next - min_geom_next) <= fp_tol,
-        ,
+        abs(candidate_df$geometry_to_next - min_geom_next) <= fp_tol, ,
         drop = FALSE
       ]
     }
@@ -343,8 +348,7 @@ multiline_to_sorted_linestring <- function(
       )
       min_start_last <- min(candidate_df$start_to_last_point)
       candidate_df <- candidate_df[
-        abs(candidate_df$start_to_last_point - min_start_last) <= fp_tol,
-        ,
+        abs(candidate_df$start_to_last_point - min_start_last) <= fp_tol, ,
         drop = FALSE
       ]
     }
@@ -378,7 +382,9 @@ multiline_to_sorted_linestring <- function(
       # Mark consecutive next points as visited while current_line stays at
       # least as close as any remaining line for the next unvisited point
       repeat {
-        next_unvisited <- points_df |> filter(!.data$visited) |> slice(1)
+        next_unvisited <- points_df |>
+          filter(!.data$visited) |>
+          slice(1)
         if (nrow(next_unvisited) == 0) {
           break
         }
