@@ -32,7 +32,7 @@
 #' This is particularly useful if the GTFS shapes do not share the same
 #' geometry. For instance, if the edges of the lines do not overlap or do not
 #' follow the same route-over-the-road – which is very common, even besides
-#' \href{https://gtfs.org/documentation/schedule/schedule-best-practices/#shapestxt}{GTFS recommendation} % # nolint
+#' \href{https://gtfs.org/documentation/schedule/schedule-best-practices/#shapestxt}{GTFS recommendation}
 #' – geometries might not be aggregated correctly, causing inconsistent results.
 #' By relying on a common road network, such as OSM, it is possible to overcome
 #' this issue and aggregate the bus routes correctly.
@@ -40,7 +40,7 @@
 #' For a detailed example, see the \code{vignette("analyse")}.
 #'
 #' Adapted from
-#' \href{https://web.archive.org/web/20201223060409/https://github.com/Bondify/GTFS_in_R/}{github.com/Bondify/GTFS_in_R}. % # nolint
+#' \href{https://web.archive.org/web/20201223060409/https://github.com/Bondify/GTFS_in_R/}{github.com/Bondify/GTFS_in_R}.
 #'
 #' @returns sf data.frame. Hourly route frequencies, with the following columns
 #'   (the first three are only present if \code{overline=FALSE}):

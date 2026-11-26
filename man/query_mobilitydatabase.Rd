@@ -58,7 +58,7 @@ API, allowing to get a list of GTFS feeds documented at this platform.
 To use it, an access or a refresh token must be provided.
 It can be obtained for free at Mobility Database website.\cr\cr
 For more details on the parameters, refer to
-\url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr \% # nolint
+\url{https://mobilitydata.github.io/mobility-feed-api/SwaggerUI/index.html#/feeds/getGtfsFeeds}.\cr\cr
 Some useful columns of the returned data.frame (refer to the API
 documentation for a full list) are:
 \describe{

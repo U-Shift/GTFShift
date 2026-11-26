@@ -48,7 +48,7 @@ This method was adapted from
 \href{https://uscuni.org/neatnet/intro.html}{uscuni.org/neatnet} by
 \href{https://github.com/miguelrelvaspires}{Miguel Relvas Pires} in the scope
 of his
-\href{https://scholar.tecnico.ulisboa.pt/records/DhKWeFU5YLpMDcOhQbKR4f7ul05HCQnZr7ND}{master's thesis}. \% # nolint
+\href{https://scholar.tecnico.ulisboa.pt/records/DhKWeFU5YLpMDcOhQbKR4f7ul05HCQnZr7ND}{master's thesis}.
 The full code (Python) of his work is openly available at
 \href{https://github.com/U-Shift/lp_streets}{GitHub}.
 }
