@@ -14,15 +14,15 @@ test_that("validate_metric_crs handles NULL, valid CRS inputs, and invalid input
   # Valid integer, authority:code string, and crs object
   crs_int <- validate_metric_crs(3857)
   expect_s3_class(crs_int, "crs")
-  expect_equal(crs_int, st_crs(3857))
+  expect_identical(crs_int, st_crs(3857))
 
   crs_str <- validate_metric_crs("EPSG:3763")
   expect_s3_class(crs_str, "crs")
-  expect_equal(crs_str, st_crs(3763))
+  expect_identical(crs_str, st_crs(3763))
 
   crs_obj <- validate_metric_crs(st_crs(4326))
   expect_s3_class(crs_obj, "crs")
-  expect_equal(crs_obj, st_crs(4326))
+  expect_identical(crs_obj, st_crs(4326))
 
   # Multivariate input (length != 1)
   expect_error(
@@ -70,13 +70,13 @@ test_that("preprocess_spatial_crs validates classes, rejects PROJ4 CRS, and tran
   # 3. Transformation to metric_crs preserves sf class and attributes
   pt_sf_3857 <- preprocess_spatial_crs(pt_sf_4326, metric_crs = 3857, arg_name = "pt_sf")
   expect_s3_class(pt_sf_3857, "sf")
-  expect_equal(st_crs(pt_sf_3857), st_crs(3857))
-  expect_equal(pt_sf_3857$id, "p1")
-  expect_equal(pt_sf_3857$extra, 42)
+  expect_identical(st_crs(pt_sf_3857), st_crs(3857))
+  expect_identical(pt_sf_3857$id, "p1")
+  expect_identical(pt_sf_3857$extra, 42)
 
   # 4. Already in metric_crs: returns unchanged without re-transforming
   pt_sf_same <- preprocess_spatial_crs(pt_sf_3857, metric_crs = 3857, arg_name = "pt_sf")
-  expect_equal(st_crs(pt_sf_same), st_crs(3857))
+  expect_identical(st_crs(pt_sf_same), st_crs(3857))
 
   # 5. Missing CRS (NA_crs_) when metric_crs is provided:
   pt_na_crs <- st_sfc(st_point(c(0, 0)), crs = NA_crs_)
@@ -106,6 +106,6 @@ test_that("preprocess_spatial_crs validates classes, rejects PROJ4 CRS, and tran
     reference_crs = st_crs(4326),
     arg_name = "pt_sf"
   )
-  expect_equal(st_crs(res_ref), st_crs(4326))
-  expect_equal(res_ref$id, "p1")
+  expect_identical(st_crs(res_ref), st_crs(4326))
+  expect_identical(res_ref$id, "p1")
 })

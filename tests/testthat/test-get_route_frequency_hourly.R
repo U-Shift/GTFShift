@@ -23,8 +23,8 @@ test_that("get_route_frequency_hourly calculates route frequencies", {
       "route_id", "route_short_name", "shape_id"
     )
   )
-  expect_true(is.numeric(res$frequency))
-  expect_true(is.numeric(res$hour))
+  expect_type(res$frequency, "integer")
+  expect_type(res$hour, "integer")
   expect_s3_class(sf::st_geometry(res), "sfc")
 })
 

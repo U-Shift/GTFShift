@@ -53,7 +53,7 @@ test_that(
           c("way_osm_id", "hour", "frequency", "geometry", "routes", "shapes")
         )
         expect_type(res$way_osm_id, "character")
-        expect_true(is.numeric(res$frequency))
+        expect_type(res$frequency, "integer")
         expect_type(res$routes, "list")
         expect_type(res$shapes, "list")
         expect_s3_class(sf::st_geometry(res), "sfc")

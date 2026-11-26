@@ -20,8 +20,8 @@ test_that("get_stop_frequency_hourly calculates stop departures per hour", {
   expect_identical(ncol(res), 4L)
   expect_contains(names(res), c("stop_id", "hour", "frequency", "geometry"))
   expect_type(res$stop_id, "character")
-  expect_true(is.numeric(res$hour))
-  expect_true(is.numeric(res$frequency))
+  expect_type(res$hour, "integer")
+  expect_type(res$frequency, "integer")
   expect_s3_class(sf::st_geometry(res), "sfc_POINT")
 
   # Validate frequency calculation for a selected stop against stop_times
