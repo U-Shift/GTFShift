@@ -7,15 +7,7 @@
 #'   stored at location. The file is overwritten if it already exists.
 #' @param create_transfers Boolean (Default FALSE). When true, generates
 #'   transfers table, aggregating close stops, even if from different GTFS.
-#' @param transfer_distance Integer (Default 300). Upper straight-line distance
-#'   limit in meters for transfers.
-#' @param transfer_time Integer (Default 120). Minimum time in seconds for
-#'   transfers; all values below this will be replaced with this value,
-#'   particularly all those defining in-place transfers where stop longitudes
-#'   and latitudes remain identical.
-#' @param transfer_street_routing Boolean (Default FALSE). If TRUE, transfer
-#'   times are calculated by routing throughout the underlying street network
-#'   (downloaded automatically).
+#' @inheritParams load_feed
 #'
 #' @details
 #' Aggregates multiple feeds using \code{gtfstools::merge_gtfs()}.

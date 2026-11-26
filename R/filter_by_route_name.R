@@ -1,6 +1,6 @@
 #' Filter GTFS feed by route name
 #'
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams get_route_frequency_hourly
 #' @param values String[]. List of the route names to filter the feed.
 #' @param short_name Boolean. If TRUE, query for \code{route_short_name},
 #'   otherwise, \code{route_long_name} is considered.

@@ -2,9 +2,7 @@
 #'
 #' For each stop, returns the number of departures aggregated per hour.
 #'
-#' @param gtfs tidygtfs. GTFS feed.
-#' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
-#'   Reference date to consider when analyzing the GTFS file.
+#' @inheritParams get_route_frequency_hourly
 #'
 #' @details
 #' This method analyses the GTFS feed for a representative day, generating for

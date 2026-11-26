@@ -2,7 +2,7 @@
 #'
 #' Get total extension of GTFS feed routes
 #'
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams get_route_frequency_hourly
 #' @param route_identifier String. (Default \code{"route_id"}). Case-sensitive
 #'   \code{routes.txt} attribute that identifies routes. Accepted values:
 #'   \code{"route_id"}, \code{"route_short_name"}, \code{"route_long_name"}.
@@ -11,8 +11,6 @@
 #'   considered.
 #' @param unified Boolean (Default \code{FALSE}). If TRUE, overlapping route
 #'   segments are only counted once in the total extension.
-#' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
-#'   Reference date to consider when analyzing the GTFS file.
 #' @param use_osm_routes osmdata::opq (Default NA). If overpass query for
 #'   transit network is defined, analysis is performed considering OSM route
 #'   geometry, using \code{GTFShift::osm_shapes_to_routes}.

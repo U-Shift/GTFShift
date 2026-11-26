@@ -2,15 +2,9 @@
 #'
 #'
 #' @param gtfs_rt_url String. URL of the Protocol Buffers GTFS-RT feed.
-#' @param destination_file String. File to save the downloaded GTFS-RT data.
-#'   Content is appended in each iteration.
 #' @param fields_collect Character vector. Fields to extract from each entity in
 #'   the feed.
-#' @param scrape_interval Integer (Default 60). Interval in seconds between each
-#'   download. Negative to run only once.
-#' @param log_file String (Optional). Path to a log file to save download logs.
-#' @param headers Named list or character vector (Optional). Custom HTTP headers
-#'   for credentials when accessing the GTFS-RT feed URL.
+#' @inheritParams rt_collect_json
 #'
 #' @details
 #' Downloads GTFS-RT data from the specified URL at regular intervals and saves

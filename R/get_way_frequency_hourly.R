@@ -3,11 +3,9 @@
 #' For each OSM way with GTFS service, returns the number of departures
 #' aggregated per hour and direction.
 #'
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams get_route_frequency_hourly
 #' @param q osmdata::opq. Overpass query for transit network, to obtain OSM
 #'   route ways, using \code{GTFShift::osm_shapes_to_routes()}.
-#' @param date Date (Default \code{GTFShift::calendar_nextBusinessWednesday()}).
-#'   Reference date to consider when analyzing the GTFS file.
 #' @param keep_osm_attributes Boolean (Default FALSE). Whether to keep all OSM
 #'   way attributes in the output \code{sf} object.
 #' @param osm_file character (Optional). Location of OSM extract file with

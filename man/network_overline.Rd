@@ -56,8 +56,9 @@ finds, for each network segment, the overlapping lines and aggregates their
 \donttest{
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-  "gtfs_tcb_sample.zip", package = "GTFShift")
-)
+  "gtfs_tcb_sample.zip",
+  package = "GTFShift"
+))
 gtfs <- GTFShift::filter_by_route_name(gtfs, c("4", "1"))
 
 # Load OSM network to serve as target network
@@ -73,8 +74,8 @@ frequency_analysis <- GTFShift::get_route_frequency_hourly(
   gtfs,
   date = gtfs$calendar$start_date[1]
 ) |>
-dplyr::group_by(shape_id) |>
-dplyr::summarize(frequency = max(frequency))
+  dplyr::group_by(shape_id) |>
+  dplyr::summarize(frequency = max(frequency))
 
 head(frequency_analysis)
 

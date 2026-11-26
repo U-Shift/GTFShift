@@ -1,6 +1,6 @@
 #' Filter GTFS feed by agency
 #'
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams get_route_frequency_hourly
 #' @param id Integer or String (Optional when name). Case-sensitive ID of the agency.
 #' @param name String (Optional when id). Case-sensitive name of the agency.
 #'

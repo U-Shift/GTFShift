@@ -73,8 +73,9 @@ ignored.
 \dontshow{if (nzchar(Sys.which("osmium"))) withAutoprint(\{ # examplesIf}
 # Subset GTFS for one route only, for demo purposes
 gtfs <- GTFShift::load_feed(system.file("extdata/samples",
-  "gtfs_tcb_sample.zip", package = "GTFShift")
-)
+  "gtfs_tcb_sample.zip",
+  package = "GTFShift"
+))
 gtfs <- GTFShift::filter_by_route_name(gtfs, "4")
 
 # Build query and prepare osm extract (possible to use API as alternative)

@@ -1,6 +1,6 @@
 #' Build shapes from GTFS stops data
 #'
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams get_route_frequency_hourly
 #'
 #' @details
 #' The function builds the shapes.txt file from the stop_times.txt and stops.txt

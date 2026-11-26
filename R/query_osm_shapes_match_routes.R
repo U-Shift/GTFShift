@@ -1,6 +1,6 @@
 #' Get OSM routes that match shapes, based on geometrical match
 #'
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams osm_shapes_to_routes
 #' @param q osmdata::opq. Overpass query for transit network
 #' @param geometry Boolean (Default TRUE). If TRUE, returns sf object with
 #'   geometry, otherwise, a simple data.frame.
@@ -16,18 +16,12 @@
 #'   ignoring case).
 #' @param log_file String (Optional). If provided, will log warnings to this
 #'   file, in addition to the console.
-#' @param osm_file character (Optional). Location of OSM extract file with
-#'   \code{osm.pbf} format. Refer to \code{osmextract::oe_download()} for more
-#'   details. If not provided OSM Overpass API is called through
-#'   \code{osmdata::osmdata_sf()}.
 #' @param num_cores Integer (Default 1). Number of cores to use for parallel
 #'   computation. Only supported on Unix-like systems (Linux, macOS).
 #' @param osm_stop_order_relaxed Boolean (Default FALSE). If TRUE, OSM routes
 #'   with entry/exit stops not respecting the right order will still be matched
 #'   (this may indicate OSM data integrity problems). If FALSE, these routes
 #'   will be ignored.
-#' @param osm_route_type character (Default "bus"). OSM route type. Used to
-#'   query OSM network (e.g., 'bus', 'train').
 #' @param metric_crs Integer or character (Default NULL). Optional projected CRS
 #'   used to compute shapes and routes lengths and stop-to-stop distances. If
 #'   NULL, spherical geometry (s2) is used by default.

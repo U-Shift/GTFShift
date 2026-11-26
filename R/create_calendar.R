@@ -1,6 +1,6 @@
 #' Create calendar.txt from calendar_dates.txt
 #'
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams get_route_frequency_hourly
 #'
 #' @details
 #' When \code{calendar_dates.txt} declares all service dates,

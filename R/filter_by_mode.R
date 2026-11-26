@@ -1,6 +1,6 @@
 #' Filter GTFS feed by mode
 #'
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams get_route_frequency_hourly
 #' @param modes Integer[]. A list with the ids of modes to consider.
 #'
 #' @details

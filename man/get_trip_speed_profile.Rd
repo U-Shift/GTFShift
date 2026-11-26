@@ -135,7 +135,8 @@ rt_collection <- read.csv(rt_collect_file) |>
 
 osm_routes <- sf::st_read(
   system.file(
-    "extdata/samples", "osm_routes_tcb.gpkg", package = "GTFShift"
+    "extdata/samples", "osm_routes_tcb.gpkg",
+    package = "GTFShift"
   ),
   quiet = TRUE
 ) |>
@@ -155,7 +156,8 @@ head(profile)
 
 # Customize aggregation (e.g. by route and day)
 route_profile <- GTFShift::get_trip_speed_profile(
-  speed, by = c("route_id", "day")
+  speed,
+  by = c("route_id", "day")
 )
 head(route_profile)
 }

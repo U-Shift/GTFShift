@@ -2,7 +2,7 @@
 #'
 #' @param sf_shapes sf object associating \code{shape_id} with an sf object
 #'   (either LINESTRING or MULTILINESTRING).
-#' @param gtfs tidygtfs. GTFS feed.
+#' @inheritParams get_route_frequency_hourly
 #' @param metric_crs Integer or character (Default NULL). Optional projected CRS
 #'   used when computing distances (passed to
 #'   \code{multiline_to_sorted_linestring} and
