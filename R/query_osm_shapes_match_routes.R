@@ -169,9 +169,6 @@
 #'     )
 #' )
 #'
-#' @import osmdata
-#' @import sf
-#' @import dplyr
 #' @importFrom callr r_bg
 #' @importFrom utils head tail
 #' @importFrom xml2 read_xml xml_find_all xml_attr

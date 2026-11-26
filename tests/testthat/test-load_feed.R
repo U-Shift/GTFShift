@@ -119,8 +119,8 @@ test_that("clean empty stop_times", {
     create_transfers = TRUE
   )
   random_trip <- gtfs$trips |>
-    sample_n(1) |>
-    pull(trip_id)
+    dplyr::sample_n(1) |>
+    dplyr::pull(trip_id)
   gtfs$stop_times[random_trip == gtfs$stop_times$trip_id, ][1, ]$arrival_time <-
     NA
   location <- withr::local_tempfile(fileext = ".zip")

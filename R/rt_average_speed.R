@@ -150,9 +150,6 @@
 #' @seealso \code{GTFShift::project_points_along_geometry()}
 #' @seealso \code{GTFShift::multiline_to_sorted_linestring()}
 #'
-#' @import sf
-#' @import dplyr
-#' @import rlang
 #' @importFrom rlang .data
 #' @srrstats {G1.1} Documents that this function is the first implementation of a novel circular-route-aware linear referencing algorithm for estimating segment speeds along transit shapes.
 #' @srrstats {G1.3} Defines forward and circular distance increments and segment speeds mathematically in `@details`.

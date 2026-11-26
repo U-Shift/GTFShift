@@ -48,7 +48,6 @@
 #' head(feeds |> dplyr::select(id, provider, producer_url))
 #'
 #' @importFrom httr GET POST add_headers content http_error http_status
-#' @import dplyr
 #' @srrstats {G2.0} Validates that `bounding_filter_method` has length 1.
 #' @srrstats {G2.1} Validates character type of `bounding_filter_method`.
 #' @srrstats {G2.2} Prohibits multivariate `bounding_filter_method`.

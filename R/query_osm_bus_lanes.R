@@ -30,9 +30,6 @@
 #'
 #' head(bus_lanes |> dplyr::select(`osm:id`, name))
 #'
-#' @import osmdata
-#' @import sf
-#' @import dplyr
 #'
 #' @export
 osm_bus_lanes <- function(bbox, osm_file = NULL) {

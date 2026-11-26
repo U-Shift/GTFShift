@@ -114,8 +114,6 @@
 #' head(osm_routes)
 #' }
 #'
-#' @import dplyr
-#' @import sf
 #' @importFrom rlang .data
 #' @srrstats {G1.1} Documents that this function is the first implementation of a novel stop-guided greedy topological sorting and orientation algorithm for converting `MULTILINESTRING` geometries into continuous `LINESTRING` geometries.
 #' @srrstats {G1.3} Formulates the initialization, iterative candidate selection, tie-breaking, and verification steps mathematically in `@details`.

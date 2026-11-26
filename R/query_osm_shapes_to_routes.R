@@ -72,9 +72,6 @@
 #'
 #' nrow(shapes_osm_ways)
 #'
-#' @import osmdata
-#' @import sf
-#' @import dplyr
 #' @importFrom callr r_bg
 #' @importFrom rlang .data
 #'

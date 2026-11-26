@@ -76,10 +76,6 @@
 #' @seealso \code{GTFShift::osm_shapes_to_routes()}
 #' @seealso \code{stplanr::overline2()}
 #'
-#' @import tidytransit
-#' @import dplyr
-#' @import sf
-#' @import lubridate
 #' @importFrom tidyselect any_of
 #' @importFrom rlang .data
 #'

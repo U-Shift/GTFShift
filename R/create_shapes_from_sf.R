@@ -63,9 +63,7 @@
 #' head(shapes_txt)
 #' }
 #'
-#' @import sf
 #' @importFrom gtfstools convert_sf_to_shapes
-#' @import dplyr
 #' @importFrom rlang .data
 #'
 #' @seealso \code{gtfstools::convert_sf_to_shapes()}

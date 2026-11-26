@@ -69,8 +69,6 @@
 #'
 #' @seealso \code{stplanr::rnet_join()}
 #'
-#' @import sf
-#' @import dplyr
 #' @importFrom rlang .data
 #' @srrstats {G1.1} Documents how this function improves upon `stplanr::overline2()` by aggregating arbitrary route attributes onto a segmented target network using `stplanr::rnet_join()` and a customizable summary function `fun`.
 #' @srrstats {G2.0} Validates that `attr` is a single column name of length 1.

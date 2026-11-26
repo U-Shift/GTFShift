@@ -35,10 +35,6 @@
 #'
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #'
-#' @import sf
-#' @import lubridate
-#' @import tidytransit
-#' @import dplyr
 #' @importFrom rlang .data
 #'
 #' @export

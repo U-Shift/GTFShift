@@ -75,8 +75,6 @@
 #'     )
 #' )
 #'
-#' @import dplyr
-#' @import tidytransit
 #' @importFrom rlang .data
 #' @srrstats {G1.1} Documents that this function is the first implementation of a novel road-segment bus lane prioritisation algorithm combining GTFS schedules and OpenStreetMap lane topology.
 #' @srrstats {G2.3b} Uses `tolower()` and `ignore.case = TRUE` when matching OpenStreetMap `oneway` and `parking` tag values.

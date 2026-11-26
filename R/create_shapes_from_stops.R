@@ -41,7 +41,6 @@
 #'
 #' summary(gtfs_with_shapes)
 #'
-#' @import dplyr
 #' @importFrom rlang .data
 #'
 #' @export

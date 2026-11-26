@@ -60,8 +60,6 @@
 #'
 #' data.frame(metric = names(stats), value = unlist(stats, use.names = FALSE))
 #'
-#' @import dplyr
-#' @import sf
 #' @importFrom stats weighted.mean
 #' @importFrom rlang .data
 #' @srrstats {G2.1} Validates that `lane_prioritisation` is an `sf` object and `weight` is character.

@@ -66,10 +66,6 @@
 #' @seealso \code{GTFShift::calendar_nextBusinessWednesday()}
 #' @seealso \code{GTFShift::osm_shapes_to_routes()}
 #'
-#' @import tidytransit
-#' @import dplyr
-#' @import sf
-#' @import lubridate
 #' @importFrom tidyselect any_of
 #' @importFrom rlang .data
 #'

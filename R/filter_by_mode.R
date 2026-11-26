@@ -30,8 +30,6 @@
 #'
 #' summary(gtfs_bus)
 #'
-#' @import tidytransit
-#' @import dplyr
 #' @importFrom rlang .data
 #' @srrstats {G2.0} Validates that `modes` is a non-empty vector or list (`length(modes) > 0`).
 #' @srrstats {G2.0a} Documents that `modes` is a vector/list of integer mode IDs.

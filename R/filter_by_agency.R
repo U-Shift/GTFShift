@@ -31,8 +31,6 @@
 #'
 #' summary(gtfs_ttsl)
 #'
-#' @import tidytransit
-#' @import dplyr
 #' @importFrom rlang .data
 #'
 #' @export

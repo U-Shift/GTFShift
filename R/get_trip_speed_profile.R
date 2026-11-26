@@ -147,7 +147,6 @@
 #'
 #' @seealso \code{GTFShift::rt_average_speed()}
 #'
-#' @import dplyr
 #' @importFrom stats median sd var quantile IQR
 #' @importFrom rlang .data
 #' @srrstats {G1.1} Documents that this function is the first implementation of a novel transit speed profiling algorithm combining circular-route-aware commercial speed and terminal-layover-adjusted commercial speed (`commercial_speed_alt`).

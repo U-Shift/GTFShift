@@ -25,7 +25,6 @@
 #'   country_code = "HK"
 #' )
 #'
-#' @import lubridate
 #'
 #' @export
 calendar_nextBusinessWednesday <- function(
@@ -48,7 +47,7 @@ calendar_nextBusinessWednesday <- function(
     next_wed <- next_wed + 7  # Move to the next Wednesday
 
     # If we cross into a new year, update holidays
-    if (year(next_wed) != year) {
+    if (lubridate::year(next_wed) != year) {
       year <- lubridate::year(next_wed)
       holidays <- calendar_get_pt_holidays(year, country_code)
     }

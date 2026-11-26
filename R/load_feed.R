@@ -80,7 +80,6 @@
 #'
 #' file.exists(store_path)
 #'
-#' @import tidytransit
 #' @importFrom gtfstools remove_duplicates remove_unused_ids
 #' @srrstats {G1.1} Documents how this function improves upon existing R GTFS readers (`tidytransit::read_gtfs()`) by integrating automated integrity repairs (`gtfstools::remove_duplicates()`, `tidytransit::interpolate_stop_times()`, `gtfstools::remove_unused_ids()`, `create_shapes_from_stops()`, and `gtfsrouter::gtfs_transfer_table()`).
 #' @srrstats {G2.7} Accepts local or remote GTFS feeds and returns domain-standard `tidygtfs` tabular collections.

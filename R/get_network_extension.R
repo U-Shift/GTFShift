@@ -41,8 +41,6 @@
 #'
 #' @seealso \code{GTFShift::get_route_frequency_hourly()}
 #'
-#' @import dplyr
-#' @import sf
 #' @importFrom rlang .data
 #' @srrstats {G2.0} Validates that `route_identifier` has length 1.
 #' @srrstats {G2.1} Validates that `gtfs` inherits from `gtfs` and `route_identifier` is character.
