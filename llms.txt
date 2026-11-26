@@ -1,0 +1,231 @@
+# GTFShift
+
+**GTFShift** encompasses a complete bundle of methods to harmonize GTFS
+and OSM data, enabling the integration and exploration of different
+layers of transit data, starting with the planned operations (GTFS), but
+also the infrastructure topology (OSM) and real-time information
+(GTFS-RT).
+
+## Installation
+
+You can install the stable version of **GTFShift** from CRAN:
+
+``` r
+
+install.packages('GTFShift')
+```
+
+For the development version, fetch from GitHub:
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("U-Shift/GTFShift")
+```
+
+## Load the package
+
+``` r
+
+library(GTFShift)
+```
+
+## Get started
+
+For more details on the package and how to get started, please visit the
+[Get started](https://u-shift.github.io/GTFShift/articles/GTFShift.html)
+page.
+
+## Main use cases
+
+### Harmonize GTFS geometries with OSM data
+
+The lack of standardization on GTFS shape geometries hampers aggregated
+analysis of different feeds and the association of planned service
+information with other urban dimensions such as the infrastructure
+topology.
+
+To solve this problem, **GTFShift** provides a bundle of methods to
+harmonize GTFS shapes with OSM road network geometries. Refer to [Get
+OSM data for bus
+routes](https://u-shift.github.io/GTFShift/articles/osm.html#get-osm-data-for-bus-routes)
+and [Generate GTFS with OSM
+geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.html)
+for more details.
+
+![](reference/figures/geometry_harmonization_barreiro.png)
+
+> Example of GTFS original shapes (salmon) and harmonized GTFS shapes
+> with OSM data (blue) for TCB, Barreiro, Portugal
+
+### Bus Lane Prioritisation
+
+**GTFShift** emerged from the necessity to understand how to get an
+overview of where bus lanes should be prioritised for a given territory,
+using General Transit Feed Specification (GTFS) and OpenStreetMap (OSM)
+data.
+
+It provides a comprehensive bundle of methods that cover several
+dimensions of this problem, namely:
+
+- Frequency of buses (and trams) per hour and direction, at a peak hour;
+- Number of lanes in the same direction;
+- Existing traffic conditions;
+- Existing bus lanes in the area (from a network continuity
+  perspective).
+
+Together, these can be used to identify road segments where bus lanes
+should be implemented, enabling for a transparent and data-driven
+decision-making process, suitable to different contexts and criteria.
+
+![](reference/figures/prioritisation.png)
+
+> Example of bus lane prioritisation analysis for Lisbon city,
+> considering road segments with a minimum frequency of 10 buses/hour,
+> average speed below 9.7 km/h and more than 1 lane per direction.
+
+#### Dashboard
+
+**GTFShift** provides an interactive dashboard that allows users to
+explore and visualize results for real case studies, aiming to
+illustrate its potential and capabilities to a non-technical audience,
+while disseminating the outputs of these real world scenarios.
+
+Visit it at
+[ushift.pt/apps/gtfshift](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/).
+
+[![](reference/figures/web.png)](https://ushift.tecnico.ulisboa.pt/apps/gtfshift/)
+
+## Related packages
+
+- [`{tidytransit}`](https://github.com/r-transit/tidytransit)
+- [`{gtfstools}`](https://github.com/ipea/gtfstools/)
+- [`{gtfsrouter`}](https://github.com/UrbanAnalyst/gtfsrouter)
+- [`{GTFSwizard}`](https://github.com/nelsonquesado/GTFSwizard)
+
+## Acknowledgement
+
+**GTFShift** is developed and maintained by
+[U-Shift](https://ushift.tecnico.ulisboa.pt) urban mobility research
+group, part of [CERIS](https://ceris.pt/) research unit, at [Instituto
+Superior Técnico](https://tecnico.ulisboa.pt/pt/), Lisbon, Portugal.
+
+  
+
+![](reference/figures/logo_acknowledgement.png)
+
+# Package index
+
+## Get GTFS feeds
+
+- [`load_feed()`](https://u-shift.github.io/GTFShift/reference/load_feed.md)
+  : Read GTFS feed, fixing integrity errors
+- [`query_mobilitydatabase()`](https://u-shift.github.io/GTFShift/reference/query_mobilitydatabase.md)
+  : Query Mobility Database API for GTFS feeds
+
+## Prioritise for bus lane implementation
+
+- [`prioritise_lanes()`](https://u-shift.github.io/GTFShift/reference/prioritise_lanes.md)
+  : Prioritise road network lanes for bus lane implementation
+- [`rt_extend_prioritisation()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritisation.md)
+  : Extend prioritisation with GTFS-RT based speed metrics
+- [`get_prioritisation_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritisation_stats.md)
+  : Get prioritisation stats
+
+## Filter
+
+- [`filter_by_agency()`](https://u-shift.github.io/GTFShift/reference/filter_by_agency.md)
+  : Filter GTFS feed by agency
+- [`filter_by_modes()`](https://u-shift.github.io/GTFShift/reference/filter_by_modes.md)
+  : Filter GTFS feed by mode
+- [`filter_by_route_name()`](https://u-shift.github.io/GTFShift/reference/filter_by_route_name.md)
+  : Filter GTFS feed by route name
+
+## Analyse
+
+- [`get_network_extension()`](https://u-shift.github.io/GTFShift/reference/get_network_extension.md)
+  : Get network routes extension
+- [`get_prioritisation_stats()`](https://u-shift.github.io/GTFShift/reference/get_prioritisation_stats.md)
+  : Get prioritisation stats
+- [`get_route_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_route_frequency_hourly.md)
+  : Get aggregated frequency per hour for each bus route
+- [`get_stop_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_stop_frequency_hourly.md)
+  : Get aggregated frequency per hour for each bus stop
+- [`get_trip_speed_profile()`](https://u-shift.github.io/GTFShift/reference/get_trip_speed_profile.md)
+  : Get trip speed profile from GTFS-RT speed estimates
+- [`get_way_frequency_hourly()`](https://u-shift.github.io/GTFShift/reference/get_way_frequency_hourly.md)
+  : Get aggregated frequency per hour for each OSM way
+- [`network_overline()`](https://u-shift.github.io/GTFShift/reference/network_overline.md)
+  : Aggregate lines based on overlap with target network
+
+## Classify
+
+- [`classify_frequency_los()`](https://u-shift.github.io/GTFShift/reference/classify_frequency_los.md)
+  : Classify bus frequency level of service based on HCM
+
+## Manipulate
+
+- [`unify()`](https://u-shift.github.io/GTFShift/reference/unify.md) :
+  Merge multiple GTFS into a single aggregated file
+- [`create_calendar()`](https://u-shift.github.io/GTFShift/reference/create_calendar.md)
+  : Create calendar.txt from calendar_dates.txt
+- [`create_shapes_from_sf()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_sf.md)
+  : Build shapes from simple feature object
+- [`create_shapes_from_stops()`](https://u-shift.github.io/GTFShift/reference/create_shapes_from_stops.md)
+  : Build shapes from GTFS stops data
+
+## OpenStreetMap
+
+- [`osm_bus_lanes()`](https://u-shift.github.io/GTFShift/reference/osm_bus_lanes.md)
+  : Export designated bus lanes from OpenStreetMap
+- [`osm_centerlines()`](https://u-shift.github.io/GTFShift/reference/osm_centerlines.md)
+  : Get centerlines for OSM road network
+- [`osm_shapes_match_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_match_routes.md)
+  : Get OSM routes that match shapes, based on geometrical match
+- [`osm_shapes_to_routes()`](https://u-shift.github.io/GTFShift/reference/osm_shapes_to_routes.md)
+  : Get OSM routes geometry considering gtfs:shape_id match
+
+## Realtime
+
+- [`rt_average_speed()`](https://u-shift.github.io/GTFShift/reference/rt_average_speed.md)
+  : Estimate average speed for GTFS-RT trip updates
+- [`rt_collect_json()`](https://u-shift.github.io/GTFShift/reference/rt_collect_json.md)
+  : Collect GTFS-RT data from a JSON feed at regular intervals
+- [`rt_collect_protobuf()`](https://u-shift.github.io/GTFShift/reference/rt_collect_protobuf.md)
+  : Collect GTFS-RT data from a Protocol Buffers feed at regular
+  intervals
+- [`rt_extend_prioritisation()`](https://u-shift.github.io/GTFShift/reference/rt_extend_prioritisation.md)
+  : Extend prioritisation with GTFS-RT based speed metrics
+
+## Utils
+
+- [`calendar_nextBusinessWednesday()`](https://u-shift.github.io/GTFShift/reference/calendar_nextBusinessWednesday.md)
+  : Get next business Wednesday
+- [`multiline_to_sorted_linestring()`](https://u-shift.github.io/GTFShift/reference/multiline_to_sorted_linestring.md)
+  : Convert a MULTILINESTRING to a sorted LINESTRING
+- [`project_points_along_geometry()`](https://u-shift.github.io/GTFShift/reference/project_points_along_geometry.md)
+  : Project points onto a linear geometry
+
+# Articles
+
+### Articles
+
+- [Prioritise bus lane
+  implementation](https://u-shift.github.io/GTFShift/articles/prioritise.md):
+- [1. Getting transit
+  data](https://u-shift.github.io/GTFShift/articles/download.md):
+- [2. Filter GTFS
+  feeds](https://u-shift.github.io/GTFShift/articles/filter.md):
+- [3. Aggregate GTFS
+  feeds](https://u-shift.github.io/GTFShift/articles/unify.md):
+- [4. Analyse GTFS
+  feeds](https://u-shift.github.io/GTFShift/articles/analyse.md):
+- [5. Classify transit
+  data](https://u-shift.github.io/GTFShift/articles/classify.md):
+- [6. Get OSM data](https://u-shift.github.io/GTFShift/articles/osm.md):
+- [7. GTFS Real
+  Time](https://u-shift.github.io/GTFShift/articles/rt.md):
+- [Update OSM
+  data](https://u-shift.github.io/GTFShift/articles/osm_update.md):
+- [Generate GTFS with OSM
+  geometries](https://u-shift.github.io/GTFShift/articles/gtfs_from_osm.md):
