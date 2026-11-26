@@ -311,7 +311,9 @@ multiline_to_sorted_linestring <- function(
     # 1) If next_point is provided, pick candidate closest to next_point
     # 2) If still tied, pick the one whose start point is closest to last_point
     min_distance <- min(c(distance_to_start, distance_to_end))
-    candidate_start_idx <- which(abs(distance_to_start - min_distance) <= fp_tol)
+    candidate_start_idx <- which(
+      abs(distance_to_start - min_distance) <= fp_tol
+    )
     candidate_end_idx <- which(abs(distance_to_end - min_distance) <= fp_tol)
     candidate_df <- data.frame(
       idx = c(candidate_start_idx, candidate_end_idx),

@@ -76,7 +76,9 @@ test_that(
     state$captured_network_times <- NULL
 
     testthat::with_mocked_bindings(
-      gtfs_transfer_table = function(gtfs_transfers, d_limit, min_transfer_time, network_times, ...) {
+      gtfs_transfer_table = function(
+        gtfs_transfers, d_limit, min_transfer_time, network_times, ...
+      ) {
         state$transfer_table_called <- TRUE
         state$captured_d_limit <- d_limit
         state$captured_min_transfer_time <- min_transfer_time

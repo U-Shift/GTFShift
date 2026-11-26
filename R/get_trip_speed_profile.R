@@ -211,7 +211,9 @@ get_trip_speed_profile <- function(
   if (length(missing_cols) > 0) {
     stop("rt_speed is missing required column(s): ", toString(missing_cols))
   }
-  speed_units <- if (speed_col %in% colnames(rt_speed) && inherits(rt_speed[[speed_col]], "units")) {
+  has_speed_units <- speed_col %in% colnames(rt_speed) &&
+    inherits(rt_speed[[speed_col]], "units")
+  speed_units <- if (has_speed_units) {
     units(rt_speed[[speed_col]])
   } else {
     NULL

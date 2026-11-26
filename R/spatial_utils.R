@@ -20,10 +20,20 @@ validate_metric_crs <- function(metric_crs = NULL) {
     return(NULL)
   }
   if (!inherits(metric_crs, "crs") && length(metric_crs) != 1) {
-    stop("metric_crs should be a valid single CRS value (e.g., 3857 or 'EPSG:3857')")
+    stop(
+      "metric_crs should be a valid single CRS value ",
+      "(e.g., 3857 or 'EPSG:3857')"
+    )
   }
-  if (is.character(metric_crs) && !is.na(metric_crs) && grepl("^\\+", trimws(metric_crs))) {
-    stop("PROJ4-strings are not permitted for metric_crs; please use WKT2 or an authority:code CRS value (e.g., 3857 or 'EPSG:3857')")
+  is_proj4 <- is.character(metric_crs) &&
+    !is.na(metric_crs) &&
+    grepl("^\\+", trimws(metric_crs))
+  if (is_proj4) {
+    stop(
+      "PROJ4-strings are not permitted for metric_crs; ",
+      "please use WKT2 or an authority:code CRS value ",
+      "(e.g., 3857 or 'EPSG:3857')"
+    )
   }
   parsed_crs <- tryCatch(
     suppressWarnings(sf::st_crs(metric_crs)),
@@ -72,21 +82,33 @@ preprocess_spatial_crs <- function(
     stop(sprintf("%s must be an sf object or sfc geometry", arg_name))
   }
   x_crs <- sf::st_crs(x)
-  if (!is.na(x_crs) && !is.null(x_crs$input) && grepl("^\\+", trimws(x_crs$input))) {
-    stop(sprintf("PROJ4-strings are not permitted for %s CRS; please use WKT2 or an authority:code CRS representation.", arg_name))
+  has_proj4_input <- !is.na(x_crs) &&
+    !is.null(x_crs$input) &&
+    grepl("^\\+", trimws(x_crs$input))
+  if (has_proj4_input) {
+    stop(
+      "PROJ4-strings are not permitted for ",
+      arg_name,
+      " CRS; please use WKT2 or an authority:code CRS representation."
+    )
   }
   metric_crs <- validate_metric_crs(metric_crs)
   if (!is.null(metric_crs)) {
     if (is.na(x_crs)) {
       if (require_valid_crs) {
-        stop(sprintf("%s must have a valid CRS to use metric_crs", arg_name))
+        stop(arg_name, " must have a valid CRS to use metric_crs")
       }
       return(x)
     }
     if (x_crs != metric_crs) {
       x <- sf::st_transform(x, crs = metric_crs)
     }
-  } else if (!is.null(reference_crs) && !is.na(reference_crs) && !is.na(x_crs) && x_crs != reference_crs) {
+  } else if (
+    !is.null(reference_crs) &&
+      !is.na(reference_crs) &&
+      !is.na(x_crs) &&
+      x_crs != reference_crs
+  ) {
     x <- sf::st_transform(x, crs = reference_crs)
   }
   x

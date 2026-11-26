@@ -76,8 +76,15 @@ query_mobilitydatabase <- function(
       "must be provided as an argument."
     )
   }
-  if (!is.character(bounding_filter_method) || length(bounding_filter_method) != 1 || is.na(bounding_filter_method)) {
-    stop("bounding_filter_method must be one of: partially_enclosed, completely_enclosed, or disjoint.")
+  if (
+    !is.character(bounding_filter_method) ||
+      length(bounding_filter_method) != 1 ||
+      is.na(bounding_filter_method)
+  ) {
+    stop(
+      "bounding_filter_method must be one of: ",
+      "partially_enclosed, completely_enclosed, or disjoint."
+    )
   }
   bounding_filter_method <- match.arg(
     tolower(bounding_filter_method),

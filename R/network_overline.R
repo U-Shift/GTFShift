@@ -119,7 +119,11 @@ network_overline <- function(
   if (!is.character(attr) || length(attr) != 1 || !(attr %in% names(lines))) {
     stop("attr must be a single column name present in lines")
   }
-  attr_units <- if (inherits(lines[[attr]], "units")) units(lines[[attr]]) else NULL
+  attr_units <- if (inherits(lines[[attr]], "units")) {
+    units(lines[[attr]])
+  } else {
+    NULL
+  }
   original_crs <- st_crs(target_network)
   metric_crs <- validate_metric_crs(metric_crs)
   target_network <- preprocess_spatial_crs(

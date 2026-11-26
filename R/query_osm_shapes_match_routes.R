@@ -216,7 +216,10 @@ osm_shapes_match_routes <- function(
   }
   if (!is.character(gtfs_match) || length(gtfs_match) != 1 ||
     !(gtfs_match %in% c("route_id", "route_short_name", "route_long_name"))) {
-    stop("gtfs_match should be one of: route_id, route_short_name or route_long_name")
+    stop(
+      "gtfs_match should be one of: ",
+      "route_id, route_short_name or route_long_name"
+    )
   }
   if (!is.character(osm_match) || length(osm_match) != 1 ||
     !(osm_match %in% c("ref", "name", "gtfs:route_id"))) {

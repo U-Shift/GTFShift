@@ -55,7 +55,11 @@ classify_frequency_los <- function(frequencies, frequency_col = "frequency") {
   if (!is.data.frame(frequencies)) {
     stop("frequencies must be a data.frame or sf object")
   }
-  if (!is.character(frequency_col) || length(frequency_col) != 1 || !(frequency_col %in% colnames(frequencies))) {
+  if (
+    !is.character(frequency_col) ||
+      length(frequency_col) != 1 ||
+      !(frequency_col %in% colnames(frequencies))
+  ) {
     stop("frequency_col must be a single column name present in frequencies")
   }
 
